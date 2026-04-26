@@ -6,18 +6,18 @@
   <title>Área PRO</title>
   <style>
     :root {
-      --bg: #050505;
-      --panel: rgba(25, 25, 25, 0.65);
-      --line: rgba(255, 255, 255, 0.08);
-      --text: #f2f2f2;
-      --muted: rgba(255, 255, 255, 0.65);
-      --danger: #ff6b6b;
-      --focus: #6ea8fe;
-      --accent-blue: #6ea8fe;
-      --accent-green: #7ddf8b;
-      --accent-purple: #b68cff;
-      --accent-orange: #ffb26b;
-      --frame-blur: 34px;
+      --bg: #0f1115;
+      --panel: rgba(34, 37, 43, 0.88);
+      --line: rgba(255, 255, 255, 0.09);
+      --text: #f3f4f7;
+      --muted: rgba(235, 238, 245, 0.66);
+      --danger: #ff7575;
+      --focus: #8fb4ff;
+      --accent-blue: #8fb4ff;
+      --accent-green: #8fd8b6;
+      --accent-purple: #bba8ff;
+      --accent-orange: #ffc58f;
+      --frame-blur: 20px;
     }
 
     * { box-sizing: border-box; }
@@ -25,10 +25,13 @@
     body {
       margin: 0;
       font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      font-size: 15px;
+      line-height: 1.45;
       color: var(--text);
+      text-transform: none;
       background:
-        radial-gradient(circle at top left, rgba(255, 255, 255, 0.12), transparent 25%),
-        radial-gradient(circle at bottom right, rgba(255, 255, 255, 0.08), transparent 25%),
+        radial-gradient(circle at top left, rgba(152, 166, 188, 0.16), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(126, 136, 156, 0.14), transparent 30%),
         var(--bg);
       min-height: 100vh;
       position: relative;
@@ -135,14 +138,13 @@
 
     .container {
       display: grid;
-      grid-template-columns: minmax(260px, 400px) 1fr;
+      grid-template-columns: 320px 1fr;
       min-height: 100vh;
     }
 
     .app-shell {
       min-height: 100vh;
-      display: grid;
-      grid-template-rows: auto 1fr;
+      display: block;
     }
 
     .app-header {
@@ -153,17 +155,17 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      padding: 12px 18px;
-      background: rgba(10, 10, 10, 0.72);
+      padding: 14px 22px;
+      background: rgba(20, 22, 27, 0.86);
       border-bottom: 1px solid var(--line);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
     }
 
     .brand {
-      font-size: 15px;
+      font-size: 16px;
       font-weight: 700;
-      letter-spacing: 0.4px;
+      letter-spacing: 0.2px;
     }
 
     .top-menu {
@@ -172,49 +174,47 @@
       flex-wrap: wrap;
     }
 
+    input, textarea {
+      text-transform: none;
+    }
+
     .top-pill {
       border: 1px solid var(--line);
       border-radius: 999px;
-      padding: 6px 10px;
+      padding: 7px 12px;
       font-size: 12px;
-      background: rgba(255,255,255,.04);
+      background: rgba(255,255,255,.06);
       color: #fff;
     }
 
     .sidebar {
-      padding: 18px;
+      padding: 20px;
       border-right: 1px solid var(--line);
-      backdrop-filter: blur(40px) saturate(145%);
-      -webkit-backdrop-filter: blur(40px) saturate(145%);
-      resize: horizontal;
+      background: rgba(18, 20, 24, 0.76);
+      backdrop-filter: blur(14px) saturate(120%);
+      -webkit-backdrop-filter: blur(14px) saturate(120%);
       overflow: auto;
-      min-width: 240px;
-      max-width: 420px;
+      min-width: 0;
     }
 
     .widget {
-      margin-bottom: 18px;
-      padding: 14px;
+      margin-bottom: 16px;
+      padding: 16px;
       border: 1px solid var(--line);
-      border-radius: 20px;
-      background: rgba(24, 24, 24, 0.36);
-      backdrop-filter: blur(var(--frame-blur)) saturate(160%);
-      -webkit-backdrop-filter: blur(var(--frame-blur)) saturate(160%);
+      border-radius: 16px;
+      background: var(--panel);
+      backdrop-filter: blur(var(--frame-blur)) saturate(110%);
+      -webkit-backdrop-filter: blur(var(--frame-blur)) saturate(110%);
       position: relative;
       overflow: hidden;
-      box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.16),
-        0 8px 30px rgba(0, 0, 0, 0.35);
-      animation: fadeInUp .5s ease both;
-      transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+      animation: fadeInUp .35s ease both;
+      transition: border-color .2s ease, box-shadow .2s ease;
     }
 
     .widget:hover {
-      transform: translateY(-2px);
-      border-color: rgba(255,255,255,.2);
-      box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.2),
-        0 14px 30px rgba(0, 0, 0, 0.3);
+      border-color: rgba(255,255,255,.22);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.26);
     }
 
     .widget::before {
@@ -236,14 +236,10 @@
     .widget-habits,
     .widget-highlights { display: none; }
 
-    .panel-primary {
-      border-color: rgba(110, 168, 254, 0.35);
-      box-shadow: inset 0 0 0 1px rgba(110, 168, 254, 0.15);
-    }
-
+    .panel-primary,
     .panel-calendar {
-      border-color: rgba(125, 223, 139, 0.3);
-      box-shadow: inset 0 0 0 1px rgba(125, 223, 139, 0.12);
+      border-color: rgba(255, 255, 255, 0.16);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
     }
 
     .widget h3 {
@@ -290,24 +286,17 @@
     }
 
     .main {
-      padding: 25px;
+      padding: 28px 28px 44px;
       overflow: auto;
+      max-width: 1180px;
+      width: 100%;
+      margin: 0 auto;
     }
 
     .topbar {
       display: flex;
       gap: 12px;
-      margin-bottom: 20px;
-    }
-
-    .quote-box {
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: 12px;
-      background: rgba(255,255,255,.03);
-      margin-bottom: 12px;
-      font-size: 13px;
-      color: var(--muted);
+      margin-bottom: 16px;
     }
 
     .word-highlight {
@@ -342,20 +331,22 @@
     .category { margin-bottom: 28px; }
 
     .category h2 {
-      font-size: 14px;
+      font-size: 13px;
       margin-bottom: 10px;
-      opacity: 0.6;
+      opacity: 0.72;
+      letter-spacing: .04em;
+      text-transform: uppercase;
     }
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-      gap: 12px;
+      grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+      gap: 10px;
     }
 
     .btn {
-      height: 95px;
-      border-radius: 18px;
+      height: 88px;
+      border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -364,11 +355,12 @@
       font-size: 13px;
       text-decoration: none;
       color: white;
-      border: 1px solid var(--line);
-      backdrop-filter: blur(22px) saturate(150%);
-      -webkit-backdrop-filter: blur(22px) saturate(150%);
+      border: 1px solid rgba(255,255,255,.1);
+      background: rgba(62, 66, 74, 0.55);
+      backdrop-filter: blur(10px) saturate(105%);
+      -webkit-backdrop-filter: blur(10px) saturate(105%);
       cursor: pointer;
-      transition: transform 0.2s;
+      transition: transform 0.16s, background .16s, border-color .16s;
       position: relative;
       overflow: hidden;
       min-width: 110px;
@@ -387,8 +379,12 @@
       transition: opacity 0.2s;
     }
 
-    .btn:hover::after { opacity: 1; }
-    .btn:hover { transform: scale(1.04); }
+    .btn:hover::after { opacity: 0.35; }
+    .btn:hover {
+      transform: translateY(-1px);
+      background: rgba(78, 82, 92, 0.68);
+      border-color: rgba(255,255,255,.2);
+    }
 
     .delete {
       position: absolute;
@@ -419,9 +415,9 @@
       max-width: 100%;
     }
 
-    .estudos .btn { background: linear-gradient(135deg, #1a2a6c, #3a7bd5); }
-    .social .btn { background: linear-gradient(135deg, #ff416c, #ff4b2b); }
-    .outros .btn { background: linear-gradient(135deg, #11998e, #38ef7d); }
+    .estudos .btn,
+    .social .btn,
+    .outros .btn { background: rgba(62, 66, 74, 0.55); }
 
     .modal {
       position: fixed;
@@ -462,6 +458,11 @@
     .task-text.done {
       text-decoration: line-through;
       color: var(--muted);
+    }
+
+    .done-row {
+      background: rgba(125, 223, 139, 0.12) !important;
+      border-color: rgba(125, 223, 139, 0.35) !important;
     }
 
     .task-left {
@@ -529,8 +530,8 @@
       pointer-events: none;
       z-index: 0;
       background:
-        radial-gradient(circle at top left, rgba(255, 255, 255, 0.12), transparent 45%),
-        linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent 40%);
+        radial-gradient(circle at top left, rgba(120, 120, 120, 0.12), transparent 45%),
+        linear-gradient(180deg, rgba(120, 120, 120, 0.04), transparent 40%);
     }
 
     .shortcuts-area > * {
@@ -586,6 +587,22 @@
       display: flex;
       gap: 8px;
       margin-bottom: 8px;
+    }
+
+    .focus-progress {
+      width: 100%;
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.1);
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    .focus-progress-fill {
+      width: 100%;
+      height: 100%;
+      transition: width .25s ease, background .25s ease;
+      background: linear-gradient(90deg, #6ea8fe, #5ce1e6);
     }
 
     .weekly-goal {
@@ -644,23 +661,21 @@
 
     .panel {
       border: 1px solid var(--line);
-      border-radius: 20px;
-      background: rgba(24, 24, 24, 0.32);
-      padding: 14px;
+      border-radius: 16px;
+      background: var(--panel);
+      padding: 16px;
       backdrop-filter: blur(var(--frame-blur)) saturate(170%);
       -webkit-backdrop-filter: blur(var(--frame-blur)) saturate(170%);
       position: relative;
       overflow: hidden;
-      box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.14),
-        0 10px 34px rgba(0, 0, 0, 0.35);
-      animation: fadeInUp .6s ease both;
-      transition: transform .25s ease, border-color .25s ease;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.24);
+      animation: fadeInUp .4s ease both;
+      transition: border-color .2s ease, box-shadow .2s ease;
     }
 
     .panel:hover {
-      transform: translateY(-2px);
-      border-color: rgba(255,255,255,.18);
+      border-color: rgba(255,255,255,.2);
+      box-shadow: 0 12px 26px rgba(0, 0, 0, 0.28);
     }
 
     .panel::after {
@@ -670,8 +685,8 @@
       pointer-events: none;
       z-index: 0;
       background:
-        radial-gradient(circle at 12% 8%, rgba(255, 255, 255, 0.1), transparent 40%),
-        linear-gradient(160deg, rgba(255, 255, 255, 0.04), transparent 50%);
+        radial-gradient(circle at 14% 10%, rgba(120, 126, 140, 0.12), transparent 44%),
+        linear-gradient(160deg, rgba(112, 118, 130, 0.05), transparent 52%);
     }
 
     .panel > * {
@@ -770,7 +785,7 @@
     .progress-fill {
       height: 100%;
       width: 0;
-      background: linear-gradient(90deg, #3a7bd5, #38ef7d);
+      background: linear-gradient(90deg, #8fb4ff, #9ac8b5);
       transition: width 0.2s;
     }
 
@@ -813,12 +828,17 @@
     }
 
     .day.today {
-      outline: 1px solid #3a7bd5;
+      outline: 1px solid #8fb4ff;
     }
 
     .day.selected {
-      background: rgba(58, 123, 213, 0.28);
-      border-color: rgba(58, 123, 213, 0.75);
+      background: rgba(143, 180, 255, 0.24);
+      border-color: rgba(143, 180, 255, 0.62);
+    }
+
+    .day.range-start {
+      border-color: rgba(255, 178, 107, 0.9);
+      box-shadow: inset 0 0 0 1px rgba(255, 178, 107, 0.6);
     }
 
     .day.has-event::after {
@@ -852,8 +872,8 @@
 
     .quick-fab {
       position: fixed;
-      right: 24px;
-      bottom: 24px;
+      right: 18px;
+      bottom: 18px;
       z-index: 20;
       display: grid;
       gap: 10px;
@@ -1005,6 +1025,20 @@
       display: none !important;
     }
 
+    .focus-mode .panel-primary {
+      border-color: rgba(255, 255, 255, 0.2);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+        0 0 16px rgba(0, 0, 0, 0.2);
+      background: rgba(24, 24, 24, 0.42);
+    }
+
+    .focus-ready {
+      background: linear-gradient(135deg, #4d8dff, #8c6dff) !important;
+      border-color: transparent !important;
+      box-shadow: 0 0 10px rgba(77,141,255,.28);
+    }
+
     .word-form {
       display: grid;
       grid-template-columns: 1fr;
@@ -1047,9 +1081,266 @@
       .sidebar {
         max-width: none;
         min-width: 0;
-        resize: none;
         border-right: 0;
         border-bottom: 1px solid var(--line);
+      }
+
+      .dashboard {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ===== redesign completo (ui v2) ===== */
+    :root {
+      --bg: #0b1020;
+      --panel: rgba(20, 26, 44, 0.78);
+      --line: rgba(160, 184, 255, 0.22);
+      --text: #eaf0ff;
+      --muted: rgba(225, 233, 255, 0.72);
+      --focus: #7cb1ff;
+      --frame-blur: 18px;
+    }
+
+    body {
+      background:
+        radial-gradient(1000px 460px at -8% -14%, rgba(106, 152, 255, 0.22), transparent 56%),
+        radial-gradient(760px 380px at 110% -8%, rgba(140, 114, 255, 0.18), transparent 54%),
+        linear-gradient(165deg, #070b17 0%, #0d1428 48%, #0b1120 100%);
+      color: var(--text);
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .app-shell {
+      max-width: 1500px;
+      margin: 0 auto;
+      padding: 18px;
+    }
+
+    .app-header {
+      position: sticky;
+      top: 14px;
+      margin-bottom: 16px;
+      border: 1px solid rgba(148, 171, 255, 0.28);
+      border-radius: 18px;
+      background: rgba(12, 18, 33, 0.72);
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.35);
+    }
+
+    .brand {
+      font-size: 17px;
+      letter-spacing: 0.02em;
+    }
+
+    .top-pill {
+      background: rgba(122, 157, 255, 0.14);
+      border-color: rgba(138, 164, 255, 0.3);
+      color: #dce8ff;
+    }
+
+    .container {
+      grid-template-columns: minmax(300px, 340px) 1fr;
+      gap: 16px;
+    }
+
+    .sidebar,
+    .main {
+      border: 1px solid rgba(150, 174, 255, 0.2);
+      border-radius: 20px;
+      background: rgba(11, 18, 34, 0.58);
+      box-shadow: 0 16px 38px rgba(0, 0, 0, 0.28);
+      backdrop-filter: blur(14px) saturate(130%);
+      -webkit-backdrop-filter: blur(14px) saturate(130%);
+    }
+
+    .main {
+      max-width: none;
+      margin: 0;
+      padding: 22px;
+    }
+
+    .sidebar {
+      padding: 16px;
+      border-right: 1px solid rgba(146, 170, 255, 0.16);
+    }
+
+    .widget,
+    .panel,
+    .shortcuts-area {
+      border: 1px solid rgba(152, 176, 255, 0.26);
+      border-radius: 16px;
+      background: linear-gradient(160deg, rgba(33, 43, 70, 0.72), rgba(17, 24, 42, 0.72));
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        0 10px 28px rgba(0, 0, 0, 0.24);
+      transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+    }
+
+    .widget:hover,
+    .panel:hover,
+    .shortcuts-area:hover {
+      transform: translateY(-2px);
+      border-color: rgba(173, 194, 255, 0.42);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        0 14px 28px rgba(0, 0, 0, 0.28);
+    }
+
+    .widget::before {
+      width: 5px;
+      opacity: 1;
+      border-radius: 12px;
+    }
+
+    .category h2 {
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      opacity: .82;
+      margin-bottom: 8px;
+    }
+
+    .grid {
+      grid-template-columns: repeat(auto-fill, minmax(128px, 1fr));
+      gap: 10px;
+    }
+
+    .btn {
+      min-height: 84px;
+      height: 84px;
+      border-radius: 14px;
+      border: 1px solid rgba(159, 183, 255, 0.28);
+      background:
+        radial-gradient(130px 70px at 20% 0%, rgba(154, 183, 255, 0.24), transparent 65%),
+        linear-gradient(170deg, rgba(62, 78, 120, 0.74), rgba(42, 55, 90, 0.74));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 10px 18px rgba(0,0,0,.24);
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px) scale(1.01);
+      border-color: rgba(184, 204, 255, 0.45);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.14), 0 14px 24px rgba(0,0,0,.3);
+    }
+
+    .btn-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.22);
+      background: rgba(10, 16, 30, .55);
+      padding: 3px;
+    }
+
+    .delete {
+      opacity: 0.9;
+      color: #e8eeff;
+    }
+
+    .topbar .search,
+    input,
+    select,
+    textarea {
+      border: 1px solid rgba(153, 177, 255, 0.28);
+      background: rgba(8, 14, 28, 0.72);
+      color: #edf2ff;
+      border-radius: 12px;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: rgba(222, 231, 255, 0.46);
+    }
+
+    .tiny-btn,
+    .modal-action,
+    .add,
+    .lock {
+      border: 1px solid rgba(156, 179, 255, 0.3);
+      background: linear-gradient(160deg, rgba(82, 112, 196, 0.34), rgba(47, 68, 120, 0.34));
+      color: #edf2ff;
+      border-radius: 12px;
+      transition: transform .16s ease, filter .16s ease, border-color .16s ease;
+    }
+
+    .tiny-btn:hover,
+    .modal-action:hover,
+    .add:hover,
+    .lock:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.06);
+      border-color: rgba(190, 209, 255, 0.45);
+    }
+
+    .progress-bar {
+      height: 10px;
+      background: rgba(165, 183, 238, 0.2);
+    }
+
+    .progress-fill {
+      background: linear-gradient(90deg, #75b0ff, #70e0ff 55%, #7ce1b6);
+      box-shadow: 0 0 12px rgba(117, 176, 255, 0.45);
+    }
+
+    .day {
+      border-radius: 12px;
+      border-color: rgba(150, 174, 255, 0.25);
+      background: rgba(24, 35, 62, 0.7);
+      transition: transform .14s ease, border-color .14s ease;
+    }
+
+    .day:hover {
+      transform: translateY(-1px);
+      border-color: rgba(190, 208, 255, 0.48);
+    }
+
+    .day.today {
+      outline: 1px solid #8ec0ff;
+      box-shadow: inset 0 0 0 1px rgba(142, 192, 255, 0.35);
+    }
+
+    .day.selected {
+      background: rgba(120, 176, 255, 0.38);
+      border-color: rgba(175, 205, 255, 0.72);
+    }
+
+    .event-item,
+    .daily-item,
+    .word-item,
+    .habit-item {
+      border-color: rgba(154, 178, 255, 0.24);
+      background: rgba(23, 32, 56, 0.64);
+      border-radius: 12px;
+    }
+
+    .quick-main {
+      width: 60px;
+      height: 60px;
+      border-radius: 16px;
+      border: 1px solid rgba(177, 197, 255, 0.35);
+      background:
+        radial-gradient(100% 100% at 30% 20%, rgba(123, 177, 255, 0.4), transparent 60%),
+        linear-gradient(170deg, rgba(74, 105, 188, 0.85), rgba(48, 66, 118, 0.9));
+      box-shadow: 0 14px 24px rgba(0, 0, 0, 0.35);
+    }
+
+    .quick-action {
+      border: 1px solid rgba(159, 183, 255, 0.3);
+      background: rgba(19, 29, 52, 0.9);
+      border-radius: 12px;
+    }
+
+    .overlay-blur {
+      background: rgba(3, 8, 18, 0.28);
+    }
+
+    @media (max-width: 1200px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        border-right: 1px solid rgba(146, 170, 255, 0.16);
       }
 
       .dashboard {
@@ -1065,14 +1356,6 @@
     <span></span>
   </div>
   <div class="app-shell">
-  <header class="app-header">
-    <div class="brand">Área PRO • Study Mode</div>
-    <nav class="top-menu">
-      <span class="top-pill">Dashboard</span>
-      <span class="top-pill">Revisão</span>
-      <span class="top-pill">Vocabulário</span>
-    </nav>
-  </header>
   <div class="container" id="app">
     <aside class="sidebar">
       <section class="widget widget-time"><h3>Hora</h3><div id="time" aria-live="polite"></div></section>
@@ -1127,7 +1410,6 @@
     </aside>
 
     <main class="main">
-      <div class="quote-box" id="quote-box"></div>
       <div class="word-highlight" id="word-highlight"></div>
       <div class="topbar">
         <input class="search" id="search" placeholder="Buscar... (/)" />
@@ -1157,6 +1439,7 @@
           <div class="focus-timer">
             <h3 style="margin-bottom:6px;">Foco (Pomodoro)</h3>
             <div class="focus-display" id="focus-display">25:00</div>
+            <div class="focus-progress"><div class="focus-progress-fill" id="focus-progress-fill"></div></div>
             <div class="focus-edit">
               <input id="focus-minutes" type="number" min="1" max="180" value="25" />
               <button id="focus-apply" type="button">Aplicar</button>
@@ -1267,6 +1550,8 @@
       habitsByDate: loadJSON(KEYS.HABITS, {}),
       words: loadJSON(KEYS.WORDS, []),
       wordIndex: Math.max(0, Number(localStorage.getItem(KEYS.WORD_INDEX) || 0)),
+      rangeStart: null,
+      customDateLabel: '',
       quickOpen: false,
       focusMode: localStorage.getItem(KEYS.FOCUS_MODE) === '1'
     };
@@ -1305,6 +1590,7 @@
       shortcutsArea: document.getElementById('shortcuts-area'),
       shortcutsEmpty: document.getElementById('shortcuts-empty'),
       focusDisplay: document.getElementById('focus-display'),
+      focusProgressFill: document.getElementById('focus-progress-fill'),
       focusMinutes: document.getElementById('focus-minutes'),
       focusApply: document.getElementById('focus-apply'),
       focusSessions: document.getElementById('focus-sessions'),
@@ -1324,7 +1610,6 @@
       qaImport: document.getElementById('qa-import'),
       qaClearDone: document.getElementById('qa-clear-done'),
       importFile: document.getElementById('import-file'),
-      quoteBox: document.getElementById('quote-box'),
       wordHighlight: document.getElementById('word-highlight'),
       wordInput: document.getElementById('word-input'),
       meaningInput: document.getElementById('meaning-input'),
@@ -1370,21 +1655,12 @@
       });
     }
 
-    const MOTIVATION_QUOTES = [
-      'Disciplina vence motivação quando a empolgação acaba.',
-      'Seu eu do futuro está contando com o estudo de hoje.',
-      'Constância pequena todo dia > intensidade rara.',
-      'Você não precisa ser perfeito, só consistente.',
-      'Cada sessão concluída é um voto na pessoa que você quer ser.',
-      'Estudar cansado ainda é melhor que não estudar.',
-      'Repetição inteligente transforma conteúdo em memória.',
-      'Quem revisa, domina. Quem só lê, esquece.'
-    ];
-
-    function renderDailyQuote() {
-      const daySeed = Math.floor(new Date().setHours(0, 0, 0, 0) / 86400000);
-      const quote = MOTIVATION_QUOTES[daySeed % MOTIVATION_QUOTES.length];
-      refs.quoteBox.textContent = `💬 Frase do dia: ${quote}`;
+    function diffDays(fromISO, toISO) {
+      const [y1, m1, d1] = fromISO.split('-').map(Number);
+      const [y2, m2, d2] = toISO.split('-').map(Number);
+      const a = Date.UTC(y1, m1 - 1, d1);
+      const b = Date.UTC(y2, m2 - 1, d2);
+      return Math.round((b - a) / 86400000);
     }
 
     function saveWords() {
@@ -1394,11 +1670,11 @@
 
     function renderWordHighlight() {
       if (!state.words.length) {
-        refs.wordHighlight.innerHTML = '<strong>Palavra do dia</strong><span class=\"muted\">Adicione palavras para começar.</span>';
+        refs.wordHighlight.innerHTML = '<strong>Palavra</strong><span class=\"muted\">Adicione palavras para começar.</span>';
         return;
       }
       const item = state.words[state.wordIndex % state.words.length];
-      refs.wordHighlight.innerHTML = `<strong>📘 Palavra do momento: ${item.word}</strong><div>${item.meaning}</div>`;
+      refs.wordHighlight.innerHTML = `<strong>📘 Palavra: ${item.word}</strong><div>${item.meaning}</div>`;
     }
 
     function renderWordList() {
@@ -1775,7 +2051,19 @@
     function renderFocusTimer() {
       refs.focusDisplay.textContent = formatDuration(state.focus.remaining);
       refs.focusStartPause.textContent = state.focus.running ? 'Pausar' : 'Iniciar';
+      refs.focusStartPause.classList.toggle('focus-ready', !state.focus.running);
       refs.focusSessions.textContent = String(state.focusSessions);
+      const total = Math.max(1, state.focusDuration * 60);
+      const ratio = Math.max(0, Math.min(1, state.focus.remaining / total));
+      refs.focusProgressFill.style.width = `${ratio * 100}%`;
+      const elapsed = 1 - ratio;
+      if (elapsed < 0.5) {
+        refs.focusProgressFill.style.background = 'linear-gradient(90deg,#6ea8fe,#5ce1e6)';
+      } else if (elapsed < 0.8) {
+        refs.focusProgressFill.style.background = 'linear-gradient(90deg,#5ce1e6,#7ddf8b)';
+      } else {
+        refs.focusProgressFill.style.background = 'linear-gradient(90deg,#ffb26b,#ff6b6b)';
+      }
     }
 
     function toggleFocusTimer() {
@@ -1859,6 +2147,7 @@
       refs.checklist.innerHTML = '';
       state.tasks.forEach((task, index) => {
         const row = document.createElement('div');
+        if (task.done) row.classList.add('done-row');
 
         const left = document.createElement('div');
         left.className = 'task-left';
@@ -1929,6 +2218,7 @@
         items.forEach((item) => {
           const row = document.createElement('div');
           row.className = 'daily-item';
+          if (item.done) row.classList.add('done-row');
 
           const left = document.createElement('div');
           left.className = 'daily-left';
@@ -1994,7 +2284,7 @@
     }
 
     function renderEvents() {
-      refs.selectedDateLabel.textContent = `Eventos em ${toHumanDate(state.selectedDate)}`;
+      refs.selectedDateLabel.textContent = state.customDateLabel || `Eventos em ${toHumanDate(state.selectedDate)}`;
       refs.eventList.innerHTML = '';
       const items = getEvents(state.selectedDate);
 
@@ -2088,9 +2378,35 @@
         if (date.getMonth() !== m) day.classList.add('other-month');
         if (iso === todayISO) day.classList.add('today');
         if (iso === state.selectedDate) day.classList.add('selected');
+        if (iso === state.rangeStart) day.classList.add('range-start');
         if (getEvents(iso).length) day.classList.add('has-event');
         day.textContent = String(date.getDate());
-        day.addEventListener('click', () => {
+        day.addEventListener('click', (e) => {
+          if (e.shiftKey) {
+            if (!state.rangeStart) {
+              state.rangeStart = iso;
+              state.customDateLabel = `Data inicial selecionada: ${toHumanDate(iso)}. Shift + clique em outra data para comparar.`;
+              renderEvents();
+              renderCalendar();
+              return;
+            }
+            const days = diffDays(state.rangeStart, iso);
+            const abs = Math.abs(days);
+            if (days > 0) {
+              state.customDateLabel = `De ${toHumanDate(state.rangeStart)} até ${toHumanDate(iso)} faltam ${abs} dias.`;
+            } else if (days < 0) {
+              state.customDateLabel = `De ${toHumanDate(state.rangeStart)} até ${toHumanDate(iso)} passaram ${abs} dias.`;
+            } else {
+              state.customDateLabel = `As duas datas são iguais (0 dias de diferença).`;
+            }
+            state.selectedDate = iso;
+            state.rangeStart = null;
+            renderCalendar();
+            renderEvents();
+            return;
+          }
+          state.customDateLabel = '';
+          state.rangeStart = null;
           state.selectedDate = iso;
           if (date.getMonth() !== m) {
             state.viewMonth = new Date(date.getFullYear(), date.getMonth(), 1);
@@ -2216,7 +2532,6 @@
     setFocusMode(state.focusMode);
     updateCalendarVisibility();
 
-    renderDailyQuote();
     renderWordList();
     renderWordHighlight();
     renderLinks();
