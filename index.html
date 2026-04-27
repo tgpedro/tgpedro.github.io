@@ -1085,6 +1085,8 @@
 
     let saveTimer = null;
     let isRemoteReady = false;
+    let realtimeChannel = null;
+    let lastRemoteSignature = '';
     let compareStartDate = null;
     let compareEndDate = null;
 
@@ -1132,14 +1134,34 @@
       localStorage.setItem(LOCAL_BACKUP_KEY, JSON.stringify(appState));
     }
 
-    async function loadAppData() {
+    function appSignature(data) {
+      return JSON.stringify(mergeDefaults(data));
+    }
+
+    function applyRemoteData(remoteData, options = {}) {
+      const nextState = mergeDefaults(remoteData);
+      const nextSignature = appSignature(nextState);
+      if (nextSignature === lastRemoteSignature && !options.force) return;
+
+      appState = nextState;
+      lastRemoteSignature = nextSignature;
+      backupLocal();
+
+      // Realtime sincroniza apenas dados salvos. O Pomodoro fica local para não bugar entre dispositivos.
+      renderAll();
+      renderNotes();
+      renderSubjects();
+      renderShortcuts();
+    }
+
+    async function loadAppData(options = {}) {
       if (!supabaseClient) {
         setSyncStatus('offline', 'local');
         appState = getLocalBackup();
         return;
       }
 
-      setSyncStatus('', 'conectando');
+      if (!options.silent) setSyncStatus('', 'conectando');
 
       const { data, error } = await supabaseClient
         .from('app_data')
@@ -1158,8 +1180,7 @@
         appState = getLocalBackup();
         await saveAppDataNow();
       } else {
-        appState = mergeDefaults(data.data);
-        backupLocal();
+        applyRemoteData(data.data, { force: !options.silent });
       }
 
       isRemoteReady = true;
@@ -1192,6 +1213,7 @@
       }
 
       isRemoteReady = true;
+      lastRemoteSignature = appSignature(appState);
       setSyncStatus('online', 'sincronizado');
     }
 
@@ -1206,25 +1228,31 @@
     });
 
     function setupRealtime() {
-      if (!supabaseClient || !isRemoteReady) return;
+      if (!supabaseClient || !isRemoteReady || realtimeChannel) return;
 
-      supabaseClient
+      realtimeChannel = supabaseClient
         .channel('app_data_changes')
         .on(
           'postgres_changes',
           { event: '*', schema: 'public', table: 'app_data', filter: `id=eq.${DATA_ID}` },
           (payload) => {
             if (!payload.new || !payload.new.data) return;
-            appState = mergeDefaults(payload.new.data);
-            backupLocal();
-            renderAll();
-            renderNotes();
-            renderSubjects();
-            renderShortcuts();
+            applyRemoteData(payload.new.data);
+            setSyncStatus('online', 'ao vivo');
           }
         )
-        .subscribe();
+        .subscribe((status) => {
+          if (status === 'SUBSCRIBED') setSyncStatus('online', 'ao vivo');
+          if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') setSyncStatus('offline', 'sem realtime');
+        });
     }
+
+    // Backup de sincronização: se o realtime do Supabase não estiver ativado na tabela,
+    // este polling ainda puxa mudanças sem mexer no Pomodoro.
+    setInterval(() => {
+      if (document.hidden || !supabaseClient || !isRemoteReady) return;
+      loadAppData({ silent: true });
+    }, 8000);
 
     function getTasks() {
       return appState.tasks || {};
