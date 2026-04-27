@@ -1067,8 +1067,11 @@
     const LOCAL_BACKUP_KEY = 'routineSupabaseBackup';
     const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
+    const fixedShortcuts = [
+      { name: 'FP', url: 'https://portal.fernandapessoa.com.br', textOnly: true, fixed: true }
+    ];
+
     const defaultShortcuts = [
-      { name: 'FP', url: 'https://portal.fernandapessoa.com.br', textOnly: true },
       { name: 'YouTube', url: 'https://www.youtube.com' },
       { name: 'Google Sala', url: 'https://classroom.google.com' },
       { name: 'Khan', url: 'https://pt.khanacademy.org' },
@@ -1573,45 +1576,93 @@
     }
     window.clearDoneTasks = clearDoneTasks;
 
+    function renderShortcutIcon(container, shortcut) {
+      container.innerHTML = '';
+      if (shortcut.textOnly) {
+        container.textContent = shortcutInitial(shortcut.name);
+        return;
+      }
+      const img = document.createElement('img');
+      img.src = faviconUrl(shortcut.url);
+      img.alt = shortcut.name;
+      img.onerror = () => { container.textContent = shortcutInitial(shortcut.name); };
+      container.appendChild(img);
+    }
+
     function renderShortcuts() {
-      const shortcuts = getShortcuts();
+      const savedShortcuts = getShortcuts();
+      const shortcuts = [...fixedShortcuts, ...savedShortcuts];
       const bar = $('shortcutsBar');
       const list = $('shortcutList');
       bar.innerHTML = '';
-      if (!shortcuts.length) {
-        bar.innerHTML = '<span class="shortcut-empty">sem atalhos</span>';
-      }
-      shortcuts.forEach((shortcut, index) => {
+
+      shortcuts.forEach((shortcut) => {
         const a = document.createElement('a');
         a.className = 'shortcut-link';
         a.href = shortcut.url;
         a.target = '_blank';
         a.rel = 'noopener noreferrer';
-        a.title = shortcut.name;
-        const img = document.createElement('img');
-        img.src = faviconUrl(shortcut.url);
-        img.alt = shortcut.name;
-        img.onerror = () => { a.textContent = shortcutInitial(shortcut.name); };
-        a.appendChild(img);
+        a.title = shortcut.fixed ? `${shortcut.name} • fixo` : shortcut.name;
+        renderShortcutIcon(a, shortcut);
         bar.appendChild(a);
       });
 
       if (list) {
         list.innerHTML = '';
-        shortcuts.forEach((shortcut, index) => {
+
+        fixedShortcuts.forEach((shortcut) => {
           const item = document.createElement('div');
           item.className = 'task';
-          item.innerHTML = `
-            <a class="shortcut-link" href="${shortcut.url}" target="_blank" rel="noopener noreferrer" title="${shortcut.name}"><img src="${faviconUrl(shortcut.url)}" onerror="this.parentElement.textContent='${shortcutInitial(shortcut.name)}'"></a>
-            <div><div class="task-text">${shortcut.name}</div><small style="color: var(--muted)">${shortcut.url}</small></div>
-            <button class="delete">apagar</button>
-          `;
-          item.querySelector('.delete').onclick = () => {
+
+          const link = document.createElement('a');
+          link.className = 'shortcut-link';
+          link.href = shortcut.url;
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          link.title = `${shortcut.name} • fixo`;
+          renderShortcutIcon(link, shortcut);
+
+          const info = document.createElement('div');
+          info.innerHTML = `<div class="task-text">${shortcut.name}</div><small style="color: var(--muted)">${shortcut.url} • fixo no código</small>`;
+
+          const badge = document.createElement('span');
+          badge.className = 'tag';
+          badge.textContent = 'fixo';
+
+          item.appendChild(link);
+          item.appendChild(info);
+          item.appendChild(badge);
+          list.appendChild(item);
+        });
+
+        savedShortcuts.forEach((shortcut, index) => {
+          const item = document.createElement('div');
+          item.className = 'task';
+
+          const link = document.createElement('a');
+          link.className = 'shortcut-link';
+          link.href = shortcut.url;
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          link.title = shortcut.name;
+          renderShortcutIcon(link, shortcut);
+
+          const info = document.createElement('div');
+          info.innerHTML = `<div class="task-text">${shortcut.name}</div><small style="color: var(--muted)">${shortcut.url}</small>`;
+
+          const deleteButton = document.createElement('button');
+          deleteButton.className = 'delete';
+          deleteButton.textContent = 'apagar';
+          deleteButton.onclick = () => {
             const all = getShortcuts();
             all.splice(index, 1);
             setShortcuts(all);
             renderShortcuts();
           };
+
+          item.appendChild(link);
+          item.appendChild(info);
+          item.appendChild(deleteButton);
           list.appendChild(item);
         });
       }
