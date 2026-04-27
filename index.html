@@ -540,7 +540,7 @@
 
     .cards-row {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 12px;
       margin-top: 18px;
     }
@@ -858,7 +858,6 @@
           <div class="small-card"><span>Foco sugerido</span><strong id="focusSuggestion">Pomodoro 25/5</strong></div>
           <div class="small-card"><span>Blocos de estudo hoje</span><strong id="studyBlocks">--</strong></div>
           <div class="small-card"><span>Dia selecionado</span><strong id="selectedDateLabel">--</strong></div>
-          <div class="small-card"><span>Cor do dia</span><strong id="dayColorLabel">--</strong></div>
         </div>
 
         <div style="height: 18px"></div>
@@ -1050,7 +1049,7 @@
         <div class="shortcut-help-item"><span>Start / pause Pomodoro</span><b class="kbd">Espaço</b></div>
         <div class="shortcut-help-item"><span>Resetar Pomodoro</span><b class="kbd">R</b></div>
         <div class="shortcut-help-item"><span>Pular ciclo</span><b class="kbd">K</b></div>
-        <div class="shortcut-help-item"><span>Fechar janela</span><b class="kbd">Esc</b></div>
+        <div class="shortcut-help-item"><span>Fechar janela</span><b class="kbd">Ctrl</b></div>
         <div class="shortcut-help-item"><span>Ver esta ajuda</span><b class="kbd">?</b></div>
       </div>
     </div>
@@ -1417,9 +1416,6 @@
       $('studyBlocks').textContent = routine.studyBlocks;
       $('selectedDateLabel').textContent = selectedDate.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
       $('focusSuggestion').textContent = selectedDate.getDay() === 6 ? '50/10 ou 25/5' : 'Pomodoro 25/5';
-      const colorNames = ['Renovação e lazer', 'Calma e foco', 'Criatividade e memória', 'Equilíbrio e constância', 'Energia e movimento', 'Leveza e recompensa', 'Ação e energia'];
-      $('dayColorLabel').textContent = colorNames[selectedDate.getDay()];
-
       const list = $('routineList');
       list.innerHTML = '';
       routine.items.forEach(item => {
@@ -1917,7 +1913,7 @@
 
       const key = e.key.toLowerCase();
 
-      if (key === 'escape') {
+      if (key === 'control') {
         closeModals();
         return;
       }
