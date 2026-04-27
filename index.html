@@ -1107,18 +1107,12 @@
     }
 
     function mergeDefaults(data = {}) {
-      const merged = {
+      return {
         tasks: data.tasks || {},
         notes: Array.isArray(data.notes) ? data.notes : [],
-        subjects: Array.isArray(data.subjects) && data.subjects.length ? data.subjects : defaultSubjects,
-        shortcuts: Array.isArray(data.shortcuts) && data.shortcuts.length ? data.shortcuts : defaultShortcuts
+        subjects: Array.isArray(data.subjects) ? data.subjects : defaultSubjects,
+        shortcuts: Array.isArray(data.shortcuts) ? data.shortcuts : defaultShortcuts
       };
-
-      if (!merged.shortcuts.some(shortcut => shortcut.name === 'FP' || shortcut.url === 'https://portal.fernandapessoa.com.br')) {
-        merged.shortcuts.unshift({ name: 'FP', url: 'https://portal.fernandapessoa.com.br', textOnly: true });
-      }
-
-      return merged;
     }
 
     function loadLegacyLocalData() {
@@ -1206,6 +1200,10 @@
       clearTimeout(saveTimer);
       saveTimer = setTimeout(saveAppDataNow, 450);
     }
+
+    window.addEventListener('beforeunload', () => {
+      backupLocal();
+    });
 
     function setupRealtime() {
       if (!supabaseClient || !isRemoteReady) return;
