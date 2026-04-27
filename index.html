@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title></title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
       --bg: #07070b;
@@ -693,6 +694,60 @@
       margin-top: 12px;
     }
 
+
+    .sync-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--muted);
+      font-size: .78rem;
+      white-space: nowrap;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.055);
+    }
+
+    .sync-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--warning);
+      box-shadow: 0 0 18px rgba(253,230,138,.35);
+    }
+
+    .sync-status.online .sync-dot {
+      background: var(--success);
+      box-shadow: 0 0 18px rgba(134,239,172,.35);
+    }
+
+    .sync-status.offline .sync-dot {
+      background: var(--danger);
+      box-shadow: 0 0 18px rgba(251,113,133,.35);
+    }
+
+    .calendar-range-info {
+      margin: 0 auto 12px;
+      max-width: 420px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.055);
+      border-radius: 18px;
+      padding: 11px 12px;
+      color: var(--muted);
+      font-size: .88rem;
+      line-height: 1.45;
+    }
+
+    .calendar-range-info strong {
+      color: var(--text);
+    }
+
+    .day.range-start, .day.range-end {
+      border-color: var(--accent);
+      background: var(--day-soft);
+      box-shadow: inset 0 0 0 1px var(--day-glow);
+    }
+
     @media (max-width: 1050px) {
       .grid { grid-template-columns: 1fr; }
       .hero { grid-template-columns: 1fr; }
@@ -724,6 +779,7 @@
       </div>
       <div class="header-actions">
         <button class="pill" id="todayBtn">Hoje</button>
+        <span class="sync-status" id="syncStatus"><span class="sync-dot"></span><span id="syncText">conectando</span></span>
         <button class="icon-btn" data-modal="shortcutModal" title="Adicionar atalho">+</button>
         <div class="header-divider"></div>
         <div class="shortcuts-bar" id="shortcutsBar"></div>
@@ -827,6 +883,7 @@
         <h2 id="monthLabel">Mês</h2>
         <button class="pill" id="nextMonth">→</button>
       </div>
+      <div class="calendar-range-info" id="calendarRangeInfo">segure <strong>shift</strong>, clique em uma data e depois em outra para contar quantos dias faltam entre elas.</div>
       <div class="calendar-grid" id="calendarGrid"></div>
     </div>
   </div>
@@ -1004,43 +1061,207 @@
     const $ = (id) => document.getElementById(id);
     const dateKey = (date) => date.toISOString().slice(0, 10);
 
+    const SUPABASE_URL = 'https://aelsvgfmijreuhpoccmt.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_P_R1Rz3zhO927yFyTaeakQ_fGGyoqMu';
+    const DATA_ID = 'main';
+    const LOCAL_BACKUP_KEY = 'routineSupabaseBackup';
+    const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+
+    const defaultShortcuts = [
+      { name: 'FP', url: 'https://portal.fernandapessoa.com.br', textOnly: true },
+      { name: 'YouTube', url: 'https://www.youtube.com' },
+      { name: 'Google Sala', url: 'https://classroom.google.com' },
+      { name: 'Khan', url: 'https://pt.khanacademy.org' },
+      { name: 'Redação Online', url: 'https://redacaonline.com.br' },
+      { name: 'Descomplica', url: 'https://descomplica.com.br' }
+    ];
+
+    let appState = {
+      tasks: {},
+      notes: [],
+      subjects: defaultSubjects,
+      shortcuts: defaultShortcuts
+    };
+
+    let saveTimer = null;
+    let isRemoteReady = false;
+    let compareStartDate = null;
+    let compareEndDate = null;
+
+    function setSyncStatus(status, text) {
+      const box = $('syncStatus');
+      const label = $('syncText');
+      if (!box || !label) return;
+      box.classList.remove('online', 'offline');
+      if (status) box.classList.add(status);
+      label.textContent = text;
+    }
+
+    function safeParse(value, fallback) {
+      try {
+        const parsed = JSON.parse(value);
+        return parsed ?? fallback;
+      } catch {
+        return fallback;
+      }
+    }
+
+    function mergeDefaults(data = {}) {
+      const merged = {
+        tasks: data.tasks || {},
+        notes: Array.isArray(data.notes) ? data.notes : [],
+        subjects: Array.isArray(data.subjects) && data.subjects.length ? data.subjects : defaultSubjects,
+        shortcuts: Array.isArray(data.shortcuts) && data.shortcuts.length ? data.shortcuts : defaultShortcuts
+      };
+
+      if (!merged.shortcuts.some(shortcut => shortcut.name === 'FP' || shortcut.url === 'https://portal.fernandapessoa.com.br')) {
+        merged.shortcuts.unshift({ name: 'FP', url: 'https://portal.fernandapessoa.com.br', textOnly: true });
+      }
+
+      return merged;
+    }
+
+    function loadLegacyLocalData() {
+      return mergeDefaults({
+        tasks: safeParse(localStorage.getItem('routineTasks'), {}),
+        notes: safeParse(localStorage.getItem('routineNotes'), []),
+        subjects: safeParse(localStorage.getItem('routineSubjects'), defaultSubjects),
+        shortcuts: safeParse(localStorage.getItem('routineShortcuts'), defaultShortcuts)
+      });
+    }
+
+    function getLocalBackup() {
+      return mergeDefaults(safeParse(localStorage.getItem(LOCAL_BACKUP_KEY), loadLegacyLocalData()));
+    }
+
+    function backupLocal() {
+      localStorage.setItem(LOCAL_BACKUP_KEY, JSON.stringify(appState));
+    }
+
+    async function loadAppData() {
+      if (!supabaseClient) {
+        setSyncStatus('offline', 'local');
+        appState = getLocalBackup();
+        return;
+      }
+
+      setSyncStatus('', 'conectando');
+
+      const { data, error } = await supabaseClient
+        .from('app_data')
+        .select('data')
+        .eq('id', DATA_ID)
+        .maybeSingle();
+
+      if (error) {
+        console.warn('Supabase load error:', error);
+        setSyncStatus('offline', 'local');
+        appState = getLocalBackup();
+        return;
+      }
+
+      if (!data) {
+        appState = getLocalBackup();
+        await saveAppDataNow();
+      } else {
+        appState = mergeDefaults(data.data);
+        backupLocal();
+      }
+
+      isRemoteReady = true;
+      setSyncStatus('online', 'sincronizado');
+      setupRealtime();
+    }
+
+    async function saveAppDataNow() {
+      backupLocal();
+
+      if (!supabaseClient) {
+        setSyncStatus('offline', 'local');
+        return;
+      }
+
+      setSyncStatus('', 'salvando');
+
+      const { error } = await supabaseClient
+        .from('app_data')
+        .upsert({
+          id: DATA_ID,
+          data: appState,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'id' });
+
+      if (error) {
+        console.warn('Supabase save error:', error);
+        setSyncStatus('offline', 'erro ao salvar');
+        return;
+      }
+
+      isRemoteReady = true;
+      setSyncStatus('online', 'sincronizado');
+    }
+
+    function queueSave() {
+      backupLocal();
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(saveAppDataNow, 450);
+    }
+
+    function setupRealtime() {
+      if (!supabaseClient || !isRemoteReady) return;
+
+      supabaseClient
+        .channel('app_data_changes')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'app_data', filter: `id=eq.${DATA_ID}` },
+          (payload) => {
+            if (!payload.new || !payload.new.data) return;
+            appState = mergeDefaults(payload.new.data);
+            backupLocal();
+            renderAll();
+            renderNotes();
+            renderSubjects();
+            renderShortcuts();
+          }
+        )
+        .subscribe();
+    }
+
     function getTasks() {
-      return JSON.parse(localStorage.getItem('routineTasks') || '{}');
+      return appState.tasks || {};
     }
 
     function setTasks(tasks) {
-      localStorage.setItem('routineTasks', JSON.stringify(tasks));
+      appState.tasks = tasks || {};
+      queueSave();
     }
 
     function getNotes() {
-      return JSON.parse(localStorage.getItem('routineNotes') || '[]');
+      return appState.notes || [];
+    }
+
+    function setNotes(notes) {
+      appState.notes = notes || [];
+      queueSave();
     }
 
     function getSubjects() {
-      const saved = localStorage.getItem('routineSubjects');
-      if (saved) return JSON.parse(saved);
-      localStorage.setItem('routineSubjects', JSON.stringify(defaultSubjects));
-      return defaultSubjects;
+      return appState.subjects || defaultSubjects;
     }
 
     function setSubjects(subjects) {
-      localStorage.setItem('routineSubjects', JSON.stringify(subjects));
+      appState.subjects = subjects || defaultSubjects;
+      queueSave();
     }
 
     function getShortcuts() {
-      const saved = localStorage.getItem('routineShortcuts');
-      if (saved) return JSON.parse(saved);
-      const defaults = [
-        { name: 'YouTube', url: 'https://www.youtube.com' },
-        { name: 'Google Sala', url: 'https://classroom.google.com' },
-        { name: 'Khan', url: 'https://pt.khanacademy.org' }
-      ];
-      localStorage.setItem('routineShortcuts', JSON.stringify(defaults));
-      return defaults;
+      return appState.shortcuts || defaultShortcuts;
     }
 
     function setShortcuts(shortcuts) {
-      localStorage.setItem('routineShortcuts', JSON.stringify(shortcuts));
+      appState.shortcuts = shortcuts || [];
+      queueSave();
     }
 
     function normalizeUrl(url) {
@@ -1060,10 +1281,6 @@
       } catch {
         return '';
       }
-    }
-
-    function setNotes(notes) {
-      localStorage.setItem('routineNotes', JSON.stringify(notes));
     }
 
     function updateClock() {
@@ -1200,16 +1417,63 @@
         if (d.getMonth() !== month) div.classList.add('muted');
         if (key === todayKey) div.classList.add('today');
         if (key === selectedKey) div.classList.add('selected');
+        if (compareStartDate && key === dateKey(compareStartDate)) div.classList.add('range-start');
+        if (compareEndDate && key === dateKey(compareEndDate)) div.classList.add('range-end');
         const routineType = d.getDay() === 0 ? 'study' : d.getDay() === 6 ? 'work' : d.getDay() === 4 ? 'school' : 'work';
         const taskDots = (tasks[key] || []).slice(0, 3).map(() => '<span class="dot"></span>').join('');
         div.innerHTML = `<span class="day-number">${d.getDate()}</span><div class="dots"><span class="dot ${routineType}"></span>${taskDots}</div>`;
-        div.onclick = () => {
+        div.onclick = (event) => {
+          if (event.shiftKey) {
+            handleCalendarCompare(d);
+            return;
+          }
+
           selectedDate = d;
           closeModals();
           renderAll();
         };
         grid.appendChild(div);
       }
+    }
+
+
+    function formatShortDate(date) {
+      return date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    function handleCalendarCompare(date) {
+      if (!compareStartDate || (compareStartDate && compareEndDate)) {
+        compareStartDate = new Date(date);
+        compareEndDate = null;
+      } else {
+        compareEndDate = new Date(date);
+      }
+
+      updateCalendarRangeInfo();
+      renderCalendar();
+    }
+
+    function updateCalendarRangeInfo() {
+      const info = $('calendarRangeInfo');
+      if (!info) return;
+
+      if (compareStartDate && compareEndDate) {
+        const start = new Date(compareStartDate);
+        const end = new Date(compareEndDate);
+        start.setHours(0, 0, 0, 0);
+        end.setHours(0, 0, 0, 0);
+        const days = Math.abs(Math.round((end - start) / (1000 * 60 * 60 * 24)));
+        const plural = days === 1 ? 'dia' : 'dias';
+        info.innerHTML = `entre <strong>${formatShortDate(start)}</strong> e <strong>${formatShortDate(end)}</strong> faltam <strong>${days} ${plural}</strong>.`;
+        return;
+      }
+
+      if (compareStartDate) {
+        info.innerHTML = `primeira data: <strong>${formatShortDate(compareStartDate)}</strong>. agora segure <strong>shift</strong> e clique na segunda data.`;
+        return;
+      }
+
+      info.innerHTML = 'segure <strong>shift</strong>, clique em uma data e depois em outra para contar quantos dias faltam entre elas.';
     }
 
     function renderTimer() {
@@ -1407,7 +1671,7 @@
 
     function openModal(id) {
       $(id).classList.add('show');
-      if (id === 'calendarModal') renderCalendar();
+      if (id === 'calendarModal') { updateCalendarRangeInfo(); renderCalendar(); }
       if (id === 'notesModal') renderNotes();
       if (id === 'subjectsModal') renderSubjects();
       if (id === 'shortcutModal') renderShortcuts();
@@ -1428,6 +1692,7 @@
       renderRoutine();
       renderTasks();
       renderCalendar();
+      renderShortcuts();
     }
 
     document.querySelectorAll('[data-modal]').forEach(btn => btn.addEventListener('click', () => openModal(btn.dataset.modal)));
@@ -1487,10 +1752,15 @@
       renderShortcuts();
     };
 
-    updateClock();
-    renderTimer();
-    renderAll();
-    setInterval(updateClock, 1000);
+    async function initApp() {
+      updateClock();
+      renderTimer();
+      await loadAppData();
+      renderAll();
+      setInterval(updateClock, 1000);
+    }
+
+    initApp();
   </script>
 </body>
 </html>
