@@ -748,6 +748,48 @@
       box-shadow: inset 0 0 0 1px var(--day-glow);
     }
 
+
+    .shortcut-help-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .shortcut-help-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.055);
+      border-radius: 18px;
+      padding: 12px;
+      color: rgba(246,244,255,.86);
+    }
+
+    .shortcut-help-item span {
+      color: var(--muted);
+      font-size: .88rem;
+      line-height: 1.35;
+    }
+
+    .kbd {
+      min-width: 36px;
+      height: 30px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.22);
+      background: rgba(255,255,255,.09);
+      box-shadow: inset 0 -2px 0 rgba(0,0,0,.18);
+      font-size: .78rem;
+      font-weight: 900;
+      color: white;
+      padding: 0 9px;
+      white-space: nowrap;
+    }
+
     @media (max-width: 1050px) {
       .grid { grid-template-columns: 1fr; }
       .hero { grid-template-columns: 1fr; }
@@ -779,6 +821,7 @@
       </div>
       <div class="header-actions">
         <button class="pill" id="todayBtn">Hoje</button>
+        <button class="icon-btn" data-modal="keyboardModal" title="Atalhos de teclado">⌨️</button>
         <span class="sync-status" id="syncStatus"><span class="sync-dot"></span><span id="syncText">conectando</span></span>
         <button class="icon-btn" data-modal="shortcutModal" title="Adicionar atalho">+</button>
         <div class="header-divider"></div>
@@ -986,6 +1029,33 @@
       <div class="notes-list" id="notesList"></div>
     </div>
   </div>
+
+  <div class="modal-backdrop" id="keyboardModal">
+    <div class="modal">
+      <div class="modal-head">
+        <h2>Atalhos de teclado</h2>
+        <button class="icon-btn close-modal">✕</button>
+      </div>
+      <div class="priority-help">
+        Use essas teclas quando você não estiver digitando em uma caixa de texto. O Pomodoro continua só no aparelho atual e não entra no realtime.
+      </div>
+      <div class="shortcut-help-grid">
+        <div class="shortcut-help-item"><span>Voltar para hoje</span><b class="kbd">T</b></div>
+        <div class="shortcut-help-item"><span>Abrir calendário</span><b class="kbd">C</b></div>
+        <div class="shortcut-help-item"><span>Abrir notas</span><b class="kbd">N</b></div>
+        <div class="shortcut-help-item"><span>Abrir matérias</span><b class="kbd">S</b></div>
+        <div class="shortcut-help-item"><span>Adicionar tarefa</span><b class="kbd">A</b></div>
+        <div class="shortcut-help-item"><span>Adicionar atalho</span><b class="kbd">L</b></div>
+        <div class="shortcut-help-item"><span>Abrir FP</span><b class="kbd">F</b></div>
+        <div class="shortcut-help-item"><span>Start / pause Pomodoro</span><b class="kbd">Espaço</b></div>
+        <div class="shortcut-help-item"><span>Resetar Pomodoro</span><b class="kbd">R</b></div>
+        <div class="shortcut-help-item"><span>Pular ciclo</span><b class="kbd">K</b></div>
+        <div class="shortcut-help-item"><span>Fechar janela</span><b class="kbd">Esc</b></div>
+        <div class="shortcut-help-item"><span>Ver esta ajuda</span><b class="kbd">?</b></div>
+      </div>
+    </div>
+  </div>
+
 
   <script>
     const defaultSubjects = [
@@ -1828,6 +1898,61 @@
       $('shortcutUrl').value = '';
       renderShortcuts();
     };
+
+
+    function isTypingInField() {
+      const active = document.activeElement;
+      if (!active) return false;
+      const tag = active.tagName.toLowerCase();
+      return tag === 'input' || tag === 'textarea' || tag === 'select' || active.isContentEditable;
+    }
+
+    function togglePomodoroByKeyboard() {
+      if (isRunning) pauseTimer();
+      else startTimer();
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (isTypingInField()) return;
+
+      const key = e.key.toLowerCase();
+
+      if (key === 'escape') {
+        closeModals();
+        return;
+      }
+
+      if (key === '?' || (e.shiftKey && key === '/')) {
+        e.preventDefault();
+        openModal('keyboardModal');
+        return;
+      }
+
+      if (key === ' ') {
+        e.preventDefault();
+        togglePomodoroByKeyboard();
+        return;
+      }
+
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+      const actions = {
+        t: () => $('todayBtn').click(),
+        c: () => openModal('calendarModal'),
+        n: () => openModal('notesModal'),
+        s: () => openModal('subjectsModal'),
+        a: () => openModal('taskModal'),
+        l: () => openModal('shortcutModal'),
+        f: () => window.open('https://portal.fernandapessoa.com.br', '_blank', 'noopener,noreferrer'),
+        r: () => resetTimer(),
+        k: () => { switchMode(); renderTimer(); }
+      };
+
+      if (actions[key]) {
+        e.preventDefault();
+        actions[key]();
+      }
+    });
 
     async function initApp() {
       updateClock();
