@@ -790,6 +790,123 @@
       white-space: nowrap;
     }
 
+
+
+    /* melhorias sem mudar o layout principal */
+    @keyframes softPop {
+      from { opacity: 0; transform: scale(.96) translateY(8px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    @keyframes softFadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes donePulse {
+      0% { transform: scale(1); }
+      45% { transform: scale(.985); }
+      100% { transform: scale(1); }
+    }
+
+    .panel, .today-card, .mini-stat, .small-card, .pomodoro, .routine-item, .task, .subject-card, .tool-card, .note {
+      animation: softFadeUp .34s ease both;
+    }
+
+    .modal-backdrop.show .modal {
+      animation: softPop .22s ease both;
+    }
+
+    .pill:active, .icon-btn:active, .primary-btn:active, .tool-card:active, .tiny-btn:active, .delete:active {
+      transform: scale(.97);
+    }
+
+    .task.done {
+      animation: donePulse .24s ease both;
+    }
+
+    .dragging {
+      opacity: .55;
+      transform: scale(.985);
+    }
+
+    .shortcut-category-title {
+      margin: 18px 0 8px;
+      color: var(--muted);
+      font-size: .78rem;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .shortcut-actions {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .drag-handle {
+      color: var(--muted);
+      cursor: grab;
+      font-weight: 900;
+      user-select: none;
+      padding: 7px 9px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.055);
+    }
+
+    .focus-modal {
+      width: min(680px, 100%);
+      text-align: center;
+    }
+
+    .focus-task {
+      margin: 14px 0 0;
+      padding: 14px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.055);
+      border-radius: 18px;
+      color: rgba(246,244,255,.86);
+      line-height: 1.45;
+    }
+
+    .focus-task strong {
+      display: block;
+      margin-bottom: 4px;
+      color: white;
+      letter-spacing: -.02em;
+    }
+
+    .focus-timer {
+      font-size: clamp(4.8rem, 13vw, 8.5rem);
+      font-weight: 950;
+      letter-spacing: -.08em;
+      line-height: .92;
+      margin: 18px 0 12px;
+    }
+
+    .plan-preview {
+      margin-top: 12px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .plan-row {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.05);
+      border-radius: 16px;
+      padding: 11px 12px;
+      color: rgba(246,244,255,.84);
+      line-height: 1.42;
+    }
+
+    .plan-row b {
+      color: white;
+    }
+
     @media (max-width: 1050px) {
       .grid { grid-template-columns: 1fr; }
       .hero { grid-template-columns: 1fr; }
@@ -942,6 +1059,8 @@
         <button class="tool-card" onclick="setPomodoro(15,5)"><span>🌱</span><b>Aquecer</b><span>15 minutos para quando estiver sem energia.</span></button>
         <button class="tool-card" onclick="addDefaultStudyTasks()"><span>📚</span><b>Checklist de estudo</b><span>Adiciona revisar, exercícios e resumo.</span></button>
         <button class="tool-card" onclick="addHomeTasks()"><span>🏠</span><b>Checklist da casa</b><span>Adiciona banho, comer, arrumar mochila e casa.</span></button>
+        <button class="tool-card" onclick="generateWeeklyPlan()"><span>🗓️</span><b>Gerar plano da semana</b><span>Cria tarefas automáticas usando prioridades, rotina e lazer.</span></button>
+        <button class="tool-card" onclick="openFocusMode()"><span>🎯</span><b>Modo foco</b><span>Abre uma tela limpa só com tarefa atual e Pomodoro.</span></button>
         <button class="tool-card" onclick="clearDoneTasks()"><span>🧹</span><b>Limpar concluídas</b><span>Remove as tarefas já marcadas.</span></button>
       </div>
     </div>
@@ -961,8 +1080,16 @@
       </div>
       <div class="form-row">
         <input id="shortcutUrl" placeholder="link" />
+        <select id="shortcutCategory">
+          <option value="estudo">estudo</option>
+          <option value="escola">escola</option>
+          <option value="enem">enem</option>
+          <option value="lazer">lazer</option>
+          <option value="outros">outros</option>
+        </select>
         <button class="primary-btn" id="addShortcut">Adicionar</button>
       </div>
+      <div class="priority-help">arraste os atalhos pela alça ⋮⋮ para reorganizar. a ordem e a categoria salvam junto.</div>
       <div class="notes-list" id="shortcutList"></div>
     </div>
   </div>
@@ -974,7 +1101,7 @@
         <button class="icon-btn close-modal">✕</button>
       </div>
       <div class="priority-help">
-        Use alta para o que precisa de mais atenção, média para manter constância, baixa para revisar sem pressão e lazer para descanso planejado. A ideia é equilibrar estudo com vida real.
+        Alta é para o que está pedindo mais atenção. Média é para manter constância. Baixa fica para revisão sem pressão. Lazer entra como descanso planejado, porque a rotina precisa caber na vida real.
       </div>
       <div class="form-row">
         <input id="newSubjectName" placeholder="Adicionar matéria ou atividade. Ex: Filme no domingo" />
@@ -1036,7 +1163,7 @@
         <button class="icon-btn close-modal">✕</button>
       </div>
       <div class="priority-help">
-        Use essas teclas quando você não estiver digitando em uma caixa de texto. O Pomodoro continua só no aparelho atual e não entra no realtime.
+        Essas teclas funcionam quando nenhuma caixa de texto está selecionada. O Pomodoro fica só neste aparelho para não misturar o tempo entre celular e computador.
       </div>
       <div class="shortcut-help-grid">
         <div class="shortcut-help-item"><span>Voltar para hoje</span><b class="kbd">T</b></div>
@@ -1046,12 +1173,44 @@
         <div class="shortcut-help-item"><span>Adicionar tarefa</span><b class="kbd">A</b></div>
         <div class="shortcut-help-item"><span>Adicionar atalho</span><b class="kbd">L</b></div>
         <div class="shortcut-help-item"><span>Abrir FP</span><b class="kbd">F</b></div>
-        <div class="shortcut-help-item"><span>Start / pause Pomodoro</span><b class="kbd">Espaço</b></div>
+        <div class="shortcut-help-item"><span>Modo foco</span><b class="kbd">M</b></div>
+        <div class="shortcut-help-item"><span>Começar / pausar Pomodoro</span><b class="kbd">Espaço</b></div>
         <div class="shortcut-help-item"><span>Resetar Pomodoro</span><b class="kbd">R</b></div>
         <div class="shortcut-help-item"><span>Pular ciclo</span><b class="kbd">K</b></div>
         <div class="shortcut-help-item"><span>Fechar janela</span><b class="kbd">Ctrl</b></div>
         <div class="shortcut-help-item"><span>Ver esta ajuda</span><b class="kbd">?</b></div>
       </div>
+    </div>
+  </div>
+
+
+  <div class="modal-backdrop" id="focusModal">
+    <div class="modal focus-modal">
+      <div class="modal-head">
+        <h2>Modo foco</h2>
+        <button class="icon-btn close-modal">✕</button>
+      </div>
+      <div class="priority-help">uma tela mais limpa sem mexer no layout principal. para sair daqui, basta apertar <strong>ctrl</strong>.</div>
+      <div class="focus-timer" id="focusTimerMirror">25:00</div>
+      <div class="timer-label" id="focusTimerLabel">Foco</div>
+      <div class="timer-buttons">
+        <button class="primary-btn" id="focusStartPause">Começar</button>
+        <button class="pill" id="focusReset">Resetar</button>
+        <button class="pill" id="focusSkip">Pular</button>
+      </div>
+      <div class="focus-task" id="focusTaskBox"></div>
+    </div>
+  </div>
+
+
+  <div class="modal-backdrop" id="planModal">
+    <div class="modal">
+      <div class="modal-head">
+        <h2>Plano da semana gerado</h2>
+        <button class="icon-btn close-modal">✕</button>
+      </div>
+      <div class="priority-help">as tarefas foram adicionadas nos próximos 7 dias sem duplicar o que já existia.</div>
+      <div class="plan-preview" id="planPreview"></div>
     </div>
   </div>
 
@@ -1071,7 +1230,7 @@
       1: {
         label: 'Segunda', summary: 'Estudo de manhã, trabalho à tarde e escola à noite.', studyBlocks: '6 pomodoros', items: [
           ['07:00', 'Acordar', 'Escovar os dentes, comer algo e preparar para começar.', 'manhã'],
-          ['07:30', 'Estudar com Pomodoro', 'Use 25/5. Escolha uma matéria na hora e comece pelo mais importante.', 'estudo'],
+          ['07:30', 'Estudar com Pomodoro', 'Pomodoro 25/5 combina bem aqui. Melhor escolher uma matéria na hora e começar pelo mais importante.', 'estudo'],
           ['10:30', 'Pausar estudos', 'Arrumar suas coisas, tomar banho, arrumar a casa e comer.', 'casa'],
           ['12:20', 'Pegar ônibus', 'Sair para o trabalho.', 'ônibus'],
           ['13:00', 'Trabalho', 'Foco no expediente até 17h.', 'trabalho'],
@@ -1137,16 +1296,18 @@
     const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
     const fixedShortcuts = [
-      { name: 'FP', url: 'https://portal.fernandapessoa.com.br', textOnly: true, fixed: true }
+      { name: 'FP', url: 'https://portal.fernandapessoa.com.br', textOnly: true, fixed: true, category: 'escola' }
     ];
 
     const defaultShortcuts = [
-      { name: 'YouTube', url: 'https://www.youtube.com' },
-      { name: 'Google Sala', url: 'https://classroom.google.com' },
-      { name: 'Khan', url: 'https://pt.khanacademy.org' },
-      { name: 'Redação Online', url: 'https://redacaonline.com.br' },
-      { name: 'Descomplica', url: 'https://descomplica.com.br' }
+      { name: 'YouTube', url: 'https://www.youtube.com', category: 'lazer' },
+      { name: 'Google Sala', url: 'https://classroom.google.com', category: 'escola' },
+      { name: 'Khan', url: 'https://pt.khanacademy.org', category: 'estudo' },
+      { name: 'Redação Online', url: 'https://redacaonline.com.br', category: 'enem' },
+      { name: 'Descomplica', url: 'https://descomplica.com.br', category: 'enem' }
     ];
+
+    const shortcutCategories = ['estudo', 'escola', 'enem', 'lazer', 'outros'];
 
     let appState = {
       tasks: {},
@@ -1180,12 +1341,27 @@
       }
     }
 
+    function normalizeShortcut(shortcut, index = 0) {
+      return {
+        name: shortcut?.name || 'Atalho',
+        url: shortcut?.url || '#',
+        category: shortcut?.category || 'outros',
+        textOnly: !!shortcut?.textOnly,
+        fixed: !!shortcut?.fixed,
+        order: Number.isFinite(shortcut?.order) ? shortcut.order : index
+      };
+    }
+
+    function normalizeShortcuts(shortcuts) {
+      return (Array.isArray(shortcuts) ? shortcuts : defaultShortcuts).map(normalizeShortcut);
+    }
+
     function mergeDefaults(data = {}) {
       return {
         tasks: data.tasks || {},
         notes: Array.isArray(data.notes) ? data.notes : [],
         subjects: Array.isArray(data.subjects) ? data.subjects : defaultSubjects,
-        shortcuts: Array.isArray(data.shortcuts) ? data.shortcuts : defaultShortcuts
+        shortcuts: normalizeShortcuts(data.shortcuts)
       };
     }
 
@@ -1437,7 +1613,7 @@
       const box = $('tasks');
       box.innerHTML = '';
       if (!tasks.length) {
-        box.innerHTML = '<p style="color: var(--muted); margin: 4px 0 0; line-height: 1.5;">Nenhuma tarefa ainda. Adicione uma tarefa rápida ou use as ferramentas.</p>';
+        box.innerHTML = '<p style="color: var(--muted); margin: 4px 0 0; line-height: 1.5;">Nenhuma tarefa ainda. Dá para adicionar uma tarefa rápida ou abrir as ferramentas para criar uma lista pronta.</p>';
         return;
       }
       tasks.forEach((task, index) => {
@@ -1576,6 +1752,9 @@
       const s = String(timerSeconds % 60).padStart(2, '0');
       $('timer').textContent = `${m}:${s}`;
       $('timerLabel').textContent = mode === 'focus' ? 'Foco' : 'Pausa';
+      if ($('focusTimerMirror')) $('focusTimerMirror').textContent = `${m}:${s}`;
+      if ($('focusTimerLabel')) $('focusTimerLabel').textContent = mode === 'focus' ? 'Foco' : 'Pausa';
+      if ($('focusStartPause')) $('focusStartPause').textContent = isRunning ? 'Pausar' : 'Começar';
     }
 
     function startTimer() {
@@ -1591,6 +1770,7 @@
     function pauseTimer() {
       isRunning = false;
       clearInterval(timerInterval);
+      renderTimer();
     }
 
     function resetTimer() {
@@ -1655,8 +1835,34 @@
       container.appendChild(img);
     }
 
+    function categoryLabel(category) {
+      return {
+        estudo: 'estudo',
+        escola: 'escola',
+        enem: 'enem',
+        lazer: 'lazer',
+        outros: 'outros'
+      }[category] || 'outros';
+    }
+
+    function sortedShortcuts(shortcuts) {
+      return [...shortcuts].map(normalizeShortcut).sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    }
+
+    function moveShortcut(index, direction) {
+      const all = sortedShortcuts(getShortcuts());
+      const nextIndex = index + direction;
+      if (nextIndex < 0 || nextIndex >= all.length) return;
+      [all[index], all[nextIndex]] = [all[nextIndex], all[index]];
+      all.forEach((shortcut, i) => shortcut.order = i);
+      setShortcuts(all);
+      renderShortcuts();
+    }
+
+    let draggedShortcutIndex = null;
+
     function renderShortcuts() {
-      const savedShortcuts = getShortcuts();
+      const savedShortcuts = sortedShortcuts(getShortcuts());
       const shortcuts = [...fixedShortcuts, ...savedShortcuts];
       const bar = $('shortcutsBar');
       const list = $('shortcutList');
@@ -1668,7 +1874,7 @@
         a.href = shortcut.url;
         a.target = '_blank';
         a.rel = 'noopener noreferrer';
-        a.title = shortcut.fixed ? `${shortcut.name} • fixo` : shortcut.name;
+        a.title = shortcut.fixed ? `${shortcut.name} • fixo • ${categoryLabel(shortcut.category)}` : `${shortcut.name} • ${categoryLabel(shortcut.category)}`;
         renderShortcutIcon(a, shortcut);
         bar.appendChild(a);
       });
@@ -1676,60 +1882,117 @@
       if (list) {
         list.innerHTML = '';
 
-        fixedShortcuts.forEach((shortcut) => {
-          const item = document.createElement('div');
-          item.className = 'task';
+        const allForModal = [...fixedShortcuts, ...savedShortcuts];
+        shortcutCategories.forEach((category) => {
+          const group = allForModal
+            .map((shortcut, originalIndex) => ({ shortcut, originalIndex }))
+            .filter(({ shortcut }) => (shortcut.category || 'outros') === category);
 
-          const link = document.createElement('a');
-          link.className = 'shortcut-link';
-          link.href = shortcut.url;
-          link.target = '_blank';
-          link.rel = 'noopener noreferrer';
-          link.title = `${shortcut.name} • fixo`;
-          renderShortcutIcon(link, shortcut);
+          if (!group.length) return;
 
-          const info = document.createElement('div');
-          info.innerHTML = `<div class="task-text">${shortcut.name}</div><small style="color: var(--muted)">${shortcut.url} • fixo no código</small>`;
+          const title = document.createElement('div');
+          title.className = 'shortcut-category-title';
+          title.textContent = categoryLabel(category);
+          list.appendChild(title);
 
-          const badge = document.createElement('span');
-          badge.className = 'tag';
-          badge.textContent = 'fixo';
+          group.forEach(({ shortcut }) => {
+            const isFixed = !!shortcut.fixed;
+            const savedIndex = savedShortcuts.findIndex(item => item.name === shortcut.name && item.url === shortcut.url && !item.fixed);
+            const item = document.createElement('div');
+            item.className = 'task';
+            if (!isFixed) {
+              item.draggable = true;
+              item.dataset.index = savedIndex;
+              item.addEventListener('dragstart', () => {
+                draggedShortcutIndex = savedIndex;
+                item.classList.add('dragging');
+              });
+              item.addEventListener('dragend', () => {
+                draggedShortcutIndex = null;
+                item.classList.remove('dragging');
+              });
+              item.addEventListener('dragover', (e) => e.preventDefault());
+              item.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const targetIndex = Number(item.dataset.index);
+                if (draggedShortcutIndex === null || draggedShortcutIndex === targetIndex) return;
+                const all = sortedShortcuts(getShortcuts());
+                const [moved] = all.splice(draggedShortcutIndex, 1);
+                all.splice(targetIndex, 0, moved);
+                all.forEach((entry, i) => entry.order = i);
+                setShortcuts(all);
+                renderShortcuts();
+              });
+            }
 
-          item.appendChild(link);
-          item.appendChild(info);
-          item.appendChild(badge);
-          list.appendChild(item);
-        });
+            const link = document.createElement('a');
+            link.className = 'shortcut-link';
+            link.href = shortcut.url;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            link.title = isFixed ? `${shortcut.name} • fixo` : shortcut.name;
+            renderShortcutIcon(link, shortcut);
 
-        savedShortcuts.forEach((shortcut, index) => {
-          const item = document.createElement('div');
-          item.className = 'task';
+            const info = document.createElement('div');
+            info.innerHTML = `<div class="task-text">${shortcut.name}</div><small style="color: var(--muted)">${shortcut.url}${isFixed ? ' • fixo no código' : ''}</small>`;
 
-          const link = document.createElement('a');
-          link.className = 'shortcut-link';
-          link.href = shortcut.url;
-          link.target = '_blank';
-          link.rel = 'noopener noreferrer';
-          link.title = shortcut.name;
-          renderShortcutIcon(link, shortcut);
+            const actions = document.createElement('div');
+            actions.className = 'shortcut-actions';
 
-          const info = document.createElement('div');
-          info.innerHTML = `<div class="task-text">${shortcut.name}</div><small style="color: var(--muted)">${shortcut.url}</small>`;
+            if (isFixed) {
+              const badge = document.createElement('span');
+              badge.className = 'tag';
+              badge.textContent = 'fixo';
+              actions.appendChild(badge);
+            } else {
+              const handle = document.createElement('span');
+              handle.className = 'drag-handle';
+              handle.textContent = '⋮⋮';
+              handle.title = 'arrastar para reorganizar';
 
-          const deleteButton = document.createElement('button');
-          deleteButton.className = 'delete';
-          deleteButton.textContent = 'apagar';
-          deleteButton.onclick = () => {
-            const all = getShortcuts();
-            all.splice(index, 1);
-            setShortcuts(all);
-            renderShortcuts();
-          };
+              const categorySelect = document.createElement('select');
+              categorySelect.style.width = '115px';
+              categorySelect.innerHTML = shortcutCategories.map(cat => `<option value="${cat}" ${cat === shortcut.category ? 'selected' : ''}>${categoryLabel(cat)}</option>`).join('');
+              categorySelect.onchange = () => {
+                const all = sortedShortcuts(getShortcuts());
+                all[savedIndex].category = categorySelect.value;
+                setShortcuts(all);
+                renderShortcuts();
+              };
 
-          item.appendChild(link);
-          item.appendChild(info);
-          item.appendChild(deleteButton);
-          list.appendChild(item);
+              const upButton = document.createElement('button');
+              upButton.className = 'tiny-btn';
+              upButton.textContent = '↑';
+              upButton.onclick = () => moveShortcut(savedIndex, -1);
+
+              const downButton = document.createElement('button');
+              downButton.className = 'tiny-btn';
+              downButton.textContent = '↓';
+              downButton.onclick = () => moveShortcut(savedIndex, 1);
+
+              const deleteButton = document.createElement('button');
+              deleteButton.className = 'delete';
+              deleteButton.textContent = 'apagar';
+              deleteButton.onclick = () => {
+                const all = sortedShortcuts(getShortcuts());
+                all.splice(savedIndex, 1);
+                all.forEach((entry, i) => entry.order = i);
+                setShortcuts(all);
+                renderShortcuts();
+              };
+
+              actions.appendChild(handle);
+              actions.appendChild(categorySelect);
+              actions.appendChild(upButton);
+              actions.appendChild(downButton);
+              actions.appendChild(deleteButton);
+            }
+
+            item.appendChild(link);
+            item.appendChild(info);
+            item.appendChild(actions);
+            list.appendChild(item);
+          });
         });
       }
     }
@@ -1812,12 +2075,129 @@
       });
     }
 
+
+    function getSubjectPool() {
+      const subjects = getSubjects().filter(subject => subject.priority !== 'lazer');
+      const high = subjects.filter(subject => subject.priority === 'alta');
+      const medium = subjects.filter(subject => subject.priority === 'media');
+      const low = subjects.filter(subject => subject.priority === 'baixa');
+      return [...high, ...high, ...medium, ...low];
+    }
+
+    function addTaskForDate(date, text, type = 'estudo') {
+      const all = getTasks();
+      const key = dateKey(date);
+      all[key] = all[key] || [];
+      if (!all[key].some(task => task.text === text)) {
+        all[key].push({ text, type, done: false });
+      }
+      setTasks(all);
+    }
+
+    function generateWeeklyPlan() {
+      const pool = getSubjectPool();
+      const leisure = getSubjects().find(subject => subject.priority === 'lazer') || { name: 'Filme / lazer no domingo' };
+      if (!pool.length) return;
+
+      const preview = [];
+      let cursor = 0;
+      const start = new Date();
+      start.setHours(0, 0, 0, 0);
+
+      for (let i = 0; i < 7; i++) {
+        const date = new Date(start);
+        date.setDate(start.getDate() + i);
+        const day = date.getDay();
+        const dayPlan = [];
+
+        if (day === 0) {
+          const subject = pool[cursor % pool.length];
+          cursor++;
+          dayPlan.push(`Revisão leve: ${subject.name}`);
+          dayPlan.push(leisure.name);
+          addTaskForDate(date, `Revisão leve: ${subject.name}`, 'estudo');
+          addTaskForDate(date, leisure.name, 'lazer');
+        } else if (day === 6) {
+          for (let n = 0; n < 3; n++) {
+            const subject = pool[cursor % pool.length];
+            cursor++;
+            const text = n === 0 ? `Estudar: ${subject.name}` : `Exercícios: ${subject.name}`;
+            dayPlan.push(text);
+            addTaskForDate(date, text, 'estudo');
+          }
+        } else if (day === 4) {
+          const subject = pool[cursor % pool.length];
+          cursor++;
+          dayPlan.push(`Revisão curta: ${subject.name}`);
+          dayPlan.push('Separar dúvidas para a escola/curso');
+          addTaskForDate(date, `Revisão curta: ${subject.name}`, 'estudo');
+          addTaskForDate(date, 'Separar dúvidas para a escola/curso', 'school');
+        } else {
+          for (let n = 0; n < 2; n++) {
+            const subject = pool[cursor % pool.length];
+            cursor++;
+            const text = n === 0 ? `Estudar: ${subject.name}` : `Exercícios: ${subject.name}`;
+            dayPlan.push(text);
+            addTaskForDate(date, text, 'estudo');
+          }
+        }
+
+        preview.push({ date, dayPlan });
+      }
+
+      renderAll();
+      closeModals();
+      openModal('planModal');
+      renderPlanPreview(preview);
+    }
+    window.generateWeeklyPlan = generateWeeklyPlan;
+
+    function renderPlanPreview(preview) {
+      const box = $('planPreview');
+      if (!box) return;
+      box.innerHTML = '';
+      preview.forEach(({ date, dayPlan }) => {
+        const row = document.createElement('div');
+        row.className = 'plan-row';
+        row.innerHTML = `<b>${date.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'short' })}</b><br>${dayPlan.join(' • ')}`;
+        box.appendChild(row);
+      });
+    }
+
+    function getCurrentFocusTask() {
+      const tasks = (getTasks()[dateKey(selectedDate)] || []);
+      return tasks.find(task => !task.done) || tasks[0] || null;
+    }
+
+    function renderFocusMode() {
+      renderTimer();
+      const box = $('focusTaskBox');
+      if (!box) return;
+      const task = getCurrentFocusTask();
+      const subjectValue = $('subjectInput')?.value?.trim();
+      if (task) {
+        box.innerHTML = `<strong>${task.text}</strong><span>${task.type || 'tarefa'} • ${selectedDate.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}</span>`;
+      } else if (subjectValue) {
+        box.innerHTML = `<strong>${subjectValue}</strong><span>foco escolhido agora</span>`;
+      } else {
+        box.innerHTML = `<strong>sem tarefa escolhida</strong><span>adicione uma tarefa ou escreva o foco no Pomodoro.</span>`;
+      }
+    }
+
+    function openFocusMode() {
+      closeModals();
+      openModal('focusModal');
+      renderFocusMode();
+    }
+    window.openFocusMode = openFocusMode;
+
     function openModal(id) {
       $(id).classList.add('show');
       if (id === 'calendarModal') { updateCalendarRangeInfo(); renderCalendar(); }
       if (id === 'notesModal') renderNotes();
       if (id === 'subjectsModal') renderSubjects();
       if (id === 'shortcutModal') renderShortcuts();
+      if (id === 'focusModal') renderFocusMode();
     }
 
     function closeModals() {
@@ -1851,7 +2231,10 @@
     $('startTimer').onclick = startTimer;
     $('pauseTimer').onclick = pauseTimer;
     $('resetTimer').onclick = resetTimer;
-    $('skipTimer').onclick = () => { switchMode(); renderTimer(); };
+    $('skipTimer').onclick = () => { switchMode(); renderTimer(); renderFocusMode(); };
+    $('focusStartPause').onclick = () => { togglePomodoroByKeyboard(); renderFocusMode(); };
+    $('focusReset').onclick = () => { resetTimer(); renderFocusMode(); };
+    $('focusSkip').onclick = () => { switchMode(); renderTimer(); renderFocusMode(); };
     $('saveSubject').onclick = () => {
       const value = $('subjectInput').value.trim();
       if (value) addTask(`Estudar: ${value}`, 'estudo');
@@ -1887,8 +2270,8 @@
       if (!name) {
         try { name = new URL(url).hostname.replace('www.', ''); } catch { name = 'Atalho'; }
       }
-      const shortcuts = getShortcuts();
-      shortcuts.push({ name, url });
+      const shortcuts = sortedShortcuts(getShortcuts());
+      shortcuts.push({ name, url, category: $('shortcutCategory').value || 'outros', order: shortcuts.length });
       setShortcuts(shortcuts);
       $('shortcutName').value = '';
       $('shortcutUrl').value = '';
@@ -1940,6 +2323,7 @@
         a: () => openModal('taskModal'),
         l: () => openModal('shortcutModal'),
         f: () => window.open('https://portal.fernandapessoa.com.br', '_blank', 'noopener,noreferrer'),
+        m: () => openFocusMode(),
         r: () => resetTimer(),
         k: () => { switchMode(); renderTimer(); }
       };
