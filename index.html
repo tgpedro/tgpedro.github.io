@@ -1901,7 +1901,7 @@
           <div class="today-card">
             <span class="eyebrow">Plano do dia</span>
             <h2 class="today-title" id="dayName">Hoje</h2>
-            <p class="today-subtitle" id="daySummary">Rotina organizada com estudos, trabalho e descanso.</p>
+            <p class="today-subtitle" id="daySummary"></p>
           </div>
           <div class="countdowns">
             <div class="mini-stat">
@@ -1913,7 +1913,7 @@
               <strong id="enemCountdown">-- dias</strong>
               <div class="enem-progress-card">
                 <div class="enem-progress-track"><div class="enem-progress-fill" id="enemProgressFill"></div></div>
-                <span id="enemProgressText">progresso até a prova</span>
+                <span id="enemProgressText">tempo restante até a prova</span>
               </div>
             </div>
           </div>
@@ -1944,7 +1944,7 @@
         <div class="section-title">
           <div>
             <h2>Rotina do dia</h2>
-            <small>Clique nos dias para trocar o cronograma</small>
+            
           </div>
         </div>
 
@@ -1956,7 +1956,7 @@
         <div class="section-title">
           <div>
             <h2>Pomodoro</h2>
-            <small>Foco total, sem distrações.</small>
+            
           </div>
         </div>
 
@@ -1984,7 +1984,7 @@
         <div class="section-title">
           <div>
             <h2>Tarefas do dia</h2>
-            <small>Salva automaticamente</small>
+            
           </div>
           <button class="pill" data-modal="taskModal">Adicionar</button>
         </div>
@@ -1994,21 +1994,15 @@
           <button class="primary-btn" id="addQuickTask">+</button>
         </div>
 
-        <div class="clarity-guide">
-          <div class="clarity-item"><b>Tarefas</b><span>o que você precisa fazer hoje.</span></div>
-          <div class="clarity-item"><b>Log</b><span>o que você estudou, sentiu e percebeu.</span></div>
-          <div class="clarity-item"><b>Revisão</b><span>nasce automaticamente quando você conclui.</span></div>
-        </div>
-
         <div class="smart-grid">
           <div class="smart-card">
             <h3>Precisam de atenção</h3>
-            <p>Mostra matérias que merecem voltar para a rotina.</p>
+            
             <div class="smart-list" id="forgottenSubjectsList"></div>
           </div>
           <div class="smart-card">
             <h3>Resumo da semana</h3>
-            <p>Feitos, revisões e dias ativos.</p>
+            
             <div class="smart-list" id="weeklyReportBox"></div>
           </div>
         </div>
@@ -2027,7 +2021,7 @@
         <h2 id="monthLabel">Mês</h2>
         <button class="pill" id="nextMonth">→</button>
       </div>
-      <div class="calendar-range-info" id="calendarRangeInfo">segure <strong>shift</strong>, clique em uma data e depois em outra para contar quantos dias faltam entre elas.</div>
+      <div class="calendar-range-info" id="calendarRangeInfo">comparar datas</div>
       <div class="calendar-grid" id="calendarGrid"></div>
       <div class="calendar-legend">
         <div class="legend-item"><span class="legend-dot study"></span>rotina de estudo</div>
@@ -2035,7 +2029,7 @@
         <div class="legend-item"><span class="legend-dot review"></span>revisão automática</div>
         <div class="legend-item"><span class="legend-dot holiday"></span>feriado</div>
       </div>
-      <div class="calendar-day-info">cada dia mostra no máximo 3 sinais para não virar bagunça. abra o dia para ver tudo.</div>
+      
       <div class="holiday-list" id="holidayList"></div>
     </div>
   </div>
@@ -2047,7 +2041,7 @@
         <button class="icon-btn close-modal">✕</button>
       </div>
       <div class="tool-section">
-        <div class="tool-section-title">estudo <small>foco e revisão</small></div>
+        <div class="tool-section-title">estudo <small></small></div>
         <div class="tools-grid">
           <button class="tool-card" onclick="setPomodoro(25,5)"><span><span class="native-tool-img" style="--tool-image: url('https://i.imgur.com/230PgM1.png')">fer</span></span><b>Pomodoro padrão</b><span>25 minutos de foco e 5 de pausa.</span></button>
           <button class="tool-card" onclick="setPomodoro(50,10)"><span><span class="native-tool-img" style="--tool-image: url('https://i.imgur.com/230PgM1.png')">fer</span></span><b>Foco longo</b><span>50 minutos estudando e 10 de pausa.</span></button>
@@ -2059,7 +2053,7 @@
       </div>
 
       <div class="tool-section">
-        <div class="tool-section-title">rotina <small>organização do dia</small></div>
+        <div class="tool-section-title">rotina <small></small></div>
         <div class="tools-grid">
           <button class="tool-card" onclick="addHomeTasks()"><span><span class="native-tool-img" style="--tool-image: url('https://i.imgur.com/230PgM1.png')">fer</span></span><b>Checklist da casa</b><span>Adiciona banho, comer, arrumar mochila e casa.</span></button>
           <button class="tool-card" onclick="generateWeeklyPlan()"><span><span class="native-tool-img" style="--tool-image: url('https://i.imgur.com/NheLhAp.png')">cal</span></span><b>Gerar plano da semana</b><span>Cria tarefas automáticas usando prioridades, rotina e lazer.</span></button>
@@ -2068,7 +2062,7 @@
       </div>
 
       <div class="tool-section">
-        <div class="tool-section-title">análise <small>entender seu ritmo</small></div>
+        <div class="tool-section-title">análise <small></small></div>
         <div class="tools-grid">
           <button class="tool-card" onclick="createSmartReviewFromWeek()"><span><span class="native-tool-img" style="--tool-image: url('https://i.imgur.com/aUMsQqP.png')">mat</span></span><b>Revisão inteligente</b><span>Cria revisões com base no que precisa de atenção.</span></button>
           <button class="tool-card" onclick="copyWeeklyReport()"><span><span class="native-tool-img" style="--tool-image: url('https://i.imgur.com/JYkW3ZI.png')">log</span></span><b>Copiar relatório</b><span>Copia o resumo semanal para você guardar.</span></button>
@@ -2076,7 +2070,7 @@
       </div>
 
       <div class="tool-section">
-        <div class="tool-section-title">limpeza <small>manter tudo leve</small></div>
+        <div class="tool-section-title">limpeza <small></small></div>
         <div class="tools-grid">
           <button class="tool-card" onclick="clearDoneTasks()"><span><span class="native-tool-img" style="--tool-image: url('https://i.imgur.com/230PgM1.png')">fer</span></span><b>Limpar concluídas</b><span>Remove as tarefas já marcadas.</span></button>
         </div>
@@ -2103,7 +2097,7 @@
         </select>
         <button class="primary-btn" id="addShortcut">Adicionar</button>
       </div>
-      <div class="priority-help">arraste os atalhos pela alça ⋮⋮ para reorganizar. a ordem e a categoria salvam junto.</div>
+      
       <div class="notes-list" id="shortcutList"></div>
     </div>
   </div>
@@ -2114,9 +2108,7 @@
         <h2 class="modal-title-with-icon"><span class="native-tool-img" style="--tool-image: url('https://i.imgur.com/aUMsQqP.png')">mat</span>Matérias e prioridades</h2>
         <button class="icon-btn close-modal">✕</button>
       </div>
-      <div class="priority-help">
-      Alta é para o que exige mais foco no momento. Média serve para manter o ritmo. Baixa fica reservada para revisões leves. O lazer entra como pausa intencional.
-      </div>
+
       <div class="form-row">
         <input id="newSubjectName" placeholder="Adicionar matéria ou atividade. Ex: Filme no domingo" />
       </div>
@@ -2176,7 +2168,7 @@
         <h2 class="modal-title-with-icon"><span class="native-tool-img" style="--tool-image: url('https://i.imgur.com/JYkW3ZI.png')">log</span>Log diário</h2>
         <button class="icon-btn close-modal">✕</button>
       </div>
-      <div class="priority-help"><strong>Tarefas</strong> são o que fazer. <strong>Log</strong> é o que você fez/sentiu. <strong>Revisão</strong> é criada automaticamente quando algo é concluído ou quando você registra dificuldade.</div>
+      
       <div class="study-stats-grid">
         <div class="small-card"><span>Registros no dia</span><strong id="logCountToday">0</strong></div>
         <div class="small-card"><span>Matérias vistas</span><strong id="logSubjectsToday">0</strong></div>
@@ -2209,7 +2201,7 @@
         <div class="log-question"><label>Qual é o próximo passo?</label><textarea id="logNextStep" placeholder="Ex: revisar amanhã, fazer mais questões, ver aula curta..."></textarea></div>
       </div>
       <div class="form-row"><button class="primary-btn" id="saveStudyLog">Salvar log da matéria</button><button class="pill" id="fillLogFromFocus">Usar foco atual</button></div>
-      <div class="priority-help">Registro rápido manual</div>
+      
       <div class="form-row"><input id="dailyLogInput" placeholder="Ex: estudei matemática, fiz exercícios e revisei redação..." /><button class="primary-btn" id="addDailyLog">Salvar</button></div>
       <div class="form-row"><button class="pill" id="exportDailyLog">Copiar resumo do dia</button><button class="pill" id="exportDailyLogJson">Copiar JSON</button><button class="pill" id="clearDailyLogDay">Limpar dia</button></div>
       <div class="daily-log-list" id="dailyLogList"></div>
@@ -2223,9 +2215,7 @@
         <h2>Atalhos de teclado</h2>
         <button class="icon-btn close-modal">✕</button>
       </div>
-      <div class="priority-help">
-        Essas teclas funcionam quando nenhuma caixa de texto está selecionada. O Pomodoro fica só neste aparelho para não misturar o tempo entre celular e computador.
-      </div>
+
       <div class="shortcut-help-grid">
         <div class="shortcut-help-item"><span>Voltar para hoje</span><b class="kbd">T</b></div>
         <div class="shortcut-help-item"><span>Abrir calendário</span><b class="kbd">C</b></div>
@@ -2270,7 +2260,7 @@
         <h2>Plano da semana gerado</h2>
         <button class="icon-btn close-modal">✕</button>
       </div>
-      <div class="priority-help">as tarefas foram adicionadas nos próximos 7 dias sem duplicar o que já existia.</div>
+      
       <div class="plan-preview" id="planPreview"></div>
     </div>
   </div>
@@ -2284,7 +2274,7 @@
       { name: 'Humanas', priority: 'media', note: 'História, geografia, filosofia e sociologia.' },
       { name: 'Linguagens', priority: 'media', note: 'Interpretação, gramática e literatura.' },
       { name: 'Escrita criativa', priority: 'baixa', note: 'Praticar sem pressão, como treino extra.' },
-      { name: 'Filme / lazer no domingo', priority: 'lazer', note: 'Descanso planejado também faz parte da rotina.' }
+      { name: 'Filme / lazer no domingo', priority: 'lazer', note: '' }
     ];
 
     const routines = {
@@ -2973,7 +2963,12 @@
         const used = Math.max(0, Math.min(total, now - enemStart));
         const percent = Math.round((used / total) * 100);
         if ($('enemProgressFill')) $('enemProgressFill').style.width = percent + '%';
-        if ($('enemProgressText')) $('enemProgressText').textContent = percent + '% do caminho até a prova';
+        let phase = 'organização inicial';
+        if (diff <= 30) phase = 'últimos ajustes';
+        else if (diff <= 60) phase = 'reta final';
+        else if (diff <= 120) phase = 'fase de revisão';
+        else if (diff <= 180) phase = 'fase de constância';
+        if ($('enemProgressText')) $('enemProgressText').textContent = phase + ' • faltam ' + diff + ' dias';
       } else {
         $('enemCountdown').textContent = 'já passou';
         if ($('enemProgressFill')) $('enemProgressFill').style.width = '100%';
@@ -3274,11 +3269,11 @@
       }
 
       if (compareStartDate) {
-        info.innerHTML = `primeira data: <strong>${formatShortDate(compareStartDate)}</strong>. agora segure <strong>shift</strong> e clique na segunda data.`;
+        info.innerHTML = `primeira data: <strong>${formatShortDate(compareStartDate)}</strong> • escolha a segunda data`;
         return;
       }
 
-      info.innerHTML = 'segure <strong>shift</strong>, clique em uma data e depois em outra para contar quantos dias faltam entre elas.';
+      info.innerHTML = 'comparar datas';
     }
 
     function unlockAudio() {
@@ -3857,7 +3852,7 @@
       subjects.push({
         name,
         priority: $('newSubjectPriority').value,
-        note: $('newSubjectPriority').value === 'lazer' ? 'Tempo livre planejado para descansar sem culpa.' : 'Adicionado por você.'
+        note: ''
       });
       setSubjects(subjects);
       $('newSubjectName').value = '';
