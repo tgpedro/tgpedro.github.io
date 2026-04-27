@@ -193,6 +193,23 @@
       padding: 0;
     }
 
+    .icon-btn.native-icon {
+      background: transparent;
+      border-color: transparent;
+      box-shadow: none;
+    }
+
+    .icon-btn.native-icon:hover {
+      background: transparent;
+      border-color: transparent;
+      box-shadow: none;
+    }
+
+    .icon-btn.native-icon:hover .native-tool-img {
+      transform: scale(1.1);
+      filter: brightness(1.16) drop-shadow(0 8px 18px var(--day-glow));
+    }
+
     .pill:hover, .icon-btn:hover, .primary-btn:hover {
       transform: translateY(-1px);
       background: rgba(255,255,255,0.13);
@@ -301,6 +318,16 @@
       margin-top: 7px;
     }
 
+    .mini-stat .subcount {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: .78rem;
+      line-height: 1.35;
+      letter-spacing: 0;
+      font-weight: 700;
+    }
+
     .mini-stat span { color: var(--muted); font-size: .88rem; }
 
     .section-title {
@@ -322,6 +349,96 @@
     .routine-list {
       display: grid;
       gap: 10px;
+    }
+
+
+
+    .now-flow {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .now-card {
+      position: relative;
+      overflow: hidden;
+      padding: 16px;
+      border-radius: 22px;
+      border: 1px solid var(--line);
+      background: linear-gradient(135deg, rgba(255,255,255,.085), rgba(255,255,255,.045));
+      min-height: 112px;
+    }
+
+    .now-card::after {
+      content: "";
+      position: absolute;
+      width: 140px;
+      height: 140px;
+      border-radius: 999px;
+      right: -70px;
+      top: -70px;
+      background: var(--day-soft);
+      pointer-events: none;
+    }
+
+    .now-card.active {
+      border-color: var(--accent);
+      box-shadow: inset 0 0 0 1px var(--day-glow), 0 18px 45px rgba(0,0,0,.18);
+    }
+
+    .now-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: .76rem;
+      font-weight: 900;
+      letter-spacing: .11em;
+      text-transform: uppercase;
+      position: relative;
+      z-index: 1;
+    }
+
+    .now-badge {
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: var(--day-soft);
+      border: 1px solid var(--day-glow);
+      color: rgba(246,244,255,.9);
+      letter-spacing: 0;
+      text-transform: none;
+      white-space: nowrap;
+    }
+
+    .now-title {
+      margin: 12px 0 5px;
+      font-size: 1.05rem;
+      font-weight: 900;
+      letter-spacing: -.035em;
+      position: relative;
+      z-index: 1;
+    }
+
+    .now-desc {
+      margin: 0;
+      color: var(--muted);
+      font-size: .88rem;
+      line-height: 1.4;
+      position: relative;
+      z-index: 1;
+    }
+
+    .routine-item.current {
+      border-color: var(--accent);
+      background: linear-gradient(135deg, var(--day-soft), rgba(255,255,255,.055));
+      box-shadow: inset 0 0 0 1px var(--day-glow);
+    }
+
+    .routine-item.next {
+      border-color: rgba(255,255,255,.22);
+      background: rgba(255,255,255,.075);
     }
 
     .routine-item {
@@ -446,8 +563,7 @@
     .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
     .dot.work { background: var(--accent-2); }
     .dot.study { background: var(--success); }
-    .dot.school { background: var(--warning); }
-
+    
     .tasks {
       display: grid;
       gap: 9px;
@@ -532,6 +648,44 @@
       gap: 8px;
     }
 
+    .alarm-row {
+      margin: 14px auto 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: .86rem;
+    }
+
+    .alarm-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.055);
+      border-radius: 999px;
+      padding: 8px 11px;
+      color: rgba(246,244,255,.88);
+      user-select: none;
+    }
+
+    .alarm-toggle input {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--accent);
+    }
+
+    .alarm-test {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      color: rgba(246,244,255,.86);
+      border-radius: 999px;
+      padding: 8px 11px;
+      font-weight: 750;
+    }
+
     .subject-box {
       margin-top: 14px;
       display: grid;
@@ -559,15 +713,29 @@
       position: fixed;
       inset: 0;
       z-index: 50;
-      display: none;
+      display: flex;
       align-items: center;
       justify-content: center;
       padding: 18px;
       background: rgba(0,0,0,0.58);
       backdrop-filter: blur(10px);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity .22s ease, visibility .22s ease;
     }
 
-    .modal-backdrop.show { display: flex; }
+    .modal-backdrop.show {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    .modal-backdrop.closing {
+      opacity: 0;
+      visibility: visible;
+      pointer-events: none;
+    }
 
     .modal {
       width: min(760px, 100%);
@@ -578,6 +746,19 @@
       background: rgba(14, 14, 24, 0.92);
       box-shadow: var(--shadow);
       padding: 18px;
+      transform: scale(.96) translateY(10px);
+      opacity: 0;
+      transition: transform .22s ease, opacity .22s ease;
+    }
+
+    .modal-backdrop.show .modal {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+    }
+
+    .modal-backdrop.closing .modal {
+      transform: scale(.96) translateY(10px);
+      opacity: 0;
     }
 
     .modal-head {
@@ -606,6 +787,36 @@
 
     .tool-card b { display: block; margin: 10px 0 5px; }
     .tool-card span { color: var(--muted); font-size: .86rem; line-height: 1.35; }
+
+    .tool-section {
+      margin-top: 14px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.025);
+      border-radius: 24px;
+      padding: 12px;
+    }
+
+    .tool-section:first-of-type { margin-top: 0; }
+
+    .tool-section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 0 0 10px;
+      color: rgba(246,244,255,.88);
+      font-size: .78rem;
+      font-weight: 950;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .tool-section-title small {
+      color: var(--muted);
+      letter-spacing: 0;
+      text-transform: none;
+      font-weight: 700;
+    }
 
     .notes-list { display: grid; gap: 10px; margin-top: 12px; }
     .note {
@@ -813,10 +1024,6 @@
       animation: softFadeUp .34s ease both;
     }
 
-    .modal-backdrop.show .modal {
-      animation: softPop .22s ease both;
-    }
-
     .pill:active, .icon-btn:active, .primary-btn:active, .tool-card:active, .tiny-btn:active, .delete:active {
       transform: scale(.97);
     }
@@ -907,23 +1114,296 @@
       color: white;
     }
 
-    @media (max-width: 1050px) {
-      .grid { grid-template-columns: 1fr; }
-      .hero { grid-template-columns: 1fr; }
-      .countdowns { grid-template-columns: repeat(2, 1fr); }
+
+    .daily-log-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .daily-log-card {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.055);
+      border-radius: 20px;
+      padding: 14px;
+    }
+
+    .daily-log-card h3 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+      letter-spacing: -0.03em;
+    }
+
+    .daily-log-card ul {
+      margin: 8px 0 0;
+      padding-left: 18px;
+      color: rgba(246,244,255,.82);
+      line-height: 1.45;
+    }
+
+    .daily-log-meta {
+      color: var(--muted);
+      font-size: .82rem;
+      line-height: 1.4;
+    }
+
+    .daily-log-empty {
+      color: var(--muted);
+      line-height: 1.5;
+      margin: 10px 0 0;
+    }
+
+
+    .log-form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .log-form-grid .full { grid-column: 1 / -1; }
+    .log-question { border: 1px solid var(--line); background: rgba(255,255,255,.045); border-radius: 18px; padding: 12px; }
+    .log-question label { display: block; color: rgba(246,244,255,.86); font-size: .84rem; font-weight: 800; margin-bottom: 8px; }
+    .log-entry-head { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; margin-bottom: 9px; }
+    .log-entry-title { font-weight: 900; letter-spacing: -.03em; }
+    .log-entry-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px; }
+    .log-answer { border: 1px solid var(--line); background: rgba(255,255,255,.04); border-radius: 14px; padding: 9px; color: rgba(246,244,255,.82); line-height: 1.42; font-size: .86rem; }
+    .log-answer b { display: block; color: white; margin-bottom: 3px; font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; }
+    .log-score-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; margin-top: 9px; }
+    .log-score-bar { height: 9px; border-radius: 999px; background: rgba(255,255,255,.08); overflow: hidden; border: 1px solid var(--line); }
+    .log-score-fill { height: 100%; width: 0%; border-radius: 999px; background: linear-gradient(90deg, var(--accent), var(--accent-2)); }
+    .holiday-mark { display: inline-flex; align-items: center; justify-content: center; min-width: 14px; height: 14px; border-radius: 999px; font-size: .6rem; background: rgba(251,113,133,.16); border: 1px solid rgba(251,113,133,.28); color: #fecdd3; font-weight: 900; }
+    .day.holiday { border-color: rgba(251,113,133,.32); background: linear-gradient(180deg, rgba(251,113,133,.08), rgba(255,255,255,.045)); }
+    .holiday-list { display: grid; gap: 7px; margin: 10px auto 0; max-width: 440px; }
+    .holiday-item { display: flex; justify-content: space-between; gap: 10px; border: 1px solid var(--line); border-radius: 16px; background: rgba(255,255,255,.045); padding: 10px 11px; color: rgba(246,244,255,.84); font-size: .86rem; }
+    .study-stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; }
+
+
+
+    .native-tool-img {
+      width: 26px;
+      height: 26px;
+      display: inline-grid;
+      place-items: center;
+      flex: 0 0 auto;
+      border-radius: 0;
+      overflow: visible;
+      background-color: transparent;
+      background-image: var(--tool-image, none);
+      background-position: center;
+      background-size: contain;
+      background-repeat: no-repeat;
+      border: 0;
+      color: rgba(246,244,255,.9);
+      font-size: .56rem;
+      font-weight: 950;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      line-height: 1;
+      box-shadow: none;
+      transition: transform .2s ease, filter .2s ease;
+    }
+
+    .native-tool-img.has-real-image,
+    .native-tool-img.image-ok {
+      color: transparent;
+      text-shadow: none;
+    }
+
+    .native-tool-img.image-error {
+      background-image: none;
+      color: rgba(246,244,255,.9);
+    }
+
+    .modal-title-with-icon {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .modal-title-with-icon .native-tool-img {
+      width: 32px;
+      height: 32px;
+      border-radius: 13px;
+      box-shadow: 0 10px 22px rgba(0,0,0,.22);
+      font-size: .62rem;
+    }
+
+    .calendar-modal {
+      width: min(620px, 100%);
+      max-height: min(620px, 88vh);
+    }
+
+    .calendar-head {
+      max-width: 440px;
+      margin: 0 auto 8px;
+      padding: 9px;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: linear-gradient(135deg, rgba(255,255,255,.085), rgba(255,255,255,.045));
+    }
+
+    .calendar-head .pill { padding: 8px 11px; }
+    .calendar-head h2 { font-size: 1.05rem; }
+
+    .calendar-grid {
+      max-width: 440px;
+      gap: 4px;
+      padding: 7px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: rgba(255,255,255,.035);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+    }
+
+    .weekday { padding: 5px 3px; border-radius: 999px; background: rgba(255,255,255,.045); font-size: .68rem; }
+
+    .day {
+      position: relative;
+      min-height: 38px;
+      border-radius: 12px;
+      padding: 4px;
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.035));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+    }
+
+    .day-number { font-size: .78rem; }
+    .dot { width: 5px; height: 5px; }
+    .holiday-mark { min-width: 12px; height: 12px; font-size: .5rem; }
+    .holiday-list { max-width: 520px; margin-top: 8px; }
+    .holiday-item { padding: 8px 10px; font-size: .8rem; }
+
+    .day:hover { box-shadow: 0 12px 26px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.08); }
+
+    .day.today::after {
+      content: 'hoje';
+      position: absolute;
+      right: 5px;
+      top: 5px;
+      font-size: .52rem;
+      font-weight: 950;
+      letter-spacing: .04em;
+      color: white;
+      border-radius: 999px;
+      padding: 2px 5px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 8px 20px var(--day-soft);
+    }
+
+    .day.selected {
+      transform: translateY(-1px);
+      background: radial-gradient(circle at top right, var(--day-glow), transparent 55%), rgba(255,255,255,.075);
+      border-color: var(--accent);
+    }
+
+    .day.holiday .day-number { color: #fecdd3; }
+
+    .holiday-mark {
+      position: absolute;
+      right: 6px;
+      bottom: 6px;
+      min-width: 18px;
+      height: 18px;
+      box-shadow: 0 8px 16px rgba(251,113,133,.12);
+    }
+
+    .holiday-list { max-width: 640px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+    .holiday-item {
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(251,113,133,.075), rgba(255,255,255,.045));
     }
 
     @media (max-width: 720px) {
-      .app { width: min(100% - 20px, 1450px); padding-top: 10px; }
-      .topbar { position: relative; top: 0; align-items: flex-start; flex-direction: column; }
-      .header-actions { width: 100%; justify-content: flex-start; }
-      .routine-item { grid-template-columns: 68px 1fr; }
-      .routine-item .tag { grid-column: 2; width: fit-content; }
-      .cards-row, .tools-grid, .countdowns { grid-template-columns: 1fr; }
-      .calendar-grid { gap: 5px; }
-      .day { border-radius: 12px; padding: 6px; }
-      .day-number { font-size: .78rem; }
+      .calendar-grid { gap: 4px; padding: 6px; max-width: 100%; }
+      .day { min-height: 50px; border-radius: 14px; }
+      .holiday-list { grid-template-columns: 1fr; }
+      .native-tool-img { width: 22px; height: 22px; }
     }
+
+    /* sistema smart: revisão automática, relatório semanal e itens que precisam de atenção */
+    .clarity-guide {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin: 18px 0 0;
+    }
+
+    .clarity-item {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.045);
+      border-radius: 18px;
+      padding: 12px;
+      line-height: 1.38;
+    }
+
+    .clarity-item b {
+      display: block;
+      margin-bottom: 3px;
+      color: white;
+      font-size: .9rem;
+      letter-spacing: -.02em;
+    }
+
+    .clarity-item span {
+      color: var(--muted);
+      font-size: .8rem;
+    }
+
+    .calendar-legend {
+      max-width: 390px;
+      margin: 10px auto 0;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 7px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.045);
+      border-radius: 999px;
+      padding: 7px 9px;
+      color: var(--muted);
+      font-size: .76rem;
+      font-weight: 750;
+    }
+
+    .legend-dot { width: 9px; height: 9px; border-radius: 999px; flex: 0 0 auto; }
+    .legend-dot.study { background: var(--success); }
+    .legend-dot.task { background: var(--accent); }
+    .legend-dot.review { background: #c4b5fd; }
+    .legend-dot.holiday { background: var(--danger); }
+
+    .calendar-day-info {
+      max-width: 390px;
+      margin: 10px auto 0;
+      color: var(--muted);
+      font-size: .82rem;
+      line-height: 1.4;
+      text-align: center;
+    }
+
+    .dot.review { background: #c4b5fd; }
+    .dot.holiday-dot { background: var(--danger); }
+
+    .enem-progress-card { margin-top: 10px; display: grid; gap: 8px; }
+    .enem-progress-track, .smart-progress-track { height: 10px; border-radius: 999px; overflow: hidden; border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.075); }
+    .enem-progress-fill, .smart-progress-fill { height: 100%; width: 0%; border-radius: inherit; background: linear-gradient(90deg, var(--accent), var(--accent-2)); box-shadow: 0 0 22px var(--day-glow); transition: width .6s ease; }
+    .smart-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 18px; }
+    .smart-card { border: 1px solid var(--line); background: linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.045)); border-radius: 22px; padding: 15px; overflow: hidden; }
+    .smart-card h3 { margin: 0 0 5px; font-size: .98rem; letter-spacing: -.03em; }
+    .smart-card p { margin: 0; color: var(--muted); font-size: .84rem; line-height: 1.42; }
+    .smart-list { display: grid; gap: 8px; margin-top: 11px; max-height: 185px; overflow: auto; padding-right: 3px; }
+    .smart-row { display: flex; justify-content: space-between; gap: 10px; align-items: center; border: 1px solid var(--line); background: rgba(255,255,255,.045); border-radius: 15px; padding: 10px; color: rgba(246,244,255,.86); font-size: .84rem; line-height: 1.35; }
+    .smart-row b { color: white; }
+    .smart-row small { color: var(--muted); }
+    .smart-number { font-size: 1.35rem; font-weight: 950; letter-spacing: -.06em; color: white; white-space: nowrap; }
+    .energy-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 10px; }
+    .review-chip { display: inline-flex; align-items: center; gap: 6px; width: fit-content; margin-top: 8px; border-radius: 999px; padding: 6px 9px; border: 1px solid rgba(134,239,172,.22); background: rgba(134,239,172,.10); color: #dcfce7; font-size: .74rem; font-weight: 850; }
+    @media (max-width: 720px) { .smart-grid, .energy-row, .clarity-guide, .calendar-legend { grid-template-columns: 1fr; } .smart-list { max-height: 150px; } }
+
   </style>
 </head>
 <body>
@@ -943,10 +1423,11 @@
         <button class="icon-btn" data-modal="shortcutModal" title="Adicionar atalho">+</button>
         <div class="header-divider"></div>
         <div class="shortcuts-bar" id="shortcutsBar"></div>
-        <button class="icon-btn" data-modal="calendarModal" title="Calendário">📅</button>
-        <button class="icon-btn" data-modal="toolsModal" title="Ferramentas">🧰</button>
-        <button class="icon-btn" data-modal="notesModal" title="Notas">📝</button>
-        <button class="icon-btn" data-modal="subjectsModal" title="Matérias e prioridades">🎯</button>
+        <button class="icon-btn native-icon" data-modal="calendarModal" title="Calendário"><span class="native-tool-img" style="--tool-image: url('https://i.imgur.com/NheLhAp.png')">cal</span></button>
+        <button class="icon-btn native-icon" data-modal="toolsModal" title="Ferramentas"><span class="native-tool-img" style="--tool-image: url('https://i.imgur.com/230PgM1.png')">fer</span></button>
+        <button class="icon-btn native-icon" data-modal="notesModal" title="Notas"><span class="native-tool-img" style="--tool-image: url('https://i.imgur.com/TWnxlsa.png')">not</span></button>
+        <button class="icon-btn native-icon" data-modal="dailyLogModal" title="Log diário"><span class="native-tool-img" style="--tool-image: url('https://i.imgur.com/JYkW3ZI.png')">log</span></button>
+        <button class="icon-btn native-icon" data-modal="subjectsModal" title="Matérias e prioridades"><span class="native-tool-img" style="--tool-image: url('https://i.imgur.com/aUMsQqP.png')">mat</span></button>
         <button class="primary-btn" data-modal="taskModal">+ tarefa</button>
       </div>
     </header>
@@ -957,7 +1438,7 @@
           <div class="today-card">
             <span class="eyebrow">Plano do dia</span>
             <h2 class="today-title" id="dayName">Hoje</h2>
-            <p class="today-subtitle" id="daySummary">Rotina organizada com estudos, trabalho, escola e descanso.</p>
+            <p class="today-subtitle" id="daySummary">Rotina organizada com estudos, trabalho e descanso.</p>
           </div>
           <div class="countdowns">
             <div class="mini-stat">
@@ -967,6 +1448,10 @@
             <div class="mini-stat">
               <span>Contagem ENEM</span>
               <strong id="enemCountdown">-- dias</strong>
+              <div class="enem-progress-card">
+                <div class="enem-progress-track"><div class="enem-progress-fill" id="enemProgressFill"></div></div>
+                <span id="enemProgressText">progresso até a prova</span>
+              </div>
             </div>
           </div>
         </div>
@@ -976,6 +1461,20 @@
           <div class="small-card"><span>Blocos de estudo hoje</span><strong id="studyBlocks">--</strong></div>
           <div class="small-card"><span>Dia selecionado</span><strong id="selectedDateLabel">--</strong></div>
         </div>
+
+        <div class="now-flow" id="nowFlow">
+          <div class="now-card active">
+            <div class="now-label">agora <span class="now-badge" id="nowTimeLeft">--</span></div>
+            <div class="now-title" id="currentRoutineTitle">Carregando...</div>
+            <p class="now-desc" id="currentRoutineDesc">Vou mostrar o que está acontecendo de acordo com o horário.</p>
+          </div>
+          <div class="now-card">
+            <div class="now-label">próxima <span class="now-badge" id="nextTimeLeft">--</span></div>
+            <div class="now-title" id="nextRoutineTitle">Carregando...</div>
+            <p class="now-desc" id="nextRoutineDesc">Também mostro quanto falta para a próxima parte da rotina.</p>
+          </div>
+        </div>
+
 
         <div style="height: 18px"></div>
 
@@ -1007,6 +1506,10 @@
             <button class="pill" id="resetTimer">Resetar</button>
             <button class="pill" id="skipTimer">Pular</button>
           </div>
+          <div class="alarm-row">
+            <label class="alarm-toggle"><input type="checkbox" id="alarmEnabled" checked /> alarme do Pomodoro</label>
+            <button class="alarm-test" id="testAlarm" type="button">testar som</button>
+          </div>
           <div class="subject-box">
             <input id="subjectInput" placeholder="O que você vai estudar agora? Ex: matemática, redação..." />
             <button class="pill" id="saveSubject">Salvar foco de hoje</button>
@@ -1027,14 +1530,33 @@
           <input id="quickTask" placeholder="Adicionar tarefa rápida..." />
           <button class="primary-btn" id="addQuickTask">+</button>
         </div>
+
+        <div class="clarity-guide">
+          <div class="clarity-item"><b>Tarefas</b><span>o que você precisa fazer hoje.</span></div>
+          <div class="clarity-item"><b>Log</b><span>o que você estudou, sentiu e percebeu.</span></div>
+          <div class="clarity-item"><b>Revisão</b><span>nasce automaticamente quando você conclui.</span></div>
+        </div>
+
+        <div class="smart-grid">
+          <div class="smart-card">
+            <h3>Precisam de atenção</h3>
+            <p>Mostra matérias que merecem voltar para a rotina.</p>
+            <div class="smart-list" id="forgottenSubjectsList"></div>
+          </div>
+          <div class="smart-card">
+            <h3>Resumo da semana</h3>
+            <p>Feitos, revisões e dias ativos.</p>
+            <div class="smart-list" id="weeklyReportBox"></div>
+          </div>
+        </div>
       </aside>
     </main>
   </div>
 
   <div class="modal-backdrop" id="calendarModal">
-    <div class="modal">
+    <div class="modal calendar-modal">
       <div class="modal-head">
-        <h2>Calendário</h2>
+        <h2 class="modal-title-with-icon"><span class="native-tool-img" style="--tool-image: url('https://i.imgur.com/NheLhAp.png')">cal</span>Calendário</h2>
         <button class="icon-btn close-modal">✕</button>
       </div>
       <div class="calendar-head">
@@ -1044,24 +1566,57 @@
       </div>
       <div class="calendar-range-info" id="calendarRangeInfo">segure <strong>shift</strong>, clique em uma data e depois em outra para contar quantos dias faltam entre elas.</div>
       <div class="calendar-grid" id="calendarGrid"></div>
+      <div class="calendar-legend">
+        <div class="legend-item"><span class="legend-dot study"></span>rotina de estudo</div>
+        <div class="legend-item"><span class="legend-dot task"></span>tarefa comum</div>
+        <div class="legend-item"><span class="legend-dot review"></span>revisão automática</div>
+        <div class="legend-item"><span class="legend-dot holiday"></span>feriado</div>
+      </div>
+      <div class="calendar-day-info">cada dia mostra no máximo 3 sinais para não virar bagunça. abra o dia para ver tudo.</div>
+      <div class="holiday-list" id="holidayList"></div>
     </div>
   </div>
 
   <div class="modal-backdrop" id="toolsModal">
     <div class="modal">
       <div class="modal-head">
-        <h2>Ferramentas</h2>
+        <h2 class="modal-title-with-icon"><span class="native-tool-img" style="--tool-image: url('https://i.imgur.com/230PgM1.png')">fer</span>Ferramentas</h2>
         <button class="icon-btn close-modal">✕</button>
       </div>
-      <div class="tools-grid">
-        <button class="tool-card" onclick="setPomodoro(25,5)"><span>🍅</span><b>Pomodoro padrão</b><span>25 minutos de foco e 5 de pausa.</span></button>
-        <button class="tool-card" onclick="setPomodoro(50,10)"><span>⚡</span><b>Foco longo</b><span>50 minutos estudando e 10 de pausa.</span></button>
-        <button class="tool-card" onclick="setPomodoro(15,5)"><span>🌱</span><b>Aquecer</b><span>15 minutos para quando estiver sem energia.</span></button>
-        <button class="tool-card" onclick="addDefaultStudyTasks()"><span>📚</span><b>Checklist de estudo</b><span>Adiciona revisar, exercícios e resumo.</span></button>
-        <button class="tool-card" onclick="addHomeTasks()"><span>🏠</span><b>Checklist da casa</b><span>Adiciona banho, comer, arrumar mochila e casa.</span></button>
-        <button class="tool-card" onclick="generateWeeklyPlan()"><span>🗓️</span><b>Gerar plano da semana</b><span>Cria tarefas automáticas usando prioridades, rotina e lazer.</span></button>
-        <button class="tool-card" onclick="openFocusMode()"><span>🎯</span><b>Modo foco</b><span>Abre uma tela limpa só com tarefa atual e Pomodoro.</span></button>
-        <button class="tool-card" onclick="clearDoneTasks()"><span>🧹</span><b>Limpar concluídas</b><span>Remove as tarefas já marcadas.</span></button>
+      <div class="tool-section">
+        <div class="tool-section-title">estudo <small>foco e revisão</small></div>
+        <div class="tools-grid">
+          <button class="tool-card" onclick="setPomodoro(25,5)"><span><span class="native-tool-img" style="--tool-image: url('https://i.imgur.com/230PgM1.png')">fer</span></span><b>Pomodoro padrão</b><span>25 minutos de foco e 5 de pausa.</span></button>
+          <button class="tool-card" onclick="setPomodoro(50,10)"><span><span class="native-tool-img" style="--tool-image: url('https://i.imgur.com/230PgM1.png')">fer</span></span><b>Foco longo</b><span>50 minutos estudando e 10 de pausa.</span></button>
+          <button class="tool-card" onclick="setPomodoro(15,5)"><span><span class="native-tool-img" style="--tool-image: url('https://i.imgur.com/230PgM1.png')">fer</span></span><b>Aquecer</b><span>15 minutos para quando estiver sem energia.</span></button>
+          <button class="tool-card" onclick="addDefaultStudyTasks()"><span><span class="native-tool-img" style="--tool-image: url('https://i.imgur.com/230PgM1.png')">fer</span></span><b>Checklist de estudo</b><span>Adiciona revisar, exercícios e resumo.</span></button>
+          <button class="tool-card" onclick="openStudyLogFromTools()"><span><span class="native-tool-img" style="--tool-image: url('https://i.imgur.com/JYkW3ZI.png')">log</span></span><b>Log de matéria</b><span>Responda perguntas depois de estudar uma matéria.</span></button>
+          <button class="tool-card" onclick="addReviewTasksFromLog()"><span><span class="native-tool-img" style="--tool-image: url('https://i.imgur.com/230PgM1.png')">fer</span></span><b>Revisar dificuldades</b><span>Cria tarefas usando dúvidas e dificuldades do log.</span></button>
+        </div>
+      </div>
+
+      <div class="tool-section">
+        <div class="tool-section-title">rotina <small>organização do dia</small></div>
+        <div class="tools-grid">
+          <button class="tool-card" onclick="addHomeTasks()"><span><span class="native-tool-img" style="--tool-image: url('https://i.imgur.com/230PgM1.png')">fer</span></span><b>Checklist da casa</b><span>Adiciona banho, comer, arrumar mochila e casa.</span></button>
+          <button class="tool-card" onclick="generateWeeklyPlan()"><span><span class="native-tool-img" style="--tool-image: url('https://i.imgur.com/NheLhAp.png')">cal</span></span><b>Gerar plano da semana</b><span>Cria tarefas automáticas usando prioridades, rotina e lazer.</span></button>
+          <button class="tool-card" onclick="openFocusMode()"><span><span class="native-tool-img" style="--tool-image: url('https://i.imgur.com/230PgM1.png')">fer</span></span><b>Modo foco</b><span>Abre uma tela limpa só com tarefa atual e Pomodoro.</span></button>
+        </div>
+      </div>
+
+      <div class="tool-section">
+        <div class="tool-section-title">análise <small>entender seu ritmo</small></div>
+        <div class="tools-grid">
+          <button class="tool-card" onclick="createSmartReviewFromWeek()"><span><span class="native-tool-img" style="--tool-image: url('https://i.imgur.com/aUMsQqP.png')">mat</span></span><b>Revisão inteligente</b><span>Cria revisões com base no que precisa de atenção.</span></button>
+          <button class="tool-card" onclick="copyWeeklyReport()"><span><span class="native-tool-img" style="--tool-image: url('https://i.imgur.com/JYkW3ZI.png')">log</span></span><b>Copiar relatório</b><span>Copia o resumo semanal para você guardar.</span></button>
+        </div>
+      </div>
+
+      <div class="tool-section">
+        <div class="tool-section-title">limpeza <small>manter tudo leve</small></div>
+        <div class="tools-grid">
+          <button class="tool-card" onclick="clearDoneTasks()"><span><span class="native-tool-img" style="--tool-image: url('https://i.imgur.com/230PgM1.png')">fer</span></span><b>Limpar concluídas</b><span>Remove as tarefas já marcadas.</span></button>
+        </div>
       </div>
     </div>
   </div>
@@ -1079,7 +1634,6 @@
         <input id="shortcutUrl" placeholder="link" />
         <select id="shortcutCategory">
           <option value="estudo">estudo</option>
-          <option value="escola">escola</option>
           <option value="enem">enem</option>
           <option value="lazer">lazer</option>
           <option value="outros">outros</option>
@@ -1094,7 +1648,7 @@
   <div class="modal-backdrop" id="subjectsModal">
     <div class="modal">
       <div class="modal-head">
-        <h2>Matérias e prioridades</h2>
+        <h2 class="modal-title-with-icon"><span class="native-tool-img" style="--tool-image: url('https://i.imgur.com/aUMsQqP.png')">mat</span>Matérias e prioridades</h2>
         <button class="icon-btn close-modal">✕</button>
       </div>
       <div class="priority-help">
@@ -1129,7 +1683,6 @@
         <select id="modalTaskType">
           <option value="study">Estudo</option>
           <option value="work">Trabalho</option>
-          <option value="school">Escola</option>
           <option value="home">Casa</option>
           <option value="rest">Descanso</option>
         </select>
@@ -1141,7 +1694,7 @@
   <div class="modal-backdrop" id="notesModal">
     <div class="modal">
       <div class="modal-head">
-        <h2>Notas rápidas</h2>
+        <h2 class="modal-title-with-icon"><span class="native-tool-img" style="--tool-image: url('https://i.imgur.com/TWnxlsa.png')">not</span>Notas rápidas</h2>
         <button class="icon-btn close-modal">✕</button>
       </div>
       <textarea id="noteText" placeholder="Digite aqui..."></textarea>
@@ -1152,6 +1705,54 @@
       <div class="notes-list" id="notesList"></div>
     </div>
   </div>
+
+
+  <div class="modal-backdrop" id="dailyLogModal">
+    <div class="modal">
+      <div class="modal-head">
+        <h2 class="modal-title-with-icon"><span class="native-tool-img" style="--tool-image: url('https://i.imgur.com/JYkW3ZI.png')">log</span>Log diário</h2>
+        <button class="icon-btn close-modal">✕</button>
+      </div>
+      <div class="priority-help"><strong>Tarefas</strong> são o que fazer. <strong>Log</strong> é o que você fez/sentiu. <strong>Revisão</strong> é criada automaticamente quando algo é concluído ou quando você registra dificuldade.</div>
+      <div class="study-stats-grid">
+        <div class="small-card"><span>Registros no dia</span><strong id="logCountToday">0</strong></div>
+        <div class="small-card"><span>Matérias vistas</span><strong id="logSubjectsToday">0</strong></div>
+        <div class="small-card"><span>Foco médio</span><strong id="logAverageFocus">--</strong></div>
+      </div>
+      <div class="energy-row">
+        <select id="logMood">
+          <option value="">humor do bloco</option>
+          <option value="cansado">cansado</option>
+          <option value="normal">normal</option>
+          <option value="ansioso">ansioso</option>
+          <option value="motivado">motivado</option>
+          <option value="tranquilo">tranquilo</option>
+        </select>
+        <select id="logEnergy">
+          <option value="">energia</option>
+          <option value="baixa">energia baixa</option>
+          <option value="media">energia média</option>
+          <option value="alta">energia alta</option>
+        </select>
+      </div>
+      <div class="form-row"><select id="logSubjectSelect"></select><input id="logMinutes" type="number" min="0" placeholder="minutos estudados" /></div>
+      <div class="log-form-grid">
+        <div class="log-question"><label>Qual era o objetivo desse bloco?</label><input id="logGoal" placeholder="Ex: revisar funções, fazer redação, corrigir erros..." /></div>
+        <div class="log-question"><label>Como foi seu foco? 0 a 10</label><input id="logFocusScore" type="number" min="0" max="10" placeholder="Ex: 8" /></div>
+        <div class="log-question full"><label>O que você estudou exatamente?</label><textarea id="logStudied" placeholder="Conte o conteúdo, páginas, vídeo, aula, lista ou tema..."></textarea></div>
+        <div class="log-question"><label>O que você aprendeu?</label><textarea id="logLearned" placeholder="Escreva com suas palavras o que ficou claro."></textarea></div>
+        <div class="log-question"><label>O que ficou difícil ou confuso?</label><textarea id="logDifficulty" placeholder="Isso vira revisão depois."></textarea></div>
+        <div class="log-question"><label>Fez exercícios? Quantos/acertos?</label><textarea id="logExercises" placeholder="Ex: 15 questões, errei 4, corrigir questão 8..."></textarea></div>
+        <div class="log-question"><label>Qual é o próximo passo?</label><textarea id="logNextStep" placeholder="Ex: revisar amanhã, fazer mais questões, ver aula curta..."></textarea></div>
+      </div>
+      <div class="form-row"><button class="primary-btn" id="saveStudyLog">Salvar log da matéria</button><button class="pill" id="fillLogFromFocus">Usar foco atual</button></div>
+      <div class="priority-help">Registro rápido manual</div>
+      <div class="form-row"><input id="dailyLogInput" placeholder="Ex: estudei matemática, fiz exercícios e revisei redação..." /><button class="primary-btn" id="addDailyLog">Salvar</button></div>
+      <div class="form-row"><button class="pill" id="exportDailyLog">Copiar resumo do dia</button><button class="pill" id="exportDailyLogJson">Copiar JSON</button><button class="pill" id="clearDailyLogDay">Limpar dia</button></div>
+      <div class="daily-log-list" id="dailyLogList"></div>
+    </div>
+  </div>
+
 
   <div class="modal-backdrop" id="keyboardModal">
     <div class="modal">
@@ -1166,6 +1767,7 @@
         <div class="shortcut-help-item"><span>Voltar para hoje</span><b class="kbd">T</b></div>
         <div class="shortcut-help-item"><span>Abrir calendário</span><b class="kbd">C</b></div>
         <div class="shortcut-help-item"><span>Abrir notas</span><b class="kbd">N</b></div>
+        <div class="shortcut-help-item"><span>Abrir log diário</span><b class="kbd">D</b></div>
         <div class="shortcut-help-item"><span>Abrir matérias</span><b class="kbd">S</b></div>
         <div class="shortcut-help-item"><span>Adicionar tarefa</span><b class="kbd">A</b></div>
         <div class="shortcut-help-item"><span>Adicionar atalho</span><b class="kbd">L</b></div>
@@ -1174,7 +1776,7 @@
         <div class="shortcut-help-item"><span>Começar / pausar Pomodoro</span><b class="kbd">Espaço</b></div>
         <div class="shortcut-help-item"><span>Resetar Pomodoro</span><b class="kbd">R</b></div>
         <div class="shortcut-help-item"><span>Pular ciclo</span><b class="kbd">K</b></div>
-        <div class="shortcut-help-item"><span>Fechar janela</span><b class="kbd">Ctrl</b></div>
+        <div class="shortcut-help-item"><span>Fechar janela</span><b class="kbd">Alt</b></div>
         <div class="shortcut-help-item"><span>Ver esta ajuda</span><b class="kbd">?</b></div>
       </div>
     </div>
@@ -1224,14 +1826,14 @@
 
     const routines = {
       1: {
-        label: 'Segunda', summary: 'Estudo de manhã, trabalho à tarde e escola à noite.', studyBlocks: '6 pomodoros', items: [
+        label: 'Segunda', summary: 'Estudo de manhã, trabalho à tarde e rotina à noite.', studyBlocks: '6 pomodoros', items: [
           ['07:00', 'Acordar', 'Escovar os dentes, comer algo e preparar para começar.', 'manhã'],
           ['07:30', 'Estudar com Pomodoro', 'Pomodoro 25/5. Escolher uma matéria na hora e começar pelo mais importante.', 'estudo'],
           ['10:30', 'Pausar estudos', 'Arrumar suas coisas, tomar banho, arrumar a casa e comer.', 'casa'],
           ['12:20', 'Pegar ônibus', 'Sair para o trabalho.', 'ônibus'],
           ['13:00', 'Trabalho', 'Trabalho até 17h.', 'trabalho'],
-          ['17:40', 'Chegar em casa', 'Descansar um pouco antes da escola.', 'descanso'],
-          ['18:00', 'Banho e comida', 'Se arrumar para ir à escola.', 'rotina'],
+          ['17:40', 'Chegar em casa', 'Descansar um pouco antes da rotina da noite.', 'descanso'],
+          ['18:00', 'Banho e comida', 'Se arrumar para a rotina da noite.', 'rotina'],
           ['23:00', 'Chegar, banho e dormir', 'Encerrar o dia.', 'sono']
         ]
       },
@@ -1244,7 +1846,7 @@
           ['09:30', 'Arrumar a casa', 'Organizar tudo logo depois do estudo.', 'casa'],
           ['10:20', 'Banho e comida', 'Se arrumar para sair sem pressa.', 'rotina'],
           ['11:10', 'Sair para o ônibus', 'Pegar ônibus mais cedo para o curso.', 'ônibus'],
-          ['Noite', 'Escola/rotina final', 'Ao chegar, banho e dormir.', 'sono']
+          ['Noite', 'Rotina final', 'Ao chegar, banho e dormir.', 'sono']
         ]
       },
       5: null,
@@ -1281,6 +1883,8 @@
     let timerSeconds = focusMinutes * 60;
     let mode = 'focus';
     let isRunning = false;
+    let audioContext = null;
+    let alarmEnabled = localStorage.getItem('pomodoroAlarmEnabled') !== 'false';
 
     const $ = (id) => document.getElementById(id);
     const dateKey = (date) => date.toISOString().slice(0, 10);
@@ -1292,24 +1896,26 @@
     const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
     const fixedShortcuts = [
-      { name: 'FP', url: 'https://portal.fernandapessoa.com.br', textOnly: true, fixed: true, category: 'escola' }
+      { name: 'FP', url: 'https://portal.fernandapessoa.com.br', textOnly: true, fixed: true, category: 'estudo' }
     ];
 
     const defaultShortcuts = [
       { name: 'YouTube', url: 'https://www.youtube.com', category: 'lazer' },
-      { name: 'Google Sala', url: 'https://classroom.google.com', category: 'escola' },
+      { name: 'Google Sala', url: 'https://classroom.google.com', category: 'estudo' },
       { name: 'Khan', url: 'https://pt.khanacademy.org', category: 'estudo' },
       { name: 'Redação Online', url: 'https://redacaonline.com.br', category: 'enem' },
       { name: 'Descomplica', url: 'https://descomplica.com.br', category: 'enem' }
     ];
 
-    const shortcutCategories = ['estudo', 'escola', 'enem', 'lazer', 'outros'];
+    const shortcutCategories = ['estudo', 'enem', 'lazer', 'outros'];
+
 
     let appState = {
       tasks: {},
       notes: [],
       subjects: defaultSubjects,
-      shortcuts: defaultShortcuts
+      shortcuts: defaultShortcuts,
+      dailyLogs: {}
     };
 
     let saveTimer = null;
@@ -1341,7 +1947,7 @@
       return {
         name: shortcut?.name || 'Atalho',
         url: shortcut?.url || '#',
-        category: shortcut?.category || 'outros',
+        category: shortcut?.category === 'escola' ? 'estudo' : (shortcut?.category || 'outros'),
         textOnly: !!shortcut?.textOnly,
         fixed: !!shortcut?.fixed,
         order: Number.isFinite(shortcut?.order) ? shortcut.order : index
@@ -1357,7 +1963,8 @@
         tasks: data.tasks || {},
         notes: Array.isArray(data.notes) ? data.notes : [],
         subjects: Array.isArray(data.subjects) ? data.subjects : defaultSubjects,
-        shortcuts: normalizeShortcuts(data.shortcuts)
+        shortcuts: normalizeShortcuts(data.shortcuts),
+        dailyLogs: data.dailyLogs || {}
       };
     }
 
@@ -1366,7 +1973,8 @@
         tasks: safeParse(localStorage.getItem('routineTasks'), {}),
         notes: safeParse(localStorage.getItem('routineNotes'), []),
         subjects: safeParse(localStorage.getItem('routineSubjects'), defaultSubjects),
-        shortcuts: safeParse(localStorage.getItem('routineShortcuts'), defaultShortcuts)
+        shortcuts: safeParse(localStorage.getItem('routineShortcuts'), defaultShortcuts),
+        dailyLogs: safeParse(localStorage.getItem('routineDailyLogs'), {})
       });
     }
 
@@ -1396,6 +2004,9 @@
       renderNotes();
       renderSubjects();
       renderShortcuts();
+      renderDailyLog();
+      renderForgottenSubjects();
+      renderWeeklyReport();
     }
 
     async function loadAppData(options = {}) {
@@ -1534,6 +2145,322 @@
       queueSave();
     }
 
+
+    function pad2(value) { return String(value).padStart(2, '0'); }
+    function localDateKey(year, month, day) { return year + '-' + pad2(month) + '-' + pad2(day); }
+    function addDays(date, amount) { const next = new Date(date); next.setDate(next.getDate() + amount); return next; }
+    function calculateEaster(year) {
+      const a = year % 19, b = Math.floor(year / 100), c = year % 100, d = Math.floor(b / 4), e = b % 4;
+      const f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3);
+      const h = (19 * a + b - d - g + 15) % 30, i = Math.floor(c / 4), k = c % 4;
+      const l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451);
+      const month = Math.floor((h + l - 7 * m + 114) / 31), day = ((h + l - 7 * m + 114) % 31) + 1;
+      return new Date(year, month - 1, day);
+    }
+    function getBrazilHolidays(year) {
+      const easter = calculateEaster(year);
+      const list = [
+        { key: localDateKey(year, 1, 1), name: 'Confraternização Universal' },
+        { key: localDateKey(year, 4, 21), name: 'Tiradentes' },
+        { key: localDateKey(year, 5, 1), name: 'Dia do Trabalho' },
+        { key: localDateKey(year, 9, 7), name: 'Independência do Brasil' },
+        { key: localDateKey(year, 10, 12), name: 'Nossa Senhora Aparecida' },
+        { key: localDateKey(year, 11, 2), name: 'Finados' },
+        { key: localDateKey(year, 11, 15), name: 'Proclamação da República' },
+        { key: localDateKey(year, 11, 20), name: 'Consciência Negra' },
+        { key: localDateKey(year, 12, 25), name: 'Natal' },
+        { key: dateKey(addDays(easter, -48)), name: 'Carnaval' },
+        { key: dateKey(addDays(easter, -47)), name: 'Carnaval' },
+        { key: dateKey(addDays(easter, -2)), name: 'Sexta-feira Santa' },
+        { key: dateKey(easter), name: 'Páscoa' },
+        { key: dateKey(addDays(easter, 60)), name: 'Corpus Christi' }
+      ];
+      return list.reduce((acc, item) => { acc[item.key] = item.name; return acc; }, {});
+    }
+    function getSubjectNamesForLog() {
+      const fromSubjects = getSubjects().map(s => s.name).filter(Boolean);
+      const defaults = ['Redação', 'Matemática', 'Natureza', 'Humanas', 'Linguagens', 'Escrita criativa'];
+      return [...new Set([...fromSubjects, ...defaults])];
+    }
+    function refreshLogSubjectSelect() {
+      const select = $('logSubjectSelect'); if (!select) return;
+      const current = select.value;
+      select.innerHTML = '<option value="">Escolher matéria/atividade</option>' + getSubjectNamesForLog().map(name => '<option value="' + name + '">' + name + '</option>').join('');
+      if (current) select.value = current;
+    }
+    function clearStudyLogForm() {
+      ['logMinutes','logGoal','logFocusScore','logStudied','logLearned','logDifficulty','logExercises','logNextStep','logMood','logEnergy'].forEach(id => { if ($(id)) $(id).value = ''; });
+      if ($('logSubjectSelect')) $('logSubjectSelect').value = '';
+    }
+
+    function getDailyLogs() {
+      return appState.dailyLogs || {};
+    }
+
+    function setDailyLogs(logs) {
+      appState.dailyLogs = logs || {};
+      queueSave();
+    }
+
+    function addDailyLogEntry(text, source = 'manual', targetDate = selectedDate, extra = {}) {
+      const clean = (text || '').trim();
+      if (!clean && !extra.subject) return;
+      const logs = getDailyLogs();
+      const key = dateKey(targetDate);
+      logs[key] = logs[key] || [];
+      logs[key].unshift({ text: clean, source, createdAt: new Date().toISOString(), ...extra });
+      setDailyLogs(logs);
+      renderDailyLog();
+    }
+    function addStudyLogFromForm() {
+      const subject = $('logSubjectSelect').value.trim();
+      const minutes = Number($('logMinutes').value || 0);
+      const goal = $('logGoal').value.trim();
+      const focusScore = $('logFocusScore').value.trim();
+      const studied = $('logStudied').value.trim();
+      const learned = $('logLearned').value.trim();
+      const difficulty = $('logDifficulty').value.trim();
+      const exercises = $('logExercises').value.trim();
+      const nextStep = $('logNextStep').value.trim();
+      const mood = $('logMood') ? $('logMood').value : '';
+      const energy = $('logEnergy') ? $('logEnergy').value : '';
+      if (!subject && !studied && !learned && !difficulty && !exercises && !nextStep && !goal) return;
+      const title = subject ? subject + (studied ? ': ' + studied.slice(0, 70) : '') : (studied || goal || 'log de estudo');
+      addDailyLogEntry(title, 'log de matéria', selectedDate, { kind: 'study_session', subject, minutes: Number.isFinite(minutes) ? minutes : 0, goal, focusScore: focusScore === '' ? null : Number(focusScore), studied, learned, difficulty, exercises, nextStep, mood, energy });
+      clearStudyLogForm();
+    }
+    function autoLogFromTask(task) {
+      if (!task || !task.done || task.loggedAt) return;
+      const type = task.type || '', text = task.text || '';
+      const looksLikeStudy = type === 'estudo' || type === 'study' || /estudar|exerc[ií]cio|revis[aã]o|resumo|redação|matem[aá]tica|natureza|humanas|linguagens/i.test(text);
+      if (looksLikeStudy) addDailyLogEntry(text.replace(/^Estudar:\s*/i, ''), 'tarefa concluída');
+    }
+    function formatLogEntry(entry) {
+      const time = entry.createdAt ? new Date(entry.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '--:--';
+      if (entry.kind !== 'study_session') return (entry.text || 'registro') + ' • ' + (entry.source || 'manual') + ' • ' + time;
+      return (entry.subject || 'estudo') + ' • ' + (entry.minutes || 0) + ' min • foco ' + (entry.focusScore ?? '--') + '/10' + (entry.mood ? ' • ' + entry.mood : '') + (entry.energy ? ' • ' + entry.energy : '') + ' • ' + time;
+    }
+    function renderDailyLogStats(entries) {
+      if (!$('logCountToday')) return;
+      const subjects = new Set(entries.map(e => e.subject).filter(Boolean));
+      const scores = entries.map(e => Number(e.focusScore)).filter(n => Number.isFinite(n));
+      const avg = scores.length ? (scores.reduce((a,b) => a + b, 0) / scores.length).toFixed(1) : '--';
+      $('logCountToday').textContent = entries.length;
+      $('logSubjectsToday').textContent = subjects.size;
+      $('logAverageFocus').textContent = avg === '--' ? '--' : avg + '/10';
+    }
+    function renderDailyLog() {
+      const list = $('dailyLogList'); if (!list) return;
+      refreshLogSubjectSelect();
+      const logs = getDailyLogs();
+      const key = dateKey(selectedDate);
+      const entries = logs[key] || [];
+      renderDailyLogStats(entries);
+      list.innerHTML = '';
+      if (!entries.length) { list.innerHTML = '<p class="daily-log-empty">Ainda não tem log nesse dia. Salve um foco, conclua uma tarefa de estudo ou responda as perguntas da matéria.</p>'; return; }
+      const card = document.createElement('div');
+      card.className = 'daily-log-card';
+      const dateLabel = selectedDate.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' });
+      card.innerHTML = '<h3>' + dateLabel + '</h3><div class="daily-log-meta">' + entries.length + ' registro' + (entries.length === 1 ? '' : 's') + ' nesse dia</div>';
+      entries.forEach((entry, index) => {
+        const entryBox = document.createElement('div');
+        entryBox.className = 'daily-log-card';
+        const score = Number(entry.focusScore);
+        const scorePercent = Number.isFinite(score) ? Math.max(0, Math.min(100, score * 10)) : 0;
+        entryBox.innerHTML = '<div class="log-entry-head"><div><div class="log-entry-title">' + (entry.kind === 'study_session' ? (entry.subject || 'Estudo') : (entry.text || 'Registro')) + '</div><div class="daily-log-meta">' + formatLogEntry(entry) + '</div></div><button class="delete" data-log-delete="' + index + '">apagar</button></div>';
+        if (entry.kind === 'study_session') {
+          const grid = document.createElement('div'); grid.className = 'log-entry-grid';
+          const items = [['objetivo', entry.goal], ['estudado', entry.studied], ['aprendi', entry.learned], ['dificuldade', entry.difficulty], ['exercícios', entry.exercises], ['próximo passo', entry.nextStep], ['humor', entry.mood], ['energia', entry.energy]].filter(pair => pair[1]);
+          grid.innerHTML = items.map(pair => '<div class="log-answer"><b>' + pair[0] + '</b>' + pair[1] + '</div>').join('');
+          entryBox.appendChild(grid);
+          if (Number.isFinite(score)) {
+            const row = document.createElement('div'); row.className = 'log-score-row';
+            row.innerHTML = '<div class="log-score-bar"><div class="log-score-fill" style="width:' + scorePercent + '%"></div></div><span class="daily-log-meta">foco ' + score + '/10</span>';
+            entryBox.appendChild(row);
+          }
+        }
+        entryBox.querySelector('[data-log-delete]').onclick = () => { const allLogs = getDailyLogs(); const dayEntries = allLogs[key] || []; dayEntries.splice(index, 1); allLogs[key] = dayEntries; setDailyLogs(allLogs); renderDailyLog(); };
+        card.appendChild(entryBox);
+      });
+      list.appendChild(card);
+    }
+    function dailyLogSummary(asJson = false) {
+      const logs = getDailyLogs(); const key = dateKey(selectedDate); const entries = logs[key] || [];
+      const dateLabel = selectedDate.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      if (asJson) return JSON.stringify({ date: key, entries }, null, 2);
+      if (!entries.length) return 'Log diário - ' + dateLabel + '\nAinda não há registros.';
+      return 'Log diário - ' + dateLabel + '\n' + entries.map(entry => {
+        if (entry.kind !== 'study_session') return '- ' + entry.text + ' (' + (entry.source || 'manual') + ')';
+        return '- ' + (entry.subject || 'estudo') + ' | ' + (entry.minutes || 0) + ' min | foco ' + (entry.focusScore ?? '--') + '/10\n  Objetivo: ' + (entry.goal || '-') + '\n  Estudado: ' + (entry.studied || '-') + '\n  Aprendi: ' + (entry.learned || '-') + '\n  Dificuldade: ' + (entry.difficulty || '-') + '\n  Exercícios: ' + (entry.exercises || '-') + '\n  Próximo passo: ' + (entry.nextStep || '-') + '\n  Humor/energia: ' + ((entry.mood || '-') + ' / ' + (entry.energy || '-'));
+      }).join('\n');
+    }
+
+
+    function escapeRegExpSmart(value) {
+      return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    function subjectAliases() {
+      return getSubjectNamesForLog().map(name => ({ name, rx: new RegExp(escapeRegExpSmart(name), 'i') }));
+    }
+
+    function detectSubjectFromText(text = '') {
+      const aliases = subjectAliases();
+      const found = aliases.find(item => item.rx.test(text));
+      if (found) return found.name;
+      if (/red[aã]ção/i.test(text)) return 'Redação';
+      if (/matem[aá]tica|funç|equação|geometria/i.test(text)) return 'Matemática';
+      if (/natureza|f[ií]sica|qu[ií]mica|biologia/i.test(text)) return 'Natureza';
+      if (/humanas|hist[oó]ria|geografia|filosofia|sociologia/i.test(text)) return 'Humanas';
+      if (/linguagens|literatura|gram[aá]tica|interpreta/i.test(text)) return 'Linguagens';
+      return '';
+    }
+
+    function addTaskOnDate(date, text, type = 'estudo', meta = {}) {
+      const all = getTasks();
+      const key = dateKey(date);
+      all[key] = all[key] || [];
+      const exists = all[key].some(t => (t.text || '').toLowerCase() === text.toLowerCase());
+      if (!exists) all[key].push({ text, type, done: false, ...meta });
+      setTasks(all);
+    }
+
+    function scheduleAutoReviews(task) {
+      const text = task?.text || '';
+      if (!text || task.reviewGeneratedAt || task.autoReview) return;
+      const subject = task.subject || detectSubjectFromText(text);
+      const clean = text.replace(/^Estudar:\s*/i, '').replace(/^Revisar:\s*/i, '').trim();
+      const plans = [
+        { days: 1, label: 'amanhã' },
+        { days: 7, label: '7 dias' },
+        { days: 30, label: '30 dias' }
+      ];
+      plans.forEach(plan => {
+        const d = addDays(selectedDate, plan.days);
+        addTaskOnDate(d, 'Revisar (' + plan.label + '): ' + clean, 'estudo', { autoReview: true, subject, originalDate: dateKey(selectedDate) });
+      });
+      addDailyLogEntry('Revisões criadas automaticamente para: ' + clean, 'revisão automática', selectedDate, { kind: 'auto_review_note', subject });
+    }
+
+    function getCompletedStudyEntries(daysBack = 60) {
+      const tasks = getTasks();
+      const logs = getDailyLogs();
+      const out = [];
+      const today = new Date(); today.setHours(0,0,0,0);
+      Object.entries(tasks).forEach(([key, list]) => {
+        const date = new Date(key + 'T00:00:00');
+        const diff = Math.round((today - date) / (1000*60*60*24));
+        if (diff < 0 || diff > daysBack) return;
+        (list || []).forEach(t => {
+          if (!t.done) return;
+          const subject = t.subject || detectSubjectFromText(t.text || '');
+          if (subject || t.type === 'estudo' || t.type === 'study') out.push({ date: key, subject: subject || 'Estudo', text: t.text || '' });
+        });
+      });
+      Object.entries(logs).forEach(([key, entries]) => {
+        const date = new Date(key + 'T00:00:00');
+        const diff = Math.round((today - date) / (1000*60*60*24));
+        if (diff < 0 || diff > daysBack) return;
+        (entries || []).forEach(e => {
+          if (e.kind === 'study_session' && e.subject) out.push({ date: key, subject: e.subject, text: e.studied || e.text || '' });
+        });
+      });
+      return out;
+    }
+
+    function getForgottenSubjects() {
+      const subjects = getSubjectNamesForLog().filter(name => !/filme|lazer|tempo livre/i.test(name));
+      const entries = getCompletedStudyEntries(120);
+      const today = new Date(); today.setHours(0,0,0,0);
+      return subjects.map(name => {
+        const matches = entries.filter(e => e.subject === name);
+        const last = matches.map(e => e.date).sort().pop();
+        const days = last ? Math.round((today - new Date(last + 'T00:00:00')) / (1000*60*60*24)) : 999;
+        return { name, days, last };
+      }).sort((a,b) => b.days - a.days).slice(0, 6);
+    }
+
+    function renderForgottenSubjects() {
+      const box = $('forgottenSubjectsList'); if (!box) return;
+      const items = getForgottenSubjects();
+      if (!items.length) { box.innerHTML = '<div class="smart-row"><span>Nada ainda. Conforme você concluir tarefas ou logs, isso aparece.</span></div>'; return; }
+      box.innerHTML = items.map(item => {
+        const label = item.days === 999 ? 'nunca' : item.days + ' dia' + (item.days === 1 ? '' : 's');
+        const status = item.days === 999 ? 'sem registro' : (item.days >= 7 ? 'atenção' : 'ok');
+        return '<div class="smart-row"><span><b>' + item.name + '</b><br><small>' + status + '</small></span><span class="smart-number">' + label + '</span></div>';
+      }).join('');
+    }
+
+    function getWeeklyReportData() {
+      const tasks = getTasks();
+      const logs = getDailyLogs();
+      const today = new Date(selectedDate); today.setHours(0,0,0,0);
+      const start = addDays(today, -6);
+      const subjectSet = new Set();
+      const activeDays = new Set();
+      let done = 0, reviews = 0, pending = 0, minutes = 0;
+      for (let i = 0; i < 7; i++) {
+        const d = addDays(start, i);
+        const key = dateKey(d);
+        (tasks[key] || []).forEach(t => {
+          if (t.done) { done++; activeDays.add(key); } else pending++;
+          if (t.autoReview || /^Revisar/i.test(t.text || '')) reviews += t.done ? 1 : 0;
+          const subject = t.subject || detectSubjectFromText(t.text || '');
+          if (t.done && subject) subjectSet.add(subject);
+        });
+        (logs[key] || []).forEach(e => {
+          if (e.kind === 'study_session') {
+            activeDays.add(key);
+            if (e.subject) subjectSet.add(e.subject);
+            minutes += Number(e.minutes || 0);
+          }
+        });
+      }
+      return { done, reviews, pending, minutes, activeDays: activeDays.size, subjects: [...subjectSet] };
+    }
+
+    function renderWeeklyReport() {
+      const box = $('weeklyReportBox'); if (!box) return;
+      const r = getWeeklyReportData();
+      const total = Math.max(1, r.done + r.pending);
+      const percent = Math.round((r.done / total) * 100);
+      box.innerHTML =
+        '<div class="smart-row"><span><b>' + r.done + '</b> tarefas concluídas<br><small>' + r.pending + ' pendentes</small></span><span class="smart-number">' + percent + '%</span></div>' +
+        '<div class="smart-progress-track"><div class="smart-progress-fill" style="width:' + percent + '%"></div></div>' +
+        '<div class="smart-row"><span>Dias ativos</span><b>' + r.activeDays + '/7</b></div>' +
+        '<div class="smart-row"><span>Revisões feitas</span><b>' + r.reviews + '</b></div>' +
+        '<div class="smart-row"><span>Minutos registrados no log</span><b>' + r.minutes + ' min</b></div>' +
+        '<div class="smart-row"><span>Matérias</span><small>' + (r.subjects.join(', ') || 'ainda sem registro') + '</small></div>';
+    }
+
+    function createSmartReviewFromWeek() {
+      const forgotten = getForgottenSubjects().filter(item => item.days >= 5 || item.days === 999).slice(0, 4);
+      if (!forgotten.length) return;
+      forgotten.forEach((item, index) => addTaskOnDate(addDays(selectedDate, index), 'Revisão inteligente: ' + item.name, 'estudo', { autoReview: true, subject: item.name }));
+      renderAll();
+      closeModals();
+    }
+    window.createSmartReviewFromWeek = createSmartReviewFromWeek;
+
+    function buildWeeklyReportText() {
+      const r = getWeeklyReportData();
+      return 'Relatório semanal\n' +
+        '- Tarefas concluídas: ' + r.done + '\n' +
+        '- Pendentes: ' + r.pending + '\n' +
+        '- Dias ativos: ' + r.activeDays + '/7\n' +
+        '- Revisões feitas: ' + r.reviews + '\n' +
+        '- Minutos registrados: ' + r.minutes + '\n' +
+        '- Matérias: ' + (r.subjects.join(', ') || 'sem registro');
+    }
+
+    async function copyWeeklyReport() {
+      const report = buildWeeklyReportText();
+      try { await navigator.clipboard.writeText(report); }
+      catch { alert(report); }
+      closeModals();
+    }
+    window.copyWeeklyReport = copyWeeklyReport;
+
     function normalizeUrl(url) {
       const clean = url.trim();
       if (!clean) return '';
@@ -1553,6 +2480,19 @@
       }
     }
 
+
+    function prepareNativeToolImages() {
+      document.querySelectorAll('.native-tool-img').forEach((el) => {
+        const raw = el.getAttribute('style') || '';
+        const match = raw.match(/url\(['"]?([^'")]+)['"]?\)/);
+        if (!match || !match[1]) return;
+        const test = new Image();
+        test.onload = () => el.classList.add('image-ok');
+        test.onerror = () => el.classList.add('image-error');
+        test.src = match[1];
+      });
+    }
+
     function updateClock() {
       const now = new Date();
       $('clock').textContent = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
@@ -1560,7 +2500,22 @@
 
       const enem = new Date('2026-10-08T00:00:00');
       const diff = Math.ceil((enem - now) / (1000 * 60 * 60 * 24));
-      $('enemCountdown').textContent = diff >= 0 ? `${diff} dias` : 'já passou';
+      const enemStart = new Date('2026-01-01T00:00:00');
+      if (diff >= 0) {
+        const weeks = Math.floor(diff / 7);
+        const extraDays = diff % 7;
+        const months = Math.floor(diff / 30);
+        $('enemCountdown').innerHTML = `${diff} dias<span class="subcount">${weeks} semanas e ${extraDays} dias • aprox. ${months} meses</span>`;
+        const total = Math.max(1, enem - enemStart);
+        const used = Math.max(0, Math.min(total, now - enemStart));
+        const percent = Math.round((used / total) * 100);
+        if ($('enemProgressFill')) $('enemProgressFill').style.width = percent + '%';
+        if ($('enemProgressText')) $('enemProgressText').textContent = percent + '% do caminho até a prova';
+      } else {
+        $('enemCountdown').textContent = 'já passou';
+        if ($('enemProgressFill')) $('enemProgressFill').style.width = '100%';
+        if ($('enemProgressText')) $('enemProgressText').textContent = 'período encerrado';
+      }
     }
 
     function renderTabs() {
@@ -1581,22 +2536,121 @@
       });
     }
 
+    function routineTimeToMinutes(value) {
+      const match = String(value || '').match(/^(\d{1,2}):(\d{2})$/);
+      if (!match) return null;
+      return Number(match[1]) * 60 + Number(match[2]);
+    }
+
+    function isSameDay(a, b) {
+      return dateKey(a) === dateKey(b);
+    }
+
+    function minutesUntilText(minutes) {
+      if (minutes == null) return '--';
+      if (minutes <= 0) return 'agora';
+      const h = Math.floor(minutes / 60);
+      const m = minutes % 60;
+      if (h && m) return `em ${h}h ${m}min`;
+      if (h) return `em ${h}h`;
+      return `em ${m}min`;
+    }
+
+    function timeRangeText(current, next) {
+      if (!current) return '--';
+      const currentTime = current[0];
+      const nextTime = next?.[0];
+      return nextTime && routineTimeToMinutes(nextTime) !== null ? `${currentTime} até ${nextTime}` : `desde ${currentTime}`;
+    }
+
+    function getRoutinePosition(routine) {
+      const timedItems = routine.items
+        .map((item, index) => ({ item, index, minutes: routineTimeToMinutes(item[0]) }))
+        .filter(entry => entry.minutes !== null)
+        .sort((a, b) => a.minutes - b.minutes);
+
+      if (!timedItems.length) return { currentIndex: -1, nextIndex: -1, current: null, next: null, minutesToNext: null, status: 'sem horário' };
+
+      if (!isSameDay(selectedDate, new Date())) {
+        return { currentIndex: -1, nextIndex: timedItems[0].index, current: null, next: timedItems[0].item, minutesToNext: null, status: 'dia selecionado' };
+      }
+
+      const now = new Date();
+      const nowMinutes = now.getHours() * 60 + now.getMinutes();
+      let current = null;
+      let next = null;
+
+      for (const entry of timedItems) {
+        if (entry.minutes <= nowMinutes) current = entry;
+        if (entry.minutes > nowMinutes) {
+          next = entry;
+          break;
+        }
+      }
+
+      if (!current && next) {
+        return { currentIndex: -1, nextIndex: next.index, current: null, next: next.item, minutesToNext: next.minutes - nowMinutes, status: 'antes de começar' };
+      }
+
+      if (current && next) {
+        return { currentIndex: current.index, nextIndex: next.index, current: current.item, next: next.item, minutesToNext: next.minutes - nowMinutes, status: 'em andamento' };
+      }
+
+      return { currentIndex: current?.index ?? -1, nextIndex: -1, current: current?.item || null, next: null, minutesToNext: null, status: 'rotina encerrando' };
+    }
+
+    function renderRoutineNow(routine, position) {
+      const currentTitle = $('currentRoutineTitle');
+      const currentDesc = $('currentRoutineDesc');
+      const nowTimeLeft = $('nowTimeLeft');
+      const nextTitle = $('nextRoutineTitle');
+      const nextDesc = $('nextRoutineDesc');
+      const nextTimeLeft = $('nextTimeLeft');
+      if (!currentTitle || !currentDesc || !nowTimeLeft || !nextTitle || !nextDesc || !nextTimeLeft) return;
+
+      if (position.current) {
+        currentTitle.textContent = position.current[1];
+        currentDesc.textContent = `${timeRangeText(position.current, position.next)} • ${position.current[2]}`;
+        nowTimeLeft.textContent = position.status;
+      } else {
+        currentTitle.textContent = position.status === 'dia selecionado' ? 'Dia fora de hoje' : 'Antes da primeira rotina';
+        currentDesc.textContent = position.status === 'dia selecionado'
+          ? 'Aqui aparece o primeiro horário desse dia. Para acompanhar em tempo real, volte para hoje.'
+          : 'A rotina ainda não começou. Dá para adiantar algo leve ou se preparar sem pressa.';
+        nowTimeLeft.textContent = position.status;
+      }
+
+      if (position.next) {
+        nextTitle.textContent = position.next[1];
+        nextDesc.textContent = `${position.next[0]} • ${position.next[2]}`;
+        nextTimeLeft.textContent = minutesUntilText(position.minutesToNext);
+      } else {
+        nextTitle.textContent = 'Sem próxima etapa';
+        nextDesc.textContent = 'Pelo horário da rotina, não tem mais um bloco com hora marcada hoje.';
+        nextTimeLeft.textContent = 'fim do dia';
+      }
+    }
+
     function renderRoutine() {
       const routine = routines[selectedDate.getDay()];
+      const position = getRoutinePosition(routine);
       $('dayName').textContent = routine.label;
       $('daySummary').textContent = routine.summary;
       $('studyBlocks').textContent = routine.studyBlocks;
       $('selectedDateLabel').textContent = selectedDate.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
       $('focusSuggestion').textContent = selectedDate.getDay() === 6 ? '50/10 ou 25/5' : 'Pomodoro 25/5';
+      renderRoutineNow(routine, position);
       const list = $('routineList');
       list.innerHTML = '';
-      routine.items.forEach(item => {
+      routine.items.forEach((item, index) => {
         const div = document.createElement('div');
         div.className = 'routine-item';
+        if (index === position.currentIndex) div.classList.add('current');
+        if (index === position.nextIndex) div.classList.add('next');
         div.innerHTML = `
           <div class="time">${item[0]}</div>
           <div><h3>${item[1]}</h3><p>${item[2]}</p></div>
-          <div class="tag">${item[3]}</div>
+          <div class="tag">${index === position.currentIndex ? 'agora' : index === position.nextIndex ? 'próxima' : item[3]}</div>
         `;
         list.appendChild(div);
       });
@@ -1642,8 +2696,16 @@
       const all = getTasks();
       const key = dateKey(selectedDate);
       all[key][index].done = !all[key][index].done;
+      if (all[key][index].done) {
+        autoLogFromTask(all[key][index]);
+        scheduleAutoReviews(all[key][index]);
+        all[key][index].reviewGeneratedAt = all[key][index].reviewGeneratedAt || new Date().toISOString();
+      }
       setTasks(all);
       renderTasks();
+      renderDailyLog();
+      renderForgottenSubjects();
+      renderWeeklyReport();
     }
 
     function deleteTask(index) {
@@ -1674,6 +2736,12 @@
       const tasks = getTasks();
       const todayKey = dateKey(new Date());
       const selectedKey = dateKey(selectedDate);
+      const holidays = getBrazilHolidays(year);
+      const holidayList = $('holidayList');
+      if (holidayList) {
+        const monthHolidays = Object.entries(holidays).filter(([key]) => Number(key.slice(5,7)) === month + 1).sort(([a],[b]) => a.localeCompare(b));
+        holidayList.innerHTML = monthHolidays.length ? monthHolidays.map(([key, name]) => '<div class="holiday-item"><span>' + name + '</span><strong>' + key.slice(8,10) + '/' + key.slice(5,7) + '</strong></div>').join('') : '<div class="holiday-item"><span>Sem feriados nacionais neste mês</span><strong>—</strong></div>';
+      }
 
       for (let i = 0; i < 42; i++) {
         const d = new Date(start);
@@ -1684,11 +2752,18 @@
         if (d.getMonth() !== month) div.classList.add('muted');
         if (key === todayKey) div.classList.add('today');
         if (key === selectedKey) div.classList.add('selected');
+        const holidayName = holidays[key];
+        if (holidayName) { div.classList.add('holiday'); div.title = holidayName; }
         if (compareStartDate && key === dateKey(compareStartDate)) div.classList.add('range-start');
         if (compareEndDate && key === dateKey(compareEndDate)) div.classList.add('range-end');
-        const routineType = d.getDay() === 0 ? 'study' : d.getDay() === 6 ? 'work' : d.getDay() === 4 ? 'school' : 'work';
-        const taskDots = (tasks[key] || []).slice(0, 3).map(() => '<span class="dot"></span>').join('');
-        div.innerHTML = `<span class="day-number">${d.getDate()}</span><div class="dots"><span class="dot ${routineType}"></span>${taskDots}</div>`;
+        const dayTasks = tasks[key] || [];
+        const dots = [];
+        if (d.getDay() === 0 || d.getDay() === 4 || dayTasks.some(t => (t.type || '').includes('estudo'))) dots.push('<span class="dot study" title="rotina de estudo"></span>');
+        if (dayTasks.some(t => t.autoReview || /^Revisar/i.test(t.text || ''))) dots.push('<span class="dot review" title="revisão automática"></span>');
+        if (dayTasks.some(t => !(t.autoReview || /^Revisar/i.test(t.text || '')))) dots.push('<span class="dot" title="tarefa"></span>');
+        if (holidayName) dots.push('<span class="dot holiday-dot" title="feriado"></span>');
+        const compactDots = dots.slice(0, 3).join('');
+        div.innerHTML = `<span class="day-number">${d.getDate()}</span><div class="dots">${compactDots}</div>`;
         div.onclick = (event) => {
           if (event.shiftKey) {
             handleCalendarCompare(d);
@@ -1743,6 +2818,39 @@
       info.innerHTML = 'segure <strong>shift</strong>, clique em uma data e depois em outra para contar quantos dias faltam entre elas.';
     }
 
+    function unlockAudio() {
+      try {
+        if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioContext.state === 'suspended') audioContext.resume();
+      } catch (error) {
+        console.warn('Não deu para preparar o áudio do Pomodoro:', error);
+      }
+    }
+
+    function playTone(frequency, startAt, duration, volume = 0.08) {
+      if (!audioContext) return;
+      const oscillator = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime + startAt);
+      gain.gain.setValueAtTime(0.0001, audioContext.currentTime + startAt);
+      gain.gain.exponentialRampToValueAtTime(volume, audioContext.currentTime + startAt + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + startAt + duration);
+      oscillator.connect(gain);
+      gain.connect(audioContext.destination);
+      oscillator.start(audioContext.currentTime + startAt);
+      oscillator.stop(audioContext.currentTime + startAt + duration + 0.03);
+    }
+
+    function playPomodoroAlarm() {
+      if (!alarmEnabled) return;
+      unlockAudio();
+      playTone(880, 0, 0.16);
+      playTone(1174, 0.19, 0.16);
+      playTone(880, 0.38, 0.22);
+      if (navigator.vibrate) navigator.vibrate([160, 90, 160]);
+    }
+
     function renderTimer() {
       const m = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
       const s = String(timerSeconds % 60).padStart(2, '0');
@@ -1754,6 +2862,7 @@
     }
 
     function startTimer() {
+      unlockAudio();
       if (isRunning) return;
       isRunning = true;
       timerInterval = setInterval(() => {
@@ -1777,6 +2886,7 @@
     }
 
     function switchMode() {
+      playPomodoroAlarm();
       mode = mode === 'focus' ? 'break' : 'focus';
       timerSeconds = (mode === 'focus' ? focusMinutes : breakMinutes) * 60;
     }
@@ -1834,7 +2944,6 @@
     function categoryLabel(category) {
       return {
         estudo: 'estudo',
-        escola: 'escola',
         enem: 'enem',
         lazer: 'lazer',
         outros: 'outros'
@@ -2125,9 +3234,9 @@
           const subject = pool[cursor % pool.length];
           cursor++;
           dayPlan.push(`Revisão curta: ${subject.name}`);
-          dayPlan.push('Separar dúvidas para a escola/curso');
+          dayPlan.push('Separar dúvidas para o estudo/curso');
           addTaskForDate(date, `Revisão curta: ${subject.name}`, 'estudo');
-          addTaskForDate(date, 'Separar dúvidas para a escola/curso', 'school');
+          addTaskForDate(date, 'Separar dúvidas para o estudo/curso', 'estudo');
         } else {
           for (let n = 0; n < 2; n++) {
             const subject = pool[cursor % pool.length];
@@ -2180,6 +3289,17 @@
       }
     }
 
+
+    function openStudyLogFromTools() { closeModals(); openModal('dailyLogModal'); }
+    window.openStudyLogFromTools = openStudyLogFromTools;
+    function addReviewTasksFromLog() {
+      const entries = (getDailyLogs()[dateKey(selectedDate)] || []).filter(entry => entry.kind === 'study_session' && (entry.difficulty || entry.nextStep));
+      if (!entries.length) { addTask('Revisar dificuldades do dia quando tiver log preenchido', 'estudo'); closeModals(); return; }
+      entries.forEach(entry => { const subject = entry.subject ? ' de ' + entry.subject : ''; const detail = entry.nextStep || entry.difficulty; addTask('Revisar' + subject + ': ' + detail.slice(0, 90), 'estudo'); });
+      closeModals();
+    }
+    window.addReviewTasksFromLog = addReviewTasksFromLog;
+
     function openFocusMode() {
       closeModals();
       openModal('focusModal');
@@ -2193,11 +3313,16 @@
       if (id === 'notesModal') renderNotes();
       if (id === 'subjectsModal') renderSubjects();
       if (id === 'shortcutModal') renderShortcuts();
+      if (id === 'dailyLogModal') renderDailyLog();
       if (id === 'focusModal') renderFocusMode();
     }
 
     function closeModals() {
-      document.querySelectorAll('.modal-backdrop').forEach(m => m.classList.remove('show'));
+      document.querySelectorAll('.modal-backdrop.show').forEach(m => {
+        m.classList.add('closing');
+        m.classList.remove('show');
+        setTimeout(() => m.classList.remove('closing'), 230);
+      });
     }
 
     function applyDayTheme() {
@@ -2212,6 +3337,9 @@
       renderTasks();
       renderCalendar();
       renderShortcuts();
+      renderDailyLog();
+      renderForgottenSubjects();
+      renderWeeklyReport();
     }
 
     document.querySelectorAll('[data-modal]').forEach(btn => btn.addEventListener('click', () => openModal(btn.dataset.modal)));
@@ -2223,7 +3351,17 @@
     $('nextMonth').onclick = () => { calendarDate.setMonth(calendarDate.getMonth() + 1); renderCalendar(); };
     $('addQuickTask').onclick = () => { addTask($('quickTask').value); $('quickTask').value = ''; };
     $('quickTask').addEventListener('keydown', e => { if (e.key === 'Enter') $('addQuickTask').click(); });
-    $('modalAddTask').onclick = () => { addTask($('modalTaskText').value, $('modalTaskType').value); $('modalTaskText').value = ''; closeModals(); };
+    $('modalAddTask').onclick = () => { addTask($('modalTaskText').value, $('modalTaskType').value === 'school' ? 'estudo' : $('modalTaskType').value); $('modalTaskText').value = ''; closeModals(); };
+    if ($('alarmEnabled')) {
+      $('alarmEnabled').checked = alarmEnabled;
+      $('alarmEnabled').onchange = (event) => {
+        alarmEnabled = event.target.checked;
+        localStorage.setItem('pomodoroAlarmEnabled', String(alarmEnabled));
+        if (alarmEnabled) unlockAudio();
+      };
+    }
+    if ($('testAlarm')) $('testAlarm').onclick = () => { alarmEnabled = true; if ($('alarmEnabled')) $('alarmEnabled').checked = true; localStorage.setItem('pomodoroAlarmEnabled', 'true'); playPomodoroAlarm(); };
+
     $('startTimer').onclick = startTimer;
     $('pauseTimer').onclick = pauseTimer;
     $('resetTimer').onclick = resetTimer;
@@ -2233,7 +3371,10 @@
     $('focusSkip').onclick = () => { switchMode(); renderTimer(); renderFocusMode(); };
     $('saveSubject').onclick = () => {
       const value = $('subjectInput').value.trim();
-      if (value) addTask(`Estudar: ${value}`, 'estudo');
+      if (value) {
+        addTask(`Estudar: ${value}`, 'estudo');
+        addDailyLogEntry(value, 'foco salvo', selectedDate, { kind: 'focus_saved', subject: value });
+      }
       $('subjectInput').value = '';
     };
     $('saveNote').onclick = () => {
@@ -2274,6 +3415,44 @@
       renderShortcuts();
     };
 
+    $('saveStudyLog').onclick = addStudyLogFromForm;
+    $('fillLogFromFocus').onclick = () => {
+      const currentFocus = $('subjectInput').value.trim();
+      if (currentFocus) {
+        refreshLogSubjectSelect();
+        const match = getSubjectNamesForLog().find(name => name.toLowerCase() === currentFocus.toLowerCase());
+        if (match) $('logSubjectSelect').value = match;
+        else $('logGoal').value = currentFocus;
+      }
+      openModal('dailyLogModal');
+    };
+    $('exportDailyLogJson').onclick = async () => {
+      const summary = dailyLogSummary(true);
+      try { await navigator.clipboard.writeText(summary); $('exportDailyLogJson').textContent = 'JSON copiado'; setTimeout(() => $('exportDailyLogJson').textContent = 'Copiar JSON', 1200); }
+      catch { alert(summary); }
+    };
+
+    $('addDailyLog').onclick = () => {
+      addDailyLogEntry($('dailyLogInput').value, 'manual');
+      $('dailyLogInput').value = '';
+    };
+    $('dailyLogInput').addEventListener('keydown', e => { if (e.key === 'Enter') $('addDailyLog').click(); });
+    $('clearDailyLogDay').onclick = () => {
+      const logs = getDailyLogs();
+      delete logs[dateKey(selectedDate)];
+      setDailyLogs(logs);
+      renderDailyLog();
+    };
+    $('exportDailyLog').onclick = async () => {
+      const summary = dailyLogSummary();
+      try {
+        await navigator.clipboard.writeText(summary);
+        $('exportDailyLog').textContent = 'Copiado';
+        setTimeout(() => $('exportDailyLog').textContent = 'Copiar resumo do dia', 1200);
+      } catch {
+        alert(summary);
+      }
+    };
 
     function isTypingInField() {
       const active = document.activeElement;
@@ -2292,7 +3471,8 @@
 
       const key = e.key.toLowerCase();
 
-      if (key === 'control') {
+      if (key === 'alt') {
+        e.preventDefault();
         closeModals();
         return;
       }
@@ -2315,6 +3495,7 @@
         t: () => $('todayBtn').click(),
         c: () => openModal('calendarModal'),
         n: () => openModal('notesModal'),
+        d: () => openModal('dailyLogModal'),
         s: () => openModal('subjectsModal'),
         a: () => openModal('taskModal'),
         l: () => openModal('shortcutModal'),
@@ -2331,11 +3512,15 @@
     });
 
     async function initApp() {
-      updateClock();
+      prepareNativeToolImages();
+    updateClock();
       renderTimer();
       await loadAppData();
       renderAll();
       setInterval(updateClock, 1000);
+      setInterval(() => {
+        if (isSameDay(selectedDate, new Date())) renderRoutine();
+      }, 30000);
     }
 
     initApp();
