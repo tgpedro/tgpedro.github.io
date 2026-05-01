@@ -854,19 +854,48 @@
       line-height: 1.35;
     }
 
-    .priority-badge {
-      border-radius: 999px;
-      padding: 6px 9px;
-      font-size: .72rem;
-      font-weight: 850;
-      white-space: nowrap;
-      border: 1px solid var(--line);
+    .subject-description {
+      min-height: 78px;
+      resize: vertical;
+      border-radius: 18px;
+      font-size: .9rem;
+      line-height: 1.45;
+      background: rgba(255,255,255,.06);
     }
 
-    .priority-alta { background: rgba(251,113,133,.14); color: #fecdd3; border-color: rgba(251,113,133,.24); }
-    .priority-media { background: rgba(253,230,138,.12); color: #fef3c7; border-color: rgba(253,230,138,.22); }
-    .priority-baixa { background: rgba(134,239,172,.12); color: #dcfce7; border-color: rgba(134,239,172,.22); }
-    .priority-lazer { background: rgba(103,232,249,.12); color: #cffafe; border-color: rgba(103,232,249,.24); }
+    .subject-description::placeholder {
+      color: rgba(247,247,251,.38);
+    }
+
+   .priority-badge {
+  border: none;
+  background: transparent;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: .72rem;
+  font-weight: 900;
+}
+
+/* cores sólidas */
+.priority-alta {
+  background: rgb(255, 0, 0); /* vermelho */
+  color: white;
+}
+
+.priority-media {
+  background: #e3ae00; /* amarelo */
+  color: rgb(255, 255, 255)
+}
+
+.priority-baixa {
+  background: #00ac3f; /* verde */
+  color: white;
+}
+
+.priority-lazer {
+  background: #2075ff; /* azul */
+  color: white;
+}
 
     .subject-actions {
       display: flex;
@@ -2066,7 +2095,27 @@
     #focusModal:not(.show) {
       pointer-events: none !important;
     }
-</style>
+
+
+    /* select custom estilo mac: agora o menu sai para o body, então não corta e não fica atrás */
+    .mac-select { position: relative; width: 100%; min-width: 0; z-index: 1; }
+    .mac-select.is-open { z-index: 120; }
+    .mac-select-value { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+    .mac-select-button { width: 100%; min-height: 46px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 13px; border: 1px solid rgba(255,255,255,.12); border-radius: 18px; background: rgba(255,255,255,.075); color: var(--text); text-align: left; font-weight: 850; letter-spacing: -.02em; outline: none; box-shadow: inset 0 1px 0 rgba(255,255,255,.08); transition: border .18s ease, background .18s ease, transform .18s ease, box-shadow .18s ease; }
+    .mac-select-button:hover, .mac-select.is-open .mac-select-button { background: rgba(255,255,255,.11); border-color: rgba(255,255,255,.18); box-shadow: 0 0 0 3px var(--day-soft), inset 0 1px 0 rgba(255,255,255,.1); }
+    .mac-select-button:active { transform: scale(.99); }
+    .mac-select-button::after { content: "⌄"; color: rgba(247,247,251,.58); font-size: 1.05rem; line-height: 1; transform: translateY(-1px); }
+    .mac-select-menu { position: fixed; left: 0; top: 0; width: 240px; max-height: min(280px, calc(100vh - 24px)); overflow-y: auto; padding: 5px; border-radius: 15px; border: 1px solid rgba(255,255,255,.16); background: rgba(72,72,78,.97); backdrop-filter: blur(18px); box-shadow: 0 20px 48px rgba(0,0,0,.42); opacity: 0; visibility: hidden; pointer-events: none; transform: translateY(-5px) scale(.985); transform-origin: top center; transition: opacity .16s ease, transform .16s ease, visibility .16s ease; z-index: 2147483000; }
+    .mac-select-menu.is-floating-open { opacity: 1; visibility: visible; pointer-events: auto; transform: translateY(0) scale(1); }
+    .mac-select-option { width: 100%; min-height: 28px; display: grid; grid-template-columns: 18px 1fr; align-items: center; gap: 6px; padding: 4px 8px; border-radius: 8px; color: rgba(255,255,255,.94); font-size: .88rem; font-weight: 750; text-align: left; background: transparent; transition: background .12s ease, color .12s ease; }
+    .mac-select-option::before { content: "✓"; opacity: 0; font-size: .78rem; color: rgba(255,255,255,.82); }
+    .mac-select-option.is-selected::before { opacity: 1; }
+    .mac-select-option:hover, .mac-select-option.is-selected { background: #2f74ff; color: white; }
+    .subject-priority-control { display: grid; gap: 7px; }
+    .subject-priority-label { color: var(--muted); font-size: .74rem; font-weight: 850; letter-spacing: .02em; }
+    @media (max-width: 860px) { .mac-select-option { min-height: 34px; font-size: .92rem; } }
+
+  </style>
 </head>
 <body>
   <div class="app">
@@ -2080,11 +2129,11 @@
       <div class="header-actions">
         <button class="pill" id="todayBtn">Hoje</button>
         <span class="sync-status" id="syncStatus"><span class="sync-dot"></span><span id="syncText">conectando</span></span>
-        <button class="icon-btn" data-modal="shortcutModal" title="Adicionar atalho">+</button>
+        <button class="icon-btn" data-modal="shortcutModal" title="adicionar atalho">+</button>
         <div class="header-divider"></div>
         <div class="shortcuts-bar" id="shortcutsBar"></div>
-        <button class="icon-btn native-icon" data-modal="toolsModal" title="Menu">☰</button>
-        <button class="primary-btn" data-modal="taskModal">Adicionar item</button>
+        <button class="icon-btn native-icon" data-modal="toolsModal" title="menu">☰</button>
+        <button class="primary-btn" data-modal="taskModal">adicionar item</button>
       </div>
     </header>
 
@@ -2195,15 +2244,15 @@
   <div class="modal-backdrop" id="toolsModal">
     <div class="modal">
       <div class="modal-head">
-        <h2>Menu</h2>
+        <h2>menu</h2>
         <button class="icon-btn close-modal">✕</button>
       </div>
       <div class="tool-section">
         <div class="tool-section-title">Ações</div>
         <div class="tools-grid">
-          <button class="tool-card" onclick="closeModals(); openModal('keyboardModal')"><span>⌨️</span><b>Atalhos</b><span>Comandos rápidos do teclado.</span></button>
-          <button class="tool-card" onclick="openFocusMode()" data-open-focus><span><span class="native-tool-img" style="--tool-image: url('https://i.imgur.com/230PgM1.png')">fer</span></span><b>Modo foco</b><span>Tela limpa para estudar.</span></button>
-          <button class="tool-card" onclick="clearDoneTasks()"><span><span class="native-tool-img" style="--tool-image: url('https://i.imgur.com/230PgM1.png')">fer</span></span><b>Limpar concluídas</b><span>Remove tarefas já marcadas.</span></button>
+          <button class="tool-card" onclick="closeModals(); openModal('keyboardModal')"><span>⌨️</span><b>atalhos</b></button>
+          <button class="tool-card" onclick="openFocusMode()" data-open-focus><span><span class="native-tool-img" style="--tool-image: url('https://i.imgur.com/230PgM1.png')">fer</span></span><b>modo foco</b></button>
+          <button class="tool-card" onclick="clearDoneTasks()"><span><span class="native-tool-img" style="--tool-image: url('https://i.imgur.com/230PgM1.png')">fer</span></span><b>limpar concluídas</b></button>
         </div>
       </div>
     </div>
@@ -2239,12 +2288,19 @@
         <input id="newSubjectName" placeholder="Adicionar matéria ou atividade. Ex: Filme no domingo" />
       </div>
       <div class="form-row">
-        <select id="newSubjectPriority">
-          <option value="alta">Prioridade alta</option>
-          <option value="media">Prioridade média</option>
-          <option value="baixa">Prioridade baixa</option>
-          <option value="lazer">Lazer/Tempo livre</option>
-        </select>
+        <textarea id="newSubjectNote" placeholder="Descrição da matéria. Ex: focar em exercícios, erros e revisão." rows="3"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="mac-select" data-select="newSubjectPriority">
+          <input class="mac-select-value" id="newSubjectPriority" value="media" />
+          <button class="mac-select-button" type="button">prioridade média</button>
+          <div class="mac-select-menu">
+            <button class="mac-select-option" type="button" data-value="alta">prioridade alta</button>
+            <button class="mac-select-option is-selected" type="button" data-value="media">prioridade média</button>
+            <button class="mac-select-option" type="button" data-value="baixa">prioridade baixa</button>
+            <button class="mac-select-option" type="button" data-value="lazer">lazer / tempo livre</button>
+          </div>
+        </div>
         <button class="primary-btn" id="addSubject">Adicionar</button>
       </div>
       <div class="subjects-grid" id="subjectsGrid"></div>
@@ -2261,12 +2317,16 @@
         <input id="modalTaskText" placeholder="Ex: exercícios de matemática" />
       </div>
       <div class="form-row">
-        <select id="modalTaskType">
-          <option value="study">Estudo</option>
-          <option value="work">Trabalho</option>
-          <option value="home">Casa</option>
-          <option value="rest">Descanso</option>
-        </select>
+        <div class="mac-select" data-select="modalTaskType">
+          <input class="mac-select-value" id="modalTaskType" value="study" />
+          <button class="mac-select-button" type="button">estudo</button>
+          <div class="mac-select-menu">
+            <button class="mac-select-option is-selected" type="button" data-value="study">estudo</button>
+            <button class="mac-select-option" type="button" data-value="work">trabalho</button>
+            <button class="mac-select-option" type="button" data-value="home">casa</button>
+            <button class="mac-select-option" type="button" data-value="rest">descanso</button>
+          </div>
+        </div>
         <button class="primary-btn" id="modalAddTask">Adicionar</button>
       </div>
     </div>
@@ -2281,17 +2341,17 @@
       </div>
 
       <div class="shortcut-help-grid">
-        <div class="shortcut-help-item"><span>Voltar para hoje</span><b class="kbd">T</b></div>
-        <div class="shortcut-help-item"><span>Abrir calendário</span><b class="kbd">C</b></div>
-        <div class="shortcut-help-item"><span>Adicionar tarefa</span><b class="kbd">A</b></div>
-        <div class="shortcut-help-item"><span>Adicionar atalho</span><b class="kbd">L</b></div>
-        <div class="shortcut-help-item"><span>Abrir FP</span><b class="kbd">F</b></div>
-        <div class="shortcut-help-item"><span>Modo foco</span><b class="kbd">M</b></div>
+        <div class="shortcut-help-item"><span>voltar para hoje</span><b class="kbd">T</b></div>
+        <div class="shortcut-help-item"><span>abrir calendário</span><b class="kbd">C</b></div>
+        <div class="shortcut-help-item"><span>adicionar tarefa</span><b class="kbd">A</b></div>
+        <div class="shortcut-help-item"><span>adicionar atalho</span><b class="kbd">L</b></div>
+        <div class="shortcut-help-item"><span>abrir FP</span><b class="kbd">F</b></div>
+        <div class="shortcut-help-item"><span>modo foco</span><b class="kbd">M</b></div>
         <div class="shortcut-help-item"><span>Começar / pausar foco</span><b class="kbd">Espaço</b></div>
-        <div class="shortcut-help-item"><span>Resetar foco</span><b class="kbd">R</b></div>
-        <div class="shortcut-help-item"><span>Pular etapa</span><b class="kbd">K</b></div>
-        <div class="shortcut-help-item"><span>Fechar janela</span><b class="kbd">Ctrl</b></div>
-        <div class="shortcut-help-item"><span>Ver esta ajuda</span><b class="kbd">?</b></div>
+        <div class="shortcut-help-item"><span>resetar foco</span><b class="kbd">R</b></div>
+        <div class="shortcut-help-item"><span>pular etapa</span><b class="kbd">K</b></div>
+        <div class="shortcut-help-item"><span>fechar janela</span><b class="kbd">Ctrl</b></div>
+        <div class="shortcut-help-item"><span>ver esta ajuda</span><b class="kbd">?</b></div>
       </div>
     </div>
   </div>
@@ -2299,7 +2359,7 @@
   <div class="modal-backdrop" id="focusModal">
     <div class="modal focus-modal">
       <div class="modal-head">
-        <h2>Modo foco</h2>
+        <h2>modo foco</h2>
         <button class="icon-btn close-modal">✕</button>
       </div>
       <div class="focus-timer" id="focusTimerMirror">25:00</div>
@@ -2582,7 +2642,7 @@
       }
 
       isRemoteReady = true;
-      setSyncStatus('online', 'sincronizado');
+      setSyncStatus('online', 'conectado');
       setupRealtime();
     }
 
@@ -2612,7 +2672,7 @@
 
       isRemoteReady = true;
       lastRemoteSignature = appSignature(appState);
-      setSyncStatus('online', 'sincronizado');
+      setSyncStatus('online', 'conectado');
     }
 
     function queueSave() {
@@ -2935,7 +2995,7 @@
       const box = $('tasks');
       box.innerHTML = '';
       if (!tasks.length) {
-        box.innerHTML = '<p style="color: var(--muted); margin: 4px 0 0; line-height: 1.5;">nenhum cronograma para hoje. Clique em Gerar para montar pelos níveis de prioridade.</p>';
+        box.innerHTML = '<p style="color: var(--muted); margin: 4px 0 0; line-height: 1.5;">nenhum cronograma para hoje. clique em gerar para montar pelos níveis de prioridade.</p>';
         return;
       }
       tasks.forEach((task, index) => {
@@ -3481,6 +3541,109 @@
       });
     }
 
+
+    const priorityOptions = [
+      { value: 'alta', label: 'prioridade alta' },
+      { value: 'media', label: 'prioridade média' },
+      { value: 'baixa', label: 'prioridade baixa' },
+      { value: 'lazer', label: 'lazer / tempo livre' }
+    ];
+
+    let openMacSelect = null;
+
+    function closeCustomSelects(except = null) {
+      document.querySelectorAll('.mac-select.is-open').forEach(select => {
+        if (select !== except) select.classList.remove('is-open');
+      });
+      document.querySelectorAll('.mac-select-menu.is-floating-open').forEach(menu => {
+        const owner = menu.__macSelectOwner;
+        if (owner && owner !== except) {
+          menu.classList.remove('is-floating-open');
+          owner.appendChild(menu);
+        }
+      });
+      if (!except || openMacSelect !== except) openMacSelect = null;
+    }
+
+    function positionCustomSelectMenu(select) {
+      const button = select.querySelector('.mac-select-button');
+      const menu = select.querySelector('.mac-select-menu');
+      if (!button || !menu) return;
+      const rect = button.getBoundingClientRect();
+      const gap = 7;
+      const maxWidth = Math.min(Math.max(rect.width, 240), window.innerWidth - 16);
+      document.body.appendChild(menu);
+      menu.__macSelectOwner = select;
+      menu.style.width = maxWidth + 'px';
+      menu.style.left = Math.min(Math.max(8, rect.left), window.innerWidth - maxWidth - 8) + 'px';
+      const menuHeight = Math.min(menu.scrollHeight || 180, window.innerHeight - 24);
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const shouldOpenUp = spaceBelow < menuHeight + gap && rect.top > menuHeight + gap;
+      menu.style.top = (shouldOpenUp ? Math.max(8, rect.top - menuHeight - gap) : Math.min(rect.bottom + gap, window.innerHeight - menuHeight - 8)) + 'px';
+      menu.classList.add('is-floating-open');
+    }
+
+    function setCustomSelectValue(select, value, label, shouldDispatch = true) {
+      if (!select) return;
+      const input = select.querySelector('.mac-select-value');
+      const button = select.querySelector('.mac-select-button');
+      const options = [...select.querySelectorAll('.mac-select-option')];
+      const selectedOption = options.find(option => option.dataset.value === value) || options[0];
+      const finalValue = selectedOption ? selectedOption.dataset.value : value;
+      const finalLabel = label || (selectedOption ? selectedOption.textContent.trim() : value);
+      if (input) input.value = finalValue;
+      if (button) button.textContent = finalLabel;
+      options.forEach(option => option.classList.toggle('is-selected', option.dataset.value === finalValue));
+      if (shouldDispatch && input) input.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
+    function setupCustomSelect(select, onChange) {
+      if (!select || select.dataset.ready === 'true') return;
+      select.dataset.ready = 'true';
+      const input = select.querySelector('.mac-select-value');
+      const button = select.querySelector('.mac-select-button');
+      const options = [...select.querySelectorAll('.mac-select-option')];
+      if (!button) return;
+      button.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const willOpen = openMacSelect !== select;
+        closeCustomSelects(select);
+        if (!willOpen) { select.classList.remove('is-open'); closeCustomSelects(); return; }
+        openMacSelect = select;
+        select.classList.add('is-open');
+        positionCustomSelectMenu(select);
+      });
+      options.forEach(option => {
+        option.addEventListener('click', (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          setCustomSelectValue(select, option.dataset.value, option.textContent.trim(), true);
+          closeCustomSelects();
+          if (typeof onChange === 'function') onChange(input ? input.value : option.dataset.value, option.textContent.trim());
+        });
+      });
+      setCustomSelectValue(select, input ? input.value : (options[0]?.dataset.value || ''), null, false);
+    }
+
+    function setupStaticCustomSelects() {
+      document.querySelectorAll('.mac-select').forEach(select => setupCustomSelect(select));
+    }
+
+    function createPrioritySelect(value, onChange) {
+      const select = document.createElement('div');
+      select.className = 'mac-select';
+      const selectedValue = value || 'media';
+      select.innerHTML = '<input class="mac-select-value" value="' + selectedValue + '" />' +
+        '<button class="mac-select-button" type="button"></button>' +
+        '<div class="mac-select-menu">' +
+        priorityOptions.map(option => '<button class="mac-select-option" type="button" data-value="' + option.value + '">' + option.label + '</button>').join('') +
+        '</div>';
+      setupCustomSelect(select, onChange);
+      setCustomSelectValue(select, selectedValue, null, false);
+      return select;
+    }
+
     function priorityLabel(priority) {
       return {
         alta: 'Alta',
@@ -3505,24 +3668,48 @@
         card.innerHTML = `
           <div class="subject-top">
             <div>
-              <h3>${subject.name}</h3>
-              <p>${subject.note || 'Sem observação ainda.'}</p>
+              <h3 class="subject-name"></h3>
+              <p class="subject-note-preview"></p>
             </div>
             <span class="priority-badge priority-${subject.priority}">${priorityLabel(subject.priority)}</span>
           </div>
+          <textarea class="subject-description" placeholder="descrição da matéria. ex: o que revisar, foco principal, dúvidas, observações..."></textarea>
+          <div class="subject-priority-control">
+            <span class="subject-priority-label">prioridade</span>
+            <div class="subject-priority-slot"></div>
+          </div>
           <div class="subject-actions">
-            <button class="tiny-btn change-priority">mudar prioridade</button>
             <button class="tiny-btn add-study">estudar hoje</button>
             <button class="tiny-btn add-sunday">colocar domingo</button>
             <button class="tiny-btn delete-subject">apagar</button>
           </div>
         `;
-        card.querySelector('.change-priority').onclick = () => {
+
+        const nameEl = card.querySelector('.subject-name');
+        const previewEl = card.querySelector('.subject-note-preview');
+        const descriptionEl = card.querySelector('.subject-description');
+
+        nameEl.textContent = subject.name;
+        previewEl.textContent = subject.note ? 'descrição salva' : 'sem descrição ainda.';
+        descriptionEl.value = subject.note || '';
+
+        descriptionEl.addEventListener('input', () => {
           const all = getSubjects();
-          all[index].priority = nextPriority(all[index].priority);
+          if (!all[index]) return;
+          all[index].note = descriptionEl.value.trim();
+          setSubjects(all);
+          previewEl.textContent = all[index].note ? 'descrição salva' : 'sem descrição ainda.';
+        });
+        const prioritySlot = card.querySelector('.subject-priority-slot');
+        prioritySlot.appendChild(createPrioritySelect(subject.priority, (value) => {
+          const all = getSubjects();
+          if (!all[index]) return;
+          all[index].priority = value;
           setSubjects(all);
           renderSubjects();
-        };
+          renderSubjectPriorityMini();
+        }));
+
         card.querySelector('.add-study').onclick = () => {
           addTask(subject.priority === 'lazer' ? subject.name : `Estudar: ${subject.name}`, subject.priority === 'lazer' ? 'lazer' : 'estudo');
           closeModals();
@@ -3542,11 +3729,11 @@
           all.splice(index, 1);
           setSubjects(all);
           renderSubjects();
+          renderSubjectPriorityMini();
         };
         grid.appendChild(card);
       });
     }
-
 
     function getSubjectPool() {
       const subjects = getSubjects().filter(subject => subject.priority !== 'lazer');
@@ -3784,6 +3971,10 @@
       renderSubjectPriorityMini();
     }
 
+    document.addEventListener('click', () => closeCustomSelects());
+    document.addEventListener('keydown', (event) => { if (event.key === 'Escape') closeCustomSelects(); });
+    setupStaticCustomSelects();
+
     document.querySelectorAll('[data-modal]').forEach(btn => btn.addEventListener('click', () => openModal(btn.dataset.modal)));
     document.querySelectorAll('.close-modal').forEach(btn => btn.addEventListener('click', closeModals));
     document.querySelectorAll('.modal-backdrop').forEach(bg => bg.addEventListener('click', (e) => { if (e.target === bg) closeModals(); }));
@@ -3818,10 +4009,12 @@
       subjects.push({
         name,
         priority: $('newSubjectPriority').value,
-        note: ''
+        note: $('newSubjectNote') ? $('newSubjectNote').value.trim() : ''
       });
       setSubjects(subjects);
       $('newSubjectName').value = '';
+      if ($('newSubjectNote')) $('newSubjectNote').value = '';
+      setCustomSelectValue(document.querySelector('[data-select=\"newSubjectPriority\"]'), 'media', 'prioridade média', false);
       renderSubjects();
       renderSubjectPriorityMini();
     };
