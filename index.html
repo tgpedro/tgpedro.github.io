@@ -878,22 +878,22 @@
 
 /* cores sólidas */
 .priority-alta {
-  background: rgb(255, 0, 0); /* vermelho */
-  color: white;
+  background: #32d74b; /* vermelho */
+  color: rgb(255, 255, 255);
 }
 
 .priority-media {
-  background: #e3ae00; /* amarelo */
-  color: rgb(255, 255, 255)
+  background: #bf5af2; /* amarelo */
+  color: rgb(0, 0, 0)
 }
 
 .priority-baixa {
-  background: #00ac3f; /* verde */
+  background: #0a83fe ; /* verde */
   color: white;
 }
 
 .priority-lazer {
-  background: #2075ff; /* azul */
+  background: #ff9f0a; /* azul */
   color: white;
 }
 
@@ -2262,6 +2262,177 @@
       .calendar-grid, .calendar-range-info, .calendar-legend, .holiday-list { max-width: 100% !important; }
     }
 
+
+    /* ajuste final pedido: só o dia longo no card + celular mais estável */
+    .today-card .greeting {
+      text-transform: lowercase;
+    }
+
+    .day-clock-title {
+      display: block !important;
+      margin-top: 8px !important;
+    }
+
+    .day-clock-title #clock {
+      display: inline-block;
+      font-size: clamp(2.15rem, 8vw, 4.1rem) !important;
+      line-height: .9;
+      letter-spacing: -.075em;
+      color: rgba(247,247,251,.94) !important;
+    }
+
+    @media (max-width: 860px) {
+      .app {
+        width: min(100% - 14px, 1180px) !important;
+        padding-top: 8px !important;
+        padding-bottom: 98px !important;
+      }
+
+      .topbar {
+        position: sticky;
+        top: 6px;
+        display: grid !important;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        gap: 8px;
+        padding: 9px !important;
+        border-radius: 22px !important;
+      }
+
+      .brand {
+        min-width: 0;
+      }
+
+      .brand p {
+        max-width: 58vw !important;
+      }
+
+      .header-actions {
+        width: auto !important;
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        gap: 5px !important;
+        overflow: visible !important;
+      }
+
+      .header-actions .icon-btn {
+        width: 36px !important;
+        height: 36px !important;
+        min-height: 36px !important;
+      }
+
+      .shortcuts-bar {
+        grid-column: 1 / -1;
+        order: 20;
+        max-width: 100% !important;
+        overflow-x: auto;
+      }
+
+      .grid {
+        gap: 10px !important;
+        margin-top: 10px !important;
+      }
+
+      .panel,
+      .today-card,
+      .mini-stat,
+      .now-card,
+      .routine-item,
+      .task,
+      .subject-card,
+      .tool-card {
+        border-radius: 22px !important;
+      }
+
+      .today-card {
+        padding: 18px !important;
+      }
+
+      .greeting {
+        margin: 0 0 8px !important;
+        font-size: clamp(1.35rem, 7vw, 2rem) !important;
+        line-height: 1.02 !important;
+      }
+
+      .day-clock-title #clock {
+        font-size: clamp(2.45rem, 18vw, 3.8rem) !important;
+      }
+
+      .focus-actions,
+      .now-flow,
+      .countdowns,
+      .tools-grid,
+      .subjects-grid,
+      .cards-row {
+        grid-template-columns: 1fr !important;
+      }
+
+      .routine-item {
+        grid-template-columns: 58px 1fr !important;
+      }
+
+      .routine-item .tag {
+        grid-column: 2 !important;
+        width: fit-content;
+      }
+
+      .modal-backdrop {
+        padding: 8px !important;
+      }
+
+      .modal {
+        max-height: 88vh !important;
+        border-radius: 26px 26px 18px 18px !important;
+      }
+    }
+
+    @media (max-width: 430px) {
+      .app {
+        width: min(100% - 10px, 1180px) !important;
+      }
+
+      .logo {
+        width: 34px !important;
+        height: 34px !important;
+        border-radius: 13px !important;
+      }
+
+      .brand h1 {
+        font-size: .92rem !important;
+      }
+
+      .brand p {
+        max-width: 52vw !important;
+        font-size: .68rem !important;
+      }
+
+      .header-actions .icon-btn {
+        width: 34px !important;
+        height: 34px !important;
+      }
+
+      .today-card {
+        padding: 16px !important;
+      }
+
+      .greeting {
+        font-size: clamp(1.25rem, 8vw, 1.7rem) !important;
+      }
+
+      .day-clock-title #clock {
+        font-size: clamp(2.2rem, 18vw, 3.35rem) !important;
+      }
+
+      .panel-pad {
+        padding: 11px !important;
+      }
+
+      .mobile-bottom-nav {
+        bottom: 8px !important;
+        width: min(390px, calc(100% - 14px)) !important;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -2289,7 +2460,7 @@
         <div class="hero">
           <div class="today-card">
             <h3 class="greeting" id="greeting">sexta-feira</h3>
-            <h2 class="today-title day-clock-title"><span id="dayName">Hoje</span><span id="clock">--:--</span></h2>
+            <h2 class="today-title day-clock-title"><span id="clock">--:--</span></h2>
           </div>
           <div class="countdowns">
             <div class="mini-stat">
@@ -2408,7 +2579,7 @@
     <div class="modal-backdrop" id="shortcutModal">
     <div class="modal">
       <div class="modal-head">
-        <h2>Adicionar atalho</h2>
+        <h2>adicionar atalho</h2>
         <button class="icon-btn close-modal">✕</button>
       </div>
       <div class="form-row">
@@ -2416,7 +2587,7 @@
       </div>
       <div class="form-row">
         <input id="shortcutUrl" placeholder="link" />
-<button class="primary-btn" id="addShortcut">Adicionar</button>
+<button class="primary-btn" id="addShortcut">adicionar</button>
       </div>
       
       <p class="shortcut-reorder-hint">arraste pelos pontinhos ou use ↑/↓ para escolher a ordem dos atalhos.</p>
@@ -2432,10 +2603,10 @@
       </div>
 
       <div class="form-row">
-        <input id="newSubjectName" placeholder="Adicionar matéria ou atividade. Ex: Filme no domingo" />
+        <input id="newSubjectName" placeholder="adicionar matéria" />
       </div>
       <div class="form-row">
-        <textarea id="newSubjectNote" placeholder="Descrição da matéria. Ex: focar em exercícios, erros e revisão." rows="3"></textarea>
+        <textarea id="newSubjectNote" placeholder="adicionar descrição da matéria" rows="3"></textarea>
       </div>
       <div class="form-row">
         <div class="mac-select" data-select="newSubjectPriority">
@@ -2461,7 +2632,7 @@
         <button class="icon-btn close-modal">✕</button>
       </div>
       <div class="form-row">
-        <input id="modalTaskText" placeholder="Ex: exercícios de matemática" />
+        <input id="modalTaskText" placeholder="" />
       </div>
       <div class="form-row">
         <div class="mac-select" data-select="modalTaskType">
@@ -3114,7 +3285,7 @@
     function renderRoutine() {
       const routine = routines[selectedDate.getDay()];
       const position = getRoutinePosition(routine);
-      $('dayName').textContent = routine.label;
+      if ($('dayName')) $('dayName').textContent = routine.label;
       $('studyBlocks').textContent = routine.studyBlocks;
       $('selectedDateLabel').textContent = selectedDate.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
       $('focusSuggestion').textContent = selectedDate.getDay() === 6 ? '50/10 ou 25/5' : 'Pomodoro 25/5';
@@ -3889,7 +4060,7 @@
             </div>
             <span class="priority-badge priority-${subject.priority}">${priorityLabel(subject.priority)}</span>
           </div>
-          <textarea class="subject-description" placeholder="descrição da matéria. ex: o que revisar, foco principal, dúvidas, observações..."></textarea>
+          <textarea class="subject-description" placeholder="descrição da matéria"></textarea>
           <div class="subject-priority-control">
             <span class="subject-priority-label">prioridade</span>
             <div class="subject-priority-slot"></div>
