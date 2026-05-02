@@ -2494,7 +2494,7 @@
         </div>
 
         <div class="focus-actions" aria-label="ações principais de estudo">
-          <button class="focus-action is-primary" type="button" onclick="openFocusMode()" data-open-focus><span>começar foco</span></button>
+          <button class="focus-action is-primary" type="button" onclick="openFocusMode()" data-open-focus><span>modo foco</span></button>
           <button class="focus-action" type="button" data-modal="calendarModal"><span>calendário</span></button>
         </div>
 
@@ -2797,6 +2797,17 @@
     const fixedShortcuts = [
       { name: 'FP', url: 'https://portal.fernandapessoa.com.br', textOnly: true, fixed: true, category: 'estudo' }
     ];
+
+    const defaultShortcuts = [
+      { name: 'YouTube', url: 'https://www.youtube.com', category: 'lazer' },
+      { name: 'Google Sala', url: 'https://classroom.google.com', category: 'estudo' },
+      { name: 'Khan', url: 'https://pt.khanacademy.org', category: 'estudo' },
+      { name: 'Redação Online', url: 'https://redacaonline.com.br', category: 'enem' },
+      { name: 'Descomplica', url: 'https://descomplica.com.br', category: 'enem' }
+    ];
+
+    const shortcutCategories = ['estudo', 'enem', 'lazer', 'outros'];
+
 
     let appState = {
       tasks: {},
@@ -4535,7 +4546,7 @@
     if (!openButton) {
       var btn = event.target.closest('button');
       var text = btn ? (btn.textContent || '').trim().toLowerCase() : '';
-      if (text === 'começar foco' || text === 'modo foco' || text === 'foco') openButton = btn;
+      if (text === 'foco' || text === 'modo foco' || text === 'foco') openButton = btn;
     }
     if (openButton) {
       event.preventDefault();
