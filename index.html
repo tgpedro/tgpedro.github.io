@@ -4077,7 +4077,7 @@
         const descriptionEl = card.querySelector('.subject-description');
 
         nameEl.textContent = subject.name;
-        previewEl.textContent = subject.note ? 'descrição salva' : 'sem descrição ainda.';
+        previewEl.textContent = subject.note ? '' : '.';
         descriptionEl.value = subject.note || '';
 
         descriptionEl.addEventListener('input', () => {
@@ -4085,7 +4085,7 @@
           if (!all[index]) return;
           all[index].note = descriptionEl.value.trim();
           setSubjects(all);
-          previewEl.textContent = all[index].note ? 'descrição salva' : 'sem descrição ainda.';
+          previewEl.textContent = all[index].note ? '' : '';
         });
         const prioritySlot = card.querySelector('.subject-priority-slot');
         prioritySlot.appendChild(createPrioritySelect(subject.priority, (value) => {
