@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title></title>
+  <title>organizador de estudos</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
-      --bg: #07070b;
+      --bg: #050509;
       --panel: rgba(255, 255, 255, 0.075);
       --panel-strong: rgba(255, 255, 255, 0.12);
-      --line: rgba(255, 255, 255, 0.12);
-      --text: #f6f4ff;
-      --muted: rgba(246, 244, 255, 0.62);
+      --line: rgba(255, 255, 255, 0.10);
+      --text: #f7f7fb;
+      --muted: rgba(247, 247, 251, 0.58);
       --accent: #60a5fa;
       --accent-2: #67e8f9;
       --day-soft: rgba(96, 165, 250, 0.18);
@@ -20,11 +20,10 @@
       --danger: #fb7185;
       --success: #86efac;
       --warning: #fde68a;
-      --shadow: 0 24px 70px rgba(0, 0, 0, 0.45);
-      --radius: 28px;
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.38);
+      --radius: 32px;
     }
-
-    body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 153, 0.18); --day-glow: rgba(103, 232, 249, 0.20); }
+body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 153, 0.18); --day-glow: rgba(103, 232, 249, 0.20); }
     body.day-1 { --accent: #60a5fa; --accent-2: #93c5fd; --day-soft: rgba(96, 165, 250, 0.18); --day-glow: rgba(96, 165, 250, 0.28); }
     body.day-2 { --accent: #a78bfa; --accent-2: #c4b5fd; --day-soft: rgba(167, 139, 250, 0.18); --day-glow: rgba(167, 139, 250, 0.28); }
     body.day-3 { --accent: #22c55e; --accent-2: #86efac; --day-soft: rgba(34, 197, 94, 0.16); --day-glow: rgba(34, 197, 94, 0.24); }
@@ -170,8 +169,6 @@
       border-radius: 6px;
     }
 
-    
-
     .pill, .icon-btn, .primary-btn {
       border: 1px solid var(--line);
       background: rgba(255,255,255,0.08);
@@ -267,16 +264,12 @@
       top: -120px;
     }
 
-    
-
     .today-title {
       margin: 16px 0 6px;
       font-size: clamp(2.05rem, 5vw, 4.4rem);
       letter-spacing: -0.012em;
       line-height: 0.88;
     }
-
-    
 
     .countdowns {
       display: grid;
@@ -330,8 +323,6 @@
       display: grid;
       gap: 10px;
     }
-
-
 
     .now-flow {
       margin-top: 14px;
@@ -543,7 +534,7 @@
     .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
     .dot.work { background: var(--accent-2); }
     .dot.study { background: var(--success); }
-    
+
     .tasks {
       display: grid;
       gap: 9px;
@@ -627,14 +618,6 @@
       flex-wrap: wrap;
       gap: 8px;
     }
-
-    
-
-    
-
-    
-
-    
 
     .pomodoro-launch {
       width: 100%;
@@ -876,24 +859,23 @@
   font-weight: 600;
 }
 
-/* cores sólidas */
 .priority-alta {
-  background: #32d74b; /* vermelho */
+  background: #32d74b;
   color: rgb(255, 255, 255);
 }
 
 .priority-media {
-  background: #bf5af2; /* amarelo */
+  background: #bf5af2;
   color: rgb(0, 0, 0)
 }
 
 .priority-baixa {
-  background: #0a83fe ; /* verde */
+  background: #0a83fe ;
   color: white;
 }
 
 .priority-lazer {
-  background: #ff9f0a; /* azul */
+  background: #ff9f0a;
   color: white;
 }
 
@@ -923,7 +905,6 @@
       padding: 12px;
       margin-top: 12px;
     }
-
 
     .sync-status {
       display: inline-flex;
@@ -978,7 +959,6 @@
       box-shadow: inset 0 0 0 1px var(--day-glow);
     }
 
-
     .shortcut-help-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -1020,11 +1000,6 @@
       white-space: nowrap;
     }
 
-
-
-    /* melhorias sem mudar o layout principal */
-    
-
     @keyframes softFadeUp {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
@@ -1053,8 +1028,6 @@
       transform: scale(.985);
     }
 
-    
-
     .shortcut-actions {
       display: flex;
       align-items: center;
@@ -1078,10 +1051,6 @@
       width: min(680px, 100%);
       text-align: center;
     }
-
-    
-
-    
 
     .focus-timer {
       font-size: clamp(4.8rem, 13vw, 8.5rem);
@@ -1110,39 +1079,9 @@
       color: white;
     }
 
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     .day.holiday { border-color: rgba(251,113,133,.32); background: linear-gradient(180deg, rgba(251,113,133,.08), rgba(255,255,255,.045)); }
     .holiday-list { display: grid; gap: 7px; margin: 10px auto 0; max-width: 440px; }
     .holiday-item { display: flex; justify-content: space-between; gap: 10px; border: 1px solid var(--line); border-radius: 16px; background: rgba(255,255,255,.045); padding: 10px 11px; color: rgba(246,244,255,.84); font-size: .86rem; }
-    
-
-
 
     .native-tool-img {
       width: 26px;
@@ -1232,7 +1171,7 @@
 
     .day-number { font-size: .78rem; }
     .dot { width: 5px; height: 5px; }
-    
+
     .holiday-list { max-width: 520px; margin-top: 8px; }
     .holiday-item { padding: 8px 10px; font-size: .8rem; }
 
@@ -1261,8 +1200,6 @@
 
     .day.holiday .day-number { color: #fecdd3; }
 
-    
-
     .holiday-list { max-width: 640px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
     .holiday-item {
@@ -1276,31 +1213,6 @@
       .holiday-list { grid-template-columns: 1fr; }
       .native-tool-img { width: 22px; height: 22px; }
     }
-
-
-
-
-
-    
-    
-    @media(max-width:520px){}
-
-    
-    
-    
-    
-    
-    
-    @media(max-width:720px){}
-
-    
-    
-
-    
-
-    
-
-    
 
     .calendar-legend {
       max-width: 390px;
@@ -1329,38 +1241,20 @@
     .legend-dot.review { background: #c4b5fd; }
     .legend-dot.holiday { background: var(--danger); }
 
-    
-
     .dot.review { background: #c4b5fd; }
     .dot.holiday-dot { background: var(--danger); }
 
     .enem-progress-card { margin-top: 10px; display: grid; gap: 8px; }
     .enem-progress-track{ height: 10px; border-radius: 999px; overflow: hidden; border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.075); }
     .enem-progress-fill{ height: 100%; width: 0%; border-radius: inherit; background: linear-gradient(90deg, var(--accent), var(--accent-2)); box-shadow: 0 0 22px var(--day-glow); transition: width .6s ease; }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    @media (max-width: 720px) { .calendar-legend{ grid-template-columns: 1fr; }  }
 
+    @media (max-width: 720px) { .calendar-legend{ grid-template-columns: 1fr; }  }
 
     .compact-status {
       display: none;
     }
     .brand-text-only { padding-left: 2px; }
     .greeting { position: relative; z-index: 1; margin: 14px 0 -4px; font-size: clamp(1.05rem, 2vw, 1.3rem); letter-spacing: -0.012em; color: rgba(246,244,255,.84); }
-    
-    
-    
-    
-
 
     .plan-helper {
       border: 1px solid var(--line);
@@ -1385,8 +1279,6 @@
     .plan-actions { display: flex; gap: 8px; margin-top: 12px; justify-content: flex-end; flex-wrap: wrap; }
     .plan-actions .primary-btn, .plan-actions .pill { padding: 10px 13px; }
 
-    
-
     @media (max-width: 860px) {
       .header-actions {
         grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1397,7 +1289,6 @@
       }
     }
 
-    /* ajuste final para celular: mantém a UI nova, mas evita estouro e arrasto lateral */
     html, body {
       max-width: 100%;
       overflow-x: hidden;
@@ -1536,8 +1427,6 @@
         margin-top: 12px;
       }
 
-      
-
       .countdowns {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         min-width: 0;
@@ -1663,7 +1552,7 @@
       }
 
       input, textarea, select {
-        font-size: 16px; /* evita zoom automático no iPhone */
+        font-size: 16px;
         padding: 11px 12px;
         border-radius: 14px;
       }
@@ -1751,8 +1640,6 @@
         height: 5px !important;
       }
 
-      
-
       .calendar-legend {
         grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
         gap: 6px;
@@ -1788,11 +1675,6 @@
 
       .header-actions {
         grid-template-columns: repeat(5, minmax(0, 1fr));
-      }
-
-      .header-actions .primary-btn,
-      .sync-status {
-        grid-column: span 2;
       }
 
       .icon-btn {
@@ -1838,8 +1720,6 @@
       }
     }
 
-
-    /* versão estilo iPhone: mais limpa, com glass leve e menos poluição visual */
     :root { --bg:#050509; --panel:rgba(255,255,255,.075); --panel-strong:rgba(255,255,255,.12); --line:rgba(255,255,255,.10); --text:#f7f7fb; --muted:rgba(247,247,251,.58); --radius:32px; --shadow:0 24px 80px rgba(0,0,0,.38); }
     body { background: radial-gradient(circle at 15% 8%, var(--day-soft), transparent 28%), radial-gradient(circle at 90% 15%, rgba(255,255,255,.055), transparent 24%), linear-gradient(180deg,#090912,#050509 58%,#040406); }
     .app { width:min(1180px, calc(100% - 34px)); padding-top:16px; }
@@ -1856,10 +1736,10 @@
     .hero { grid-template-columns:1fr; gap:12px; }
     .today-card { min-height:168px; padding:24px; border-radius:32px; background:linear-gradient(145deg, rgba(255,255,255,.12), rgba(255,255,255,.055)), radial-gradient(circle at 85% 12%, var(--day-glow), transparent 38%); border-color:rgba(255,255,255,.12); box-shadow:inset 0 1px 0 rgba(255,255,255,.10); }
     .today-card::after { display:none; }
-    
+
     .greeting { margin:14px 0 6px !important; color:rgba(247,247,251,.88) !important; font-size:clamp(1.5rem,3vw,2.45rem) !important; letter-spacing:-.055em; line-height:1; font-weight: 600; }
     .today-title { margin:0 0 6px; font-size:clamp(1.9rem,5vw,3.35rem); letter-spacing:-.07em; opacity:.78; }
-    
+
     .countdowns { grid-template-columns:repeat(2,minmax(0,1fr)); min-width:0; }
     .mini-stat, .small-card, .now-card, .routine-item, .task, .tool-card, .subject-card, .note{ border-radius:24px; background:rgba(255,255,255,.055); border-color:rgba(255,255,255,.085); box-shadow:inset 0 1px 0 rgba(255,255,255,.055); }
     .mini-stat { padding:16px; } .mini-stat strong { font-size:1.35rem; }
@@ -1869,7 +1749,7 @@
     .tabs { padding-bottom:2px; margin-bottom:10px; } .tab { border-radius:999px; background:rgba(255,255,255,.055); border-color:rgba(255,255,255,.08); padding:8px 11px; font-size:.82rem; } .tab.active { background:rgba(255,255,255,.14); border-color:rgba(255,255,255,.16); }
     .routine-list { gap:8px; } .routine-item { grid-template-columns:70px 1fr auto; padding:11px 12px; }
     .tasks { max-height:none; gap:8px; } .task { padding:12px; }
-       
+
     .pomodoro-launch { width:100%; margin:14px 0 0; display:grid; grid-template-columns:1fr auto; align-items:center; gap:3px 12px; text-align:left; padding:14px 16px; background:linear-gradient(145deg,rgba(255,255,255,.12),rgba(255,255,255,.055)); border:1px solid rgba(255,255,255,.10); }
     .pomodoro-launch span { font-weight: 600; letter-spacing:-.025em; } .pomodoro-launch b { font-size:1.2rem; letter-spacing:-.05em; } .pomodoro-launch small { grid-column:1/-1; color:var(--muted); }
     .modal-backdrop { background:rgba(0,0,0,.48); backdrop-filter:blur(18px); } .modal { border-radius:34px; background:rgba(20,20,28,.82); border-color:rgba(255,255,255,.11); box-shadow:0 28px 90px rgba(0,0,0,.45); } .modal-head h2 { font-size:1.18rem; letter-spacing:-.04em; }
@@ -1879,8 +1759,6 @@
     @media (max-width:860px) { .app { width:min(100% - 18px,1180px); padding-bottom:32px; } .topbar { display:flex; align-items:center; gap:10px; border-radius:26px; } .brand { flex:1 1 auto; } .brand p { max-width:46vw; } .header-actions { width:auto; display:flex; flex-wrap:nowrap; gap:6px; } .header-actions .pill,.header-actions .icon-btn,.header-actions .primary-btn { min-height:38px; } .header-actions .pill#todayBtn { display:none; } .grid { grid-template-columns:1fr; } .countdowns,.now-flow,.tools-grid { grid-template-columns:1fr; } .modal-backdrop { align-items:flex-end; } .modal { border-radius:30px 30px 20px 20px; } }
     @media (max-width:430px) { .header-actions .primary-btn { padding:8px 10px; font-size:.78rem; } .brand h1{font-size:.95rem;} .brand p{font-size:.7rem;} .today-card{padding:20px;} .routine-item{grid-template-columns:58px 1fr;} .routine-item .tag{grid-column:2;} }
 
-  
-    /* versão estável: visual de app sem a barra cinza do navegador */
     html, body {
       scrollbar-width: none;
       -ms-overflow-style: none;
@@ -1898,7 +1776,6 @@
       -webkit-overflow-scrolling: touch;
     }
 
-    /* ajustes pedidos: atalhos visíveis, FP fixo e cards menos confusos */
     .shortcuts-bar {
       display: flex !important;
       max-width: 310px;
@@ -1942,16 +1819,6 @@
       transform-origin: right center;
     }
 
-    
-
-    
-
-    
-    
-    
-
-    
-
     .tool-section-title {
       color: rgba(247,247,251,.78);
     }
@@ -1964,8 +1831,6 @@
       .header-divider { display: none !important; }
     }
 
-
-    /* reorganização final: mantém todos os sistemas, mas deixa a tela principal agir como app */
     .grid { grid-template-columns: minmax(0, 1.12fr) minmax(340px, .88fr); align-items: start; }
     .today-card { min-height: 170px; }
     .now-flow { margin-top: 16px; }
@@ -1977,8 +1842,7 @@
     .focus-action.is-primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); border-color: transparent; box-shadow: 0 18px 40px var(--day-soft); }
     .focus-action.is-primary b { color: rgba(255,255,255,.78); }
     aside.panel { position: sticky; top: 94px; }
-    
-    
+
     .routine-list { max-height: none; }
     .mobile-bottom-nav { position: fixed; left: 50%; bottom: 12px; transform: translateX(-50%); z-index: 35; width: min(420px, calc(100% - 22px)); padding: 7px; border: 1px solid rgba(255,255,255,.12); border-radius: 999px; background: rgba(12,12,19,.74); backdrop-filter: blur(22px); box-shadow: 0 20px 60px rgba(0,0,0,.42); grid-template-columns: repeat(4, 1fr); gap: 5px; }
     .mobile-bottom-nav button { min-height: 48px; border-radius: 999px; background: transparent; color: rgba(247,247,251,.72); display: grid; place-items: center; gap: 1px; padding: 5px; }
@@ -1990,8 +1854,6 @@
     @media (max-width: 860px) { .app { padding-bottom: 92px; } .mobile-bottom-nav { display: grid; } .topbar { top: 8px; } .header-actions .primary-btn { display: none; } .today-card { min-height: 145px; } .focus-actions { grid-template-columns: 1fr 1fr; } .focus-action { min-height: 70px; border-radius: 18px; padding: 12px; } .focus-action.is-primary { grid-column: 1 / -1; }  }
     @media (max-width: 430px) { .focus-actions { grid-template-columns: 1fr; } .focus-action.is-primary { grid-column: auto; } }
 
-
-    /* ajuste de clareza visual: menos poluição, mais hierarquia, sem remover sistemas */
     .topbar { box-shadow: 0 18px 45px rgba(0,0,0,.28); background: rgba(8,8,13,.82); }
     .brand h1 { font-size: 1rem; letter-spacing: -.03em; }
     .brand p { font-size: .76rem; opacity: .78; }
@@ -1999,13 +1861,10 @@
     .header-actions .primary-btn { min-width: 108px; }
     .grid { grid-template-columns: minmax(0, 1.18fr) minmax(340px, .82fr); align-items: start; }
     .panel { background: rgba(255,255,255,.052); border-color: rgba(255,255,255,.095); box-shadow: 0 18px 48px rgba(0,0,0,.30); }
-    .hero { grid-template-columns: 1fr; gap: 12px; }
     .today-card { min-height: auto !important; padding: 22px !important; border-radius: 28px !important; background: linear-gradient(145deg, rgba(255,255,255,.105), rgba(255,255,255,.045)), radial-gradient(circle at 92% 10%, var(--day-soft), transparent 42%) !important; box-shadow: none !important; }
-    
+
     .greeting { margin-top: 10px; font-size: 1rem; color: var(--muted); }
     .today-title { font-size: clamp(2.15rem, 6vw, 3.45rem) !important; margin: 6px 0 6px !important; }
-    
-    .countdowns { grid-template-columns: repeat(2, minmax(0, 1fr)); min-width: 0; }
     .mini-stat { padding: 13px 14px !important; border-radius: 19px !important; background: rgba(255,255,255,.043) !important; box-shadow: none !important; }
     .mini-stat strong { font-size: 1.15rem !important; }
     .now-flow { margin-top: 14px; grid-template-columns: 1.15fr .85fr; }
@@ -2028,28 +1887,18 @@
     .tasks { max-height: 300px; margin-top: 8px; }
     .task { padding: 10px; border-radius: 17px; background: rgba(255,255,255,.044); }
     .pomodoro-launch { margin: 12px 0 0 !important; padding: 12px 14px !important; border-radius: 18px !important; background: rgba(255,255,255,.045) !important; box-shadow: none !important; }
-    
-    
-    
-    
-    
+
     .routine-item{ background: rgba(255,255,255,.038) !important; box-shadow: none !important; }
     @media (max-width: 860px) {
-      .topbar { border-radius: 20px; }
       .header-actions { grid-template-columns: repeat(5, minmax(0,1fr)); }
       .header-actions .pill, .header-actions .sync-status { display: none; }
       .grid, .hero, .now-flow, .countdowns { grid-template-columns: 1fr; }
-      aside.panel { position: static; }
-      .focus-actions { grid-template-columns: 1fr 1fr; }
-      .focus-action.is-primary { grid-column: 1 / -1; }
       .today-card { padding: 18px !important; }
       .today-title { font-size: clamp(2rem, 15vw, 3rem) !important; }
       .panel-pad { padding: 12px; }
       .tasks { max-height: none; }
     }
     @media (max-width: 430px) {
-      .focus-actions { grid-template-columns: 1fr; }
-      .focus-action.is-primary { grid-column: auto; }
       .countdowns { display: none; }
       .shortcuts-bar { max-height: 38px; }
       .calm-drawer > summary { align-items: flex-start; }
@@ -2062,9 +1911,6 @@
     .focus-presets { margin-bottom:10px; }
     @media (max-width: 520px) { .day-clock-title { align-items:flex-start; flex-direction:column; gap:4px; } }
 
-  
-
-
     .shortcut-reorder-hint {
       color: var(--muted);
       margin: 8px 0 10px;
@@ -2075,7 +1921,6 @@
       grid-template-columns: auto 1fr auto;
     }
 
-    /* correção direta do modo foco: evita backdrop invisível travando a tela */
     #focusModal.show {
       display: flex !important;
       opacity: 1 !important;
@@ -2096,8 +1941,6 @@
       pointer-events: none !important;
     }
 
-
-    /* select custom estilo mac: menu escuro, fonte leve e preso ao botão ao rolar */
     .mac-select { position: relative; width: 100%; min-width: 0; z-index: 1; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif; font-weight: 400; user-select: none; -webkit-user-select: none; }
     .mac-select.is-open { z-index: 2147482500; }
     .mac-select-value { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
@@ -2116,9 +1959,6 @@
     select, select option { background: #212126; color: #f7f7fb; font-weight: 400; color-scheme: dark; }
     @media (max-width: 860px) { .mac-select-option { min-height: 34px; font-size: .92rem; } }
 
-  
-
-    /* scrollbar do mac select oculta: o menu ainda rola, mas sem barrinha visível */
     .mac-select-menu {
       scrollbar-width: none;
       -ms-overflow-style: none;
@@ -2135,8 +1975,6 @@
       background: transparent;
     }
 
-
-    /* ajuste mobile final: toque maior, sem estouro lateral e select mais estável no celular */
     body.mac-select-lock {
       overflow: hidden;
       touch-action: none;
@@ -2262,8 +2100,6 @@
       .calendar-grid, .calendar-range-info, .calendar-legend, .holiday-list { max-width: 100% !important; }
     }
 
-
-    /* ajuste final pedido: só o dia longo no card + celular mais estável */
     .today-card .greeting {
       text-transform: lowercase;
     }
@@ -2344,10 +2180,6 @@
         border-radius: 22px !important;
       }
 
-      .today-card {
-        padding: 18px !important;
-      }
-
       .greeting {
         margin: 0 0 8px !important;
         font-size: clamp(1.35rem, 7vw, 2rem) !important;
@@ -2387,9 +2219,6 @@
     }
 
     @media (max-width: 430px) {
-      .app {
-        width: min(100% - 10px, 1180px) !important;
-      }
 
       .logo {
         width: 34px !important;
@@ -2433,9 +2262,6 @@
       }
     }
 
-  
-
-    /* ajuste final das fontes: visual mais leve, parecido com app/iOS/Steam */
     html, body {
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
@@ -2537,7 +2363,6 @@
     .focus-action.is-primary span {
       font-weight: 600 !important;
     }
-
   </style>
 </head>
 <body>
@@ -2606,7 +2431,7 @@
         <details class="calm-drawer routine-drawer">
           <summary>
             <span>rotina</span>
-            
+
           </summary>
           <div class="drawer-content">
             <div class="tabs" id="tabs"></div>
@@ -2659,7 +2484,7 @@
         <div class="legend-item"><span class="legend-dot task"></span>tarefa comum</div>
         <div class="legend-item"><span class="legend-dot holiday"></span>feriado</div>
       </div>
-      
+
       <div class="holiday-list" id="holidayList"></div>
     </div>
   </div>
@@ -2694,7 +2519,7 @@
         <input id="shortcutUrl" placeholder="link" />
 <button class="primary-btn" id="addShortcut">adicionar</button>
       </div>
-      
+
       <p class="shortcut-reorder-hint">arraste pelos pontinhos ou use ↑/↓ para escolher a ordem dos atalhos.</p>
       <div class="notes-list" id="shortcutList"></div>
     </div>
