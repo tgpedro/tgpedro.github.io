@@ -3149,7 +3149,7 @@
       $('liveDate').textContent = now.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
       updateGreeting();
 
-      const enem = new Date('2026-10-08T00:00:00');
+      const enem = new Date('2026-11-01T00:00:00');
       const diff = Math.ceil((enem - now) / (1000 * 60 * 60 * 24));
       const enemStart = new Date('2026-01-01T00:00:00');
       if (diff >= 0) {
