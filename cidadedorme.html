@@ -1,1 +1,1162 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cidade Dorme</title>
+  <style>
+    :root{
+      --bg:#030303;
+      --panel:rgba(255,255,255,.06);
+      --panel-2:rgba(255,255,255,.09);
+      --border:rgba(255,255,255,.10);
+      --text:#f5f5f7;
+      --muted:#a1a1aa;
+      --danger:#ff453a;
+      --accent:#0a84ff;
+      --success:#32d74b;
+      --warning:#ffd60a;
+      --shadow:0 24px 80px rgba(0,0,0,.55);
+      --radius:28px;
+    }
 
+    *{box-sizing:border-box}
+
+    html,body{
+      margin:0;
+      min-height:100%;
+      background:
+        radial-gradient(circle at 50% -20%, rgba(10,132,255,.14), transparent 28%),
+        radial-gradient(circle at 50% 120%, rgba(255,69,58,.10), transparent 26%),
+        linear-gradient(180deg, #050505 0%, #020202 100%);
+      color:var(--text);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    }
+
+    body{
+      padding:18px;
+      display:flex;
+      justify-content:center;
+    }
+
+    .app{
+      width:100%;
+      max-width:560px;
+    }
+
+    .hero{
+      padding:24px 22px;
+      border:1px solid var(--border);
+      border-radius:32px;
+      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      backdrop-filter:blur(18px);
+      box-shadow:var(--shadow);
+      margin-bottom:14px;
+    }
+
+    .eyebrow{
+      font-size:12px;
+      color:var(--muted);
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      margin-bottom:8px;
+    }
+
+    h1{
+      margin:0;
+      font-size:38px;
+      line-height:1;
+      letter-spacing:-.05em;
+      font-weight:900;
+    }
+
+    .sub{
+      margin-top:10px;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.5;
+    }
+
+    .panel{
+      margin-top:14px;
+      padding:16px;
+      border:1px solid var(--border);
+      border-radius:24px;
+      background:var(--panel);
+      backdrop-filter:blur(16px);
+      box-shadow:var(--shadow);
+    }
+
+    .panel-title{
+      font-size:12px;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      color:var(--muted);
+      margin-bottom:12px;
+    }
+
+    .row{
+      display:flex;
+      gap:10px;
+    }
+
+    input{
+      flex:1;
+      width:100%;
+      border:none;
+      outline:none;
+      background:rgba(255,255,255,.07);
+      color:var(--text);
+      padding:14px 16px;
+      border-radius:18px;
+      font-size:16px;
+      border:1px solid transparent;
+      transition:.2s ease;
+    }
+
+    input:focus{
+      border-color:rgba(10,132,255,.55);
+      box-shadow:0 0 0 4px rgba(10,132,255,.12);
+    }
+
+    button{
+      border:none;
+      outline:none;
+      cursor:pointer;
+      border-radius:18px;
+      padding:14px 16px;
+      color:var(--text);
+      font-size:15px;
+      font-weight:800;
+      transition:transform .12s ease, opacity .2s ease;
+    }
+
+    button:active{ transform:scale(.985); }
+
+    .btn-primary{
+      background:linear-gradient(180deg, rgba(10,132,255,.96), rgba(10,132,255,.74));
+    }
+
+    .btn-secondary{
+      background:rgba(255,255,255,.08);
+      border:1px solid var(--border);
+    }
+
+    .btn-danger{
+      background:linear-gradient(180deg, rgba(255,69,58,.96), rgba(255,69,58,.74));
+    }
+
+    .btn-success{
+      background:linear-gradient(180deg, rgba(50,215,75,.96), rgba(50,215,75,.74));
+    }
+
+    .btn-ghost{
+      background:rgba(255,255,255,.05);
+      border:1px solid var(--border);
+    }
+
+    .grid-actions{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:12px;
+    }
+
+    .players{
+      display:grid;
+      gap:10px;
+      margin-top:10px;
+    }
+
+    .player{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:14px 16px;
+      background:rgba(255,255,255,.05);
+      border:1px solid var(--border);
+      border-radius:18px;
+    }
+
+    .player-name{
+      font-weight:800;
+      letter-spacing:-.02em;
+    }
+
+    .chip{
+      font-size:12px;
+      color:var(--muted);
+      padding:6px 10px;
+      border-radius:999px;
+      background:rgba(255,255,255,.06);
+      border:1px solid var(--border);
+    }
+
+    .screen{
+      min-height:360px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      gap:14px;
+      text-align:center;
+      padding:24px;
+      border-radius:32px;
+      border:1px solid var(--border);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.04));
+      backdrop-filter:blur(22px);
+      box-shadow:var(--shadow);
+      margin-top:14px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .screen::before{
+      content:"";
+      position:absolute;
+      inset:-40% auto auto -10%;
+      width:260px;
+      height:260px;
+      background:radial-gradient(circle, rgba(10,132,255,.16), transparent 65%);
+      pointer-events:none;
+    }
+
+    .screen::after{
+      content:"";
+      position:absolute;
+      inset:auto -10% -45% auto;
+      width:280px;
+      height:280px;
+      background:radial-gradient(circle, rgba(255,69,58,.12), transparent 65%);
+      pointer-events:none;
+    }
+
+    .phase,.title,.text,.choices,.result-stack,.narration{
+      position:relative;
+      z-index:1;
+    }
+
+    .phase{
+      font-size:12px;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.18em;
+    }
+
+    .title{
+      font-size:34px;
+      font-weight:900;
+      letter-spacing:-.05em;
+      line-height:1.05;
+    }
+
+    .text{
+      color:#d4d4d8;
+      font-size:15px;
+      line-height:1.55;
+    }
+
+    .narration{
+      font-size:16px;
+      line-height:1.6;
+      color:#ededf0;
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:22px;
+      padding:16px;
+    }
+
+    .choices{
+      display:grid;
+      gap:10px;
+      margin-top:4px;
+    }
+
+    .big-name{
+      font-size:30px;
+      font-weight:900;
+      letter-spacing:-.05em;
+      line-height:1.05;
+      word-break:break-word;
+    }
+
+    .role{
+      font-size:36px;
+      font-weight:900;
+      letter-spacing:-.05em;
+      text-transform:lowercase;
+    }
+
+    .role.assassino{ color:var(--danger); }
+    .role.detetive{ color:var(--accent); }
+    .role.inocente{ color:var(--success); }
+
+    .result-stack{
+      display:grid;
+      gap:12px;
+    }
+
+    .result-card{
+      text-align:left;
+      padding:16px;
+      border-radius:22px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.05);
+    }
+
+    .result-label{
+      font-size:12px;
+      color:var(--muted);
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      margin-bottom:8px;
+    }
+
+    .result-value{
+      font-size:24px;
+      font-weight:900;
+      letter-spacing:-.04em;
+      line-height:1.1;
+    }
+
+    .result-value.success{ color:var(--success); }
+    .result-value.fail{ color:var(--warning); }
+    .result-value.danger{ color:var(--danger); }
+
+    .footer-note{
+      margin-top:12px;
+      text-align:center;
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    .overlay{
+      position:fixed;
+      inset:0;
+      background:#000;
+      z-index:1000;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+    }
+
+    .overlay.show{ display:flex; }
+
+    .overlay-card{
+      width:min(100%, 460px);
+      text-align:center;
+      padding:26px 22px;
+      border-radius:30px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.04);
+      backdrop-filter:blur(20px);
+      box-shadow:var(--shadow);
+    }
+
+    .anti-title{
+      font-size:14px;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      color:var(--muted);
+      margin-bottom:10px;
+    }
+
+    .hold-zone{
+      margin-top:16px;
+      padding:22px;
+      border-radius:24px;
+      border:1px dashed rgba(255,255,255,.18);
+      background:rgba(255,255,255,.03);
+      user-select:none;
+      -webkit-user-select:none;
+      touch-action:none;
+    }
+
+    .hold-main{
+      font-size:22px;
+      font-weight:900;
+      letter-spacing:-.03em;
+      line-height:1.15;
+    }
+
+    .hold-sub{
+      margin-top:8px;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.45;
+    }
+
+    .secret{
+      margin-top:18px;
+      min-height:110px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      border-radius:24px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      padding:18px;
+    }
+
+    .hidden-secret{
+      filter:blur(18px);
+      opacity:.35;
+      transform:scale(.98);
+      transition:.18s ease;
+    }
+
+    .visible-secret{
+      filter:none;
+      opacity:1;
+      transform:scale(1);
+    }
+
+    .small-btn{
+      margin-top:14px;
+      width:100%;
+    }
+
+    @media (max-width:560px){
+      body{ padding:14px; }
+      h1{ font-size:32px; }
+      .screen{ min-height:330px; padding:20px; }
+      .title{ font-size:28px; }
+      .grid-actions{ grid-template-columns:1fr; }
+      .row{ flex-direction:column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="hero">
+      <div class="eyebrow">narrador automático</div>
+      <h1>cidade dorme</h1>
+      <div class="sub">
+        Sorteie os papéis, revele com proteção e deixe o celular narrar a rodada com mais suspense.
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">jogadores</div>
+      <div class="row">
+        <input id="nameInput" type="text" placeholder="digite um nome" maxlength="24" />
+        <button class="btn-primary" id="addBtn">adicionar</button>
+      </div>
+
+      <div class="players" id="playersList"></div>
+
+      <div class="grid-actions">
+        <button class="btn-secondary" id="setupBtn">sortear papéis</button>
+        <button class="btn-success" id="startBtn">começar jogo</button>
+      </div>
+    </div>
+
+    <div class="screen" id="screen"></div>
+
+    <div class="footer-note">
+      O detetive escolhe um suspeito durante a noite. No dia, o jogo mostra se ele acertou ou errou.
+    </div>
+  </div>
+
+  <div class="overlay" id="overlay">
+    <div class="overlay-card">
+      <div class="anti-title">modo anti-espionagem</div>
+      <div class="hold-zone" id="holdZone">
+        <div class="hold-main" id="holdMain">segure para revelar</div>
+        <div class="hold-sub" id="holdSub">somente a pessoa da vez deve olhar</div>
+      </div>
+
+      <div class="secret hidden-secret" id="secretBox">
+        <div class="big-name" id="secretName">...</div>
+        <div class="role" id="secretRole">...</div>
+      </div>
+
+      <button class="btn-ghost small-btn" id="closeOverlayBtn">continuar</button>
+    </div>
+  </div>
+
+  <script>
+    const players = [];
+    let roles = {};
+    let alive = [];
+    let revealIndex = 0;
+
+    let state = "idle";
+    let victim = null;
+    let detectiveGuess = null;
+    let locked = false;
+
+    const screen = document.getElementById("screen");
+    const playersList = document.getElementById("playersList");
+    const nameInput = document.getElementById("nameInput");
+    const addBtn = document.getElementById("addBtn");
+    const setupBtn = document.getElementById("setupBtn");
+    const startBtn = document.getElementById("startBtn");
+
+    const overlay = document.getElementById("overlay");
+    const holdZone = document.getElementById("holdZone");
+    const holdMain = document.getElementById("holdMain");
+    const holdSub = document.getElementById("holdSub");
+    const secretBox = document.getElementById("secretBox");
+    const secretName = document.getElementById("secretName");
+    const secretRole = document.getElementById("secretRole");
+    const closeOverlayBtn = document.getElementById("closeOverlayBtn");
+
+    function speak(text){
+      try{
+        speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = "pt-BR";
+        utter.rate = 0.94;
+        utter.pitch = 0.92;
+        speechSynthesis.speak(utter);
+      }catch(e){}
+    }
+
+    function speakLines(lines, gap = 1700){
+      return new Promise((resolve) => {
+        if(!Array.isArray(lines) || lines.length === 0){
+          resolve();
+          return;
+        }
+
+        let index = 0;
+
+        const run = () => {
+          speak(lines[index]);
+          index++;
+          if(index >= lines.length){
+            setTimeout(resolve, gap);
+          } else {
+            setTimeout(run, gap);
+          }
+        };
+
+        run();
+      });
+    }
+
+    function delay(ms){
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    function shuffle(array){
+      for(let i = array.length - 1; i > 0; i--){
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    }
+
+    function renderPlayers(){
+      playersList.innerHTML = "";
+
+      if(players.length === 0){
+        const empty = document.createElement("div");
+        empty.className = "player";
+        empty.innerHTML = `<span class="player-name">ninguém ainda</span><span class="chip">adicione nomes</span>`;
+        playersList.appendChild(empty);
+        return;
+      }
+
+      players.forEach((player, i) => {
+        const item = document.createElement("div");
+        item.className = "player";
+        item.innerHTML = `
+          <span class="player-name">${escapeHtml(player)}</span>
+          <span class="chip">jogador ${i + 1}</span>
+        `;
+        playersList.appendChild(item);
+      });
+    }
+
+    function escapeHtml(text){
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function setScreen({ phase = "", title = "", text = "", narration = "", content = null }){
+      screen.innerHTML = `
+        <div class="phase">${phase}</div>
+        <div class="title">${title}</div>
+        <div class="text">${text}</div>
+        ${narration ? `<div class="narration">${narration}</div>` : ""}
+      `;
+
+      if(content){
+        screen.appendChild(content);
+      }
+    }
+
+    function createChoices(names, onPick, variant = "btn-secondary"){
+      const wrap = document.createElement("div");
+      wrap.className = "choices";
+
+      names.forEach(name => {
+        const btn = document.createElement("button");
+        btn.className = variant;
+        btn.textContent = name;
+        btn.addEventListener("click", () => onPick(name), { once: true });
+        wrap.appendChild(btn);
+      });
+
+      return wrap;
+    }
+
+    function getAssassin(){
+      return alive.find(name => roles[name] === "assassino");
+    }
+
+    function getDetective(){
+      return alive.find(name => roles[name] === "detetive");
+    }
+
+    function endGame(message){
+      state = "ended";
+      locked = false;
+
+      const result = document.createElement("div");
+      result.className = "choices";
+
+      const rolesBox = document.createElement("div");
+      rolesBox.className = "panel";
+      rolesBox.style.marginTop = "4px";
+      rolesBox.innerHTML = `
+        <div class="panel-title">papéis finais</div>
+        ${players.map(name => `
+          <div class="player" style="margin:8px 0 0">
+            <span class="player-name">${escapeHtml(name)}</span>
+            <span class="chip">${roles[name]}</span>
+          </div>
+        `).join("")}
+      `;
+
+      result.appendChild(rolesBox);
+
+      const restart = document.createElement("button");
+      restart.className = "btn-primary";
+      restart.textContent = "nova partida";
+      restart.onclick = () => {
+        roles = {};
+        alive = [...players];
+        revealIndex = 0;
+        victim = null;
+        detectiveGuess = null;
+        state = "idle";
+        locked = false;
+        speechSynthesis.cancel();
+        renderPlayers();
+        showIdle();
+      };
+      result.appendChild(restart);
+
+      setScreen({
+        phase: "fim",
+        title: message,
+        text: "a partida terminou.",
+        narration: "A noite finalmente chegou ao fim. Todos agora sabem quem era quem.",
+        content: result
+      });
+
+      speak(message);
+    }
+
+    function isGameEnded(){
+      const assassin = getAssassin();
+
+      if(!assassin){
+        endGame("detetive e inocentes venceram");
+        return true;
+      }
+
+      if(alive.length <= 2 && alive.includes(assassin)){
+        endGame(`assassino venceu: ${assassin}`);
+        return true;
+      }
+
+      return false;
+    }
+
+    function showIdle(){
+      setScreen({
+        phase: "pronto",
+        title: "prepare os nomes",
+        text: "adicione pelo menos 3 jogadores.",
+        narration: "Quando todos estiverem prontos, sorteie os papéis e comece a partida."
+      });
+    }
+
+    function addPlayer(){
+      if(state !== "idle" && state !== "ready-to-setup") return;
+
+      const value = nameInput.value.trim();
+      if(!value) return;
+      if(players.includes(value)){
+        nameInput.value = "";
+        return;
+      }
+
+      players.push(value);
+      nameInput.value = "";
+      state = "ready-to-setup";
+      renderPlayers();
+      showIdle();
+    }
+
+    addBtn.addEventListener("click", addPlayer);
+    nameInput.addEventListener("keydown", (e) => {
+      if(e.key === "Enter") addPlayer();
+    });
+
+    function setupGame(){
+      if(players.length < 3){
+        alert("coloque pelo menos 3 jogadores.");
+        return;
+      }
+
+      roles = {};
+      alive = [...players];
+      victim = null;
+      detectiveGuess = null;
+      revealIndex = 0;
+      state = "revealing";
+      locked = false;
+
+      const tempRoles = ["assassino", "detetive"];
+      while(tempRoles.length < players.length){
+        tempRoles.push("inocente");
+      }
+
+      shuffle(tempRoles);
+
+      players.forEach((name, i) => {
+        roles[name] = tempRoles[i];
+      });
+
+      revealNextRole();
+    }
+
+    setupBtn.addEventListener("click", setupGame);
+
+    function openRevealOverlay(playerName, roleName){
+      return new Promise((resolve) => {
+        overlay.classList.add("show");
+        holdMain.textContent = "segure para revelar";
+        holdSub.textContent = `somente ${playerName} deve olhar`;
+        secretName.innerHTML = escapeHtml(playerName);
+        secretRole.textContent = roleName;
+        secretRole.className = `role ${roleName}`;
+        secretBox.className = "secret hidden-secret";
+
+        function showSecret(){
+          secretBox.className = "secret visible-secret";
+          holdMain.textContent = "solte quando terminar";
+          holdSub.textContent = "depois toque em continuar";
+        }
+
+        function hideSecret(){
+          secretBox.className = "secret hidden-secret";
+          holdMain.textContent = "segure para revelar";
+          holdSub.textContent = `somente ${playerName} deve olhar`;
+        }
+
+        function clearHoldEvents(){
+          holdZone.onmousedown = null;
+          holdZone.onmouseup = null;
+          holdZone.onmouseleave = null;
+          holdZone.ontouchstart = null;
+          holdZone.ontouchend = null;
+          holdZone.ontouchcancel = null;
+        }
+
+        holdZone.onmousedown = showSecret;
+        holdZone.onmouseup = hideSecret;
+        holdZone.onmouseleave = hideSecret;
+        holdZone.ontouchstart = (e) => { e.preventDefault(); showSecret(); };
+        holdZone.ontouchend = (e) => { e.preventDefault(); hideSecret(); };
+        holdZone.ontouchcancel = hideSecret;
+
+        closeOverlayBtn.onclick = () => {
+          clearHoldEvents();
+          overlay.classList.remove("show");
+          resolve();
+        };
+      });
+    }
+
+    async function revealNextRole(){
+      if(revealIndex >= players.length){
+        state = "ready";
+        setScreen({
+          phase: "papéis sorteados",
+          title: "todos já sabem seus papéis",
+          text: "agora a partida pode começar.",
+          narration: "A cidade ainda está em silêncio. Ninguém sabe quem é inocente, quem investiga e quem mata."
+        });
+        return;
+      }
+
+      const player = players[revealIndex];
+      const actionBox = document.createElement("div");
+      actionBox.className = "choices";
+
+      const btn = document.createElement("button");
+      btn.className = "btn-primary";
+      btn.textContent = `revelar papel de ${player}`;
+      btn.onclick = async () => {
+        btn.disabled = true;
+        await openRevealOverlay(player, roles[player]);
+        revealIndex++;
+        revealNextRole();
+      };
+
+      actionBox.appendChild(btn);
+
+      setScreen({
+        phase: `revelação ${revealIndex + 1} de ${players.length}`,
+        title: `passe o celular para ${player}`,
+        text: "revele o papel de forma protegida.",
+        narration: "Segure para mostrar e solte para esconder. Assim ninguém espia o papel do outro.",
+        content: actionBox
+      });
+    }
+
+    startBtn.addEventListener("click", async () => {
+      if(state !== "ready" && state !== "ready-next-round"){
+        alert("sorteie e revele os papéis primeiro.");
+        return;
+      }
+      if(locked) return;
+      await runNightCycle();
+    });
+
+    async function runNightCycle(){
+      if(state === "ended" || locked) return;
+      locked = true;
+
+      victim = null;
+      detectiveGuess = null;
+      state = "night";
+
+      setScreen({
+        phase: "noite",
+        title: "cidade dorme",
+        text: "todos fecham os olhos.",
+        narration: "A cidade mergulha no silêncio. Nenhum rosto se move. Nenhuma palavra deve ser dita."
+      });
+
+      await speakLines([
+        "Cidade dorme.",
+        "Todos fechem os olhos."
+      ], 1800);
+
+      await delay(1000);
+
+      if(isGameEnded()){
+        locked = false;
+        return;
+      }
+
+      await assassinTurn();
+      if(state === "ended"){
+        locked = false;
+        return;
+      }
+
+      await detectiveTurn();
+      if(state === "ended"){
+        locked = false;
+        return;
+      }
+
+      await dayReveal();
+
+      if(state !== "ended"){
+        locked = false;
+      }
+    }
+
+    function waitForChoice(title, subtitle, names, confirmLabel, variant = "btn-secondary", confirmClass = "btn-primary"){
+      return new Promise((resolve) => {
+        const firstStep = () => {
+          const wrap = document.createElement("div");
+          wrap.className = "choices";
+
+          const choices = createChoices(names, (picked) => {
+            const confirmWrap = document.createElement("div");
+            confirmWrap.className = "choices";
+
+            const confirm = document.createElement("button");
+            confirm.className = confirmClass;
+            confirm.textContent = `${confirmLabel} ${picked}`;
+            confirm.onclick = () => resolve(picked);
+
+            const back = document.createElement("button");
+            back.className = "btn-ghost";
+            back.textContent = "voltar";
+            back.onclick = firstStep;
+
+            confirmWrap.append(confirm, back);
+
+            setScreen({
+              phase: "confirmação",
+              title,
+              text: `você escolheu ${picked}.`,
+              narration: "Confirme apenas quando tiver certeza.",
+              content: confirmWrap
+            });
+          }, variant);
+
+          wrap.appendChild(choices);
+
+          setScreen({
+            phase: "escolha",
+            title,
+            text: subtitle,
+            narration: "Escolha com cuidado. Essa decisão muda a rodada.",
+            content: wrap
+          });
+        };
+
+        firstStep();
+      });
+    }
+
+    async function assassinTurn(){
+      const assassin = getAssassin();
+
+      if(!assassin){
+        isGameEnded();
+        return;
+      }
+
+      state = "assassin-wake";
+
+      setScreen({
+        phase: "noite",
+        title: "assassino acorde",
+        text: `${assassin}, pegue o celular.`,
+        narration: "A escuridão se abre para uma única pessoa. Agora a cidade está nas mãos do assassino."
+      });
+
+      await speakLines([
+        "Assassino, acorde.",
+        "Escolha sua vítima."
+      ], 1800);
+
+      const options = alive.filter(name => name !== assassin);
+
+      if(options.length === 0){
+        isGameEnded();
+        return;
+      }
+
+      state = "assassin-choice";
+      const picked = await waitForChoice(
+        "quem o assassino quer matar?",
+        "escolha a vítima desta noite.",
+        options,
+        "confirmar vítima:",
+        "btn-secondary",
+        "btn-danger"
+      );
+
+      if(state === "ended") return;
+
+      victim = picked;
+      alive = alive.filter(name => name !== picked);
+
+      setScreen({
+        phase: "noite",
+        title: "assassino durma",
+        text: "passe o celular sem mostrar a tela.",
+        narration: "A decisão foi tomada. O assassino volta ao silêncio, deixando para trás apenas a promessa do amanhecer."
+      });
+
+      await speakLines([
+        "Assassino, durma."
+      ], 1800);
+
+      if(isGameEnded()) return;
+    }
+
+    async function detectiveTurn(){
+      const detective = getDetective();
+
+      if(!detective){
+        return;
+      }
+
+      state = "detective-wake";
+
+      setScreen({
+        phase: "noite",
+        title: "detetive acorde",
+        text: `${detective}, pegue o celular.`,
+        narration: "Enquanto a cidade ainda dorme, o detetive abre os olhos e tenta enxergar a verdade escondida."
+      });
+
+      await speakLines([
+        "Detetive, acorde.",
+        "Escolha quem você suspeita ser o assassino."
+      ], 1800);
+
+      const options = alive.filter(name => name !== detective);
+
+      if(options.length === 0){
+        setScreen({
+          phase: "noite",
+          title: "detetive durma",
+          text: "não há ninguém para investigar.",
+          narration: "O detetive não encontra ninguém para observar nesta rodada."
+        });
+
+        await speakLines([
+          "Detetive, durma."
+        ], 1800);
+        return;
+      }
+
+      state = "detective-choice";
+      const picked = await waitForChoice(
+        "de quem o detetive suspeita?",
+        "escolha uma pessoa para investigar.",
+        options,
+        "confirmar suspeita:",
+        "btn-secondary",
+        "btn-primary"
+      );
+
+      if(state === "ended") return;
+
+      detectiveGuess = picked;
+
+      setScreen({
+        phase: "noite",
+        title: "detetive durma",
+        text: "a investigação foi registrada.",
+        narration: "A suspeita foi feita. Agora resta esperar o amanhecer para descobrir se havia verdade nela."
+      });
+
+      await speakLines([
+        "Detetive, durma."
+      ], 1800);
+    }
+
+    async function dayReveal(){
+      state = "day";
+
+      setScreen({
+        phase: "amanhecer",
+        title: "cidade acorda",
+        text: "o silêncio da noite acabou.",
+        narration: "Os olhos se abrem. A cidade tenta entender o que aconteceu enquanto todos dormiam."
+      });
+
+      await speakLines([
+        "Cidade, acorde."
+      ], 1800);
+
+      await delay(800);
+
+      let detectiveHit = false;
+      if(detectiveGuess){
+        detectiveHit = roles[detectiveGuess] === "assassino";
+        if(detectiveHit){
+          const assassin = getAssassin();
+          if(assassin){
+            alive = alive.filter(name => name !== assassin);
+          }
+        }
+      }
+
+      const resultStack = document.createElement("div");
+      resultStack.className = "result-stack";
+
+      const deathCard = document.createElement("div");
+      deathCard.className = "result-card";
+      deathCard.innerHTML = `
+        <div class="result-label">vítima da noite</div>
+        <div class="result-value danger">${victim ? escapeHtml(victim) : "ninguém"}</div>
+      `;
+      resultStack.appendChild(deathCard);
+
+      if(detectiveGuess){
+        const suspectCard = document.createElement("div");
+        suspectCard.className = "result-card";
+        suspectCard.innerHTML = `
+          <div class="result-label">suspeita do detetive</div>
+          <div class="result-value">${escapeHtml(detectiveGuess)}</div>
+        `;
+        resultStack.appendChild(suspectCard);
+
+        const hitCard = document.createElement("div");
+        hitCard.className = "result-card";
+        hitCard.innerHTML = `
+          <div class="result-label">resultado da investigação</div>
+          <div class="result-value ${detectiveHit ? "success" : "fail"}">
+            ${detectiveHit ? "o detetive acertou" : "o detetive errou"}
+          </div>
+        `;
+        resultStack.appendChild(hitCard);
+      }
+
+      setScreen({
+        phase: "resultado",
+        title: detectiveHit ? "verdade revelada" : "fim da rodada",
+        text: detectiveHit ? "o assassino foi descoberto." : "a cidade ainda não sabe toda a verdade.",
+        narration: detectiveHit
+          ? "Mesmo diante da escuridão, o detetive encontrou a resposta certa."
+          : "A investigação falhou. O medo continua vivo entre todos.",
+        content: resultStack
+      });
+
+      if(victim){
+        await speakLines([
+          `Houve uma morte nesta noite.`,
+          `${victim} foi a vítima.`
+        ], 1900);
+      } else {
+        await speakLines([
+          `Ninguém morreu nesta noite.`
+        ], 1900);
+      }
+
+      if(detectiveGuess){
+        await speakLines([
+          `O detetive investigou ${detectiveGuess}.`,
+          detectiveHit ? `E acertou.` : `Mas errou.`
+        ], 1900);
+      }
+
+      if(isGameEnded()){
+        return;
+      }
+
+      const continueWrap = document.createElement("div");
+      continueWrap.className = "choices";
+
+      const nextBtn = document.createElement("button");
+      nextBtn.className = "btn-primary";
+      nextBtn.textContent = "próxima noite";
+      nextBtn.onclick = async () => {
+        if(locked) return;
+        await runNightCycle();
+      };
+
+      continueWrap.appendChild(nextBtn);
+      screen.appendChild(continueWrap);
+
+      locked = false;
+      state = "ready-next-round";
+    }
+
+    renderPlayers();
+    showIdle();
+  </script>
+</body>
+</html>
