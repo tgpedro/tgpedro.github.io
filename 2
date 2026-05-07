@@ -1,0 +1,1529 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Estudo Premium - Organizador ENEM</title>
+    <!-- Lucide Icons via CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Supabase JS via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --bg-black: #000000;
+            --card-bg: #1c1c1e;
+            --card-bg-elevated: #2c2c2e;
+            --text-primary: #ffffff;
+            --text-secondary: #8e8e93;
+            --accent-blue: #007aff;
+            --accent-green: #34c759;
+            --accent-red: #ff3b30;
+            --accent-orange: #ff9500;
+            --accent-purple: #af52de;
+            --accent-pink: #ff2d55;
+            --accent-yellow: #ffcc00;
+            --border-radius: 20px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-black);
+            color: var(--text-primary);
+            line-height: 1.5;
+            overflow-x: hidden;
+            padding-bottom: calc(80px + var(--safe-area-bottom));
+        }
+
+        /* Layout */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .desktop-grid {
+                display: grid;
+                grid-template-columns: 1fr 350px;
+                gap: 24px;
+            }
+        }
+
+        /* Header */
+        header {
+            padding: 20px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .greeting h1 {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .greeting p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .icon-btn {
+            background: var(--card-bg);
+            border: none;
+            color: var(--text-primary);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .icon-btn:active {
+            transform: scale(0.9);
+            background: var(--card-bg-elevated);
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: var(--transition);
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* ENEM Countdown */
+        .countdown-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            text-align: center;
+        }
+
+        .countdown-item span {
+            display: block;
+        }
+
+        .countdown-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--accent-blue);
+        }
+
+        .countdown-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin-top: 16px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent-blue);
+            width: 0%;
+            transition: width 1s ease-out;
+        }
+
+        /* Routine */
+        .routine-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .routine-item:last-child {
+            border-bottom: none;
+        }
+
+        .routine-time {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            min-width: 50px;
+        }
+
+        .routine-content {
+            flex: 1;
+        }
+
+        .routine-label {
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .routine-item.active {
+            background: rgba(0, 122, 255, 0.1);
+            margin: 0 -20px;
+            padding: 12px 20px;
+            border-radius: 12px;
+            border-bottom: none;
+        }
+
+        .routine-item.active .routine-time {
+            color: var(--accent-blue);
+        }
+
+        .routine-badge {
+            font-size: 10px;
+            background: var(--accent-blue);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 8px;
+            text-transform: uppercase;
+        }
+
+        /* Subjects */
+        .subject-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+        }
+
+        .subject-card {
+            background: var(--card-bg-elevated);
+            padding: 16px;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .subject-card:active {
+            transform: scale(0.95);
+        }
+
+        .subject-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .subject-priority {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .priority-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 4px;
+        }
+
+        /* Navigation */
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(28, 28, 30, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0 calc(10px + var(--safe-area-bottom));
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 10px;
+            gap: 4px;
+            transition: var(--transition);
+        }
+
+        .nav-item.active {
+            color: var(--accent-blue);
+        }
+
+        /* Modals / Sheets */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: flex-end;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-sheet {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 600px;
+            border-radius: 24px 24px 0 0;
+            padding: 24px;
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        @media (min-width: 768px) {
+            .modal-overlay {
+                align-items: center;
+            }
+            .modal-sheet {
+                border-radius: 24px;
+                width: 90%;
+                max-width: 500px;
+                transform: scale(0.9);
+            }
+            .modal-overlay.active .modal-sheet {
+                transform: scale(1);
+            }
+        }
+
+        .modal-overlay.active .modal-sheet {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            margin-left: 4px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            background: var(--card-bg-elevated);
+            border: none;
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: var(--text-primary);
+            font-size: 16px;
+            outline: none;
+        }
+
+        .btn-primary {
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 14px;
+            width: 100%;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
+
+        /* Pomodoro */
+        .timer-display {
+            font-size: 64px;
+            font-weight: 700;
+            text-align: center;
+            margin: 20px 0;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .timer-controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .timer-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .timer-btn.play { background: var(--accent-green); color: white; }
+        .timer-btn.pause { background: var(--accent-orange); color: white; }
+        .timer-btn.reset { background: var(--card-bg-elevated); color: var(--text-primary); }
+
+        /* Tasks */
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--card-bg-elevated);
+            border-radius: 12px;
+            margin-bottom: 8px;
+            transition: var(--transition);
+        }
+
+        .task-checkbox {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 2px solid var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .task-checkbox.checked {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+        }
+
+        .task-text {
+            flex: 1;
+            font-size: 15px;
+        }
+
+        .task-text.completed {
+            text-decoration: line-through;
+            color: var(--text-secondary);
+        }
+
+        /* Calendar */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            text-align: center;
+        }
+
+        .calendar-day-head {
+            font-size: 11px;
+            color: var(--text-secondary);
+            padding: 8px 0;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .calendar-day.today {
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        .calendar-day.other-month {
+            color: #333;
+        }
+
+        .calendar-dot {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: var(--accent-orange);
+            position: absolute;
+            bottom: 4px;
+        }
+
+        /* Shortcuts */
+        .shortcuts-scroll {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            scrollbar-width: none;
+        }
+
+        .shortcuts-scroll::-webkit-scrollbar { display: none; }
+
+        .shortcut-item {
+            flex: 0 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            width: 60px;
+        }
+
+        .shortcut-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--card-bg-elevated);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .shortcut-name {
+            font-size: 10px;
+            color: var(--text-secondary);
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fade {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        /* Utility Classes */
+        .hidden { display: none !important; }
+        .mt-20 { margin-top: 20px; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; }
+        .text-accent { color: var(--accent-blue); }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="animate-fade">
+            <div class="greeting">
+                <p id="current-date">Segunda, 6 de Maio</p>
+                <h1 id="greeting-text">Bom dia, Pedro</h1>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn" onclick="openModal('modal-shortcuts')"><i data-lucide="link"></i></button>
+                <button class="icon-btn" onclick="openModal('modal-tools')"><i data-lucide="grid"></i></button>
+            </div>
+        </header>
+
+        <div class="desktop-grid">
+            <!-- Main Content -->
+            <main>
+                <!-- ENEM Countdown -->
+                <section class="card animate-fade" style="animation-delay: 0.1s">
+                    <div class="card-title"><i data-lucide="target" size="18"></i> Foco no ENEM 2026</div>
+                    <div class="countdown-grid">
+                        <div class="countdown-item">
+                            <span class="countdown-value" id="days-left">0</span>
+                            <span class="countdown-label">Dias</span>
+                        </div>
+                        <div class="countdown-item">
+                            <span class="countdown-value" id="weeks-left">0</span>
+                            <span class="countdown-label">Semanas</span>
+                        </div>
+                        <div class="countdown-item">
+                            <span class="countdown-value" id="months-left">0</span>
+                            <span class="countdown-label">Meses</span>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="enem-progress"></div>
+                    </div>
+                </section>
+
+                <!-- Current Routine -->
+                <section class="card animate-fade" style="animation-delay: 0.2s">
+                    <div class="card-title"><i data-lucide="clock" size="18"></i> Agora na Rotina</div>
+                    <div id="routine-display">
+                        <!-- Dynamic content -->
+                    </div>
+                </section>
+
+                <!-- Subjects -->
+                <section class="card animate-fade" style="animation-delay: 0.3s">
+                    <div class="flex-between mb-16">
+                        <div class="card-title" style="margin-bottom: 0"><i data-lucide="book-open" size="18"></i> Matérias</div>
+                        <span class="text-accent" style="font-size: 13px; cursor: pointer;" onclick="openModal('modal-subjects')">Ver todas</span>
+                    </div>
+                    <div class="subject-grid" id="subject-summary">
+                        <!-- Dynamic content -->
+                    </div>
+                </section>
+            </main>
+
+            <!-- Sidebar / Secondary Content -->
+            <aside>
+                <!-- Quick Focus -->
+                <section class="card animate-fade" style="animation-delay: 0.4s">
+                    <div class="card-title"><i data-lucide="zap" size="18"></i> Modo Foco</div>
+                    <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">Inicie uma sessão de estudo profundo agora.</p>
+                    <button class="btn-primary" onclick="openModal('modal-pomodoro')">Iniciar Pomodoro</button>
+                </section>
+
+                <!-- Daily Tasks -->
+                <section class="card animate-fade" style="animation-delay: 0.5s">
+                    <div class="flex-between mb-16">
+                        <div class="card-title" style="margin-bottom: 0"><i data-lucide="check-circle" size="18"></i> Tarefas do Dia</div>
+                        <button class="icon-btn" style="width: 28px; height: 28px;" onclick="openModal('modal-add-task')"><i data-lucide="plus" size="16"></i></button>
+                    </div>
+                    <div id="task-list">
+                        <!-- Dynamic content -->
+                    </div>
+                </section>
+            </aside>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav class="nav-bar">
+        <a href="#" class="nav-item active" onclick="showView('home')">
+            <i data-lucide="home"></i>
+            <span>Início</span>
+        </a>
+        <a href="#" class="nav-item" onclick="openModal('modal-calendar')">
+            <i data-lucide="calendar"></i>
+            <span>Calendário</span>
+        </a>
+        <a href="#" class="nav-item" onclick="openModal('modal-pomodoro')">
+            <i data-lucide="timer"></i>
+            <span>Foco</span>
+        </a>
+        <a href="#" class="nav-item" onclick="openModal('modal-log')">
+            <i data-lucide="edit-3"></i>
+            <span>Log</span>
+        </a>
+        <a href="#" class="nav-item" onclick="openModal('modal-tools')">
+            <i data-lucide="more-horizontal"></i>
+            <span>Mais</span>
+        </a>
+    </nav>
+
+    <!-- Modals -->
+    
+    <!-- Pomodoro Modal -->
+    <div id="modal-pomodoro" class="modal-overlay" onclick="closeModalOnOverlay(event)">
+        <div class="modal-sheet">
+            <div class="modal-header">
+                <h2 class="modal-title">Modo Foco</h2>
+                <button class="icon-btn" onclick="closeModal('modal-pomodoro')"><i data-lucide="x"></i></button>
+            </div>
+            <div class="timer-display" id="timer-display">25:00</div>
+            <div class="timer-controls">
+                <button class="timer-btn reset" onclick="resetTimer()"><i data-lucide="rotate-ccw"></i></button>
+                <button class="timer-btn play" id="timer-toggle" onclick="toggleTimer()"><i data-lucide="play"></i></button>
+                <button class="timer-btn reset" onclick="setTimer(50)"><span style="font-weight: bold">50</span></button>
+            </div>
+            <div class="mt-20">
+                <label>Estudando agora:</label>
+                <select id="pomodoro-subject">
+                    <option value="">Geral / Nenhuma</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calendar Modal -->
+    <div id="modal-calendar" class="modal-overlay" onclick="closeModalOnOverlay(event)">
+        <div class="modal-sheet">
+            <div class="modal-header">
+                <h2 class="modal-title">Calendário</h2>
+                <button class="icon-btn" onclick="closeModal('modal-calendar')"><i data-lucide="x"></i></button>
+            </div>
+            <div class="flex-between mb-16">
+                <button class="icon-btn" onclick="changeMonth(-1)"><i data-lucide="chevron-left"></i></button>
+                <h3 id="calendar-month-year">Maio 2026</h3>
+                <button class="icon-btn" onclick="changeMonth(1)"><i data-lucide="chevron-right"></i></button>
+            </div>
+            <div class="calendar-grid" id="calendar-grid">
+                <!-- Dynamic calendar -->
+            </div>
+            <div id="calendar-details" class="mt-20" style="font-size: 14px; color: var(--text-secondary);">
+                Selecione um dia para ver detalhes.
+            </div>
+        </div>
+    </div>
+
+    <!-- Log Modal -->
+    <div id="modal-log" class="modal-overlay" onclick="closeModalOnOverlay(event)">
+        <div class="modal-sheet">
+            <div class="modal-header">
+                <h2 class="modal-title">Log de Estudo</h2>
+                <button class="icon-btn" onclick="closeModal('modal-log')"><i data-lucide="x"></i></button>
+            </div>
+            <form id="log-form" onsubmit="saveLog(event)">
+                <div class="form-group">
+                    <label>Matéria</label>
+                    <select id="log-subject" required></select>
+                </div>
+                <div class="form-group">
+                    <label>O que você estudou?</label>
+                    <input type="text" id="log-content" placeholder="Ex: Geometria Espacial" required>
+                </div>
+                <div class="form-group">
+                    <label>Tempo (minutos)</label>
+                    <input type="number" id="log-duration" value="50">
+                </div>
+                <div class="form-group">
+                    <label>Como foi o dia?</label>
+                    <textarea id="log-notes" rows="3" placeholder="Sentimentos, dificuldades..."></textarea>
+                </div>
+                <button type="submit" class="btn-primary">Salvar Registro</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Task Modal -->
+    <div id="modal-add-task" class="modal-overlay" onclick="closeModalOnOverlay(event)">
+        <div class="modal-sheet">
+            <div class="modal-header">
+                <h2 class="modal-title">Nova Tarefa</h2>
+                <button class="icon-btn" onclick="closeModal('modal-add-task')"><i data-lucide="x"></i></button>
+            </div>
+            <form onsubmit="addTask(event)">
+                <div class="form-group">
+                    <label>Descrição</label>
+                    <input type="text" id="task-input" placeholder="O que precisa fazer?" required>
+                </div>
+                <div class="form-group">
+                    <label>Matéria (Opcional)</label>
+                    <select id="task-subject-select">
+                        <option value="">Nenhuma</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary">Adicionar Tarefa</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Shortcuts Modal -->
+    <div id="modal-shortcuts" class="modal-overlay" onclick="closeModalOnOverlay(event)">
+        <div class="modal-sheet">
+            <div class="modal-header">
+                <h2 class="modal-title">Atalhos</h2>
+                <button class="icon-btn" onclick="closeModal('modal-shortcuts')"><i data-lucide="x"></i></button>
+            </div>
+            <div class="shortcuts-scroll" id="shortcuts-list">
+                <!-- Dynamic shortcuts -->
+            </div>
+            <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+            <form onsubmit="addShortcut(event)">
+                <div class="form-group">
+                    <label>Nome</label>
+                    <input type="text" id="shortcut-name" placeholder="Ex: YouTube" required>
+                </div>
+                <div class="form-group">
+                    <label>URL</label>
+                    <input type="url" id="shortcut-url" placeholder="https://..." required>
+                </div>
+                <button type="submit" class="btn-primary">Adicionar Atalho</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tools Modal -->
+    <div id="modal-tools" class="modal-overlay" onclick="closeModalOnOverlay(event)">
+        <div class="modal-sheet">
+            <div class="modal-header">
+                <h2 class="modal-title">Ferramentas</h2>
+                <button class="icon-btn" onclick="closeModal('modal-tools')"><i data-lucide="x"></i></button>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <button class="btn-primary" style="background: var(--card-bg-elevated)" onclick="generateSchedule()">Gerar Cronograma</button>
+                <button class="btn-primary" style="background: var(--card-bg-elevated)" onclick="clearCompletedTasks()">Limpar Concluídas</button>
+                <button class="btn-primary" style="background: var(--card-bg-elevated)" onclick="exportData()">Exportar Dados</button>
+                <button class="btn-primary" style="background: var(--card-bg-elevated)" onclick="importData()">Importar Dados</button>
+            </div>
+            <div class="mt-20">
+                <label>Configuração Supabase (Opcional)</label>
+                <input type="text" id="sb-url" placeholder="Supabase URL" style="margin-bottom: 8px;">
+                <input type="password" id="sb-key" placeholder="Supabase Anon Key">
+                <button class="btn-primary mt-20" onclick="saveSupabaseConfig()">Salvar Configuração</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subjects Modal -->
+    <div id="modal-subjects" class="modal-overlay" onclick="closeModalOnOverlay(event)">
+        <div class="modal-sheet">
+            <div class="modal-header">
+                <h2 class="modal-title">Gerenciar Matérias</h2>
+                <button class="icon-btn" onclick="closeModal('modal-subjects')"><i data-lucide="x"></i></button>
+            </div>
+            <div id="subjects-full-list">
+                <!-- Dynamic content -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- State Management ---
+        let state = {
+            user: { name: "Pedro" },
+            tasks: [],
+            subjects: [
+                { id: 1, name: "Matemática", priority: "Alta", color: "var(--accent-blue)", notes: "" },
+                { id: 2, name: "Linguagens", priority: "Média", color: "var(--accent-orange)", notes: "" },
+                { id: 3, name: "Humanas", priority: "Média", color: "var(--accent-purple)", notes: "" },
+                { id: 4, name: "Natureza", priority: "Alta", color: "var(--accent-green)", notes: "" },
+                { id: 5, name: "Redação", priority: "Alta", color: "var(--accent-red)", notes: "" },
+                { id: 6, name: "Escrita Criativa", priority: "Baixa", color: "var(--accent-pink)", notes: "" },
+                { id: 7, name: "Português", priority: "Média", color: "var(--accent-yellow)", notes: "" },
+                { id: 8, name: "Lazer", priority: "Lazer", color: "var(--text-secondary)", notes: "" }
+            ],
+            logs: [],
+            reviews: [],
+            shortcuts: [
+                { name: "FP", url: "https://fernandapessoa.com.br", icon: "🎓" }
+            ],
+            pomodoro: {
+                timeLeft: 1500,
+                isActive: false,
+                currentSubject: null,
+                timerId: null,
+                endTime: null
+            },
+            calendar: {
+                currentMonth: new Date().getMonth(),
+                currentYear: new Date().getFullYear()
+            },
+            supabase: {
+                url: "",
+                key: "",
+                client: null
+            }
+        };
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            loadLocalData();
+            initLucide();
+            updateClock();
+            setInterval(updateClock, 1000);
+            updateCountdown();
+            renderRoutine();
+            renderSubjects();
+            renderTasks();
+            renderShortcuts();
+            populateSubjectSelects();
+            
+            // Check for active timer from previous session
+            checkActiveTimer();
+        });
+
+        function initLucide() {
+            lucide.createIcons();
+        }
+
+        function loadLocalData() {
+            const saved = localStorage.getItem('estudo_premium_state');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                state = { ...state, ...parsed };
+                // Ensure functions don't break if structure changed
+                if (!state.shortcuts) state.shortcuts = [];
+            }
+        }
+
+        function saveState() {
+            localStorage.setItem('estudo_premium_state', JSON.stringify(state));
+            syncWithSupabase();
+        }
+
+        // --- UI Helpers ---
+        function openModal(id) {
+            const modal = document.getElementById(id);
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('active'), 10);
+        }
+
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            modal.classList.remove('active');
+            setTimeout(() => modal.style.display = 'none', 300);
+        }
+
+        function closeModalOnOverlay(e) {
+            if (e.target.classList.contains('modal-overlay')) {
+                closeModal(e.target.id);
+            }
+        }
+
+        function updateClock() {
+            const now = new Date();
+            const hours = now.getHours();
+            let greeting = "Boa noite";
+            if (hours >= 5 && hours < 12) greeting = "Bom dia";
+            else if (hours >= 12 && hours < 18) greeting = "Boa tarde";
+
+            document.getElementById('greeting-text').textContent = `${greeting}, ${state.user.name}`;
+            
+            const options = { weekday: 'long', day: 'numeric', month: 'long' };
+            document.getElementById('current-date').textContent = now.toLocaleDateString('pt-BR', options);
+            
+            // Update routine if hour changed
+            if (now.getMinutes() === 0 && now.getSeconds() === 0) {
+                renderRoutine();
+            }
+        }
+
+        // --- ENEM Countdown ---
+        function updateCountdown() {
+            const examDate = new Date('2026-11-01T08:00:00');
+            const now = new Date();
+            const diff = examDate - now;
+
+            if (diff <= 0) return;
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const weeks = Math.floor(days / 7);
+            const months = Math.floor(days / 30.44);
+
+            document.getElementById('days-left').textContent = days;
+            document.getElementById('weeks-left').textContent = weeks;
+            document.getElementById('months-left').textContent = months;
+
+            // Progress (assuming start of prep is Jan 2026)
+            const startDate = new Date('2026-01-01T00:00:00');
+            const total = examDate - startDate;
+            const elapsed = now - startDate;
+            const progress = Math.min(100, Math.max(0, (elapsed / total) * 100));
+            document.getElementById('enem-progress').style.width = `${progress}%`;
+        }
+
+        // --- Routine Logic ---
+        const routineData = {
+            weekdays: [
+                { time: "07:00", label: "Acordar" },
+                { time: "07:30", label: "Estudar" },
+                { time: "10:30", label: "Organizar / Almoço" },
+                { time: "12:20", label: "Ônibus" },
+                { time: "13:00", label: "Trabalho" },
+                { time: "17:00", label: "Volta do Trabalho" },
+                { time: "17:40", label: "Descanso" },
+                { time: "18:00", label: "Banho / Comida" },
+                { time: "19:00", label: "Escola" },
+                { time: "23:00", label: "Dormir" }
+            ],
+            thursday: [
+                { time: "08:00", label: "Estudar" },
+                { time: "11:00", label: "Preparar Casa" },
+                { time: "13:00", label: "Sair para Curso" },
+                { time: "18:00", label: "Revisão" },
+                { time: "22:00", label: "Descanso" }
+            ],
+            saturday: [
+                { time: "08:00", label: "Trabalho" },
+                { time: "13:00", label: "Almoço" },
+                { time: "14:00", label: "Tarde Livre / Revisão" },
+                { time: "20:00", label: "Lazer" }
+            ],
+            sunday: [
+                { time: "09:00", label: "Descanso" },
+                { time: "14:00", label: "Organização da Semana" },
+                { time: "18:00", label: "Lazer" }
+            ]
+        };
+
+        function renderRoutine() {
+            const now = new Date();
+            const day = now.getDay();
+            const currentTime = now.getHours() * 60 + now.getMinutes();
+            
+            let todayRoutine = routineData.weekdays;
+            if (day === 4) todayRoutine = routineData.thursday;
+            else if (day === 6) todayRoutine = routineData.saturday;
+            else if (day === 0) todayRoutine = routineData.sunday;
+
+            const container = document.getElementById('routine-display');
+            container.innerHTML = '';
+
+            let activeIndex = -1;
+            for (let i = 0; i < todayRoutine.length; i++) {
+                const [h, m] = todayRoutine[i].time.split(':').map(Number);
+                const itemTime = h * 60 + m;
+                
+                const nextItem = todayRoutine[i+1];
+                let isNow = false;
+                
+                if (nextItem) {
+                    const [nh, nm] = nextItem.time.split(':').map(Number);
+                    const nextTime = nh * 60 + nm;
+                    if (currentTime >= itemTime && currentTime < nextTime) isNow = true;
+                } else if (currentTime >= itemTime) {
+                    isNow = true;
+                }
+
+                if (isNow) activeIndex = i;
+            }
+
+            // Show current and next
+            const current = todayRoutine[activeIndex] || { time: "--:--", label: "Nada planejado" };
+            const next = todayRoutine[activeIndex + 1] || { time: "--:--", label: "Fim do dia" };
+
+            container.innerHTML = `
+                <div class="routine-item active">
+                    <div class="routine-time">${current.time}</div>
+                    <div class="routine-content">
+                        <div class="routine-label">${current.label} <span class="routine-badge">Agora</span></div>
+                    </div>
+                </div>
+                <div class="routine-item">
+                    <div class="routine-time">${next.time}</div>
+                    <div class="routine-content">
+                        <div class="routine-label">${next.label} <span style="font-size: 11px; color: var(--text-secondary); margin-left: 8px;">Próximo</span></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- Subjects Logic ---
+        function renderSubjects() {
+            const summary = document.getElementById('subject-summary');
+            const fullList = document.getElementById('subjects-full-list');
+            
+            summary.innerHTML = '';
+            fullList.innerHTML = '';
+
+            state.subjects.slice(0, 4).forEach(sub => {
+                summary.innerHTML += `
+                    <div class="subject-card" onclick="openSubjectDetails(${sub.id})">
+                        <div class="subject-name">${sub.name}</div>
+                        <div class="subject-priority">
+                            <span class="priority-dot" style="background: ${sub.color}"></span>
+                            ${sub.priority}
+                        </div>
+                    </div>
+                `;
+            });
+
+            state.subjects.forEach(sub => {
+                fullList.innerHTML += `
+                    <div class="card" style="margin-bottom: 12px; padding: 16px;">
+                        <div class="flex-between">
+                            <div>
+                                <div class="subject-name">${sub.name}</div>
+                                <select onchange="updateSubjectPriority(${sub.id}, this.value)" style="font-size: 12px; padding: 4px 8px; width: auto; margin-top: 8px;">
+                                    <option value="Alta" ${sub.priority === 'Alta' ? 'selected' : ''}>Alta</option>
+                                    <option value="Média" ${sub.priority === 'Média' ? 'selected' : ''}>Média</option>
+                                    <option value="Baixa" ${sub.priority === 'Baixa' ? 'selected' : ''}>Baixa</option>
+                                    <option value="Lazer" ${sub.priority === 'Lazer' ? 'selected' : ''}>Lazer</option>
+                                </select>
+                            </div>
+                            <button class="icon-btn" onclick="startPomodoroForSubject(${sub.id})"><i data-lucide="play" size="16"></i></button>
+                        </div>
+                    </div>
+                `;
+            });
+            initLucide();
+        }
+
+        function updateSubjectPriority(id, priority) {
+            const sub = state.subjects.find(s => s.id === id);
+            if (sub) {
+                sub.priority = priority;
+                saveState();
+                renderSubjects();
+            }
+        }
+
+        function populateSubjectSelects() {
+            const selects = ['pomodoro-subject', 'log-subject', 'task-subject-select'];
+            selects.forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const currentVal = el.value;
+                el.innerHTML = id === 'pomodoro-subject' || id === 'task-subject-select' ? '<option value="">Nenhuma</option>' : '';
+                state.subjects.forEach(sub => {
+                    el.innerHTML += `<option value="${sub.id}">${sub.name}</option>`;
+                });
+                el.value = currentVal;
+            });
+        }
+
+        // --- Pomodoro Logic ---
+        function setTimer(minutes) {
+            state.pomodoro.timeLeft = minutes * 60;
+            updateTimerDisplay();
+        }
+
+        function toggleTimer() {
+            if (state.pomodoro.isActive) {
+                pauseTimer();
+            } else {
+                startTimer();
+            }
+        }
+
+        function startTimer() {
+            state.pomodoro.isActive = true;
+            state.pomodoro.endTime = Date.now() + (state.pomodoro.timeLeft * 1000);
+            document.getElementById('timer-toggle').innerHTML = '<i data-lucide="pause"></i>';
+            document.getElementById('timer-toggle').className = 'timer-btn pause';
+            initLucide();
+            
+            state.pomodoro.timerId = setInterval(() => {
+                const now = Date.now();
+                state.pomodoro.timeLeft = Math.max(0, Math.round((state.pomodoro.endTime - now) / 1000));
+                updateTimerDisplay();
+
+                if (state.pomodoro.timeLeft <= 0) {
+                    clearInterval(state.pomodoro.timerId);
+                    state.pomodoro.isActive = false;
+                    alert("Tempo esgotado! Bom trabalho.");
+                    resetTimer();
+                }
+            }, 1000);
+            saveState();
+        }
+
+        function pauseTimer() {
+            state.pomodoro.isActive = false;
+            clearInterval(state.pomodoro.timerId);
+            document.getElementById('timer-toggle').innerHTML = '<i data-lucide="play"></i>';
+            document.getElementById('timer-toggle').className = 'timer-btn play';
+            initLucide();
+            saveState();
+        }
+
+        function resetTimer() {
+            pauseTimer();
+            state.pomodoro.timeLeft = 1500;
+            updateTimerDisplay();
+            saveState();
+        }
+
+        function updateTimerDisplay() {
+            const mins = Math.floor(state.pomodoro.timeLeft / 60);
+            const secs = state.pomodoro.timeLeft % 60;
+            const display = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            document.getElementById('timer-display').textContent = display;
+            document.title = state.pomodoro.isActive ? `(${display}) Estudo` : 'Estudo Premium';
+        }
+
+        function checkActiveTimer() {
+            if (state.pomodoro.isActive && state.pomodoro.endTime) {
+                const now = Date.now();
+                if (now < state.pomodoro.endTime) {
+                    state.pomodoro.timeLeft = Math.round((state.pomodoro.endTime - now) / 1000);
+                    startTimer();
+                } else {
+                    state.pomodoro.isActive = false;
+                    state.pomodoro.timeLeft = 0;
+                    updateTimerDisplay();
+                }
+            }
+        }
+
+        function startPomodoroForSubject(id) {
+            const sub = state.subjects.find(s => s.id === id);
+            document.getElementById('pomodoro-subject').value = id;
+            closeModal('modal-subjects');
+            openModal('modal-pomodoro');
+            resetTimer();
+            startTimer();
+        }
+
+        // --- Tasks Logic ---
+        function renderTasks() {
+            const container = document.getElementById('task-list');
+            container.innerHTML = '';
+            
+            const todayTasks = state.tasks.filter(t => !t.completed);
+            const completedTasks = state.tasks.filter(t => t.completed);
+
+            if (todayTasks.length === 0 && completedTasks.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-secondary); font-size: 13px; text-align: center; padding: 20px;">Nenhuma tarefa para hoje.</p>';
+                return;
+            }
+
+            [...todayTasks, ...completedTasks].forEach(task => {
+                const subject = state.subjects.find(s => s.id == task.subjectId);
+                container.innerHTML += `
+                    <div class="task-item">
+                        <div class="task-checkbox ${task.completed ? 'checked' : ''}" onclick="toggleTask(${task.id})">
+                            ${task.completed ? '<i data-lucide="check" size="14" color="white"></i>' : ''}
+                        </div>
+                        <div class="task-text ${task.completed ? 'completed' : ''}">
+                            ${task.text}
+                            ${subject ? `<br><span style="font-size: 10px; color: ${subject.color}">${subject.name}</span>` : ''}
+                        </div>
+                        <button class="icon-btn" style="width: 24px; height: 24px; background: transparent;" onclick="deleteTask(${task.id})">
+                            <i data-lucide="trash-2" size="14" color="var(--text-secondary)"></i>
+                        </button>
+                    </div>
+                `;
+            });
+            initLucide();
+        }
+
+        function addTask(e) {
+            e.preventDefault();
+            const input = document.getElementById('task-input');
+            const subjectId = document.getElementById('task-subject-select').value;
+            
+            const newTask = {
+                id: Date.now(),
+                text: input.value,
+                subjectId: subjectId,
+                completed: false,
+                date: new Date().toISOString()
+            };
+
+            state.tasks.unshift(newTask);
+            input.value = '';
+            saveState();
+            renderTasks();
+            closeModal('modal-add-task');
+        }
+
+        function toggleTask(id) {
+            const task = state.tasks.find(t => t.id === id);
+            if (task) {
+                task.completed = !task.completed;
+                saveState();
+                renderTasks();
+            }
+        }
+
+        function deleteTask(id) {
+            state.tasks = state.tasks.filter(t => t.id !== id);
+            saveState();
+            renderTasks();
+        }
+
+        function clearCompletedTasks() {
+            state.tasks = state.tasks.filter(t => !t.completed);
+            saveState();
+            renderTasks();
+            alert("Tarefas concluídas removidas.");
+        }
+
+        // --- Log & Reviews ---
+        function saveLog(e) {
+            e.preventDefault();
+            const subjectId = document.getElementById('log-subject').value;
+            const content = document.getElementById('log-content').value;
+            const duration = document.getElementById('log-duration').value;
+            const notes = document.getElementById('log-notes').value;
+
+            const newLog = {
+                id: Date.now(),
+                subjectId,
+                content,
+                duration,
+                notes,
+                date: new Date().toISOString()
+            };
+
+            state.logs.push(newLog);
+            
+            // Create automatic reviews (1, 7, 30 days)
+            const intervals = [1, 7, 30];
+            intervals.forEach(days => {
+                const reviewDate = new Date();
+                reviewDate.setDate(reviewDate.getDate() + days);
+                state.reviews.push({
+                    id: Date.now() + days,
+                    logId: newLog.id,
+                    subjectId,
+                    content: `Revisão: ${content}`,
+                    date: reviewDate.toISOString(),
+                    completed: false
+                });
+            });
+
+            saveState();
+            e.target.reset();
+            closeModal('modal-log');
+            alert("Estudo registrado e revisões agendadas!");
+        }
+
+        // --- Shortcuts ---
+        function renderShortcuts() {
+            const container = document.getElementById('shortcuts-list');
+            container.innerHTML = '';
+            state.shortcuts.forEach((s, index) => {
+                container.innerHTML += `
+                    <div class="shortcut-item" onclick="window.open('${s.url}', '_blank')">
+                        <div class="shortcut-icon">${s.icon || '🔗'}</div>
+                        <div class="shortcut-name">${s.name}</div>
+                        <button onclick="event.stopPropagation(); deleteShortcut(${index})" style="background:none; border:none; color:var(--accent-red); font-size:8px;">Remover</button>
+                    </div>
+                `;
+            });
+        }
+
+        function addShortcut(e) {
+            e.preventDefault();
+            const name = document.getElementById('shortcut-name').value;
+            const url = document.getElementById('shortcut-url').value;
+            state.shortcuts.push({ name, url, icon: '🔗' });
+            saveState();
+            renderShortcuts();
+            e.target.reset();
+        }
+
+        function deleteShortcut(index) {
+            state.shortcuts.splice(index, 1);
+            saveState();
+            renderShortcuts();
+        }
+
+        // --- Calendar Logic ---
+        function renderCalendar() {
+            const grid = document.getElementById('calendar-grid');
+            const monthYear = document.getElementById('calendar-month-year');
+            grid.innerHTML = '';
+
+            const date = new Date(state.calendar.currentYear, state.calendar.currentMonth, 1);
+            const monthName = date.toLocaleDateString('pt-BR', { month: 'long' });
+            monthYear.textContent = `${monthName.charAt(0).toUpperCase() + monthName.slice(1)} ${state.calendar.currentYear}`;
+
+            const daysInMonth = new Date(state.calendar.currentYear, state.calendar.currentMonth + 1, 0).getDate();
+            const firstDayIndex = new Date(state.calendar.currentYear, state.calendar.currentMonth, 1).getDay();
+
+            const dayHeads = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
+            dayHeads.forEach(d => grid.innerHTML += `<div class="calendar-day-head">${d}</div>`);
+
+            for (let i = 0; i < firstDayIndex; i++) {
+                grid.innerHTML += `<div class="calendar-day other-month"></div>`;
+            }
+
+            const today = new Date();
+            for (let i = 1; i <= daysInMonth; i++) {
+                const isToday = today.getDate() === i && today.getMonth() === state.calendar.currentMonth && today.getFullYear() === state.calendar.currentYear;
+                
+                // Check for events
+                const currentDateStr = new Date(state.calendar.currentYear, state.calendar.currentMonth, i).toDateString();
+                const hasTask = state.tasks.some(t => new Date(t.date).toDateString() === currentDateStr);
+                const hasReview = state.reviews.some(r => new Date(r.date).toDateString() === currentDateStr);
+
+                grid.innerHTML += `
+                    <div class="calendar-day ${isToday ? 'today' : ''}" onclick="showDayDetails(${i})">
+                        ${i}
+                        ${(hasTask || hasReview) ? '<div class="calendar-dot"></div>' : ''}
+                    </div>
+                `;
+            }
+        }
+
+        function changeMonth(dir) {
+            state.calendar.currentMonth += dir;
+            if (state.calendar.currentMonth > 11) {
+                state.calendar.currentMonth = 0;
+                state.calendar.currentYear++;
+            } else if (state.calendar.currentMonth < 0) {
+                state.calendar.currentMonth = 11;
+                state.calendar.currentYear--;
+            }
+            renderCalendar();
+        }
+
+        function showDayDetails(day) {
+            const date = new Date(state.calendar.currentYear, state.calendar.currentMonth, day);
+            const dateStr = date.toDateString();
+            const details = document.getElementById('calendar-details');
+            
+            const dayTasks = state.tasks.filter(t => new Date(t.date).toDateString() === dateStr);
+            const dayReviews = state.reviews.filter(r => new Date(r.date).toDateString() === dateStr);
+
+            let html = `<strong>${date.toLocaleDateString('pt-BR')}</strong><br>`;
+            if (dayTasks.length === 0 && dayReviews.length === 0) {
+                html += "Nenhum evento para este dia.";
+            } else {
+                dayTasks.forEach(t => html += `• Tarefa: ${t.text}<br>`);
+                dayReviews.forEach(r => html += `• Revisão: ${r.content}<br>`);
+            }
+            details.innerHTML = html;
+        }
+
+        // --- Supabase Integration ---
+        function saveSupabaseConfig() {
+            state.supabase.url = document.getElementById('sb-url').value;
+            state.supabase.key = document.getElementById('sb-key').value;
+            saveState();
+            alert("Configuração salva! Tentando conectar...");
+            initSupabase();
+        }
+
+        function initSupabase() {
+            if (state.supabase.url && state.supabase.key) {
+                try {
+                    state.supabase.client = supabase.createClient(state.supabase.url, state.supabase.key);
+                    console.log("Supabase conectado");
+                } catch (e) {
+                    console.error("Erro Supabase:", e);
+                }
+            }
+        }
+
+        async function syncWithSupabase() {
+            if (!state.supabase.client) return;
+            // Placeholder for actual sync logic
+            console.log("Sincronizando com Supabase...");
+        }
+
+        // --- Tools ---
+        function generateSchedule() {
+            alert("Cronograma inteligente gerado com base nas suas prioridades! (Simulação)");
+            // Logic to distribute subjects based on priority
+        }
+
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "estudo_premium_backup.json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.readAsText(file, 'UTF-8');
+                reader.onload = readerEvent => {
+                    const content = readerEvent.target.result;
+                    state = JSON.parse(content);
+                    saveState();
+                    location.reload();
+                }
+            }
+            input.click();
+        }
+
+        // Initial render for calendar when modal opens
+        document.querySelector('[onclick="openModal(\'modal-calendar\')"]').addEventListener('click', renderCalendar);
+
+    </script>
+
+    <!-- 
+    SQL PARA SUPABASE:
+    
+    CREATE TABLE profiles (
+        id UUID REFERENCES auth.users ON DELETE CASCADE,
+        name TEXT,
+        settings JSONB,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+        PRIMARY KEY (id)
+    );
+
+    CREATE TABLE tasks (
+        id BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+        user_id UUID REFERENCES auth.users,
+        text TEXT NOT NULL,
+        subject_id BIGINT,
+        completed BOOLEAN DEFAULT FALSE,
+        date TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    );
+
+    CREATE TABLE subjects (
+        id BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+        user_id UUID REFERENCES auth.users,
+        name TEXT NOT NULL,
+        priority TEXT,
+        color TEXT,
+        notes TEXT
+    );
+
+    CREATE TABLE logs (
+        id BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+        user_id UUID REFERENCES auth.users,
+        subject_id BIGINT,
+        content TEXT,
+        duration INT,
+        notes TEXT,
+        date TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    );
+
+    CREATE TABLE reviews (
+        id BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+        user_id UUID REFERENCES auth.users,
+        log_id BIGINT,
+        subject_id BIGINT,
+        content TEXT,
+        date TIMESTAMP WITH TIME ZONE,
+        completed BOOLEAN DEFAULT FALSE
+    );
+
+    CREATE TABLE shortcuts (
+        id BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+        user_id UUID REFERENCES auth.users,
+        name TEXT,
+        url TEXT,
+        icon TEXT
+    );
+    -->
+</body>
+</html>
