@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Calculadora iOS 18</title>
+    <!-- Lucide Icons for SF Symbols feel -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --system-blue: #007AFF;
+            --system-red: #FF3B30;
+            --system-green: #34C759;
+            --system-orange: #FF9500;
+            --system-gray: #8E8E93;
+            --bg-color: #F2F2F7;
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --text-color: #000000;
+            --text-secondary: #636366;
+            --border-color: rgba(0, 0, 0, 0.1);
+            --tab-bg: rgba(118, 118, 128, 0.12);
+            --glass-effect: blur(20px) saturate(180%);
+            --safe-area-top: env(safe-area-inset-top);
+            --safe-area-bottom: env(safe-area-inset-bottom);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #000000;
+                --card-bg: rgba(28, 28, 30, 0.8);
+                --text-color: #FFFFFF;
+                --text-secondary: #AEAEB2;
+                --border-color: rgba(255, 255, 255, 0.1);
+                --tab-bg: rgba(118, 118, 128, 0.24);
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at top right, rgba(0, 122, 255, 0.1), transparent),
+                              radial-gradient(circle at bottom left, rgba(52, 199, 89, 0.1), transparent);
+            background-attachment: fixed;
+            color: var(--text-color);
+            padding: calc(20px + var(--safe-area-top)) 16px calc(100px + var(--safe-area-bottom));
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 440px;
+        }
+
+        header {
+            margin-bottom: 24px;
+            padding: 0 8px;
+            text-align: left;
+        }
+
+        header h1 {
+            font-size: 34px;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        /* Tab Switcher - iOS 18 Style */
+        .tab-container {
+            background: var(--tab-bg);
+            backdrop-filter: var(--glass-effect);
+            border-radius: 14px;
+            padding: 3px;
+            display: flex;
+            margin-bottom: 24px;
+            position: sticky;
+            top: calc(10px + var(--safe-area-top));
+            z-index: 100;
+        }
+
+        .tab-button {
+            flex: 1;
+            border: none;
+            background: none;
+            padding: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-color);
+            border-radius: 11px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .tab-button i {
+            width: 16px;
+            height: 16px;
+        }
+
+        .tab-button.active {
+            background: var(--card-bg);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: scale(1.02);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section-title {
+            font-size: 13px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin: 24px 16px 8px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        /* iOS List Group */
+        .ios-list {
+            background-color: var(--card-bg);
+            backdrop-filter: var(--glass-effect);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .ios-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            min-height: 52px;
+            border-bottom: 0.5px solid var(--border-color);
+        }
+
+        .ios-item:last-child {
+            border-bottom: none;
+        }
+
+        .icon-box {
+            width: 30px;
+            height: 30px;
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            color: white;
+        }
+
+        .icon-box i {
+            width: 18px;
+            height: 18px;
+        }
+
+        .ios-item label {
+            flex: 1;
+            font-size: 17px;
+            font-weight: 400;
+        }
+
+        .ios-item input[type="number"], 
+        .ios-item select {
+            background: none;
+            border: none;
+            color: var(--system-blue);
+            font-size: 17px;
+            text-align: right;
+            outline: none;
+            width: 100px;
+            font-weight: 500;
+        }
+
+        /* Switch Style */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 51px;
+            height: 31px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: var(--system-gray);
+            transition: .3s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 27px; width: 27px;
+            left: 2px; bottom: 2px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+        }
+
+        input:checked + .slider {
+            background-color: var(--system-green);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+
+        /* Calendar */
+        .calendar-container {
+            padding: 16px;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            text-align: center;
+        }
+
+        .weekday {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            border-radius: 10px;
+            transition: all 0.2s;
+        }
+
+        .day.thursday {
+            background-color: var(--system-blue);
+            color: white;
+            font-weight: 700;
+            box-shadow: 0 4px 10px rgba(0, 122, 255, 0.3);
+        }
+
+        /* Result Cards - iOS 18 Widgets Style */
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .widget {
+            background: var(--card-bg);
+            backdrop-filter: var(--glass-effect);
+            border-radius: 20px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 100px;
+        }
+
+        .widget-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .widget-value {
+            font-size: 20px;
+            font-weight: 700;
+            margin-top: 8px;
+        }
+
+        .total-banner {
+            grid-column: span 2;
+            background: linear-gradient(135deg, var(--system-blue), #5856D6);
+            color: white;
+            padding: 24px;
+            border-radius: 24px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 122, 255, 0.3);
+            margin-top: 8px;
+        }
+
+        .total-banner.green {
+            background: linear-gradient(135deg, var(--system-green), #28CD41);
+            box-shadow: 0 10px 30px rgba(52, 199, 89, 0.3);
+        }
+
+        .total-banner .label {
+            font-size: 14px;
+            font-weight: 600;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .total-banner .value {
+            font-size: 40px;
+            font-weight: 800;
+            margin-top: 4px;
+        }
+
+        /* Action Buttons */
+        .action-bar {
+            position: fixed;
+            bottom: calc(20px + var(--safe-area-bottom));
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 32px);
+            max-width: 400px;
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 12px;
+            z-index: 1000;
+        }
+
+        .btn {
+            height: 56px;
+            border-radius: 18px;
+            border: none;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+            opacity: 0.8;
+        }
+
+        .btn-primary {
+            background-color: var(--text-color);
+            color: var(--bg-color);
+        }
+
+        .btn-secondary {
+            background-color: var(--card-bg);
+            backdrop-filter: var(--glass-effect);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        /* Utility */
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Calculadora</h1>
+        </header>
+
+        <div class="tab-container">
+            <button class="tab-button active" onclick="switchTab('salario')">
+                <i data-lucide="banknote"></i> Salário
+            </button>
+            <button class="tab-button" onclick="switchTab('vt')">
+                <i data-lucide="bus"></i> Transporte
+            </button>
+        </div>
+
+        <!-- ABA SALÁRIO -->
+        <div id="tab-salario" class="tab-content active">
+            <div class="section-title">Configurações</div>
+            <div class="ios-list">
+                <div class="ios-item">
+                    <div class="icon-box" style="background: var(--system-blue);"><i data-lucide="dollar-sign"></i></div>
+                    <label>Valor/Hora</label>
+                    <input id="valorHora" type="number" step="0.01" placeholder="0,00" inputmode="decimal">
+                </div>
+                <div class="ios-item">
+                    <div class="icon-box" style="background: var(--system-orange);"><i data-lucide="clock"></i></div>
+                    <label>Horas/Dia</label>
+                    <input id="horasDia" type="number" step="0.1" placeholder="0" inputmode="decimal">
+                </div>
+                <div class="ios-item">
+                    <div class="icon-box" style="background: var(--system-green);"><i data-lucide="calendar-check"></i></div>
+                    <label>Dias Trabalhados</label>
+                    <input id="diasMes" type="number" placeholder="0" inputmode="numeric">
+                </div>
+                <div class="ios-item">
+                    <div class="icon-box" style="background: var(--system-gray);"><i data-lucide="calendar"></i></div>
+                    <label>Dias no Mês</label>
+                    <select id="diasCalendario">
+                        <option value="30">30 dias</option>
+                        <option value="31">31 dias</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="section-title">Deduções</div>
+            <div class="ios-list">
+                <div class="ios-item">
+                    <div class="icon-box" style="background: #5856D6;"><i data-lucide="bus"></i></div>
+                    <label>Vale-Transporte (6,5%)</label>
+                    <label class="switch">
+                        <input id="valeTransporte" type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="ios-item">
+                    <div class="icon-box" style="background: var(--system-red);"><i data-lucide="shield-check"></i></div>
+                    <label>INSS (7%)</label>
+                    <label class="switch">
+                        <input id="inss" type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="ios-item">
+                    <div class="icon-box" style="background: #AF52DE;"><i data-lucide="arrow-down-circle"></i></div>
+                    <label>Adiantamento</label>
+                    <label class="switch">
+                        <input id="adiantamento" type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="result-grid">
+                <div class="widget">
+                    <div class="widget-title"><i data-lucide="trending-up"></i> Bruto</div>
+                    <div id="salarioBruto" class="widget-value">R$ 0,00</div>
+                </div>
+                <div class="widget">
+                    <div class="widget-title"><i data-lucide="trending-down"></i> Descontos</div>
+                    <div id="totalDescontos" class="widget-value" style="color: var(--system-red);">R$ 0,00</div>
+                </div>
+                <div class="total-banner">
+                    <div class="label">Salário Líquido</div>
+                    <div id="salarioLiquido" class="value">R$ 0,00</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ABA VALE TRANSPORTE -->
+        <div id="tab-vt" class="tab-content">
+            <div class="section-title">Período</div>
+            <div class="ios-list">
+                <div class="ios-item">
+                    <div class="icon-box" style="background: var(--system-blue);"><i data-lucide="calendar-days"></i></div>
+                    <label>Mês</label>
+                    <select id="mesVT"></select>
+                </div>
+                <div class="ios-item">
+                    <div class="icon-box" style="background: var(--system-gray);"><i data-lucide="hash"></i></div>
+                    <label>Ano</label>
+                    <input id="anoVT" type="number" inputmode="numeric">
+                </div>
+            </div>
+
+            <div class="section-title">Tarifas</div>
+            <div class="ios-list">
+                <div class="ios-item">
+                    <div class="icon-box" style="background: var(--system-orange);"><i data-lucide="ticket"></i></div>
+                    <label>Paraty</label>
+                    <select id="tarifaParaty">
+                        <option value="7.25">R$ 7,25</option>
+                        <option value="3.625">R$ 3,63 (50%)</option>
+                    </select>
+                </div>
+                <div class="ios-item">
+                    <div class="icon-box" style="background: var(--system-blue);"><i data-lucide="map-pin"></i></div>
+                    <label>Interno</label>
+                    <select id="tarifaInterna">
+                        <option value="5.20">R$ 5,20</option>
+                        <option value="2.50">R$ 2,50 (50%)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="section-title">Calendário</div>
+            <div class="ios-list">
+                <div class="calendar-container">
+                    <div class="calendar-header">
+                        <strong id="tituloCalendario">Maio 2024</strong>
+                        <span id="totalQuintas" style="color: var(--system-blue); font-weight: 600;">0 quintas</span>
+                    </div>
+                    <div class="calendar-grid">
+                        <div class="weekday">D</div><div class="weekday">S</div><div class="weekday">T</div>
+                        <div class="weekday">Q</div><div class="weekday">Q</div><div class="weekday">S</div>
+                        <div class="weekday">S</div>
+                    </div>
+                    <div id="diasCalendarioVisual" class="calendar-grid" style="margin-top: 8px;"></div>
+                </div>
+            </div>
+
+            <div class="result-grid">
+                <div class="widget">
+                    <div class="widget-title"><i data-lucide="calendar-range"></i> Quintas</div>
+                    <div id="quintasResultado" class="widget-value">0</div>
+                </div>
+                <div class="widget">
+                    <div class="widget-title"><i data-lucide="coins"></i> Por Quinta</div>
+                    <div id="valorPorQuinta" class="widget-value">R$ 0,00</div>
+                </div>
+                <div class="total-banner green">
+                    <div class="label">Total VT Quintas</div>
+                    <div id="valeUsado" class="value">R$ 0,00</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <button class="btn btn-secondary" onclick="limparAtual()">
+                <i data-lucide="rotate-ccw"></i> Limpar
+            </button>
+            <button class="btn btn-primary" onclick="calcularAtual()">
+                <i data-lucide="calculator"></i> Calcular
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        const elements = {
+            valorHora: document.getElementById('valorHora'),
+            horasDia: document.getElementById('horasDia'),
+            diasMes: document.getElementById('diasMes'),
+            valeTransporte: document.getElementById('valeTransporte'),
+            inss: document.getElementById('inss'),
+            adiantamento: document.getElementById('adiantamento'),
+            diasCalendario: document.getElementById('diasCalendario'),
+            mesVT: document.getElementById('mesVT'),
+            anoVT: document.getElementById('anoVT'),
+            tarifaParaty: document.getElementById('tarifaParaty'),
+            tarifaInterna: document.getElementById('tarifaInterna'),
+            salarioBruto: document.getElementById('salarioBruto'),
+            totalDescontos: document.getElementById('totalDescontos'),
+            salarioLiquido: document.getElementById('salarioLiquido'),
+            tituloCalendario: document.getElementById('tituloCalendario'),
+            totalQuintas: document.getElementById('totalQuintas'),
+            diasCalendarioVisual: document.getElementById('diasCalendarioVisual'),
+            quintasResultado: document.getElementById('quintasResultado'),
+            valorPorQuinta: document.getElementById('valorPorQuinta'),
+            valeUsado: document.getElementById('valeUsado')
+        };
+
+        let currentTab = 'salario';
+
+        const nomesMeses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            if (tab === 'salario') {
+                document.querySelector('.tab-button:nth-child(1)').classList.add('active');
+                document.getElementById('tab-salario').classList.add('active');
+            } else {
+                document.querySelector('.tab-button:nth-child(2)').classList.add('active');
+                document.getElementById('tab-vt').classList.add('active');
+                atualizarCalendario();
+            }
+        }
+
+        function formatarDinheiro(valor) {
+            return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        function pegarNumero(el) {
+            return Number(String(el.value).replace(',', '.')) || 0;
+        }
+
+        function diasNoMes(ano, mes) {
+            return new Date(ano, mes + 1, 0).getDate();
+        }
+
+        function prepararMeses() {
+            nomesMeses.forEach((nome, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = nome;
+                elements.mesVT.appendChild(option);
+            });
+            const hoje = new Date();
+            elements.mesVT.value = hoje.getMonth();
+            elements.anoVT.value = hoje.getFullYear();
+            elements.diasCalendario.value = diasNoMes(hoje.getFullYear(), hoje.getMonth());
+        }
+
+        function atualizarCalendario() {
+            const mes = Number(elements.mesVT.value);
+            const ano = pegarNumero(elements.anoVT) || new Date().getFullYear();
+            const totalDias = diasNoMes(ano, mes);
+            const primeiroDiaSemana = new Date(ano, mes, 1).getDay();
+            elements.tituloCalendario.textContent = `${nomesMeses[mes]} ${ano}`;
+            elements.diasCalendarioVisual.innerHTML = '';
+            let quintas = 0;
+            for (let i = 0; i < primeiroDiaSemana; i++) {
+                const empty = document.createElement('div');
+                empty.className = 'day';
+                elements.diasCalendarioVisual.appendChild(empty);
+            }
+            for (let dia = 1; dia <= totalDias; dia++) {
+                const data = new Date(ano, mes, dia);
+                const dayEl = document.createElement('div');
+                dayEl.className = 'day';
+                if (data.getDay() === 4) {
+                    dayEl.classList.add('thursday');
+                    quintas++;
+                }
+                dayEl.textContent = dia;
+                elements.diasCalendarioVisual.appendChild(dayEl);
+            }
+            elements.totalQuintas.textContent = `${quintas} ${quintas === 1 ? 'quinta' : 'quintas'}`;
+            return quintas;
+        }
+
+        function calcularSalario() {
+            const bruto = pegarNumero(elements.valorHora) * pegarNumero(elements.horasDia) * pegarNumero(elements.diasMes);
+            const descVT = elements.valeTransporte.checked ? bruto * 0.065 : 0;
+            const descINSS = elements.inss.checked ? bruto * 0.07 : 0;
+            const adiantamentoValor = elements.adiantamento.checked ? (elements.diasCalendario.value === '31' ? 203 : 196) : 0;
+            const totalDescontos = descVT + descINSS + adiantamentoValor;
+            elements.salarioBruto.textContent = formatarDinheiro(bruto);
+            elements.totalDescontos.textContent = '-' + formatarDinheiro(totalDescontos);
+            elements.salarioLiquido.textContent = formatarDinheiro(bruto - totalDescontos);
+        }
+
+        function calcularVT() {
+            const quintas = atualizarCalendario();
+            const valorDaQuinta = (pegarNumero(elements.tarifaParaty) + pegarNumero(elements.tarifaInterna)) * 2;
+            elements.valorPorQuinta.textContent = formatarDinheiro(valorDaQuinta);
+            elements.quintasResultado.textContent = quintas;
+            elements.valeUsado.textContent = formatarDinheiro(valorDaQuinta * quintas);
+        }
+
+        function calcularAtual() {
+            if (currentTab === 'salario') calcularSalario();
+            else calcularVT();
+        }
+
+        function limparAtual() {
+            if (currentTab === 'salario') {
+                elements.valorHora.value = ''; elements.horasDia.value = ''; elements.diasMes.value = '';
+                calcularSalario();
+            } else {
+                const hoje = new Date();
+                elements.mesVT.value = hoje.getMonth(); elements.anoVT.value = hoje.getFullYear();
+                calcularVT();
+            }
+        }
+
+        // Auto-calculate
+        [elements.valorHora, elements.horasDia, elements.diasMes, elements.diasCalendario, elements.valeTransporte, elements.inss, elements.adiantamento].forEach(el => {
+            el.addEventListener('input', calcularSalario);
+        });
+        [elements.mesVT, elements.anoVT, elements.tarifaParaty, elements.tarifaInterna].forEach(el => {
+            el.addEventListener('input', calcularVT);
+        });
+
+        prepararMeses();
+        calcularSalario();
+        calcularVT();
+    </script>
+</body>
+</html>
