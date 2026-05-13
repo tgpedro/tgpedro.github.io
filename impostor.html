@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>IMPOSTOR | BUG-FREE</title>
+<title>IMPOSTOR</title>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
@@ -28,15 +28,19 @@
   touch-action: manipulation;
 }
 
+html,
 body {
   margin: 0;
-  height: 100vh;
-  height: -webkit-fill-available;
+  width: 100%;
+  height: 100%;
   background: var(--bg);
   color: var(--text);
+  overflow: hidden;
+}
+
+body {
   display: flex;
   flex-direction: column;
-  overflow: hidden;
 }
 
 .app {
@@ -48,121 +52,387 @@ body {
   position: relative;
   display: flex;
   flex-direction: column;
-  padding: 20px;
+  padding: 18px;
   border-left: 1px solid var(--border);
   border-right: 1px solid var(--border);
+  min-height: 100dvh;
 }
 
-header { padding: 15px 0; text-align: center; }
-h1 { font-family: 'Orbitron', sans-serif; font-size: 24px; font-weight: 900; margin: 0; color: var(--primary); letter-spacing: 4px; text-shadow: 0 0 15px var(--primary-glow); }
+header {
+  padding: 10px 0 16px;
+  text-align: center;
+}
 
-.content { flex: 1; overflow-y: auto; padding-bottom: 120px; }
+h1 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 24px;
+  font-weight: 900;
+  margin: 0;
+  color: var(--primary);
+  letter-spacing: 4px;
+  text-shadow: 0 0 15px var(--primary-glow);
+}
 
-.input-group { display: flex; gap: 8px; margin-bottom: 15px; }
-input { flex: 1; padding: 14px; border-radius: 8px; border: 1px solid var(--border); background: #000; color: var(--accent); font-size: 16px; outline: none; }
-input:focus { border-color: var(--accent); }
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 115px;
+}
 
-button { cursor: pointer; border: 1px solid transparent; border-radius: 8px; font-weight: 700; text-transform: uppercase; transition: all 0.1s; display: flex; align-items: center; justify-content: center; }
-.btn-add { padding: 0 15px; background: transparent; border: 1px solid var(--accent); color: var(--accent); }
-.btn-main { width: 100%; padding: 18px; background: var(--primary); color: white; box-shadow: 0 0 20px var(--primary-glow); font-size: 15px; }
-.btn-main:active { transform: scale(0.96); filter: brightness(1.2); }
-.btn-secondary { width: 100%; padding: 14px; background: var(--secondary); color: var(--text-dim); margin-top: 8px; font-size: 13px; }
-.btn-ghost { background: transparent; color: var(--text-dim); font-size: 10px; padding: 8px; margin-top: 15px; width: 100%; border: none; }
+.input-group {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
 
-.player-card { background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 12px 15px; margin-bottom: 6px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; animation: slideIn 0.2s ease-out; }
-@keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
-.remove-btn { color: var(--primary); font-size: 11px; padding: 5px; }
+input {
+  flex: 1;
+  min-width: 0;
+  padding: 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #000;
+  color: var(--accent);
+  font-size: 16px;
+  outline: none;
+}
 
-.screen { display: flex; flex-direction: column; height: 100%; text-align: center; justify-content: center; }
-.label-small { text-transform: uppercase; letter-spacing: 2px; color: var(--accent); font-size: 10px; margin-bottom: 8px; }
-.display-name { font-family: 'Orbitron', sans-serif; font-size: 36px; font-weight: 900; margin: 15px 0; color: white; }
+input:focus {
+  border-color: var(--accent);
+}
 
-.info-box { background: rgba(0,0,0,0.5); border: 1px solid var(--border); padding: 35px 15px; margin: 15px 0; border-radius: 4px; position: relative; }
-.info-box::before { content: ""; position: absolute; top: -1px; left: -1px; width: 15px; height: 15px; border-top: 2px solid var(--primary); border-left: 2px solid var(--primary); }
+button {
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  transition: all 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-.category-tag { color: var(--accent); font-size: 11px; margin-bottom: 8px; display: block; }
-.secret-word { font-family: 'Orbitron', sans-serif; font-size: 28px; font-weight: 900; color: white; word-break: break-word; }
-.impostor-text { font-family: 'Orbitron', sans-serif; font-size: 28px; font-weight: 900; color: var(--primary); animation: blink 1s infinite; }
-@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+.btn-add {
+  padding: 0 15px;
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+}
 
-.footer-actions { position: absolute; bottom: 0; left: 0; right: 0; padding: 15px; padding-bottom: calc(var(--safe-area-bottom) + 10px); background: linear-gradient(transparent, var(--card) 40%); z-index: 50; }
+.btn-main {
+  width: 100%;
+  padding: 17px;
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 0 20px var(--primary-glow);
+  font-size: 15px;
+}
 
-.reveal-list { text-align: left; margin-top: 15px; border-top: 1px solid var(--border); padding-top: 15px; }
-.reveal-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 12px; }
-.role-impostor { color: var(--primary); font-weight: bold; }
-.role-agent { color: var(--accent); }
+.btn-main:active {
+  transform: scale(0.96);
+  filter: brightness(1.2);
+}
 
-.hidden { display: none !important; }
+.btn-secondary {
+  width: 100%;
+  padding: 14px;
+  background: var(--secondary);
+  color: var(--text-dim);
+  margin-top: 8px;
+  font-size: 13px;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 10px;
+  padding: 8px;
+  margin-top: 15px;
+  width: 100%;
+  border: none;
+}
+
+.player-card {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  padding: 12px 15px;
+  margin-bottom: 6px;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  animation: slideIn 0.2s ease-out;
+  gap: 10px;
+}
+
+.player-card span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.remove-btn {
+  color: var(--primary);
+  font-size: 11px;
+  padding: 5px;
+  flex-shrink: 0;
+}
+
+.screen {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100dvh - 170px);
+  text-align: center;
+  justify-content: center;
+}
+
+.label-small {
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--accent);
+  font-size: 10px;
+  margin-bottom: 8px;
+}
+
+.display-name {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(26px, 9vw, 36px);
+  font-weight: 900;
+  margin: 15px 0;
+  color: white;
+  word-break: break-word;
+}
+
+.info-box {
+  background: rgba(0,0,0,0.5);
+  border: 1px solid var(--border);
+  padding: 22px 14px;
+  margin: 15px 0;
+  border-radius: 8px;
+  position: relative;
+  min-height: 125px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.info-box::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 15px;
+  height: 15px;
+  border-top: 2px solid var(--primary);
+  border-left: 2px solid var(--primary);
+}
+
+.category-tag {
+  color: var(--accent);
+  font-size: 11px;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.secret-word {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(22px, 8vw, 30px);
+  font-weight: 900;
+  color: white;
+  word-break: break-word;
+}
+
+.impostor-text {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(20px, 7vw, 28px);
+  font-weight: 900;
+  color: var(--primary);
+  animation: blink 1s infinite;
+  word-break: break-word;
+}
+
+@keyframes blink {
+  0%, 100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.4;
+  }
+}
+
+.footer-actions {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 15px;
+  padding-bottom: calc(var(--safe-area-bottom) + 10px);
+  background: linear-gradient(transparent, var(--card) 40%);
+  z-index: 50;
+}
+
+.reveal-list {
+  text-align: left;
+  margin-top: 15px;
+  border-top: 1px solid var(--border);
+  padding-top: 15px;
+}
+
+.reveal-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  font-size: 12px;
+}
+
+.role-impostor {
+  color: var(--primary);
+  font-weight: bold;
+}
+
+.role-agent {
+  color: var(--accent);
+}
+
+.hidden {
+  display: none !important;
+}
 </style>
 </head>
 
 <body>
 <main class="app">
-  <header><h1>IMPOSTOR</h1></header>
+  <header>
+    <h1>IMPOSTOR</h1>
+  </header>
 
   <div class="content">
-    <!-- SETUP -->
     <section id="setup">
       <div class="input-group">
-        <input id="playerInput" placeholder="NOME DO AGENTE" autocomplete="off">
+        <input id="playerInput" placeholder="NOME" autocomplete="off">
         <button id="addBtn" class="btn-add">ADD</button>
       </div>
-      <div id="count" style="font-size: 9px; color: var(--text-dim); margin-bottom: 10px; letter-spacing: 1px;">0 AGENTES ATIVOS</div>
+
+      <div id="count" style="font-size: 9px; color: var(--text-dim); margin-bottom: 10px; letter-spacing: 1px;">
+        0 AGENTES ATIVOS
+      </div>
+
       <div class="players-list" id="playersList"></div>
       
       <div style="margin-top: 15px;">
-        <button class="btn-secondary" id="exampleBtn">CARREGAR EQUIPE TESTE</button>
         <button class="btn-ghost" id="clearBtn">WIPE_ALL_DATA</button>
       </div>
     </section>
 
-    <!-- PASS SCREEN -->
     <section id="passScreen" class="hidden screen">
-      <div class="label-small">TRANSFERIR DISPOSITIVO</div>
+      <div class="label-small">TRANSFERIR DISPOSITIVO PARA:</div>
       <div class="display-name" id="currentName"></div>
-      <div style="color: var(--text-dim); font-size: 11px;">AGUARDANDO AUTENTICAÇÃO BIOMÉTRICA...</div>
+      <div style="color: var(--text-dim); font-size: 11px;">AGUARDANDO...</div>
     </section>
 
-    <!-- SECRET SCREEN -->
     <section id="secretScreen" class="hidden screen">
-      <div class="label-small">DADOS DESCRIPTOGRAFADOS</div>
+      <div class="label-small">DADOS</div>
       <div class="info-box" id="secretContent"></div>
     </section>
 
-    <!-- END SCREEN -->
     <section id="endScreen" class="hidden screen">
       <div class="label-small">OPERAÇÃO EM CURSO</div>
+
       <div class="info-box">
-        <div class="category-tag">CATEGORIA DO ARQUIVO</div>
+        <div class="category-tag">CATEGORIA</div>
         <div class="secret-word" id="finalCategory"></div>
       </div>
       
       <button id="showRevealBtn" class="btn-secondary">REVELAR IDENTIDADES</button>
       
       <div id="revealArea" class="hidden reveal-list">
-        <div class="label-small">RELATÓRIO DE CAMPO</div>
+        <div class="label-small">RELATÓRIO</div>
         <div id="revealContent"></div>
       </div>
     </section>
   </div>
 
   <div class="footer-actions">
-    <button id="startBtn" class="btn-main">INICIAR OPERAÇÃO</button>
-    <button id="revealBtn" class="btn-main hidden">ACESSAR DADOS</button>
+    <button id="startBtn" class="btn-main">INICIAR</button>
+    <button id="revealBtn" class="btn-main hidden">ACESSAR</button>
     <button id="hideBtn" class="btn-main hidden">CONFIRMAR E PASSAR</button>
     <button id="newRoundBtn" class="btn-main hidden">NOVA RODADA</button>
-    <button id="restartBtn" class="btn-secondary hidden">ABORTAR</button>
+    <button id="restartBtn" class="btn-secondary hidden">CANCELAR</button>
   </div>
 </main>
 
 <script>
 const categories = [
-  {name:"COMIDA",words:["PIZZA","HAMBÚRGUER","SUSHI","LASANHA","COXINHA","PASTEL","BOLO","BRIGADEIRO","PIPOCA","TACO","MACARRÃO","CHURRASCO","AÇAÍ","SORVETE","PANQUECA","BATATA FRITA","HOT DOG","PUDIM","FEIJOADA","STROGONOFF"]},
-  {name:"ANIMAIS",words:["GATO","CACHORRO","LEÃO","TIGRE","GIRAFA","ELEFANTE","MACACO","COELHO","PINGUIM","TUBARÃO","GOLFINHO","CORUJA","COBRA","CAVALO","URSO","JACARÉ","RATO","LOBO","RAPOSA","BORBOLETA"]},
-  {name:"LUGARES",words:["PRAIA","SHOPPING","CINEMA","ESCOLA","HOSPITAL","AEROPORTO","PARQUE","MERCADO","IGREJA","MUSEU","BIBLIOTECA","RESTAURANTE","ACADEMIA","RODOVIÁRIA","HOTEL","FARMÁCIA","ESTÁDIO","BALADA","TEATRO","ZOOLÓGICO"]},
-  {name:"OBJETOS",words:["CELULAR","ÓCULOS","CHAVE","MOCHILA","GARRAFA","CONTROLE","CADEIRA","RELÓGIO","ESPELHO","CANETA","CADERNO","FONE","CARREGADOR","TRAVESSEIRO","GUARDA-CHUVA","ESCOVA","VENTILADOR","TELEVISÃO","NOTEBOOK","ANEL"]},
-  {name:"FILMES E SÉRIES",words:["BARBIE","AVATAR","SHREK","VINGADORES","WANDINHA","STRANGER THINGS","HARRY POTTER","TITANIC","INTERESTELAR","CORALINE","TOY STORY","HOMEM-ARANHA","JOGOS VORAZES","ROUND 6","BREAKING BAD","FRIENDS","DIVERTIDAMENTE","MATRIX","CREPÚSCULO","THE LAST OF US"]},
-  {name:"INTERNET",words:["MEME","TIKTOK","REELS","EMOJI","STALKER","INFLUENCER","TREND","COMENTÁRIO","LIKE","VÍDEO","LIVE","PRINT","FILTRO","FOFOCA","PERFIL","STORY","VIRAL","HASHTAG","PODCAST","CANCELAMENTO"]}
+  {
+    name: "COMIDA",
+    words: [
+      "PIZZA", "HAMBÚRGUER", "SUSHI", "LASANHA", "COXINHA",
+      "PASTEL", "BOLO", "BRIGADEIRO", "PIPOCA", "TACO",
+      "MACARRÃO", "CHURRASCO", "AÇAÍ", "SORVETE", "PANQUECA",
+      "BATATA FRITA", "HOT DOG", "PUDIM", "FEIJOADA", "STROGONOFF"
+    ]
+  },
+  {
+    name: "ANIMAIS",
+    words: [
+      "GATO", "CACHORRO", "LEÃO", "TIGRE", "GIRAFA",
+      "ELEFANTE", "MACACO", "COELHO", "PINGUIM", "TUBARÃO",
+      "GOLFINHO", "CORUJA", "COBRA", "CAVALO", "URSO",
+      "JACARÉ", "RATO", "LOBO", "RAPOSA", "BORBOLETA"
+    ]
+  },
+  {
+    name: "LUGARES",
+    words: [
+      "PRAIA", "SHOPPING", "CINEMA", "ESCOLA", "HOSPITAL",
+      "AEROPORTO", "PARQUE", "MERCADO", "IGREJA", "MUSEU",
+      "BIBLIOTECA", "RESTAURANTE", "ACADEMIA", "RODOVIÁRIA", "HOTEL",
+      "FARMÁCIA", "ESTÁDIO", "BALADA", "TEATRO", "ZOOLÓGICO"
+    ]
+  },
+  {
+    name: "OBJETOS",
+    words: [
+      "CELULAR", "ÓCULOS", "CHAVE", "MOCHILA", "GARRAFA",
+      "CONTROLE", "CADEIRA", "RELÓGIO", "ESPELHO", "CANETA",
+      "CADERNO", "FONE", "CARREGADOR", "TRAVESSEIRO", "GUARDA-CHUVA",
+      "ESCOVA", "VENTILADOR", "TELEVISÃO", "NOTEBOOK", "ANEL"
+    ]
+  },
+  {
+    name: "FILMES E SÉRIES",
+    words: [
+      "BARBIE", "AVATAR", "SHREK", "VINGADORES", "WANDINHA",
+      "STRANGER THINGS", "HARRY POTTER", "TITANIC", "INTERESTELAR", "CORALINE",
+      "TOY STORY", "HOMEM-ARANHA", "JOGOS VORAZES", "ROUND 6", "BREAKING BAD",
+      "FRIENDS", "DIVERTIDAMENTE", "MATRIX", "CREPÚSCULO", "THE LAST OF US"
+    ]
+  },
+  {
+    name: "INTERNET",
+    words: [
+      "MEME", "TIKTOK", "REELS", "EMOJI", "STALKER",
+      "INFLUENCER", "TREND", "COMENTÁRIO", "LIKE", "VÍDEO",
+      "LIVE", "PRINT", "FILTRO", "FOFOCA", "PERFIL",
+      "STORY", "VIRAL", "HASHTAG", "PODCAST", "CANCELAMENTO"
+    ]
+  }
 ];
 
 let players = [];
@@ -170,7 +440,7 @@ let currentIndex = 0;
 let impostorIndex = 0;
 let chosenCategory = null;
 let chosenWord = "";
-let lastWord = ""; // Para evitar repetição imediata
+let lastWord = "";
 
 const screens = {
   setup: document.getElementById("setup"),
@@ -188,91 +458,143 @@ const btns = {
 };
 
 function showScreen(screenId) {
-  Object.values(screens).forEach(s => s.classList.add("hidden"));
+  Object.values(screens).forEach(screen => {
+    screen.classList.add("hidden");
+  });
+
   screens[screenId].classList.remove("hidden");
   
-  Object.values(btns).forEach(b => b.classList.add("hidden"));
-  if(screenId === 'setup') btns.start.classList.remove("hidden");
-  if(screenId === 'pass') { btns.reveal.classList.remove("hidden"); btns.restart.classList.remove("hidden"); }
-  if(screenId === 'secret') btns.hide.classList.remove("hidden");
-  if(screenId === 'end') { btns.newRound.classList.remove("hidden"); btns.restart.classList.remove("hidden"); }
+  Object.values(btns).forEach(button => {
+    button.classList.add("hidden");
+  });
+
+  if (screenId === "setup") {
+    btns.start.classList.remove("hidden");
+  }
+
+  if (screenId === "pass") {
+    btns.reveal.classList.remove("hidden");
+    btns.restart.classList.remove("hidden");
+  }
+
+  if (screenId === "secret") {
+    btns.hide.classList.remove("hidden");
+  }
+
+  if (screenId === "end") {
+    btns.newRound.classList.remove("hidden");
+    btns.restart.classList.remove("hidden");
+  }
   
-  // Resetar área de revelação ao mudar de tela
-  if(screenId !== 'end') {
+  if (screenId !== "end") {
     document.getElementById("revealArea").classList.add("hidden");
   }
 }
 
-function renderPlayers(){
+function renderPlayers() {
   const list = document.getElementById("playersList");
+  const count = document.getElementById("count");
+
   list.innerHTML = "";
-  document.getElementById("count").textContent = players.length + " AGENTES ATIVOS";
-  players.forEach((name, i) => {
+  count.textContent = players.length + " AGENTES ATIVOS";
+
+  players.forEach((name, index) => {
     const div = document.createElement("div");
     div.className = "player-card";
-    div.innerHTML = `<span>${name.toUpperCase()}</span><span class="remove-btn" onclick="removePlayer(${i})">REMOVER</span>`;
+
+    div.innerHTML = `
+      <span>${name.toUpperCase()}</span>
+      <span class="remove-btn" onclick="removePlayer(${index})">REMOVER</span>
+    `;
+
     list.appendChild(div);
   });
 }
 
-function removePlayer(i) { players.splice(i, 1); renderPlayers(); }
+function removePlayer(index) {
+  players.splice(index, 1);
+  renderPlayers();
+}
 
-function addPlayer(){
+function addPlayer() {
   const input = document.getElementById("playerInput");
-  const val = input.value.trim().toUpperCase();
+  const value = input.value.trim().toUpperCase();
   
-  if(!val) return;
-  if(players.includes(val)) { alert("ERRO: AGENTE JÁ REGISTRADO."); return; }
+  if (!value) return;
+
+  if (players.includes(value)) {
+    alert("ERRO: AGENTE JÁ REGISTRADO.");
+    return;
+  }
   
-  players.push(val);
+  players.push(value);
   input.value = "";
   renderPlayers();
 }
 
-document.getElementById("addBtn").onclick = addPlayer;
-document.getElementById("playerInput").onkeydown = (e) => { if(e.key === 'Enter') addPlayer(); };
+function prepareRound() {
+  let newCategory;
+  let newWord;
 
-function prepareRound(){
-  // Evitar repetição da mesma palavra
-  let newCategory, newWord;
   do {
-    newCategory = categories[Math.floor(Math.random()*categories.length)];
-    newWord = newCategory.words[Math.floor(Math.random()*newCategory.words.length)];
-  } while (newWord === lastWord);
+    newCategory = categories[Math.floor(Math.random() * categories.length)];
+    newWord = newCategory.words[Math.floor(Math.random() * newCategory.words.length)];
+  } while (newWord === lastWord && categories.length > 1);
   
   chosenCategory = newCategory;
   chosenWord = newWord;
   lastWord = newWord;
-  impostorIndex = Math.floor(Math.random()*players.length);
+  impostorIndex = Math.floor(Math.random() * players.length);
   currentIndex = 0;
 }
 
+function showPass() {
+  document.getElementById("currentName").textContent = players[currentIndex];
+  showScreen("pass");
+}
+
+document.getElementById("addBtn").onclick = addPlayer;
+
+document.getElementById("playerInput").onkeydown = event => {
+  if (event.key === "Enter") {
+    addPlayer();
+  }
+};
+
 btns.start.onclick = () => {
-  if(players.length < 3) { alert("ERRO: MÍNIMO 3 AGENTES NECESSÁRIOS."); return; }
+  if (players.length < 3) {
+    alert("ERRO: MÍNIMO 3 PESSOAS NECESSÁRIAS.");
+    return;
+  }
+
   prepareRound();
   showPass();
 };
 
-function showPass(){
-  document.getElementById("currentName").textContent = players[currentIndex];
-  showScreen('pass');
-}
-
 btns.reveal.onclick = () => {
   const content = document.getElementById("secretContent");
-  if(currentIndex === impostorIndex){
-    content.innerHTML = `<div class="category-tag">ARQUIVO: ${chosenCategory.name}</div><div class="impostor-text">VOCÊ É O IMPOSTOR</div>`;
+
+  if (currentIndex === impostorIndex) {
+    content.innerHTML = `
+      <div class="category-tag">CATEGORIA: ${chosenCategory.name}</div>
+      <div class="impostor-text">VOCÊ É O IMPOSTOR</div>
+    `;
   } else {
-    content.innerHTML = `<div class="category-tag">ARQUIVO: ${chosenCategory.name}</div><div class="secret-word">${chosenWord}</div>`;
+    content.innerHTML = `
+      <div class="category-tag">CATEGORIA: ${chosenCategory.name}</div>
+      <div class="secret-word">${chosenWord}</div>
+    `;
   }
-  showScreen('secret');
+
+  showScreen("secret");
 };
 
 btns.hide.onclick = () => {
   currentIndex++;
-  if(currentIndex >= players.length) {
+
+  if (currentIndex >= players.length) {
     document.getElementById("finalCategory").textContent = chosenCategory.name;
-    showScreen('end');
+    showScreen("end");
   } else {
     showPass();
   }
@@ -281,21 +603,34 @@ btns.hide.onclick = () => {
 document.getElementById("showRevealBtn").onclick = () => {
   const area = document.getElementById("revealArea");
   const content = document.getElementById("revealContent");
-  content.innerHTML = players.map((p, i) => `
+
+  content.innerHTML = players.map((player, index) => `
     <div class="reveal-item">
-      <span>${p}</span>
-      <span class="${i === impostorIndex ? 'role-impostor' : 'role-agent'}">
-        ${i === impostorIndex ? 'IMPOSTOR' : chosenWord}
+      <span>${player}</span>
+      <span class="${index === impostorIndex ? "role-impostor" : "role-agent"}">
+        ${index === impostorIndex ? "IMPOSTOR" : chosenWord}
       </span>
     </div>
-  `).join('');
+  `).join("");
+
   area.classList.toggle("hidden");
 };
 
-btns.newRound.onclick = () => { prepareRound(); showPass(); };
-btns.restart.onclick = () => { showScreen('setup'); };
-document.getElementById("clearBtn").onclick = () => { if(confirm("CONFIRMAR WIPE TOTAL?")) { players = []; renderPlayers(); } };
-document.getElementById("exampleBtn").onclick = () => { players = ["ALPHA", "BRAVO", "CHARLIE", "DELTA"]; renderPlayers(); };
+btns.newRound.onclick = () => {
+  prepareRound();
+  showPass();
+};
+
+btns.restart.onclick = () => {
+  showScreen("setup");
+};
+
+document.getElementById("clearBtn").onclick = () => {
+  if (confirm("CONFIRMAR WIPE TOTAL?")) {
+    players = [];
+    renderPlayers();
+  }
+};
 
 renderPlayers();
 </script>
