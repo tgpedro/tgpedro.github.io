@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>IMPOSTOR | FINAL</title>
+<title>IMPOSTOR | BUG-FREE</title>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
@@ -39,22 +39,6 @@ body {
   overflow: hidden;
 }
 
-html {
-  height: -webkit-fill-available;
-}
-
-/* Scanline Effect */
-body::before {
-  content: " ";
-  display: block;
-  position: fixed;
-  top: 0; left: 0; bottom: 0; right: 0;
-  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-  z-index: 100;
-  background-size: 100% 2px, 3px 100%;
-  pointer-events: none;
-}
-
 .app {
   flex: 1;
   width: 100%;
@@ -69,179 +53,43 @@ body::before {
   border-right: 1px solid var(--border);
 }
 
-header {
-  padding: 20px 0;
-  text-align: center;
-}
+header { padding: 15px 0; text-align: center; }
+h1 { font-family: 'Orbitron', sans-serif; font-size: 24px; font-weight: 900; margin: 0; color: var(--primary); letter-spacing: 4px; text-shadow: 0 0 15px var(--primary-glow); }
 
-h1 {
-  font-family: 'Orbitron', sans-serif;
-  font-size: 28px;
-  font-weight: 900;
-  margin: 0;
-  color: var(--primary);
-  letter-spacing: 4px;
-  text-shadow: 0 0 15px var(--primary-glow);
-}
+.content { flex: 1; overflow-y: auto; padding-bottom: 120px; }
 
-.content {
-  flex: 1;
-  overflow-y: auto;
-  padding-bottom: 100px; /* Espaço para botões fixos */
-}
+.input-group { display: flex; gap: 8px; margin-bottom: 15px; }
+input { flex: 1; padding: 14px; border-radius: 8px; border: 1px solid var(--border); background: #000; color: var(--accent); font-size: 16px; outline: none; }
+input:focus { border-color: var(--accent); }
 
-.input-group {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 20px;
-}
-
-input {
-  flex: 1;
-  padding: 16px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: #000;
-  color: var(--accent);
-  font-size: 16px;
-  outline: none;
-}
-
-button {
-  cursor: pointer;
-  border: 1px solid transparent;
-  border-radius: 8px;
-  font-weight: 700;
-  font-size: 14px;
-  text-transform: uppercase;
-  transition: all 0.1s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.btn-add {
-  padding: 0 20px;
-  background: transparent;
-  border: 1px solid var(--accent);
-  color: var(--accent);
-}
-
-.btn-main {
-  width: 100%;
-  padding: 20px;
-  background: var(--primary);
-  color: white;
-  box-shadow: 0 0 20px var(--primary-glow);
-  font-size: 16px;
-}
-
+button { cursor: pointer; border: 1px solid transparent; border-radius: 8px; font-weight: 700; text-transform: uppercase; transition: all 0.1s; display: flex; align-items: center; justify-content: center; }
+.btn-add { padding: 0 15px; background: transparent; border: 1px solid var(--accent); color: var(--accent); }
+.btn-main { width: 100%; padding: 18px; background: var(--primary); color: white; box-shadow: 0 0 20px var(--primary-glow); font-size: 15px; }
 .btn-main:active { transform: scale(0.96); filter: brightness(1.2); }
+.btn-secondary { width: 100%; padding: 14px; background: var(--secondary); color: var(--text-dim); margin-top: 8px; font-size: 13px; }
+.btn-ghost { background: transparent; color: var(--text-dim); font-size: 10px; padding: 8px; margin-top: 15px; width: 100%; border: none; }
 
-.btn-secondary {
-  width: 100%;
-  padding: 16px;
-  background: var(--secondary);
-  color: var(--text-dim);
-  margin-top: 10px;
-}
+.player-card { background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 12px 15px; margin-bottom: 6px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; animation: slideIn 0.2s ease-out; }
+@keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+.remove-btn { color: var(--primary); font-size: 11px; padding: 5px; }
 
-.btn-ghost {
-  background: transparent;
-  color: var(--text-dim);
-  font-size: 11px;
-  padding: 10px;
-  margin-top: 10px;
-}
+.screen { display: flex; flex-direction: column; height: 100%; text-align: center; justify-content: center; }
+.label-small { text-transform: uppercase; letter-spacing: 2px; color: var(--accent); font-size: 10px; margin-bottom: 8px; }
+.display-name { font-family: 'Orbitron', sans-serif; font-size: 36px; font-weight: 900; margin: 15px 0; color: white; }
 
-.players-list {
-  margin-top: 10px;
-}
+.info-box { background: rgba(0,0,0,0.5); border: 1px solid var(--border); padding: 35px 15px; margin: 15px 0; border-radius: 4px; position: relative; }
+.info-box::before { content: ""; position: absolute; top: -1px; left: -1px; width: 15px; height: 15px; border-top: 2px solid var(--primary); border-left: 2px solid var(--primary); }
 
-.player-card {
-  background: rgba(255,255,255,0.02);
-  border: 1px solid var(--border);
-  padding: 14px 16px;
-  margin-bottom: 8px;
-  border-radius: 8px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.player-card span { font-size: 14px; }
-.remove-btn { color: var(--primary); font-size: 12px; }
-
-.screen {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  text-align: center;
-}
-
-.label-small {
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  color: var(--accent);
-  font-size: 11px;
-  margin-bottom: 10px;
-}
-
-.display-name {
-  font-family: 'Orbitron', sans-serif;
-  font-size: 40px;
-  font-weight: 900;
-  margin: 20px 0;
-  color: white;
-}
-
-.info-box {
-  background: rgba(0,0,0,0.5);
-  border: 1px solid var(--border);
-  padding: 40px 20px;
-  margin: 20px 0;
-  border-radius: 4px;
-  position: relative;
-}
-
-.info-box::before {
-  content: ""; position: absolute; top: -1px; left: -1px; width: 15px; height: 15px;
-  border-top: 2px solid var(--primary); border-left: 2px solid var(--primary);
-}
-
-.category-tag { color: var(--accent); font-size: 12px; margin-bottom: 10px; display: block; }
-.secret-word { font-family: 'Orbitron', sans-serif; font-size: 32px; font-weight: 900; color: white; }
-.impostor-text { font-family: 'Orbitron', sans-serif; font-size: 32px; font-weight: 900; color: var(--primary); animation: blink 1s infinite; }
-
+.category-tag { color: var(--accent); font-size: 11px; margin-bottom: 8px; display: block; }
+.secret-word { font-family: 'Orbitron', sans-serif; font-size: 28px; font-weight: 900; color: white; word-break: break-word; }
+.impostor-text { font-family: 'Orbitron', sans-serif; font-size: 28px; font-weight: 900; color: var(--primary); animation: blink 1s infinite; }
 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
-.footer-actions {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 20px;
-  padding-bottom: var(--safe-area-bottom);
-  background: linear-gradient(transparent, var(--card) 30%);
-}
+.footer-actions { position: absolute; bottom: 0; left: 0; right: 0; padding: 15px; padding-bottom: calc(var(--safe-area-bottom) + 10px); background: linear-gradient(transparent, var(--card) 40%); z-index: 50; }
 
-.reveal-list {
-  text-align: left;
-  margin-top: 20px;
-  border-top: 1px solid var(--border);
-  padding-top: 20px;
-}
-
-.reveal-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-  font-size: 13px;
-}
-
-.reveal-role { font-weight: bold; }
-.role-impostor { color: var(--primary); }
+.reveal-list { text-align: left; margin-top: 15px; border-top: 1px solid var(--border); padding-top: 15px; }
+.reveal-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 12px; }
+.role-impostor { color: var(--primary); font-weight: bold; }
 .role-agent { color: var(--accent); }
 
 .hidden { display: none !important; }
@@ -250,9 +98,7 @@ button {
 
 <body>
 <main class="app">
-  <header>
-    <h1>IMPOSTOR</h1>
-  </header>
+  <header><h1>IMPOSTOR</h1></header>
 
   <div class="content">
     <!-- SETUP -->
@@ -261,31 +107,31 @@ button {
         <input id="playerInput" placeholder="NOME DO AGENTE" autocomplete="off">
         <button id="addBtn" class="btn-add">ADD</button>
       </div>
-      <div id="count" style="font-size: 10px; color: var(--text-dim); margin-bottom: 10px;">0 AGENTES ATIVOS</div>
+      <div id="count" style="font-size: 9px; color: var(--text-dim); margin-bottom: 10px; letter-spacing: 1px;">0 AGENTES ATIVOS</div>
       <div class="players-list" id="playersList"></div>
       
-      <div style="margin-top: 20px;">
+      <div style="margin-top: 15px;">
         <button class="btn-secondary" id="exampleBtn">CARREGAR EQUIPE TESTE</button>
-        <button class="btn-ghost" id="clearBtn">LIMPAR TODOS OS DADOS</button>
+        <button class="btn-ghost" id="clearBtn">WIPE_ALL_DATA</button>
       </div>
     </section>
 
     <!-- PASS SCREEN -->
     <section id="passScreen" class="hidden screen">
-      <div class="label-small">ENTREGAR DISPOSITIVO PARA</div>
+      <div class="label-small">TRANSFERIR DISPOSITIVO</div>
       <div class="display-name" id="currentName"></div>
-      <div style="color: var(--text-dim); font-size: 12px; margin-top: 10px;">CERTIFIQUE-SE QUE NINGUÉM ESTÁ OLHANDO</div>
+      <div style="color: var(--text-dim); font-size: 11px;">AGUARDANDO AUTENTICAÇÃO BIOMÉTRICA...</div>
     </section>
 
     <!-- SECRET SCREEN -->
     <section id="secretScreen" class="hidden screen">
-      <div class="label-small">DADOS CRIPTOGRAFADOS</div>
+      <div class="label-small">DADOS DESCRIPTOGRAFADOS</div>
       <div class="info-box" id="secretContent"></div>
     </section>
 
     <!-- END SCREEN -->
     <section id="endScreen" class="hidden screen">
-      <div class="label-small">MISSÃO EM CURSO</div>
+      <div class="label-small">OPERAÇÃO EM CURSO</div>
       <div class="info-box">
         <div class="category-tag">CATEGORIA DO ARQUIVO</div>
         <div class="secret-word" id="finalCategory"></div>
@@ -294,7 +140,7 @@ button {
       <button id="showRevealBtn" class="btn-secondary">REVELAR IDENTIDADES</button>
       
       <div id="revealArea" class="hidden reveal-list">
-        <div class="label-small">RELATÓRIO FINAL</div>
+        <div class="label-small">RELATÓRIO DE CAMPO</div>
         <div id="revealContent"></div>
       </div>
     </section>
@@ -302,12 +148,11 @@ button {
 
   <div class="footer-actions">
     <button id="startBtn" class="btn-main">INICIAR OPERAÇÃO</button>
-    <button id="revealBtn" class="btn-main hidden">DESCRIPTOGRAFAR</button>
+    <button id="revealBtn" class="btn-main hidden">ACESSAR DADOS</button>
     <button id="hideBtn" class="btn-main hidden">CONFIRMAR E PASSAR</button>
     <button id="newRoundBtn" class="btn-main hidden">NOVA RODADA</button>
-    <button id="restartBtn" class="btn-secondary hidden">ABORTAR MISSÃO</button>
+    <button id="restartBtn" class="btn-secondary hidden">ABORTAR</button>
   </div>
-
 </main>
 
 <script>
@@ -325,6 +170,7 @@ let currentIndex = 0;
 let impostorIndex = 0;
 let chosenCategory = null;
 let chosenWord = "";
+let lastWord = ""; // Para evitar repetição imediata
 
 const screens = {
   setup: document.getElementById("setup"),
@@ -345,12 +191,16 @@ function showScreen(screenId) {
   Object.values(screens).forEach(s => s.classList.add("hidden"));
   screens[screenId].classList.remove("hidden");
   
-  // Gerenciar botões do footer
   Object.values(btns).forEach(b => b.classList.add("hidden"));
   if(screenId === 'setup') btns.start.classList.remove("hidden");
   if(screenId === 'pass') { btns.reveal.classList.remove("hidden"); btns.restart.classList.remove("hidden"); }
   if(screenId === 'secret') btns.hide.classList.remove("hidden");
   if(screenId === 'end') { btns.newRound.classList.remove("hidden"); btns.restart.classList.remove("hidden"); }
+  
+  // Resetar área de revelação ao mudar de tela
+  if(screenId !== 'end') {
+    document.getElementById("revealArea").classList.add("hidden");
+  }
 }
 
 function renderPlayers(){
@@ -367,26 +217,44 @@ function renderPlayers(){
 
 function removePlayer(i) { players.splice(i, 1); renderPlayers(); }
 
-document.getElementById("addBtn").onclick = () => {
-  const val = document.getElementById("playerInput").value.trim();
-  if(val) { players.push(val); document.getElementById("playerInput").value = ""; renderPlayers(); }
-};
+function addPlayer(){
+  const input = document.getElementById("playerInput");
+  const val = input.value.trim().toUpperCase();
+  
+  if(!val) return;
+  if(players.includes(val)) { alert("ERRO: AGENTE JÁ REGISTRADO."); return; }
+  
+  players.push(val);
+  input.value = "";
+  renderPlayers();
+}
+
+document.getElementById("addBtn").onclick = addPlayer;
+document.getElementById("playerInput").onkeydown = (e) => { if(e.key === 'Enter') addPlayer(); };
 
 function prepareRound(){
-  chosenCategory = categories[Math.floor(Math.random()*categories.length)];
-  chosenWord = chosenCategory.words[Math.floor(Math.random()*chosenCategory.words.length)];
+  // Evitar repetição da mesma palavra
+  let newCategory, newWord;
+  do {
+    newCategory = categories[Math.floor(Math.random()*categories.length)];
+    newWord = newCategory.words[Math.floor(Math.random()*newCategory.words.length)];
+  } while (newWord === lastWord);
+  
+  chosenCategory = newCategory;
+  chosenWord = newWord;
+  lastWord = newWord;
   impostorIndex = Math.floor(Math.random()*players.length);
   currentIndex = 0;
 }
 
 btns.start.onclick = () => {
-  if(players.length < 3) return alert("ERRO: MÍNIMO 3 AGENTES.");
+  if(players.length < 3) { alert("ERRO: MÍNIMO 3 AGENTES NECESSÁRIOS."); return; }
   prepareRound();
   showPass();
 };
 
 function showPass(){
-  document.getElementById("currentName").textContent = players[currentIndex].toUpperCase();
+  document.getElementById("currentName").textContent = players[currentIndex];
   showScreen('pass');
 }
 
@@ -404,7 +272,6 @@ btns.hide.onclick = () => {
   currentIndex++;
   if(currentIndex >= players.length) {
     document.getElementById("finalCategory").textContent = chosenCategory.name;
-    document.getElementById("revealArea").classList.add("hidden");
     showScreen('end');
   } else {
     showPass();
@@ -416,19 +283,19 @@ document.getElementById("showRevealBtn").onclick = () => {
   const content = document.getElementById("revealContent");
   content.innerHTML = players.map((p, i) => `
     <div class="reveal-item">
-      <span>${p.toUpperCase()}</span>
-      <span class="reveal-role ${i === impostorIndex ? 'role-impostor' : 'role-agent'}">
+      <span>${p}</span>
+      <span class="${i === impostorIndex ? 'role-impostor' : 'role-agent'}">
         ${i === impostorIndex ? 'IMPOSTOR' : chosenWord}
       </span>
     </div>
   `).join('');
-  area.classList.remove("hidden");
+  area.classList.toggle("hidden");
 };
 
 btns.newRound.onclick = () => { prepareRound(); showPass(); };
 btns.restart.onclick = () => { showScreen('setup'); };
-document.getElementById("clearBtn").onclick = () => { players = []; renderPlayers(); };
-document.getElementById("exampleBtn").onclick = () => { players = ["Alpha", "Bravo", "Charlie", "Delta"]; renderPlayers(); };
+document.getElementById("clearBtn").onclick = () => { if(confirm("CONFIRMAR WIPE TOTAL?")) { players = []; renderPlayers(); } };
+document.getElementById("exampleBtn").onclick = () => { players = ["ALPHA", "BRAVO", "CHARLIE", "DELTA"]; renderPlayers(); };
 
 renderPlayers();
 </script>
