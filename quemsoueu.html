@@ -12,22 +12,17 @@
     <style>
         :root {
             --primary: #0A84FF;
-            --primary-2: #64D2FF;
             --success: #30D158;
             --danger: #FF453A;
             --warning: #FFD60A;
-
             --bg: #000000;
-            --bg-soft: #0C0C0E;
-            --card: rgba(28, 28, 30, .76);
+            --card: rgba(28, 28, 30, .78);
             --card-solid: #1C1C1E;
-            --card-2: rgba(44, 44, 46, .88);
+            --card-2: rgba(44, 44, 46, .92);
             --line: rgba(255, 255, 255, .10);
-
             --text: #FFFFFF;
             --text-2: rgba(235, 235, 245, .68);
             --text-3: rgba(235, 235, 245, .38);
-
             --safe-top: env(safe-area-inset-top);
             --safe-bottom: env(safe-area-inset-bottom);
         }
@@ -38,7 +33,7 @@
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", Arial, sans-serif;
         }
 
         html,
@@ -59,8 +54,8 @@
 
         button {
             border: none;
-            cursor: pointer;
             color: inherit;
+            cursor: pointer;
         }
 
         .app-bg {
@@ -69,21 +64,8 @@
             z-index: -2;
             background:
                 radial-gradient(circle at 50% -12%, rgba(10, 132, 255, .36), transparent 34%),
-                radial-gradient(circle at 105% 8%, rgba(191, 90, 242, .17), transparent 28%),
-                radial-gradient(circle at 0% 40%, rgba(48, 209, 88, .07), transparent 26%),
+                radial-gradient(circle at 105% 8%, rgba(191, 90, 242, .15), transparent 28%),
                 linear-gradient(180deg, #060608 0%, #000 100%);
-        }
-
-        .noise {
-            position: fixed;
-            inset: 0;
-            z-index: -1;
-            opacity: .045;
-            pointer-events: none;
-            background-image:
-                radial-gradient(circle at 20% 30%, #fff 0 1px, transparent 1px),
-                radial-gradient(circle at 70% 80%, #fff 0 1px, transparent 1px);
-            background-size: 24px 24px;
         }
 
         .screen {
@@ -128,10 +110,6 @@
             justify-content: space-between;
             gap: 14px;
             margin-bottom: 18px;
-        }
-
-        .brand {
-            min-width: 0;
         }
 
         .brand small {
@@ -181,21 +159,6 @@
             backdrop-filter: blur(28px);
             -webkit-backdrop-filter: blur(28px);
             box-shadow: 0 22px 70px rgba(0, 0, 0, .28);
-        }
-
-        .hero-card::before {
-            content: "";
-            position: absolute;
-            inset: -1px;
-            background:
-                radial-gradient(circle at 20% 0%, rgba(100, 210, 255, .18), transparent 34%),
-                radial-gradient(circle at 100% 100%, rgba(10, 132, 255, .12), transparent 40%);
-            pointer-events: none;
-        }
-
-        .hero-inner {
-            position: relative;
-            z-index: 1;
         }
 
         .hero-title {
@@ -260,11 +223,6 @@
 
         .search::placeholder {
             color: var(--text-3);
-        }
-
-        .search:focus {
-            border-color: rgba(10,132,255,.76);
-            background: rgba(44, 44, 46, .96);
         }
 
         .categories {
@@ -385,7 +343,7 @@
             align-items: center;
             justify-content: center;
             background: var(--primary);
-            transition: background .18s ease;
+            transition: background .16s ease;
             touch-action: none;
         }
 
@@ -431,7 +389,6 @@
             font-size: 24px;
             font-weight: 950;
             letter-spacing: -.5px;
-            box-shadow: 0 10px 30px rgba(0,0,0,.18);
         }
 
         .word {
@@ -450,8 +407,8 @@
             will-change: transform, opacity;
             transform: translateZ(0);
             transition:
-                transform .34s cubic-bezier(.18,.89,.32,1.20),
-                opacity .22s ease;
+                transform .30s cubic-bezier(.18,.89,.32,1.18),
+                opacity .20s ease;
         }
 
         .word.up {
@@ -503,7 +460,7 @@
             position: absolute;
             right: 16px;
             z-index: 13;
-            color: rgba(255,255,255,.38);
+            color: rgba(255,255,255,.36);
             font-size: 11px;
             font-weight: 950;
             letter-spacing: .8px;
@@ -632,10 +589,6 @@
             -webkit-backdrop-filter: blur(16px);
         }
 
-        .hist-item span:first-child {
-            overflow-wrap: anywhere;
-        }
-
         .hist-item.correct {
             border-left: 4px solid var(--success);
         }
@@ -669,10 +622,6 @@
             background: rgba(255,255,255,.10);
             border: 1px solid var(--line);
             color: white;
-        }
-
-        .btn:active {
-            transform: scale(.985);
         }
 
         .modal {
@@ -780,7 +729,6 @@
         .segmented button.active {
             background: rgba(255,255,255,.16);
             color: white;
-            box-shadow: 0 6px 18px rgba(0,0,0,.15);
         }
 
         .toggle-row {
@@ -886,7 +834,6 @@
 
 <body>
     <div class="app-bg"></div>
-    <div class="noise"></div>
 
     <main>
         <section id="homeScreen" class="screen active scroll">
@@ -897,27 +844,22 @@
                 </div>
 
                 <button class="icon-btn" onclick="openSettings()" aria-label="Abrir ajustes">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                        <path d="M12 15.5A3.5 3.5 0 1 0 12 8.5a3.5 3.5 0 0 0 0 7Z" stroke="white" stroke-width="2"/>
-                        <path d="M19.4 15a1.8 1.8 0 0 0 .36 1.98l.04.04a2.18 2.18 0 0 1-3.08 3.08l-.04-.04A1.8 1.8 0 0 0 14.7 19.7a1.8 1.8 0 0 0-1.1 1.65V21.5a2.18 2.18 0 0 1-4.36 0v-.06A1.8 1.8 0 0 0 8.14 19.8a1.8 1.8 0 0 0-1.98.36l-.04.04a2.18 2.18 0 0 1-3.08-3.08l.04-.04A1.8 1.8 0 0 0 3.44 15a1.8 1.8 0 0 0-1.65-1.1H1.64a2.18 2.18 0 0 1 0-4.36h.06A1.8 1.8 0 0 0 3.35 8.44a1.8 1.8 0 0 0-.36-1.98l-.04-.04a2.18 2.18 0 0 1 3.08-3.08l.04.04A1.8 1.8 0 0 0 8.05 3.74a1.8 1.8 0 0 0 1.1-1.65V1.94a2.18 2.18 0 0 1 4.36 0V2a1.8 1.8 0 0 0 1.1 1.65 1.8 1.8 0 0 0 1.98-.36l.04-.04a2.18 2.18 0 0 1 3.08 3.08l-.04.04a1.8 1.8 0 0 0-.36 1.98 1.8 1.8 0 0 0 1.65 1.1h.15a2.18 2.18 0 0 1 0 4.36h-.06A1.8 1.8 0 0 0 19.4 15Z" stroke="white" stroke-width="1.7" stroke-linecap="round"/>
-                    </svg>
+                    ⚙︎
                 </button>
             </div>
 
             <div class="hero-card">
-                <div class="hero-inner">
-                    <div class="hero-title">pronto para jogar</div>
+                <div class="hero-title">pronto para jogar</div>
 
-                    <div class="hero-grid">
-                        <div class="mini-stat">
-                            <span>rodada</span>
-                            <strong id="homeDuration">75s</strong>
-                        </div>
+                <div class="hero-grid">
+                    <div class="mini-stat">
+                        <span>rodada</span>
+                        <strong id="homeDuration">75s</strong>
+                    </div>
 
-                        <div class="mini-stat">
-                            <span>controle</span>
-                            <strong id="homeControl">sensor + toque</strong>
-                        </div>
+                    <div class="mini-stat">
+                        <span>controle</span>
+                        <strong id="homeControl">sensor + toque</strong>
                     </div>
                 </div>
             </div>
@@ -952,20 +894,9 @@
             <div class="tap-label bottom">toque: erro</div>
 
             <div class="game-top">
-                <button class="icon-btn" onclick="exitGame()" aria-label="Sair">
-                    <svg width="14" height="22" viewBox="0 0 14 22" fill="none">
-                        <path d="M11.5 2L2.5 11L11.5 20" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </button>
-
+                <button class="icon-btn" onclick="exitGame()" aria-label="Sair">‹</button>
                 <div id="gameTimer" class="timer">75s</div>
-
-                <button class="icon-btn" onclick="openSettings()" aria-label="Ajustes">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                        <path d="M12 15.5A3.5 3.5 0 1 0 12 8.5a3.5 3.5 0 0 0 0 7Z" stroke="white" stroke-width="2"/>
-                        <path d="M19.4 15a1.8 1.8 0 0 0 .36 1.98l.04.04a2.18 2.18 0 0 1-3.08 3.08l-.04-.04A1.8 1.8 0 0 0 14.7 19.7a1.8 1.8 0 0 0-1.1 1.65V21.5a2.18 2.18 0 0 1-4.36 0v-.06A1.8 1.8 0 0 0 8.14 19.8a1.8 1.8 0 0 0-1.98.36l-.04.04a2.18 2.18 0 0 1-3.08-3.08l.04-.04A1.8 1.8 0 0 0 3.44 15a1.8 1.8 0 0 0-1.65-1.1H1.64a2.18 2.18 0 0 1 0-4.36h.06A1.8 1.8 0 0 0 3.35 8.44a1.8 1.8 0 0 0-.36-1.98l-.04-.04a2.18 2.18 0 0 1 3.08-3.08l.04.04A1.8 1.8 0 0 0 8.05 3.74a1.8 1.8 0 0 0 1.1-1.65V1.94a2.18 2.18 0 0 1 4.36 0V2a1.8 1.8 0 0 0 1.1 1.65 1.8 1.8 0 0 0 1.98-.36l.04-.04a2.18 2.18 0 0 1 3.08 3.08l-.04.04a1.8 1.8 0 0 0-.36 1.98 1.8 1.8 0 0 0 1.65 1.1h.15a2.18 2.18 0 0 1 0 4.36h-.06A1.8 1.8 0 0 0 19.4 15Z" stroke="white" stroke-width="1.7" stroke-linecap="round"/>
-                    </svg>
-                </button>
+                <button class="icon-btn" onclick="openSettings()" aria-label="Ajustes">⚙︎</button>
             </div>
 
             <div id="wordEl" class="word">GO!</div>
@@ -1021,21 +952,21 @@
 
             <div class="setting">
                 <label>inclinação necessária</label>
-                <p>quanto maior, mais precisa inclinar para marcar. no iPhone, 62–70 costuma ficar melhor.</p>
+                <p>quanto maior, mais precisa inclinar para marcar. teste entre 62 e 76.</p>
 
                 <div class="range-row">
-                    <input id="sensitivityInput" type="range" min="45" max="85" value="66" oninput="setSensitivity(this.value)" />
-                    <div id="sensitivityValue" class="range-value">66</div>
+                    <input id="sensitivityInput" type="range" min="45" max="90" value="70" oninput="setSensitivity(this.value)" />
+                    <div id="sensitivityValue" class="range-value">70</div>
                 </div>
             </div>
 
             <div class="setting">
                 <label>zona neutra</label>
-                <p>ignora pequenas tremidas quando o celular está quase reto.</p>
+                <p>ignora tremidas quando o celular está quase reto.</p>
 
                 <div class="range-row">
-                    <input id="neutralInput" type="range" min="18" max="45" value="28" oninput="setNeutralZone(this.value)" />
-                    <div id="neutralValue" class="range-value">28</div>
+                    <input id="neutralInput" type="range" min="18" max="50" value="32" oninput="setNeutralZone(this.value)" />
+                    <div id="neutralValue" class="range-value">32</div>
                 </div>
             </div>
 
@@ -1212,20 +1143,22 @@
 
         const DEFAULT_SETTINGS = {
             duration: 75,
-            sensitivity: 66,
-            neutralZone: 28,
-            invertSensor: true,
+            sensitivity: 70,
+            neutralZone: 32,
+            invertSensor: false,
             useSensor: true,
             vibration: true
         };
 
         const SENSOR_RULES = {
-            animationTime: 340,
-            cooldown: 500,
+            animationTime: 300,
+            cooldown: 420,
             minSamples: 8,
             maxSamples: 16,
             stabilityLimit: 4.2,
-            startDelay: 620
+            startDelay: 620,
+            filterSize: 5,
+            spikeLimit: 38
         };
 
         let settings = loadSettings();
@@ -1252,7 +1185,9 @@
             lastValue: null,
             stableCount: 0,
             locked: false,
-            mustReturnNeutral: false
+            mustReturnNeutral: false,
+            lastSmooth: null,
+            filterValues: []
         };
 
         function init() {
@@ -1264,7 +1199,7 @@
 
         function loadSettings() {
             try {
-                const saved = JSON.parse(localStorage.getItem("quemSouEuSettings"));
+                const saved = JSON.parse(localStorage.getItem("quemSouEuSettingsV2"));
                 return { ...DEFAULT_SETTINGS, ...saved };
             } catch {
                 return { ...DEFAULT_SETTINGS };
@@ -1272,7 +1207,7 @@
         }
 
         function saveSettings() {
-            localStorage.setItem("quemSouEuSettings", JSON.stringify(settings));
+            localStorage.setItem("quemSouEuSettingsV2", JSON.stringify(settings));
             updateSettingsUI();
             updateHomeInfo();
         }
@@ -1406,6 +1341,8 @@
             sensor.stableCount = 0;
             sensor.locked = true;
             sensor.mustReturnNeutral = false;
+            sensor.lastSmooth = null;
+            sensor.filterValues = [];
 
             document.getElementById("gameScreen").classList.add("calibrating");
             setHint(settings.useSensor ? "calibrando..." : "toque em cima ou embaixo");
@@ -1423,6 +1360,28 @@
             }, SENSOR_RULES.startDelay);
         }
 
+        function getOrientationAngle() {
+            if (screen.orientation && typeof screen.orientation.angle === "number") {
+                return screen.orientation.angle;
+            }
+
+            if (typeof window.orientation === "number") {
+                return window.orientation;
+            }
+
+            return 0;
+        }
+
+        function getLandscapeDirectionMultiplier() {
+            const angle = getOrientationAngle();
+
+            if (angle === -90 || angle === 270) {
+                return -1;
+            }
+
+            return 1;
+        }
+
         function getMotionValue(event) {
             const beta = event.beta;
             const gamma = event.gamma;
@@ -1430,7 +1389,7 @@
             const isLandscape = window.innerWidth > window.innerHeight;
 
             if (isLandscape && typeof gamma === "number") {
-                return gamma;
+                return gamma * getLandscapeDirectionMultiplier();
             }
 
             if (typeof beta === "number") {
@@ -1444,15 +1403,40 @@
             return null;
         }
 
+        function smoothMotionValue(value) {
+            if (sensor.lastSmooth !== null) {
+                const jump = Math.abs(value - sensor.lastSmooth);
+
+                if (jump > SENSOR_RULES.spikeLimit) {
+                    return sensor.lastSmooth;
+                }
+            }
+
+            sensor.filterValues.push(value);
+
+            if (sensor.filterValues.length > SENSOR_RULES.filterSize) {
+                sensor.filterValues.shift();
+            }
+
+            const sum = sensor.filterValues.reduce((total, item) => total + item, 0);
+            const smooth = sum / sensor.filterValues.length;
+
+            sensor.lastSmooth = smooth;
+
+            return smooth;
+        }
+
         function handleOrientation(event) {
             if (!game.active) return;
             if (!settings.useSensor) return;
             if (game.isAnimating) return;
             if (sensor.locked) return;
 
-            const value = getMotionValue(event);
+            let value = getMotionValue(event);
 
             if (value === null || Number.isNaN(value)) return;
+
+            value = smoothMotionValue(value);
 
             if (!sensor.ready) {
                 calibrateSensor(value);
@@ -1530,7 +1514,7 @@
                     if (game.active && sensor.ready) {
                         setHint("incline bem");
                     }
-                }, 480);
+                }, 420);
             }
         }
 
@@ -1567,18 +1551,12 @@
             if (type === "correct") {
                 gameScreen.classList.add("correct");
                 wordEl.classList.add("up");
-
-                if (settings.vibration && navigator.vibrate) {
-                    navigator.vibrate(60);
-                }
             } else {
                 gameScreen.classList.add("wrong");
                 wordEl.classList.add("down");
-
-                if (settings.vibration && navigator.vibrate) {
-                    navigator.vibrate([38, 36, 38]);
-                }
             }
+
+            haptic(type);
 
             setTimeout(() => {
                 gameScreen.classList.remove("correct", "wrong");
@@ -1594,6 +1572,16 @@
                     setHint(settings.useSensor ? "incline bem" : "toque em cima ou embaixo");
                 }
             }, SENSOR_RULES.animationTime);
+        }
+
+        function haptic(type) {
+            if (!settings.vibration || !navigator.vibrate) return;
+
+            if (type === "correct") {
+                navigator.vibrate(45);
+            } else {
+                navigator.vibrate([35, 30, 35]);
+            }
         }
 
         function renderWord() {
@@ -1774,7 +1762,7 @@
             beginCalibration();
 
             setTimeout(() => {
-                if (game.words[game.index] === "TESTE") {
+                if (game.active && game.words[game.index] === "TESTE") {
                     game.active = false;
                     game.isAnimating = false;
                     showScreen("homeScreen");
@@ -1793,6 +1781,18 @@
         }
 
         window.addEventListener("deviceorientation", handleOrientation);
+
+        window.addEventListener("orientationchange", () => {
+            if (game.active && settings.useSensor) {
+                beginCalibration();
+            }
+        });
+
+        window.addEventListener("resize", () => {
+            if (game.active && settings.useSensor) {
+                beginCalibration();
+            }
+        });
 
         window.addEventListener("keydown", event => {
             if (event.key === "ArrowUp") {
