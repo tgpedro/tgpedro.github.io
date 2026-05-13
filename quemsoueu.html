@@ -1,598 +1,578 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="apple-mobile-web-app-capable" content="true">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Quem Sou Eu?">
-  <meta name="theme-color" content="#ffffff">
-  <title>Quem Sou Eu?</title>
-  <style>
-    :root {
-      --primary: #007AFF;
-      --success: #34c759;
-      --danger: #ff3b30;
-      --bg: #f2f2f7;
-      --card-bg: #ffffff;
-      --text: #1c1c1e;
-      --text-secondary: #8e8e93;
-      --ios-blur: rgba(255, 255, 255, 0.8);
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="true">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Quem Sou Eu?">
+    <title>Quem Sou Eu?</title>
+    <style>
+        :root {
+            --ios-blue: #007AFF;
+            --ios-green: #34C759;
+            --ios-red: #FF3B30;
+            --ios-gray: #8E8E93;
+            --ios-bg: #F2F2F7;
+            --ios-card: #FFFFFF;
+            --safe-top: env(safe-area-inset-top);
+            --safe-bottom: env(safe-area-inset-bottom);
+        }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-      -webkit-user-select: none;
-      user-select: none;
-    }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+            user-select: none;
+            outline: none;
+        }
 
-    body, html {
-      width: 100%;
-      height: 100%;
-      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
-      overflow: hidden;
-      position: fixed;
-    }
+        body, html {
+            width: 100%;
+            height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
+            background-color: var(--ios-bg);
+            color: #000;
+            overflow: hidden;
+            position: fixed;
+        }
 
-    .app-container {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-    }
+        /* --- SCREENS --- */
+        .screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: none;
+            flex-direction: column;
+            z-index: 10;
+            background-color: var(--ios-bg);
+        }
 
-    .screen {
-      display: none;
-      width: 100%;
-      height: 100%;
-      padding: 20px;
-      flex-direction: column;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      animation: fadeIn 0.3s ease-out;
-    }
+        .screen.active {
+            display: flex;
+            animation: screenFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(1.02); }
-      to { opacity: 1; transform: scale(1); }
-    }
+        @keyframes screenFadeIn {
+            from { opacity: 0; transform: scale(1.05); }
+            to { opacity: 1; transform: scale(1); }
+        }
 
-    .screen.active {
-      display: flex;
-    }
+        /* --- HOME SCREEN --- */
+        .home-screen {
+            padding: calc(40px + var(--safe-top)) 20px var(--safe-bottom);
+            overflow-y: auto;
+            background: linear-gradient(180deg, #FFFFFF 0%, #F2F2F7 100%);
+        }
 
-    /* iOS Back Button */
-    .back-button {
-      position: absolute;
-      top: 40px;
-      left: 20px;
-      z-index: 100;
-      background: none;
-      border: none;
-      color: var(--primary);
-      font-size: 17px;
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-      font-weight: 400;
-      padding: 10px;
-      margin: -10px;
-    }
+        .app-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
 
-    .back-button svg {
-      margin-right: 5px;
-    }
+        .app-header h1 {
+            font-size: 42px;
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
-    /* Home Screen Premium */
-    .home-screen {
-      background: linear-gradient(180deg, #ffffff 0%, #f2f2f7 100%);
-    }
+        .app-header p {
+            color: var(--ios-gray);
+            font-size: 18px;
+            font-weight: 500;
+        }
 
-    .home-header {
-      padding: 60px 0 30px;
-      text-align: center;
-    }
+        .categories-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 20px;
+            padding-bottom: 40px;
+        }
 
-    .home-header h1 {
-      font-size: 40px;
-      font-weight: 800;
-      letter-spacing: -1px;
-      margin-bottom: 10px;
-      background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
+        .category-card {
+            background: var(--ios-card);
+            border-radius: 28px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            aspect-ratio: 0.85;
+        }
 
-    .home-header p {
-      color: var(--text-secondary);
-      font-size: 18px;
-      font-weight: 500;
-    }
+        .category-card:active {
+            transform: scale(0.92);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
 
-    .categories-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 20px;
-      padding-bottom: 40px;
-    }
+        .cat-img {
+            width: 100%;
+            height: 65%;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
 
-    .category-card {
-      background: var(--card-bg);
-      border-radius: 24px;
-      overflow: hidden;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      display: flex;
-      flex-direction: column;
-      border: none;
-      cursor: pointer;
-      text-align: left;
-      position: relative;
-    }
+        .cat-img::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0; height: 40%;
+            background: linear-gradient(to top, rgba(0,0,0,0.3), transparent);
+        }
 
-    .category-card:active {
-      transform: scale(0.92);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
+        .cat-info {
+            padding: 15px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
 
-    .category-image {
-      width: 100%;
-      height: 140px;
-      background-size: cover;
-      background-position: center;
-      position: relative;
-    }
+        .cat-info h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
 
-    .category-image::after {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 50%;
-      background: linear-gradient(to top, rgba(0,0,0,0.4), transparent);
-    }
+        .cat-info span {
+            font-size: 13px;
+            color: var(--ios-gray);
+            font-weight: 600;
+        }
 
-    .category-info {
-      padding: 16px;
-      background: white;
-    }
+        /* --- GAME SCREEN --- */
+        .game-screen {
+            background-color: var(--ios-blue);
+            color: white;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-    .category-info h3 {
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 4px;
-    }
+        .game-screen.correct { background-color: var(--ios-green) !important; }
+        .game-screen.wrong { background-color: var(--ios-red) !important; }
 
-    .category-info span {
-      font-size: 14px;
-      color: var(--text-secondary);
-      font-weight: 500;
-    }
+        /* iOS Back Button */
+        .ios-back {
+            position: absolute;
+            top: calc(20px + var(--safe-top));
+            left: 20px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            z-index: 100;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
 
-    /* Game Screen - Minimalist & Animated */
-    .game-screen {
-      background-color: var(--primary);
-      color: white;
-      justify-content: center;
-      align-items: center;
-      padding: 0;
-      overflow: hidden;
-      transition: background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    }
+        .ios-back:active {
+            transform: scale(0.9);
+            background: rgba(255, 255, 255, 0.4);
+        }
 
-    .game-timer {
-      position: absolute;
-      top: 40px;
-      font-size: 28px;
-      font-weight: 700;
-      opacity: 0.9;
-      font-variant-numeric: tabular-nums;
-    }
+        .ios-back svg {
+            width: 12px;
+            height: 20px;
+            margin-right: 2px;
+        }
 
-    .word-container {
-      width: 100%;
-      height: 200px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      perspective: 1000px;
-    }
+        .game-timer {
+            position: absolute;
+            top: calc(30px + var(--safe-top));
+            font-size: 32px;
+            font-weight: 800;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -1px;
+            opacity: 0.9;
+        }
 
-    .game-word {
-      font-size: 72px;
-      font-weight: 900;
-      text-align: center;
-      padding: 0 40px;
-      word-break: break-word;
-      line-height: 1;
-      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
+        .word-box {
+            width: 100%;
+            padding: 0 60px;
+            text-align: center;
+            perspective: 1200px;
+        }
 
-    /* Animations for words */
-    .word-slide-up {
-      animation: slideUpOut 0.5s forwards;
-    }
+        .word-text {
+            font-size: 84px;
+            font-weight: 900;
+            line-height: 1;
+            letter-spacing: -2px;
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            text-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
 
-    .word-slide-down {
-      animation: slideDownOut 0.5s forwards;
-    }
+        /* Animations */
+        .anim-up { transform: translateY(-150vh) rotateX(45deg); opacity: 0; }
+        .anim-down { transform: translateY(150vh) rotateX(-45deg); opacity: 0; }
+        .anim-in { animation: wordIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
 
-    .word-enter {
-      animation: slideIn 0.5s forwards;
-    }
+        @keyframes wordIn {
+            from { transform: scale(0.4) translateY(50px); opacity: 0; }
+            to { transform: scale(1) translateY(0); opacity: 1; }
+        }
 
-    @keyframes slideUpOut {
-      to { transform: translateY(-150%) rotateX(30deg); opacity: 0; }
-    }
+        /* --- COUNTDOWN --- */
+        .countdown-screen {
+            background: white;
+            justify-content: center;
+            align-items: center;
+        }
 
-    @keyframes slideDownOut {
-      to { transform: translateY(150%) rotateX(-30deg); opacity: 0; }
-    }
+        .count-num {
+            font-size: 160px;
+            font-weight: 900;
+            color: var(--ios-blue);
+            animation: countPulse 1s infinite;
+        }
 
-    @keyframes slideIn {
-      from { transform: scale(0.5); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
+        @keyframes countPulse {
+            0% { transform: scale(0.8); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
 
-    /* Feedback states */
-    .game-screen.correct { background-color: var(--success) !important; }
-    .game-screen.wrong { background-color: var(--danger) !important; }
+        /* --- GAME OVER --- */
+        .game-over-screen {
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
 
-    /* Countdown Screen */
-    .countdown-screen {
-      justify-content: center;
-      align-items: center;
-      background: white;
-    }
+        .result-box {
+            background: white;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 36px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+        }
 
-    .countdown-number {
-      font-size: 140px;
-      font-weight: 900;
-      color: var(--primary);
-      animation: pulse 1s infinite;
-    }
+        .result-box h2 {
+            font-size: 34px;
+            font-weight: 800;
+            margin-bottom: 30px;
+        }
 
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-      100% { transform: scale(1); }
-    }
+        .stats-grid {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 40px;
+        }
 
-    /* Game Over Screen */
-    .game-over-screen {
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      background: var(--bg);
-    }
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
 
-    .result-card {
-      background: white;
-      padding: 40px;
-      border-radius: 32px;
-      width: 90%;
-      max-width: 450px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-    }
+        .stat-val {
+            font-size: 52px;
+            font-weight: 900;
+        }
 
-    .result-card h2 {
-      font-size: 32px;
-      font-weight: 800;
-      margin-bottom: 24px;
-    }
+        .stat-label {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--ios-gray);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
 
-    .score-row {
-      display: flex;
-      justify-content: space-around;
-      margin-bottom: 40px;
-    }
+        .btn-restart {
+            background: var(--ios-blue);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 22px;
+            border-radius: 22px;
+            font-size: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(0,122,255,0.3);
+        }
 
-    .score-item {
-      display: flex;
-      flex-direction: column;
-    }
+        /* --- ORIENTATION --- */
+        .landscape-hint {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.98);
+            color: white;
+            z-index: 9999;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 30px;
+        }
 
-    .score-val {
-      font-size: 48px;
-      font-weight: 800;
-    }
+        .landscape-hint svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            animation: rotatePhone 2s infinite ease-in-out;
+        }
 
-    .score-label {
-      font-size: 16px;
-      color: var(--text-secondary);
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
+        @keyframes rotatePhone {
+            0% { transform: rotate(0deg); }
+            50% { transform: rotate(-90deg); }
+            100% { transform: rotate(0deg); }
+        }
 
-    .btn-primary {
-      background: var(--primary);
-      color: white;
-      border: none;
-      padding: 20px 32px;
-      border-radius: 20px;
-      font-size: 20px;
-      font-weight: 700;
-      width: 100%;
-      cursor: pointer;
-      box-shadow: 0 8px 20px rgba(0,122,255,0.3);
-      transition: all 0.2s;
-    }
-
-    .btn-primary:active {
-      transform: scale(0.98);
-      box-shadow: 0 4px 10px rgba(0,122,255,0.2);
-    }
-
-    /* Orientation Hint */
-    .orientation-hint {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.95);
-      color: white;
-      display: none;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-      text-align: center;
-      padding: 40px;
-    }
-
-    .orientation-hint p {
-      font-size: 20px;
-      font-weight: 600;
-      margin-top: 20px;
-    }
-
-    @media (orientation: portrait) {
-      .game-screen .orientation-hint {
-        display: flex;
-      }
-    }
-  </style>
+        @media (orientation: portrait) {
+            .game-screen .landscape-hint { display: flex; }
+        }
+    </style>
 </head>
 <body>
-  <div class="app-container">
-    <!-- HOME SCREEN -->
-    <div id="homeScreen" class="screen active home-screen">
-      <div class="home-header">
-        <h1>Quem Sou Eu?</h1>
-        <p>Escolha uma categoria</p>
-      </div>
-      <div id="categoriesGrid" class="categories-grid">
-        <!-- Categories will be injected here -->
-      </div>
-    </div>
 
-    <!-- COUNTDOWN SCREEN -->
-    <div id="countdownScreen" class="screen">
-      <div class="countdown-number" id="countdownNumber">3</div>
-    </div>
-
-    <!-- GAME SCREEN -->
-    <div id="gameScreen" class="screen game-screen">
-      <button class="back-button" onclick="goBack()">
-        <svg width="12" height="21" viewBox="0 0 12 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M10.5 19.5L1.5 10.5L10.5 1.5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        Voltar
-      </button>
-      
-      <div class="orientation-hint">
-        <div style="font-size: 60px; animation: rotate 2s infinite;">📱</div>
-        <p>Vire o celular de lado para jogar!</p>
-      </div>
-      
-      <div class="game-timer" id="gameTimer">75s</div>
-      
-      <div class="word-container">
-        <div class="game-word" id="gameWord">PALAVRA</div>
-      </div>
-    </div>
-
-    <!-- GAME OVER SCREEN -->
-    <div id="gameOverScreen" class="screen">
-      <div class="result-card">
-        <h2 id="resultTitle">Fim de Jogo!</h2>
-        <div class="score-row">
-          <div class="score-item">
-            <span class="score-val" id="finalCorrect" style="color: var(--success)">0</span>
-            <span class="score-label">Acertos</span>
-          </div>
-          <div class="score-item">
-            <span class="score-val" id="finalWrong" style="color: var(--danger)">0</span>
-            <span class="score-label">Erros</span>
-          </div>
+    <div class="app-container">
+        <!-- HOME -->
+        <div id="homeScreen" class="screen active home-screen">
+            <div class="app-header">
+                <h1>Quem Sou Eu?</h1>
+                <p>Escolha uma categoria para jogar</p>
+            </div>
+            <div id="categoriesGrid" class="categories-container"></div>
         </div>
-        <button class="btn-primary" onclick="location.reload()">Jogar Novamente</button>
-      </div>
+
+        <!-- COUNTDOWN -->
+        <div id="countdownScreen" class="screen countdown-screen">
+            <div id="countNum" class="count-num">3</div>
+        </div>
+
+        <!-- GAME -->
+        <div id="gameScreen" class="screen game-screen">
+            <div class="ios-back" onclick="exitGame()">
+                <svg viewBox="0 0 12 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10.5 19.5L1.5 10.5L10.5 1.5" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+
+            <div class="landscape-hint">
+                <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                    <rect x="5" y="2" width="14" height="20" rx="2" />
+                    <path d="M12 18h.01" />
+                </svg>
+                <h2>Vire o celular!</h2>
+                <p>Para jogar, segure o celular na horizontal contra a sua testa.</p>
+            </div>
+
+            <div id="gameTimer" class="game-timer">75s</div>
+            
+            <div class="word-box">
+                <div id="wordText" class="word-text">PREPARE-SE</div>
+            </div>
+        </div>
+
+        <!-- GAME OVER -->
+        <div id="gameOverScreen" class="screen game-over-screen">
+            <div class="result-box">
+                <h2>Resultado</h2>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span id="resCorrect" class="stat-val" style="color: var(--ios-green)">0</span>
+                        <span class="stat-label">Acertos</span>
+                    </div>
+                    <div class="stat-item">
+                        <span id="resWrong" class="stat-val" style="color: var(--ios-red)">0</span>
+                        <span class="stat-label">Erros</span>
+                    </div>
+                </div>
+                <button class="btn-restart" onclick="location.reload()">Início</button>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <script>
-    const CATEGORIES = [
-      {
-        id: "celebridades",
-        name: "Celebridades",
-        img: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&q=80",
-        words: ["Cristiano Ronaldo", "Messi", "Neymar", "Shakira", "Beyoncé", "Taylor Swift", "The Weeknd", "Bad Bunny", "Billie Eilish", "Drake", "Ariana Grande", "Dwayne Johnson", "Tom Cruise", "Leonardo DiCaprio", "Scarlett Johansson"]
-      },
-      {
-        id: "filmes",
-        name: "Filmes",
-        img: "https://images.unsplash.com/photo-1485846234645-a62644f84728?w=400&q=80",
-        words: ["Avatar", "Titanic", "Homem-Aranha", "Vingadores", "Interestelar", "Matrix", "Inception", "Gladiador", "Jurassic Park", "De Volta para o Futuro", "Forrest Gump", "O Iluminado", "Psicose", "Pulp Fiction", "Kill Bill"]
-      },
-      {
-        id: "series",
-        name: "Séries",
-        img: "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=400&q=80",
-        words: ["Game of Thrones", "Breaking Bad", "Stranger Things", "The Office", "Friends", "Wandinha", "Round 6", "Dark", "The Crown", "Sherlock", "Dexter", "House", "Grey's Anatomy", "Suits", "Peaky Blinders"]
-      },
-      {
-        id: "animais",
-        name: "Animais",
-        img: "https://images.unsplash.com/photo-1518939565613-37f1b92e99b5?w=400&q=80",
-        words: ["Leão", "Tigre", "Golfinho", "Pinguim", "Águia", "Cobra", "Elefante", "Girafa", "Urso Panda", "Lobo", "Raposa", "Macaco", "Tubarão", "Coruja", "Pavão"]
-      },
-      {
-        id: "comida",
-        name: "Comida",
-        img: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=80",
-        words: ["Pizza", "Hambúrguer", "Sushi", "Lasanha", "Coxinha", "Açaí", "Brigadeiro", "Churrasco", "Tacos", "Macarrão", "Feijoada", "Pastel", "Bolo", "Sorvete", "Panqueca"]
-      },
-      {
-        id: "esportes",
-        name: "Esportes",
-        img: "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=400&q=80",
-        words: ["Futebol", "Basquete", "Tênis", "Natação", "Boxe", "Skate", "Surfe", "Yoga", "Corrida", "Ciclismo", "Vôlei", "Badminton", "Golfe", "Snowboard", "Escalada"]
-      }
-    ];
+    <script>
+        const CATEGORIES = [
+            { id: "celebridades", name: "Celebridades", img: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400", words: ["Cristiano Ronaldo", "Messi", "Neymar", "Shakira", "Beyoncé", "Taylor Swift", "The Weeknd", "Bad Bunny", "Billie Eilish", "Drake", "Ariana Grande", "Dwayne Johnson", "Tom Cruise", "Leonardo DiCaprio", "Scarlett Johansson", "Anitta", "Ivete Sangalo", "Silvio Santos"] },
+            { id: "filmes", name: "Filmes", img: "https://images.unsplash.com/photo-1485846234645-a62644f84728?w=400", words: ["Avatar", "Titanic", "Homem-Aranha", "Vingadores", "Interestelar", "Matrix", "Inception", "Gladiador", "Jurassic Park", "De Volta para o Futuro", "Forrest Gump", "O Iluminado", "Psicose", "Pulp Fiction", "Kill Bill", "Star Wars", "Harry Potter", "Coringa"] },
+            { id: "series", name: "Séries", img: "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=400", words: ["Game of Thrones", "Breaking Bad", "Stranger Things", "The Office", "Friends", "Wandinha", "Round 6", "Dark", "The Crown", "Sherlock", "Dexter", "House", "Grey's Anatomy", "Suits", "Peaky Blinders", "The Boys", "Succession"] },
+            { id: "animais", name: "Animais", img: "https://images.unsplash.com/photo-1518939565613-37f1b92e99b5?w=400", words: ["Leão", "Tigre", "Golfinho", "Pinguim", "Águia", "Cobra", "Elefante", "Girafa", "Urso Panda", "Lobo", "Raposa", "Macaco", "Tubarão", "Coruja", "Pavão", "Canguru", "Hipopótamo", "Zebra"] },
+            { id: "comida", name: "Comida", img: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400", words: ["Pizza", "Hambúrguer", "Sushi", "Lasanha", "Coxinha", "Açaí", "Brigadeiro", "Churrasco", "Tacos", "Macarrão", "Feijoada", "Pastel", "Bolo", "Sorvete", "Panqueca", "Pão de Queijo", "Tapioca"] },
+            { id: "esportes", name: "Esportes", img: "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=400", words: ["Futebol", "Basquete", "Tênis", "Natação", "Boxe", "Skate", "Surfe", "Yoga", "Corrida", "Ciclismo", "Vôlei", "Badminton", "Golfe", "Snowboard", "Escalada", "Karatê", "Judô"] }
+        ];
 
-    let currentWords = [];
-    let wordIndex = 0;
-    let score = { correct: 0, wrong: 0 };
-    let timeLeft = 75;
-    let timerInterval = null;
-    let isProcessing = false;
+        let gameState = {
+            active: false,
+            words: [],
+            index: 0,
+            score: { correct: 0, wrong: 0 },
+            timeLeft: 75,
+            timer: null,
+            isProcessing: false,
+            lastActionTime: 0
+        };
 
-    function init() {
-      const grid = document.getElementById('categoriesGrid');
-      CATEGORIES.forEach(cat => {
-        const card = document.createElement('button');
-        card.className = 'category-card';
-        card.innerHTML = `
-          <div class="category-image" style="background-image: url('${cat.img}')"></div>
-          <div class="category-info">
-            <h3>${cat.name}</h3>
-            <span>${cat.words.length} palavras</span>
-          </div>
-        `;
-        card.onclick = () => startCountdown(cat.id);
-        grid.appendChild(card);
-      });
-    }
+        // --- SENSOR LOGIC (ROBUST) ---
+        // We use a threshold system with a "cooldown" to prevent rapid skipping
+        const SENSOR_CONFIG = {
+            thresholdCorrect: 110, // Tilt forward
+            thresholdWrong: 45,    // Tilt back
+            cooldown: 1200         // 1.2s between actions
+        };
 
-    function showScreen(id) {
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
-    }
-
-    function goBack() {
-      clearInterval(timerInterval);
-      showScreen('homeScreen');
-    }
-
-    function startCountdown(catId) {
-      const cat = CATEGORIES.find(c => c.id === catId);
-      currentWords = [...cat.words].sort(() => Math.random() - 0.5);
-      wordIndex = 0;
-      score = { correct: 0, wrong: 0 };
-      timeLeft = 75;
-
-      showScreen('countdownScreen');
-      let count = 3;
-      document.getElementById('countdownNumber').innerText = count;
-      
-      const interval = setInterval(() => {
-        count--;
-        if (count > 0) {
-          document.getElementById('countdownNumber').innerText = count;
-        } else {
-          clearInterval(interval);
-          startGame();
+        function init() {
+            const grid = document.getElementById('categoriesGrid');
+            CATEGORIES.forEach(cat => {
+                const card = document.createElement('div');
+                card.className = 'category-card';
+                card.innerHTML = `
+                    <div class="cat-img" style="background-image: url('${cat.img}')"></div>
+                    <div class="cat-info">
+                        <h3>${cat.name}</h3>
+                        <span>${cat.words.length} PALAVRAS</span>
+                    </div>
+                `;
+                card.onclick = () => startSequence(cat.id);
+                grid.appendChild(card);
+            });
         }
-      }, 1000);
 
-      if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-        DeviceOrientationEvent.requestPermission().catch(console.error);
-      }
-    }
-
-    function startGame() {
-      showScreen('gameScreen');
-      updateWord(true);
-      startTimer();
-    }
-
-    function updateWord(isFirst = false) {
-      const wordEl = document.getElementById('gameWord');
-      if (wordIndex >= currentWords.length) {
-        wordIndex = 0;
-        currentWords.sort(() => Math.random() - 0.5);
-      }
-      
-      wordEl.innerText = currentWords[wordIndex];
-      wordEl.className = 'game-word word-enter';
-    }
-
-    function startTimer() {
-      document.getElementById('gameTimer').innerText = timeLeft + 's';
-      timerInterval = setInterval(() => {
-        timeLeft--;
-        document.getElementById('gameTimer').innerText = timeLeft + 's';
-        if (timeLeft <= 0) {
-          clearInterval(timerInterval);
-          endGame();
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
         }
-      }, 1000);
-    }
 
-    function handleAction(type) {
-      if (isProcessing) return;
-      isProcessing = true;
+        function startSequence(catId) {
+            const cat = CATEGORIES.find(c => c.id === catId);
+            gameState.words = [...cat.words].sort(() => Math.random() - 0.5);
+            gameState.index = 0;
+            gameState.score = { correct: 0, wrong: 0 };
+            gameState.timeLeft = 75;
+            gameState.active = false;
 
-      const screen = document.getElementById('gameScreen');
-      const wordEl = document.getElementById('gameWord');
+            showScreen('countdownScreen');
+            let count = 3;
+            const countEl = document.getElementById('countNum');
+            countEl.innerText = count;
 
-      if (type === 'correct') {
-        score.correct++;
-        screen.classList.add('correct');
-        wordEl.classList.add('word-slide-up');
-      } else {
-        score.wrong++;
-        screen.classList.add('wrong');
-        wordEl.classList.add('word-slide-down');
-      }
+            const interval = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    countEl.innerText = count;
+                } else {
+                    clearInterval(interval);
+                    startGame();
+                }
+            }, 1000);
 
-      // Longer feedback duration (800ms instead of 500ms)
-      setTimeout(() => {
-        screen.classList.remove('correct', 'wrong');
-        wordIndex++;
-        updateWord();
-        isProcessing = false;
-      }, 800);
-    }
-
-    // Motion Detection
-    window.addEventListener('deviceorientation', (event) => {
-      if (document.getElementById('gameScreen').classList.contains('active') && !isProcessing) {
-        const beta = event.beta; 
-        
-        // Tilt forward (correct): beta > 100
-        // Tilt back (wrong): beta < 40
-        if (beta > 100) {
-          handleAction('correct');
-        } else if (beta < 40 && beta > -20) {
-          handleAction('wrong');
+            // iOS Sensor Permission
+            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                DeviceOrientationEvent.requestPermission().catch(console.error);
+            }
         }
-      }
-    });
 
-    // Keyboard Fallback
-    window.addEventListener('keydown', (e) => {
-      if (document.getElementById('gameScreen').classList.contains('active')) {
-        if (e.key === 'ArrowUp') handleAction('correct');
-        if (e.key === 'ArrowDown') handleAction('wrong');
-      }
-    });
+        function startGame() {
+            gameState.active = true;
+            showScreen('gameScreen');
+            nextWord(true);
+            
+            document.getElementById('gameTimer').innerText = gameState.timeLeft + 's';
+            gameState.timer = setInterval(() => {
+                gameState.timeLeft--;
+                document.getElementById('gameTimer').innerText = gameState.timeLeft + 's';
+                if (gameState.timeLeft <= 0) endGame();
+            }, 1000);
+        }
 
-    init();
-  </script>
+        function nextWord(isFirst = false) {
+            const wordEl = document.getElementById('wordText');
+            if (!isFirst) gameState.index++;
+            
+            if (gameState.index >= gameState.words.length) {
+                gameState.words.sort(() => Math.random() - 0.5);
+                gameState.index = 0;
+            }
+
+            wordEl.innerText = gameState.words[gameState.index];
+            wordEl.className = 'word-text anim-in';
+        }
+
+        function handleAction(type) {
+            const now = Date.now();
+            if (gameState.isProcessing || !gameState.active || (now - gameState.lastActionTime < SENSOR_CONFIG.cooldown)) return;
+            
+            gameState.isProcessing = true;
+            gameState.lastActionTime = now;
+
+            const screen = document.getElementById('gameScreen');
+            const wordEl = document.getElementById('wordText');
+
+            if (type === 'correct') {
+                gameState.score.correct++;
+                screen.classList.add('correct');
+                wordEl.classList.add('anim-up');
+                if (window.navigator.vibrate) window.navigator.vibrate(100);
+            } else {
+                gameState.score.wrong++;
+                screen.classList.add('wrong');
+                wordEl.classList.add('anim-down');
+                if (window.navigator.vibrate) window.navigator.vibrate([50, 50, 50]);
+            }
+
+            // Feedback duration: 1 second for better visibility
+            setTimeout(() => {
+                screen.classList.remove('correct', 'wrong');
+                nextWord();
+                gameState.isProcessing = false;
+            }, 1000);
+        }
+
+        function exitGame() {
+            clearInterval(gameState.timer);
+            gameState.active = false;
+            showScreen('homeScreen');
+        }
+
+        function endGame() {
+            clearInterval(gameState.timer);
+            gameState.active = false;
+            document.getElementById('resCorrect').innerText = gameState.score.correct;
+            document.getElementById('resWrong').innerText = gameState.score.wrong;
+            showScreen('gameOverScreen');
+        }
+
+        // --- SENSOR EVENT ---
+        window.addEventListener('deviceorientation', (e) => {
+            if (!gameState.active || gameState.isProcessing) return;
+
+            const beta = e.beta; // Tilt
+            
+            // Logic:
+            // Correct: Phone tilted forward (screen facing down) -> beta > 110
+            // Wrong: Phone tilted back (screen facing up) -> beta < 45
+            if (beta > SENSOR_CONFIG.thresholdCorrect) {
+                handleAction('correct');
+            } else if (beta < SENSOR_CONFIG.thresholdWrong && beta > -20) {
+                handleAction('wrong');
+            }
+        });
+
+        // Keyboard Fallback (for testing)
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowUp') handleAction('correct');
+            if (e.key === 'ArrowDown') handleAction('wrong');
+            if (e.key === 'Escape') exitGame();
+        });
+
+        init();
+    </script>
 </body>
 </html>
