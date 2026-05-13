@@ -17,9 +17,9 @@
             --card-bg: rgba(255, 255, 255, 0.8);
             --text-color: #000000;
             --text-secondary: #636366;
-            --border-color: rgba(0, 0, 0, 0.1);
+            --border-color: rgba(0, 0, 0, 0.05);
             --tab-bg: rgba(118, 118, 128, 0.12);
-            --glass-effect: blur(20px) saturate(180%);
+            --glass-effect: blur(25px) saturate(180%);
             --safe-area-top: env(safe-area-inset-top);
             --safe-area-bottom: env(safe-area-inset-bottom);
         }
@@ -45,11 +45,11 @@
 
         body {
             background-color: var(--bg-color);
-            background-image: radial-gradient(circle at top right, rgba(0, 122, 255, 0.1), transparent),
-                              radial-gradient(circle at bottom left, rgba(52, 199, 89, 0.1), transparent);
+            background-image: radial-gradient(circle at top right, rgba(0, 122, 255, 0.12), transparent),
+                              radial-gradient(circle at bottom left, rgba(52, 199, 89, 0.12), transparent);
             background-attachment: fixed;
             color: var(--text-color);
-            padding: calc(20px + var(--safe-area-top)) 16px calc(100px + var(--safe-area-bottom));
+            padding: calc(20px + var(--safe-area-top)) 16px calc(110px + var(--safe-area-bottom));
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -64,7 +64,6 @@
         header {
             margin-bottom: 24px;
             padding: 0 8px;
-            text-align: left;
         }
 
         header h1 {
@@ -73,7 +72,7 @@
             letter-spacing: -1px;
         }
 
-        /* Tab Switcher - iOS 18 Style */
+        /* Tab Switcher */
         .tab-container {
             background: var(--tab-bg);
             backdrop-filter: var(--glass-effect);
@@ -84,6 +83,7 @@
             position: sticky;
             top: calc(10px + var(--safe-area-top));
             z-index: 100;
+            border: 0.5px solid var(--border-color);
         }
 
         .tab-button {
@@ -103,15 +103,9 @@
             gap: 6px;
         }
 
-        .tab-button i {
-            width: 16px;
-            height: 16px;
-        }
-
         .tab-button.active {
             background: var(--card-bg);
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            transform: scale(1.02);
         }
 
         .tab-content {
@@ -168,6 +162,7 @@
             justify-content: center;
             margin-right: 12px;
             color: white;
+            flex-shrink: 0;
         }
 
         .icon-box i {
@@ -179,6 +174,7 @@
             flex: 1;
             font-size: 17px;
             font-weight: 400;
+            margin-right: 10px;
         }
 
         .ios-item input[type="number"], 
@@ -191,14 +187,18 @@
             outline: none;
             width: 100px;
             font-weight: 500;
+            flex-shrink: 0;
         }
 
-        /* Switch Style */
+        /* Switch Style - FIXED COMPACT SIZE */
         .switch {
             position: relative;
             display: inline-block;
-            width: 51px;
-            height: 31px;
+            width: 51px !important;
+            height: 31px !important;
+            min-width: 51px !important;
+            max-width: 51px !important;
+            flex-shrink: 0;
         }
 
         .switch input {
@@ -211,18 +211,20 @@
             position: absolute;
             cursor: pointer;
             top: 0; left: 0; right: 0; bottom: 0;
-            background-color: var(--system-gray);
-            transition: .3s;
+            background-color: rgba(120, 120, 128, 0.32);
+            transition: .3s cubic-bezier(0.4, 0, 0.2, 1);
             border-radius: 34px;
         }
 
         .slider:before {
             position: absolute;
             content: "";
-            height: 27px; width: 27px;
-            left: 2px; bottom: 2px;
+            height: 27px;
+            width: 27px;
+            left: 2px;
+            top: 2px;
             background-color: white;
-            transition: .3s;
+            transition: .3s cubic-bezier(0.4, 0, 0.2, 1);
             border-radius: 50%;
             box-shadow: 0 3px 8px rgba(0,0,0,0.15);
         }
@@ -277,7 +279,7 @@
             box-shadow: 0 4px 10px rgba(0, 122, 255, 0.3);
         }
 
-        /* Result Cards - iOS 18 Widgets Style */
+        /* Result Cards */
         .result-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -288,13 +290,14 @@
         .widget {
             background: var(--card-bg);
             backdrop-filter: var(--glass-effect);
-            border-radius: 20px;
+            border-radius: 22px;
             padding: 16px;
             border: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             min-height: 100px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
         }
 
         .widget-title {
@@ -378,6 +381,7 @@
         .btn-primary {
             background-color: var(--text-color);
             color: var(--bg-color);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
         }
 
         .btn-secondary {
@@ -387,8 +391,11 @@
             border: 1px solid var(--border-color);
         }
 
-        /* Utility */
-        .hidden { display: none; }
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
     </style>
 </head>
 <body>
