@@ -19,6 +19,12 @@
   --text-dim: #62667a;
   --border: #1f2230;
   --safe-area-bottom: env(safe-area-inset-bottom, 20px);
+  
+  /* Cores da Tela Final - Estilo Cyber Gold/Purple */
+  --end-bg: #0a0510;
+  --end-accent: #ffcc00;
+  --end-secondary: #8a2be2;
+  --end-glow: rgba(255, 204, 0, 0.3);
 }
 
 * {
@@ -56,6 +62,13 @@ body {
   border-left: 1px solid var(--border);
   border-right: 1px solid var(--border);
   min-height: 100dvh;
+  transition: background 0.5s ease;
+}
+
+/* Estilo especial quando estiver na tela final */
+.app.end-mode {
+  background: var(--end-bg);
+  border-color: var(--end-secondary);
 }
 
 header {
@@ -71,12 +84,26 @@ h1 {
   color: var(--primary);
   letter-spacing: 4px;
   text-shadow: 0 0 15px var(--primary-glow);
+  transition: all 0.5s ease;
+}
+
+.end-mode h1 {
+  color: var(--end-accent);
+  text-shadow: 0 0 15px var(--end-glow);
 }
 
 .content {
   flex: 1;
   overflow-y: auto;
   padding-bottom: 115px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.content::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
 }
 
 .input-group {
@@ -129,6 +156,12 @@ button {
   font-size: 15px;
 }
 
+.end-mode .btn-main {
+  background: var(--end-accent);
+  color: #000;
+  box-shadow: 0 0 20px var(--end-glow);
+}
+
 .btn-main:active {
   transform: scale(0.96);
   filter: brightness(1.2);
@@ -141,6 +174,11 @@ button {
   color: var(--text-dim);
   margin-top: 8px;
   font-size: 13px;
+}
+
+.end-mode .btn-secondary {
+  background: var(--end-secondary);
+  color: white;
 }
 
 .btn-ghost {
@@ -207,6 +245,10 @@ button {
   margin-bottom: 8px;
 }
 
+.end-mode .label-small {
+  color: var(--end-accent);
+}
+
 .display-name {
   font-family: 'Orbitron', sans-serif;
   font-size: clamp(26px, 9vw, 36px);
@@ -240,11 +282,24 @@ button {
   border-left: 2px solid var(--primary);
 }
 
+.end-mode .info-box {
+  border-color: var(--end-secondary);
+  background: rgba(138, 43, 226, 0.05);
+}
+
+.end-mode .info-box::before {
+  border-color: var(--end-accent);
+}
+
 .category-tag {
   color: var(--accent);
   font-size: 11px;
   margin-bottom: 8px;
   display: block;
+}
+
+.end-mode .category-tag {
+  color: var(--end-accent);
 }
 
 .secret-word {
@@ -285,11 +340,19 @@ button {
   z-index: 50;
 }
 
+.end-mode .footer-actions {
+  background: linear-gradient(transparent, var(--end-bg) 40%);
+}
+
 .reveal-list {
   text-align: left;
   margin-top: 15px;
   border-top: 1px solid var(--border);
   padding-top: 15px;
+}
+
+.end-mode .reveal-list {
+  border-color: var(--end-secondary);
 }
 
 .reveal-item {
@@ -306,18 +369,41 @@ button {
   font-weight: bold;
 }
 
+.end-mode .role-impostor {
+  color: #ff4d4d;
+  text-shadow: 0 0 5px rgba(255, 77, 77, 0.5);
+}
+
 .role-agent {
   color: var(--accent);
+}
+
+.end-mode .role-agent {
+  color: var(--end-accent);
 }
 
 .hidden {
   display: none !important;
 }
+
+/* Estilo específico para a tela final */
+#endScreen .secret-word {
+  color: var(--end-accent);
+  text-shadow: 0 0 10px var(--end-glow);
+}
+
+.end-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 18px;
+  color: var(--end-accent);
+  margin-bottom: 20px;
+  letter-spacing: 2px;
+}
 </style>
 </head>
 
 <body>
-<main class="app">
+<main class="app" id="appContainer">
   <header>
     <h1>IMPOSTOR</h1>
   </header>
@@ -352,7 +438,8 @@ button {
     </section>
 
     <section id="endScreen" class="hidden screen">
-      <div class="label-small">OPERAÇÃO EM CURSO</div>
+      <div class="end-title">OPERAÇÃO FINALIZADA</div>
+      <div class="label-small">RESUMO DA MISSÃO</div>
 
       <div class="info-box">
         <div class="category-tag">CATEGORIA</div>
@@ -362,7 +449,7 @@ button {
       <button id="showRevealBtn" class="btn-secondary">REVELAR IDENTIDADES</button>
       
       <div id="revealArea" class="hidden reveal-list">
-        <div class="label-small">RELATÓRIO</div>
+        <div class="label-small">RELATÓRIO DE CAMPO</div>
         <div id="revealContent"></div>
       </div>
     </section>
@@ -442,6 +529,7 @@ let chosenCategory = null;
 let chosenWord = "";
 let lastWord = "";
 
+const appContainer = document.getElementById("appContainer");
 const screens = {
   setup: document.getElementById("setup"),
   pass: document.getElementById("passScreen"),
@@ -463,6 +551,13 @@ function showScreen(screenId) {
   });
 
   screens[screenId].classList.remove("hidden");
+  
+  // Alternar classe de modo final no container principal
+  if (screenId === "end") {
+    appContainer.classList.add("end-mode");
+  } else {
+    appContainer.classList.remove("end-mode");
+  }
   
   Object.values(btns).forEach(button => {
     button.classList.add("hidden");
