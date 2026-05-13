@@ -5,14 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="true">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Quem Sou Eu? - Advanced Pro</title>
+    <title>Quem Sou Eu?</title>
+
     <style>
         :root {
             --primary: #007AFF;
             --success: #34C759;
             --danger: #FF3B30;
+            --warning: #FFCC00;
             --bg: #000000;
             --card-bg: #1C1C1E;
+            --card-soft: #2C2C2E;
             --text: #FFFFFF;
             --text-sec: #8E8E93;
             --safe-top: env(safe-area-inset-top);
@@ -25,6 +28,7 @@
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
+            user-select: none;
         }
 
         body, html {
@@ -34,18 +38,21 @@
             color: var(--text);
             overflow: hidden;
             position: fixed;
+            touch-action: none;
         }
 
         .bg-glow {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            inset: 0;
             background: radial-gradient(circle at 50% -20%, #1c1c1e 0%, #000000 100%);
             z-index: -1;
         }
 
         .screen {
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
+            inset: 0;
+            width: 100%;
+            height: 100%;
             display: none;
             flex-direction: column;
             z-index: 10;
@@ -55,15 +62,25 @@
 
         .screen.active {
             display: flex;
-            animation: fadeIn 0.4s ease;
+            animation: fadeIn 0.35s ease;
         }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
 
-        /* --- HOME SCREEN --- */
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         .home-screen {
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
+            touch-action: pan-y;
         }
 
         .hero {
@@ -79,6 +96,13 @@
             background: linear-gradient(180deg, #FFF 0%, #AAA 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            margin-top: 8px;
+            color: var(--text-sec);
+            font-size: 14px;
+            font-weight: 600;
         }
 
         .search-container {
@@ -99,10 +123,13 @@
             color: white;
             font-size: 17px;
             outline: none;
-            transition: border-color 0.3s;
+            transition: border-color 0.3s, background 0.3s;
         }
 
-        .search-bar:focus { border-color: var(--primary); }
+        .search-bar:focus {
+            border-color: var(--primary);
+            background: #303033;
+        }
 
         .categories-grid {
             display: grid;
@@ -118,40 +145,95 @@
             position: relative;
             aspect-ratio: 0.85;
             border: 1px solid rgba(255,255,255,0.05);
-            transition: transform 0.2s;
+            transition: transform 0.2s, border-color 0.2s;
         }
 
-        .cat-card:active { transform: scale(0.94); }
+        .cat-card:active {
+            transform: scale(0.94);
+            border-color: rgba(255,255,255,0.18);
+        }
 
         .cat-img {
             width: 100%;
             height: 100%;
             background-size: cover;
             background-position: center;
-            opacity: 0.6;
+            opacity: 0.62;
+            transform: scale(1.02);
         }
 
         .cat-info {
             position: absolute;
-            bottom: 0; left: 0; right: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
             padding: 15px;
             background: linear-gradient(to top, rgba(0,0,0,0.95), transparent);
         }
 
-        .cat-info h3 { font-size: 18px; font-weight: 800; margin-bottom: 2px; }
-        .cat-info span { font-size: 11px; color: var(--text-sec); font-weight: 700; text-transform: uppercase; }
+        .cat-info h3 {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 2px;
+        }
 
-        /* --- GAME SCREEN --- */
+        .cat-info span {
+            font-size: 11px;
+            color: var(--text-sec);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .empty-state {
+            color: var(--text-sec);
+            text-align: center;
+            padding: 40px 0;
+            grid-column: 1 / -1;
+            font-weight: 600;
+        }
+
+        .countdown-screen {
+            justify-content: center;
+            align-items: center;
+            gap: 18px;
+        }
+
+        #countText {
+            font-size: 160px;
+            font-weight: 900;
+            color: var(--primary);
+            line-height: 1;
+        }
+
+        .count-hint {
+            color: var(--text-sec);
+            font-weight: 700;
+            text-align: center;
+            max-width: 280px;
+            line-height: 1.35;
+        }
+
         .game-screen {
             background-color: var(--primary);
             padding: 0;
             justify-content: center;
             align-items: center;
-            transition: background-color 0.4s ease;
+            transition: background-color 0.35s ease;
+            overflow: hidden;
+            touch-action: none;
         }
 
-        .game-screen.correct { background-color: var(--success) !important; }
-        .game-screen.wrong { background-color: var(--danger) !important; }
+        .game-screen.correct {
+            background-color: var(--success) !important;
+        }
+
+        .game-screen.wrong {
+            background-color: var(--danger) !important;
+        }
+
+        .game-screen.calibrating {
+            background-color: #1f7df2 !important;
+        }
 
         .ios-back-circle {
             position: absolute;
@@ -170,7 +252,11 @@
             z-index: 100;
         }
 
-        .ios-back-circle svg { width: 12px; height: 20px; margin-right: 2px; }
+        .ios-back-circle svg {
+            width: 12px;
+            height: 20px;
+            margin-right: 2px;
+        }
 
         .timer-bar {
             position: absolute;
@@ -178,49 +264,190 @@
             font-size: 36px;
             font-weight: 900;
             text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 50;
+        }
+
+        .sensor-status {
+            position: absolute;
+            bottom: calc(24px + var(--safe-bottom));
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: rgba(0,0,0,0.22);
+            color: rgba(255,255,255,0.9);
+            font-size: 13px;
+            font-weight: 700;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 70;
+            white-space: nowrap;
+            opacity: 0.9;
         }
 
         .word-main {
-            font-size: 84px;
+            font-size: clamp(42px, 13vw, 88px);
             font-weight: 900;
             text-align: center;
             padding: 0 40px;
-            line-height: 0.9;
+            line-height: 0.92;
             letter-spacing: -2px;
             text-transform: uppercase;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: transform 0.38s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+            max-width: 100%;
+            word-break: keep-all;
+            overflow-wrap: anywhere;
+            text-shadow: 0 4px 18px rgba(0,0,0,0.18);
         }
 
-        .slide-up { transform: translateY(-100vh); opacity: 0; }
-        .slide-down { transform: translateY(100vh); opacity: 0; }
+        .slide-up {
+            transform: translateY(-100vh) rotate(-4deg);
+            opacity: 0;
+        }
 
-        /* --- RESULTS --- */
-        .results-screen { overflow-y: auto; }
-        .res-header { text-align: center; margin-bottom: 25px; }
-        .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
-        .res-box { background: var(--card-bg); padding: 20px; border-radius: 20px; text-align: center; }
-        .res-box .val { font-size: 42px; font-weight: 900; display: block; }
-        .res-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 30px; }
-        .res-item { background: var(--card-bg); padding: 16px 20px; border-radius: 16px; display: flex; justify-content: space-between; font-weight: 600; }
-        .res-item.correct { border-left: 4px solid var(--success); }
-        .res-item.wrong { border-left: 4px solid var(--danger); }
+        .slide-down {
+            transform: translateY(100vh) rotate(4deg);
+            opacity: 0;
+        }
 
-        .btn-restart {
-            background: var(--primary);
+        .tap-zone {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            z-index: 20;
+        }
+
+        .tap-zone.top {
+            top: 0;
+        }
+
+        .tap-zone.bottom {
+            bottom: 0;
+        }
+
+        .tap-label {
+            position: absolute;
+            right: 16px;
+            font-size: 12px;
+            font-weight: 800;
+            color: rgba(255,255,255,0.55);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            z-index: 25;
+            pointer-events: none;
+        }
+
+        .tap-label.top {
+            top: calc(86px + var(--safe-top));
+        }
+
+        .tap-label.bottom {
+            bottom: calc(70px + var(--safe-bottom));
+        }
+
+        .results-screen {
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            touch-action: pan-y;
+        }
+
+        .res-header {
+            text-align: center;
+            margin: 28px 0 25px;
+        }
+
+        .res-header h2 {
+            font-size: 34px;
+            font-weight: 900;
+            letter-spacing: -0.8px;
+        }
+
+        .res-header p {
+            margin-top: 6px;
+            color: var(--text-sec);
+            font-weight: 600;
+        }
+
+        .res-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .res-box {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 20px;
+            text-align: center;
+        }
+
+        .res-box .val {
+            font-size: 42px;
+            font-weight: 900;
+            display: block;
+        }
+
+        .res-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .res-item {
+            background: var(--card-bg);
+            padding: 16px 20px;
+            border-radius: 16px;
+            display: flex;
+            justify-content: space-between;
+            gap: 14px;
+            font-weight: 600;
+        }
+
+        .res-item span:first-child {
+            overflow-wrap: anywhere;
+        }
+
+        .res-item.correct {
+            border-left: 4px solid var(--success);
+        }
+
+        .res-item.wrong {
+            border-left: 4px solid var(--danger);
+        }
+
+        .btn-row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            padding-bottom: 20px;
+        }
+
+        .btn-restart,
+        .btn-home {
             color: white;
             border: none;
-            padding: 22px;
+            padding: 20px;
             border-radius: 20px;
-            font-size: 18px;
+            font-size: 17px;
             font-weight: 800;
             text-transform: uppercase;
             width: 100%;
         }
 
-        /* --- ORIENTATION --- */
+        .btn-restart {
+            background: var(--primary);
+        }
+
+        .btn-home {
+            background: var(--card-soft);
+        }
+
         .orientation-lock {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            inset: 0;
             background: #000;
             z-index: 10000;
             display: none;
@@ -228,181 +455,657 @@
             justify-content: center;
             align-items: center;
             text-align: center;
+            padding: 24px;
+        }
+
+        .orientation-lock h2 {
+            font-weight: 900;
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .orientation-lock p {
+            color: var(--text-sec);
+            font-weight: 600;
+            max-width: 300px;
+            line-height: 1.35;
         }
 
         @media (orientation: portrait) {
-            .game-screen .orientation-lock { display: flex; }
+            .game-screen .orientation-lock {
+                display: flex;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .hero h1 {
+                font-size: 36px;
+            }
+
+            .categories-grid {
+                gap: 12px;
+            }
+
+            .cat-card {
+                border-radius: 20px;
+            }
+
+            .word-main {
+                padding: 0 24px;
+                font-size: clamp(38px, 12vw, 70px);
+            }
+
+            #countText {
+                font-size: 130px;
+            }
         }
     </style>
 </head>
-<body>
 
+<body>
     <div class="bg-glow"></div>
 
     <div class="app-container">
-        <!-- HOME -->
         <div id="homeScreen" class="screen active home-screen">
             <div class="hero">
                 <h1>Quem Sou Eu?</h1>
+                <p>escolha uma categoria e vire o celular para jogar</p>
             </div>
+
             <div class="search-container">
                 <input type="text" id="searchInput" class="search-bar" placeholder="Pesquisar categorias..." oninput="filterCategories()">
             </div>
+
             <div id="categoriesGrid" class="categories-grid"></div>
         </div>
 
-        <!-- COUNTDOWN -->
-        <div id="countdownScreen" class="screen" style="justify-content: center; align-items: center;">
-            <div id="countText" style="font-size: 160px; font-weight: 900; color: var(--primary);">3</div>
+        <div id="countdownScreen" class="screen countdown-screen">
+            <div id="countText">3</div>
+            <div class="count-hint">deixe o celular parado na posição inicial</div>
         </div>
 
-        <!-- GAME -->
         <div id="gameScreen" class="screen game-screen">
             <div class="orientation-lock">
                 <div style="font-size: 60px; margin-bottom: 20px;">📱</div>
-                <h2 style="font-weight: 900;">VIRE O CELULAR</h2>
+                <h2>VIRE O CELULAR</h2>
+                <p>o jogo funciona melhor com o celular deitado em paisagem</p>
             </div>
 
+            <div class="tap-zone top" onclick="handleTapAction('correct')"></div>
+            <div class="tap-zone bottom" onclick="handleTapAction('wrong')"></div>
+
+            <div class="tap-label top">toque: acerto</div>
+            <div class="tap-label bottom">toque: erro</div>
+
             <div class="ios-back-circle" onclick="exitGame()">
-                <svg viewBox="0 0 12 21" fill="none"><path d="M10.5 19.5L1.5 10.5L10.5 1.5" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <svg viewBox="0 0 12 21" fill="none">
+                    <path d="M10.5 19.5L1.5 10.5L10.5 1.5" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
             </div>
 
             <div id="gameTimer" class="timer-bar">75s</div>
             <div id="wordMain" class="word-main">GO!</div>
+            <div id="sensorStatus" class="sensor-status">calibrando...</div>
         </div>
 
-        <!-- RESULTS -->
         <div id="resultsScreen" class="screen results-screen">
-            <div class="res-header"><h2>Resultado</h2></div>
-            <div class="res-grid">
-                <div class="res-box"><span id="resCorrect" class="val" style="color: var(--success)">0</span><span>Acertos</span></div>
-                <div class="res-box"><span id="resWrong" class="val" style="color: var(--danger)">0</span><span>Erros</span></div>
+            <div class="res-header">
+                <h2>Resultado</h2>
+                <p id="resSummary">fim da rodada</p>
             </div>
+
+            <div class="res-grid">
+                <div class="res-box">
+                    <span id="resCorrect" class="val" style="color: var(--success)">0</span>
+                    <span>Acertos</span>
+                </div>
+
+                <div class="res-box">
+                    <span id="resWrong" class="val" style="color: var(--danger)">0</span>
+                    <span>Erros</span>
+                </div>
+            </div>
+
             <div id="resList" class="res-list"></div>
-            <button class="btn-restart" onclick="location.reload()">Jogar Novamente</button>
+
+            <div class="btn-row">
+                <button class="btn-restart" onclick="restartSameCategory()">Jogar novamente</button>
+                <button class="btn-home" onclick="backHomeFromResults()">Trocar categoria</button>
+            </div>
         </div>
     </div>
 
     <script>
         const CATEGORIES = [
-            { id: "celebridades", name: "Celebridades", img: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663518097424/qUJuCChaqOabwsis.png", words: ["Cristiano Ronaldo", "Messi", "Neymar", "Shakira", "Beyoncé", "Taylor Swift", "The Weeknd", "Bad Bunny", "Billie Eilish", "Drake", "Ariana Grande", "Dwayne Johnson", "Tom Cruise", "Leonardo DiCaprio", "Scarlett Johansson", "Anitta", "Ivete Sangalo", "Silvio Santos", "Faustão", "Gisele Bündchen", "Will Smith", "Rihanna", "Lady Gaga", "Katy Perry", "Justin Bieber", "Ed Sheeran", "Zendaya", "Tom Holland", "Robert Downey Jr", "Chris Evans", "Brad Pitt", "Angelina Jolie", "Meryl Streep", "Johnny Depp", "Keanu Reeves", "The Rock", "Gal Gadot", "Margot Robbie", "Ryan Reynolds", "Hugh Jackman"] },
-            { id: "filmes", name: "Filmes", img: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663518097424/wzmEQWiPvIopDzNy.png", words: ["Avatar", "Titanic", "Homem-Aranha", "Vingadores", "Interestelar", "Matrix", "Inception", "Gladiador", "Jurassic Park", "De Volta para o Futuro", "Forrest Gump", "O Iluminado", "Psicose", "Pulp Fiction", "Kill Bill", "Star Wars", "Harry Potter", "Coringa", "O Rei Leão", "Toy Story", "Procurando Nemo", "Shrek", "Batman", "Superman", "Mulher-Maravilha", "Pantera Negra", "O Poderoso Chefão", "Clube da Luta", "Parasita", "Cidade de Deus", "O Senhor dos Anéis", "O Hobbit", "Duna", "Oppenheimer", "Barbie", "Top Gun", "Missão Impossível", "John Wick", "Velozes e Furiosos"] },
-            { id: "series", name: "Séries", img: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663518097424/xefNzoYSkGXVQQEl.png", words: ["Game of Thrones", "Breaking Bad", "Stranger Things", "The Office", "Friends", "Wandinha", "Round 6", "Dark", "The Crown", "Sherlock", "Dexter", "House", "Grey's Anatomy", "Suits", "Peaky Blinders", "The Boys", "Succession", "The Last of Us", "The Mandalorian", "Black Mirror", "La Casa de Papel", "Elite", "Sex Education", "Euphoria", "Ted Lasso", "The Bear", "Beef", "The White Lotus", "Cobra Kai", "The Witcher", "The Walking Dead", "Vikings", "Better Call Saul", "Narcos", "Ozark", "The Umbrella Academy", "Loki", "The Flash", "Arrow", "Supernatural"] },
-            { id: "animais", name: "Animais", img: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663518097424/qlmYbZNvZJhsdMXv.png", words: ["Leão", "Tigre", "Golfinho", "Pinguim", "Águia", "Cobra", "Elefante", "Girafa", "Urso Panda", "Lobo", "Raposa", "Macaco", "Tubarão", "Coruja", "Pavão", "Canguru", "Hipopótamo", "Zebra", "Crocodilo", "Tartaruga", "Baleia", "Orca", "Polvo", "Água-viva", "Camaleão", "Esquilo", "Castor", "Lontra", "Suricato", "Panda Vermelho", "Coala", "Ornitorrinco", "Preguiça", "Tamanduá", "Tatu", "Arara", "Tucano", "Beija-flor", "Guepardo", "Rinoceronte"] },
-            { id: "comida", name: "Comida", img: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663518097424/QKfqaGbLQPkbfrZd.png", words: ["Pizza", "Hambúrguer", "Sushi", "Lasanha", "Coxinha", "Açaí", "Brigadeiro", "Churrasco", "Tacos", "Macarrão", "Feijoada", "Pastel", "Bolo", "Sorvete", "Panqueca", "Pão de Queijo", "Tapioca", "Guacamole", "Paella", "Ramen", "Hot Dog", "Nuggets", "Batata Frita", "Pipoca", "Donut", "Croissant", "Waffle", "Churros", "Pudim", "Mousse", "Risoto", "Estrogonofe", "Quibe", "Esfiha", "Falafel", "Hummus", "Ceviche", "Poke", "Fondue", "Brownie"] },
-            { id: "esportes", name: "Esportes", img: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663518097424/UwoUDiRhRTxzsHYf.png", words: ["Futebol", "Basquete", "Tênis", "Natação", "Boxe", "Skate", "Surfe", "Yoga", "Corrida", "Ciclismo", "Vôlei", "Badminton", "Golfe", "Snowboard", "Escalada", "Karatê", "Judô", "Fórmula 1", "MotoGP", "Rugby", "Beisebol", "Futebol Americano", "Hóquei", "Esgrima", "Arco e Flecha", "Ginástica", "Crossfit", "Ping Pong", "Handebol", "Polo Aquático", "Atletismo", "Canoagem", "Vela", "Hipismo", "Triatlo", "MMA", "Muay Thai", "Jiu-Jitsu", "Sumô", "Críquete"] }
+            {
+                id: "celebridades",
+                name: "Celebridades",
+                img: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663518097424/qUJuCChaqOabwsis.png",
+                words: [
+                    "Cristiano Ronaldo", "Messi", "Neymar", "Shakira", "Beyoncé", "Taylor Swift", "The Weeknd", "Bad Bunny",
+                    "Billie Eilish", "Drake", "Ariana Grande", "Dwayne Johnson", "Tom Cruise", "Leonardo DiCaprio",
+                    "Scarlett Johansson", "Anitta", "Ivete Sangalo", "Silvio Santos", "Faustão", "Gisele Bündchen",
+                    "Will Smith", "Rihanna", "Lady Gaga", "Katy Perry", "Justin Bieber", "Ed Sheeran", "Zendaya",
+                    "Tom Holland", "Robert Downey Jr", "Chris Evans", "Brad Pitt", "Angelina Jolie", "Meryl Streep",
+                    "Johnny Depp", "Keanu Reeves", "The Rock", "Gal Gadot", "Margot Robbie", "Ryan Reynolds", "Hugh Jackman"
+                ]
+            },
+            {
+                id: "filmes",
+                name: "Filmes",
+                img: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663518097424/wzmEQWiPvIopDzNy.png",
+                words: [
+                    "Avatar", "Titanic", "Homem-Aranha", "Vingadores", "Interestelar", "Matrix", "Inception", "Gladiador",
+                    "Jurassic Park", "De Volta para o Futuro", "Forrest Gump", "O Iluminado", "Psicose", "Pulp Fiction",
+                    "Kill Bill", "Star Wars", "Harry Potter", "Coringa", "O Rei Leão", "Toy Story", "Procurando Nemo",
+                    "Shrek", "Batman", "Superman", "Mulher-Maravilha", "Pantera Negra", "O Poderoso Chefão",
+                    "Clube da Luta", "Parasita", "Cidade de Deus", "O Senhor dos Anéis", "O Hobbit", "Duna",
+                    "Oppenheimer", "Barbie", "Top Gun", "Missão Impossível", "John Wick", "Velozes e Furiosos"
+                ]
+            },
+            {
+                id: "series",
+                name: "Séries",
+                img: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663518097424/xefNzoYSkGXVQQEl.png",
+                words: [
+                    "Game of Thrones", "Breaking Bad", "Stranger Things", "The Office", "Friends", "Wandinha", "Round 6",
+                    "Dark", "The Crown", "Sherlock", "Dexter", "House", "Grey's Anatomy", "Suits", "Peaky Blinders",
+                    "The Boys", "Succession", "The Last of Us", "The Mandalorian", "Black Mirror", "La Casa de Papel",
+                    "Elite", "Sex Education", "Euphoria", "Ted Lasso", "The Bear", "Beef", "The White Lotus",
+                    "Cobra Kai", "The Witcher", "The Walking Dead", "Vikings", "Better Call Saul", "Narcos",
+                    "Ozark", "The Umbrella Academy", "Loki", "The Flash", "Arrow", "Supernatural"
+                ]
+            },
+            {
+                id: "animais",
+                name: "Animais",
+                img: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663518097424/qlmYbZNvZJhsdMXv.png",
+                words: [
+                    "Leão", "Tigre", "Golfinho", "Pinguim", "Águia", "Cobra", "Elefante", "Girafa", "Urso Panda", "Lobo",
+                    "Raposa", "Macaco", "Tubarão", "Coruja", "Pavão", "Canguru", "Hipopótamo", "Zebra", "Crocodilo",
+                    "Tartaruga", "Baleia", "Orca", "Polvo", "Água-viva", "Camaleão", "Esquilo", "Castor", "Lontra",
+                    "Suricato", "Panda Vermelho", "Coala", "Ornitorrinco", "Preguiça", "Tamanduá", "Tatu", "Arara",
+                    "Tucano", "Beija-flor", "Guepardo", "Rinoceronte"
+                ]
+            },
+            {
+                id: "comida",
+                name: "Comida",
+                img: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663518097424/QKfqaGbLQPkbfrZd.png",
+                words: [
+                    "Pizza", "Hambúrguer", "Sushi", "Lasanha", "Coxinha", "Açaí", "Brigadeiro", "Churrasco", "Tacos",
+                    "Macarrão", "Feijoada", "Pastel", "Bolo", "Sorvete", "Panqueca", "Pão de Queijo", "Tapioca",
+                    "Guacamole", "Paella", "Ramen", "Hot Dog", "Nuggets", "Batata Frita", "Pipoca", "Donut",
+                    "Croissant", "Waffle", "Churros", "Pudim", "Mousse", "Risoto", "Estrogonofe", "Quibe", "Esfiha",
+                    "Falafel", "Hummus", "Ceviche", "Poke", "Fondue", "Brownie"
+                ]
+            },
+            {
+                id: "esportes",
+                name: "Esportes",
+                img: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663518097424/UwoUDiRhRTxzsHYf.png",
+                words: [
+                    "Futebol", "Basquete", "Tênis", "Natação", "Boxe", "Skate", "Surfe", "Yoga", "Corrida", "Ciclismo",
+                    "Vôlei", "Badminton", "Golfe", "Snowboard", "Escalada", "Karatê", "Judô", "Fórmula 1", "MotoGP",
+                    "Rugby", "Beisebol", "Futebol Americano", "Hóquei", "Esgrima", "Arco e Flecha", "Ginástica",
+                    "Crossfit", "Ping Pong", "Handebol", "Polo Aquático", "Atletismo", "Canoagem", "Vela", "Hipismo",
+                    "Triatlo", "MMA", "Muay Thai", "Jiu-Jitsu", "Sumô", "Críquete"
+                ]
+            },
+            {
+                id: "objetos",
+                name: "Objetos",
+                img: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=900&auto=format&fit=crop",
+                words: [
+                    "Celular", "Controle remoto", "Geladeira", "Micro-ondas", "Ventilador", "Notebook", "Cadeira", "Mesa",
+                    "Escova de dentes", "Guarda-chuva", "Mochila", "Óculos", "Relógio", "Chave", "Carteira", "Caneta",
+                    "Lápis", "Tesoura", "Espelho", "Travesseiro", "Cobertor", "Sapato", "Boné", "Fone de ouvido",
+                    "Carregador", "Televisão", "Sofá", "Copo", "Prato", "Panela", "Garrafa", "Lâmpada", "Caderno",
+                    "Livro", "Bicicleta", "Câmera", "Violão", "Caixa de som", "Perfume", "Sabonete"
+                ]
+            },
+            {
+                id: "lugares",
+                name: "Lugares",
+                img: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=900&auto=format&fit=crop",
+                words: [
+                    "Praia", "Cinema", "Shopping", "Escola", "Hospital", "Aeroporto", "Rodoviária", "Igreja", "Museu",
+                    "Biblioteca", "Padaria", "Farmácia", "Restaurante", "Parque", "Zoológico", "Estádio", "Academia",
+                    "Supermercado", "Banco", "Hotel", "Piscina", "Teatro", "Circo", "Salão de beleza", "Barbearia",
+                    "Posto de gasolina", "Delegacia", "Correio", "Feira", "Floresta", "Montanha", "Cachoeira",
+                    "Fazenda", "Castelo", "Ilha", "Metrô", "Elevador", "Escritório", "Sala de aula"
+                ]
+            }
         ];
 
-        let game = { active: false, words: [], index: 0, history: [], timeLeft: 75, timer: null, isProcessing: false, lastAction: 0 };
+        const game = {
+            active: false,
+            categoryId: null,
+            words: [],
+            index: 0,
+            history: [],
+            timeLeft: 75,
+            timer: null,
+            isProcessing: false,
+            lastAction: 0
+        };
 
-        // --- SENSOR CALIBRATION (ADVANCED DEAD ZONE) ---
         const SENSORS = {
-            DEAD_ZONE_MIN: 60,
-            DEAD_ZONE_MAX: 100,
-            UP_THRESHOLD: 115,
-            DOWN_THRESHOLD: 45,
-            COOLDOWN: 1200
+            START_DELAY: 1300,
+            COOLDOWN: 950,
+            REQUIRED_DIFF: 34,
+            RETURN_TO_NEUTRAL: 16,
+            MIN_STABLE_READINGS: 5,
+            MAX_BASE_SAMPLES: 12
+        };
+
+        const sensor = {
+            supported: false,
+            permissionAsked: false,
+            permissionGranted: false,
+            ready: false,
+            locked: false,
+            base: null,
+            samples: [],
+            stableReadings: 0,
+            lastValue: null,
+            usingGamma: false,
+            messageTimer: null
         };
 
         function init() {
             renderCategories(CATEGORIES);
+            prepareSensorSupport();
+        }
+
+        function prepareSensorSupport() {
+            sensor.supported = typeof DeviceOrientationEvent !== "undefined";
         }
 
         function renderCategories(list) {
-            const grid = document.getElementById('categoriesGrid');
-            grid.innerHTML = '';
+            const grid = document.getElementById("categoriesGrid");
+            grid.innerHTML = "";
+
+            if (!list.length) {
+                grid.innerHTML = `<div class="empty-state">nenhuma categoria encontrada</div>`;
+                return;
+            }
+
             list.forEach(cat => {
-                const card = document.createElement('div');
-                card.className = 'cat-card';
-                card.innerHTML = `<div class="cat-img" style="background-image: url('${cat.img}')"></div><div class="cat-info"><span>${cat.words.length} Palavras</span><h3>${cat.name}</h3></div>`;
+                const card = document.createElement("div");
+                card.className = "cat-card";
+                card.innerHTML = `
+                    <div class="cat-img" style="background-image: url('${cat.img}')"></div>
+                    <div class="cat-info">
+                        <span>${cat.words.length} palavras</span>
+                        <h3>${cat.name}</h3>
+                    </div>
+                `;
                 card.onclick = () => startSequence(cat.id);
                 grid.appendChild(card);
             });
         }
 
         function filterCategories() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
+            const query = document.getElementById("searchInput").value.trim().toLowerCase();
             const filtered = CATEGORIES.filter(c => c.name.toLowerCase().includes(query));
             renderCategories(filtered);
         }
 
         function showScreen(id) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
+            document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+            document.getElementById(id).classList.add("active");
         }
 
-        function startSequence(catId) {
+        async function startSequence(catId) {
             const cat = CATEGORIES.find(c => c.id === catId);
-            game.words = [...cat.words].sort(() => Math.random() - 0.5);
-            game.index = 0; game.history = []; game.timeLeft = 75; game.active = false;
-            showScreen('countdownScreen');
-            let count = 3; const txt = document.getElementById('countText'); txt.innerText = count;
+            if (!cat) return;
+
+            game.categoryId = catId;
+            game.words = shuffle([...cat.words]);
+            game.index = 0;
+            game.history = [];
+            game.timeLeft = 75;
+            game.active = false;
+            game.isProcessing = false;
+            game.lastAction = 0;
+
+            clearInterval(game.timer);
+            document.getElementById("gameTimer").innerText = "75s";
+
+            await requestSensorPermission();
+
+            showScreen("countdownScreen");
+
+            let count = 3;
+            const txt = document.getElementById("countText");
+            txt.innerText = count;
+
             const interval = setInterval(() => {
-                count--; if (count > 0) txt.innerText = count;
-                else { clearInterval(interval); startGame(); }
+                count--;
+
+                if (count > 0) {
+                    txt.innerText = count;
+                } else {
+                    clearInterval(interval);
+                    startGame();
+                }
             }, 1000);
-            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-                DeviceOrientationEvent.requestPermission().catch(console.error);
+        }
+
+        async function requestSensorPermission() {
+            if (!sensor.supported || sensor.permissionAsked) return;
+
+            sensor.permissionAsked = true;
+
+            try {
+                if (typeof DeviceOrientationEvent.requestPermission === "function") {
+                    const result = await DeviceOrientationEvent.requestPermission();
+                    sensor.permissionGranted = result === "granted";
+                } else {
+                    sensor.permissionGranted = true;
+                }
+            } catch (err) {
+                sensor.permissionGranted = false;
             }
         }
 
         function startGame() {
-            game.active = true; showScreen('gameScreen'); renderWord();
+            game.active = true;
+            showScreen("gameScreen");
+            renderWord();
+            resetSensorCalibration();
+
             game.timer = setInterval(() => {
-                game.timeLeft--; document.getElementById('gameTimer').innerText = game.timeLeft + 's';
-                if (game.timeLeft <= 0) finish();
+                game.timeLeft--;
+                document.getElementById("gameTimer").innerText = game.timeLeft + "s";
+
+                if (game.timeLeft <= 0) {
+                    finish();
+                }
             }, 1000);
         }
 
+        function resetSensorCalibration() {
+            sensor.ready = false;
+            sensor.locked = true;
+            sensor.base = null;
+            sensor.samples = [];
+            sensor.stableReadings = 0;
+            sensor.lastValue = null;
+            sensor.usingGamma = false;
+
+            const screen = document.getElementById("gameScreen");
+            screen.classList.add("calibrating");
+
+            setSensorStatus("calibrando...");
+
+            setTimeout(() => {
+                sensor.locked = false;
+                setSensorStatus("segure parado");
+            }, SENSORS.START_DELAY);
+        }
+
+        function calibrateFromValue(value) {
+            if (sensor.ready || sensor.locked) return;
+
+            if (typeof value !== "number" || Number.isNaN(value)) return;
+
+            sensor.samples.push(value);
+
+            if (sensor.samples.length > SENSORS.MAX_BASE_SAMPLES) {
+                sensor.samples.shift();
+            }
+
+            if (sensor.lastValue !== null) {
+                const movement = Math.abs(value - sensor.lastValue);
+
+                if (movement < 2.8) {
+                    sensor.stableReadings++;
+                } else {
+                    sensor.stableReadings = 0;
+                }
+            }
+
+            sensor.lastValue = value;
+
+            if (sensor.samples.length >= 6 && sensor.stableReadings >= SENSORS.MIN_STABLE_READINGS) {
+                const total = sensor.samples.reduce((sum, item) => sum + item, 0);
+                sensor.base = total / sensor.samples.length;
+                sensor.ready = true;
+
+                document.getElementById("gameScreen").classList.remove("calibrating");
+                setSensorStatus("pronto");
+
+                setTimeout(() => {
+                    if (game.active) setSensorStatus("incline ou toque");
+                }, 800);
+            }
+        }
+
+        function getMotionValue(e) {
+            const beta = e.beta;
+            const gamma = e.gamma;
+
+            if (beta === null && gamma === null) return null;
+
+            const isLandscape = Math.abs(window.orientation || 0) === 90 || window.innerWidth > window.innerHeight;
+
+            if (isLandscape && typeof gamma === "number") {
+                sensor.usingGamma = true;
+                return gamma;
+            }
+
+            if (typeof beta === "number") {
+                sensor.usingGamma = false;
+                return beta;
+            }
+
+            return gamma;
+        }
+
+        function handleOrientation(e) {
+            if (!game.active || game.isProcessing) return;
+
+            const value = getMotionValue(e);
+            if (value === null || typeof value !== "number" || Number.isNaN(value)) return;
+
+            if (!sensor.ready) {
+                calibrateFromValue(value);
+                return;
+            }
+
+            if (sensor.locked || sensor.base === null) return;
+
+            const diff = value - sensor.base;
+            const absDiff = Math.abs(diff);
+
+            if (absDiff < SENSORS.RETURN_TO_NEUTRAL) {
+                sensor.locked = false;
+            }
+
+            if (absDiff < SENSORS.REQUIRED_DIFF) return;
+
+            if (diff > 0) {
+                triggerSensorAction("correct");
+            } else {
+                triggerSensorAction("wrong");
+            }
+        }
+
+        function triggerSensorAction(type) {
+            if (sensor.locked) return;
+
+            sensor.locked = true;
+            handleAction(type);
+
+            setTimeout(() => {
+                sensor.base = null;
+                sensor.samples = [];
+                sensor.stableReadings = 0;
+                sensor.lastValue = null;
+                sensor.ready = false;
+                sensor.locked = false;
+
+                if (game.active) {
+                    document.getElementById("gameScreen").classList.add("calibrating");
+                    setSensorStatus("recentralizando...");
+                }
+            }, 320);
+        }
+
+        function handleTapAction(type) {
+            if (!game.active || game.isProcessing) return;
+            handleAction(type);
+        }
+
         function renderWord() {
-            const el = document.getElementById('wordMain');
-            if (game.index >= game.words.length) { game.words.sort(() => Math.random() - 0.5); game.index = 0; }
+            const el = document.getElementById("wordMain");
+
+            if (game.index >= game.words.length) {
+                game.words = shuffle(game.words);
+                game.index = 0;
+            }
+
             el.innerText = game.words[game.index];
-            el.className = 'word-main';
+            el.className = "word-main";
         }
 
         function handleAction(type) {
             const now = Date.now();
-            if (game.isProcessing || !game.active || (now - game.lastAction < SENSORS.COOLDOWN)) return;
-            game.isProcessing = true; game.lastAction = now;
-            const screen = document.getElementById('gameScreen');
-            const wordEl = document.getElementById('wordMain');
-            game.history.push({ word: game.words[game.index], status: type });
-            if (type === 'correct') { screen.classList.add('correct'); wordEl.classList.add('slide-up'); if(navigator.vibrate) navigator.vibrate(100); }
-            else { screen.classList.add('wrong'); wordEl.classList.add('slide-down'); if(navigator.vibrate) navigator.vibrate([50, 50, 50]); }
+
+            if (game.isProcessing || !game.active || now - game.lastAction < SENSORS.COOLDOWN) return;
+
+            game.isProcessing = true;
+            game.lastAction = now;
+
+            const screen = document.getElementById("gameScreen");
+            const wordEl = document.getElementById("wordMain");
+
+            screen.classList.remove("calibrating");
+
+            game.history.push({
+                word: game.words[game.index],
+                status: type
+            });
+
+            if (type === "correct") {
+                screen.classList.add("correct");
+                wordEl.classList.add("slide-up");
+
+                if (navigator.vibrate) navigator.vibrate(80);
+            } else {
+                screen.classList.add("wrong");
+                wordEl.classList.add("slide-down");
+
+                if (navigator.vibrate) navigator.vibrate([45, 45, 45]);
+            }
+
             setTimeout(() => {
-                screen.classList.remove('correct', 'wrong');
-                game.index++; renderWord();
+                screen.classList.remove("correct", "wrong");
+                game.index++;
+                renderWord();
                 game.isProcessing = false;
-            }, 800);
+
+                if (game.active) {
+                    resetMiniCalibration();
+                }
+            }, 760);
         }
 
-        function exitGame() { clearInterval(game.timer); game.active = false; showScreen('homeScreen'); }
+        function resetMiniCalibration() {
+            sensor.ready = false;
+            sensor.base = null;
+            sensor.samples = [];
+            sensor.stableReadings = 0;
+            sensor.lastValue = null;
+            sensor.locked = false;
+
+            document.getElementById("gameScreen").classList.add("calibrating");
+            setSensorStatus("segure parado");
+        }
+
+        function exitGame() {
+            clearInterval(game.timer);
+            game.active = false;
+            game.isProcessing = false;
+            showScreen("homeScreen");
+        }
 
         function finish() {
-            clearInterval(game.timer); game.active = false;
-            document.getElementById('resCorrect').innerText = game.history.filter(h => h.status === 'correct').length;
-            document.getElementById('resWrong').innerText = game.history.filter(h => h.status === 'wrong').length;
-            const list = document.getElementById('resList'); list.innerHTML = '';
-            game.history.forEach(h => {
-                const div = document.createElement('div'); div.className = `res-item ${h.status}`;
-                div.innerHTML = `<span>${h.word}</span><span>${h.status === 'correct' ? '✅' : '❌'}</span>`;
-                list.appendChild(div);
-            });
-            showScreen('resultsScreen');
+            clearInterval(game.timer);
+            game.active = false;
+            game.isProcessing = false;
+
+            const correct = game.history.filter(h => h.status === "correct").length;
+            const wrong = game.history.filter(h => h.status === "wrong").length;
+            const total = correct + wrong;
+
+            document.getElementById("resCorrect").innerText = correct;
+            document.getElementById("resWrong").innerText = wrong;
+            document.getElementById("resSummary").innerText = total ? `${total} palavras jogadas` : "nenhuma palavra marcada";
+
+            const list = document.getElementById("resList");
+            list.innerHTML = "";
+
+            if (!game.history.length) {
+                list.innerHTML = `<div class="empty-state">nenhum resultado nesta rodada</div>`;
+            } else {
+                game.history.forEach(h => {
+                    const div = document.createElement("div");
+                    div.className = `res-item ${h.status}`;
+                    div.innerHTML = `
+                        <span>${h.word}</span>
+                        <span>${h.status === "correct" ? "✅" : "❌"}</span>
+                    `;
+                    list.appendChild(div);
+                });
+            }
+
+            showScreen("resultsScreen");
         }
 
-        window.addEventListener('deviceorientation', (e) => {
-            if (!game.active || game.isProcessing) return;
-            const beta = e.beta;
-            if (beta > SENSORS.UP_THRESHOLD) handleAction('correct');
-            else if (beta < SENSORS.DOWN_THRESHOLD && beta > -20) handleAction('wrong');
+        function restartSameCategory() {
+            if (!game.categoryId) {
+                showScreen("homeScreen");
+                return;
+            }
+
+            startSequence(game.categoryId);
+        }
+
+        function backHomeFromResults() {
+            clearInterval(game.timer);
+            game.active = false;
+            showScreen("homeScreen");
+        }
+
+        function setSensorStatus(text) {
+            const el = document.getElementById("sensorStatus");
+            el.innerText = text;
+        }
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+
+            return array;
+        }
+
+        window.addEventListener("deviceorientation", handleOrientation);
+
+        window.addEventListener("keydown", (e) => {
+            if (e.key === "ArrowUp") handleAction("correct");
+            if (e.key === "ArrowDown") handleAction("wrong");
+            if (e.key === "Escape") exitGame();
         });
 
-        window.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowUp') handleAction('correct');
-            if (e.key === 'ArrowDown') handleAction('wrong');
-        });
+        document.addEventListener("gesturestart", e => e.preventDefault());
+        document.addEventListener("touchmove", e => {
+            if (game.active) e.preventDefault();
+        }, { passive: false });
 
         init();
     </script>
