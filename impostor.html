@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Impostor</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+
+body{
+  margin:0;
+  min-height:100vh;
+  background:#080910;
+  color:white;
+  padding:14px;
+}
+
+.app{
+  width:100%;
+  max-width:430px;
+  margin:0 auto;
+  background:#151722;
+  border:1px solid #2b3040;
+  border-radius:28px;
+  padding:20px;
+  box-shadow:0 20px 60px #0008;
+}
+
+h1{
+  font-size:34px;
+  margin:0 0 8px;
+  line-height:1;
+}
+
+p{
+  color:#aeb5c8;
+  line-height:1.4;
+  margin:10px 0;
+  font-size:15px;
+}
+
+input{
+  width:100%;
+  padding:15px;
+  border-radius:16px;
+  border:1px solid #343a4d;
+  background:#0b0d14;
+  color:white;
+  font-size:16px;
+  outline:none;
+}
+
+button{
+  width:100%;
+  padding:15px;
+  border:0;
+  border-radius:16px;
+  margin-top:10px;
+  background:#6d5dfc;
+  color:white;
+  font-weight:800;
+  font-size:16px;
+}
+
+.secondary{
+  background:#2a2f3d;
+}
+
+.danger{
+  background:#3a2028;
+  color:#ff9b9b;
+}
+
+.hidden{
+  display:none;
+}
+
+.players{
+  margin:14px 0;
+  display:grid;
+  gap:8px;
+}
+
+.player{
+  background:#0f1119;
+  border:1px solid #2c3140;
+  border-radius:14px;
+  padding:11px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.remove{
+  width:auto;
+  margin:0;
+  padding:7px 9px;
+  font-size:13px;
+  background:#252a38;
+}
+
+.screen{
+  text-align:center;
+}
+
+.label{
+  text-transform:uppercase;
+  letter-spacing:.12em;
+  color:#8991a6;
+  font-size:12px;
+  margin-bottom:8px;
+}
+
+.name{
+  font-size:36px;
+  font-weight:900;
+  margin:10px 0 14px;
+  line-height:1;
+}
+
+.box{
+  background:#0f1119;
+  border:1px solid #303648;
+  border-radius:20px;
+  padding:16px 12px;
+  margin:14px 0;
+}
+
+.category{
+  display:inline-block;
+  background:#28235f;
+  color:#cfc9ff;
+  padding:7px 12px;
+  border-radius:999px;
+  font-size:14px;
+  font-weight:800;
+  margin-bottom:10px;
+}
+
+.word{
+  font-size:32px;
+  font-weight:950;
+  line-height:1.1;
+  word-break:break-word;
+}
+
+.impostor{
+  font-size:28px;
+  font-weight:950;
+  color:#ff6b6b;
+  line-height:1.1;
+}
+
+.small{
+  font-size:13px;
+  color:#8e95a8;
+  margin-bottom:0;
+}
+</style>
+</head>
+
+<body>
+<main class="app">
+
+<section id="setup">
+  <h1>Impostor</h1>
+  <p>adicione os jogadores. todos verão a palavra, menos uma pessoa.</p>
+
+  <input id="playerInput" placeholder="nome do jogador">
+  <button id="addBtn">adicionar jogador</button>
+
+  <p id="count">0 jogadores</p>
+  <div class="players" id="playersList"></div>
+
+  <button id="startBtn">começar</button>
+  <button class="secondary" id="exampleBtn">preencher exemplo</button>
+  <button class="danger" id="clearBtn">limpar nomes</button>
+</section>
+
+<section id="passScreen" class="hidden screen">
+  <div class="label">passe o celular para</div>
+  <div class="name" id="currentName"></div>
+  <p>toque em revelar só quando a tela estiver virada para você.</p>
+
+  <button id="revealBtn">revelar</button>
+  <button class="secondary restartBtn">reiniciar rodada</button>
+</section>
+
+<section id="secretScreen" class="hidden screen">
+  <div class="label">sua informação</div>
+
+  <div class="box" id="secretContent"></div>
+
+  <button id="hideBtn">esconder e passar</button>
+  <button class="secondary restartBtn">reiniciar rodada</button>
+</section>
+
+<section id="endScreen" class="hidden screen">
+  <h1>começou</h1>
+  <p>agora cada pessoa fala uma característica sem entregar a palavra.</p>
+
+  <div class="box">
+    <div class="label">categoria</div>
+    <div class="word" id="finalCategory"></div>
+  </div>
+
+  <button id="newRoundBtn">nova rodada com os mesmos jogadores</button>
+  <button class="secondary restartBtn">voltar sem apagar nomes</button>
+  <button class="danger" id="clearEndBtn">limpar nomes</button>
+</section>
+
+</main>
+
+<script>
+const categories = [
+  {name:"comida",words:["pizza","hambúrguer","sushi","lasanha","coxinha","pastel","bolo","brigadeiro","pipoca","taco","macarrão","churrasco","açaí","sorvete","panqueca","batata frita","hot dog","pudim","feijoada","strogonoff"]},
+  {name:"animais",words:["gato","cachorro","leão","tigre","girafa","elefante","macaco","coelho","pinguim","tubarão","golfinho","coruja","cobra","cavalo","urso","jacaré","rato","lobo","raposa","borboleta"]},
+  {name:"lugares",words:["praia","shopping","cinema","escola","hospital","aeroporto","parque","mercado","igreja","museu","biblioteca","restaurante","academia","rodoviária","hotel","farmácia","estádio","balada","teatro","zoológico"]},
+  {name:"objetos",words:["celular","óculos","chave","mochila","garrafa","controle","cadeira","relógio","espelho","caneta","caderno","fone","carregador","travesseiro","guarda-chuva","escova","ventilador","televisão","notebook","anel"]},
+  {name:"filmes e séries",words:["barbie","avatar","shrek","vingadores","wandinha","stranger things","harry potter","titanic","interestelar","coraline","toy story","homem-aranha","jogos vorazes","round 6","breaking bad","friends","divertidamente","matrix","crepúsculo","the last of us"]},
+  {name:"internet",words:["meme","tiktok","reels","emoji","stalker","influencer","trend","comentário","like","vídeo","live","print","filtro","fofoca","perfil","story","viral","hashtag","podcast","cancelamento"]}
+];
+
+let players = [];
+let currentIndex = 0;
+let impostorIndex = 0;
+let chosenCategory = null;
+let chosenWord = "";
+
+const setup = document.getElementById("setup");
+const passScreen = document.getElementById("passScreen");
+const secretScreen = document.getElementById("secretScreen");
+const endScreen = document.getElementById("endScreen");
+
+const input = document.getElementById("playerInput");
+const playersList = document.getElementById("playersList");
+const count = document.getElementById("count");
+
+function randomItem(arr){
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function showOnly(screen){
+  setup.classList.add("hidden");
+  passScreen.classList.add("hidden");
+  secretScreen.classList.add("hidden");
+  endScreen.classList.add("hidden");
+  screen.classList.remove("hidden");
+  window.scrollTo(0,0);
+}
+
+function renderPlayers(){
+  playersList.innerHTML = "";
+  count.textContent = players.length + " jogador" + (players.length === 1 ? "" : "es");
+
+  players.forEach((name, index) => {
+    const div = document.createElement("div");
+    div.className = "player";
+
+    const text = document.createElement("div");
+    text.textContent = `${index + 1}. ${name}`;
+
+    const btn = document.createElement("button");
+    btn.className = "remove";
+    btn.textContent = "remover";
+    btn.onclick = () => {
+      players.splice(index, 1);
+      renderPlayers();
+    };
+
+    div.appendChild(text);
+    div.appendChild(btn);
+    playersList.appendChild(div);
+  });
+}
+
+function addPlayer(){
+  const name = input.value.trim();
+  if(!name) return;
+
+  players.push(name);
+  input.value = "";
+  renderPlayers();
+}
+
+function prepareRound(){
+  chosenCategory = randomItem(categories);
+  chosenWord = randomItem(chosenCategory.words);
+  impostorIndex = Math.floor(Math.random() * players.length);
+  currentIndex = 0;
+}
+
+function startGame(){
+  if(players.length < 3){
+    alert("precisa ter pelo menos 3 jogadores.");
+    return;
+  }
+
+  prepareRound();
+  showPassScreen();
+}
+
+function showPassScreen(){
+  document.getElementById("currentName").textContent = players[currentIndex];
+  showOnly(passScreen);
+}
+
+function showSecret(){
+  const content = document.getElementById("secretContent");
+
+  if(currentIndex === impostorIndex){
+    content.innerHTML = `
+      <div class="category">${chosenCategory.name}</div>
+      <div class="impostor">você é o impostor</div>
+      <p class="small">você só sabe a categoria. tente disfarçar.</p>
+    `;
+  } else {
+    content.innerHTML = `
+      <div class="category">${chosenCategory.name}</div>
+      <div class="word">${chosenWord}</div>
+      <p class="small">não fale a palavra diretamente.</p>
+    `;
+  }
+
+  showOnly(secretScreen);
+}
+
+function hideSecret(){
+  currentIndex++;
+
+  if(currentIndex >= players.length){
+    document.getElementById("finalCategory").textContent = chosenCategory.name;
+    showOnly(endScreen);
+    return;
+  }
+
+  showPassScreen();
+}
+
+function newRound(){
+  prepareRound();
+  showPassScreen();
+}
+
+function restartRound(){
+  currentIndex = 0;
+  impostorIndex = 0;
+  chosenCategory = null;
+  chosenWord = "";
+  renderPlayers();
+  showOnly(setup);
+}
+
+function clearPlayers(){
+  players = [];
+  currentIndex = 0;
+  impostorIndex = 0;
+  chosenCategory = null;
+  chosenWord = "";
+  input.value = "";
+  renderPlayers();
+  showOnly(setup);
+}
+
+document.getElementById("addBtn").onclick = addPlayer;
+document.getElementById("startBtn").onclick = startGame;
+document.getElementById("revealBtn").onclick = showSecret;
+document.getElementById("hideBtn").onclick = hideSecret;
+document.getElementById("newRoundBtn").onclick = newRound;
+document.getElementById("clearBtn").onclick = clearPlayers;
+document.getElementById("clearEndBtn").onclick = clearPlayers;
+
+document.getElementById("exampleBtn").onclick = () => {
+  players = ["Pedro", "Ana", "Lucas", "Julia"];
+  renderPlayers();
+};
+
+document.querySelectorAll(".restartBtn").forEach(btn => {
+  btn.onclick = restartRound;
+});
+
+input.addEventListener("keydown", e => {
+  if(e.key === "Enter") addPlayer();
+});
+
+renderPlayers();
+</script>
+</body>
+</html>
