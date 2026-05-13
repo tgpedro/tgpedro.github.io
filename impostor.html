@@ -2,227 +2,322 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Impostor</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>IMPOSTOR | FINAL</title>
 
 <style>
-*{
-  box-sizing:border-box;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
+
+:root {
+  --bg: #050508;
+  --card: #0d0e14;
+  --primary: #ff003c;
+  --primary-glow: rgba(255, 0, 60, 0.4);
+  --secondary: #1a1c26;
+  --accent: #00f2ff;
+  --text: #e0e0e6;
+  --text-dim: #62667a;
+  --border: #1f2230;
+  --safe-area-bottom: env(safe-area-inset-bottom, 20px);
 }
 
-body{
-  margin:0;
-  min-height:100vh;
-  background:#080910;
-  color:white;
-  padding:14px;
+* {
+  box-sizing: border-box;
+  font-family: 'JetBrains Mono', monospace;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
-.app{
-  width:100%;
-  max-width:430px;
-  margin:0 auto;
-  background:#151722;
-  border:1px solid #2b3040;
-  border-radius:28px;
-  padding:20px;
-  box-shadow:0 20px 60px #0008;
+body {
+  margin: 0;
+  height: 100vh;
+  height: -webkit-fill-available;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-h1{
-  font-size:34px;
-  margin:0 0 8px;
-  line-height:1;
+html {
+  height: -webkit-fill-available;
 }
 
-p{
-  color:#aeb5c8;
-  line-height:1.4;
-  margin:10px 0;
-  font-size:15px;
+/* Scanline Effect */
+body::before {
+  content: " ";
+  display: block;
+  position: fixed;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+  z-index: 100;
+  background-size: 100% 2px, 3px 100%;
+  pointer-events: none;
 }
 
-input{
-  width:100%;
-  padding:15px;
-  border-radius:16px;
-  border:1px solid #343a4d;
-  background:#0b0d14;
-  color:white;
-  font-size:16px;
-  outline:none;
+.app {
+  flex: 1;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  background: var(--card);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
 }
 
-button{
-  width:100%;
-  padding:15px;
-  border:0;
-  border-radius:16px;
-  margin-top:10px;
-  background:#6d5dfc;
-  color:white;
-  font-weight:800;
-  font-size:16px;
+header {
+  padding: 20px 0;
+  text-align: center;
 }
 
-.secondary{
-  background:#2a2f3d;
+h1 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 28px;
+  font-weight: 900;
+  margin: 0;
+  color: var(--primary);
+  letter-spacing: 4px;
+  text-shadow: 0 0 15px var(--primary-glow);
 }
 
-.danger{
-  background:#3a2028;
-  color:#ff9b9b;
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 100px; /* Espaço para botões fixos */
 }
 
-.hidden{
-  display:none;
+.input-group {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
 }
 
-.players{
-  margin:14px 0;
-  display:grid;
-  gap:8px;
+input {
+  flex: 1;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #000;
+  color: var(--accent);
+  font-size: 16px;
+  outline: none;
 }
 
-.player{
-  background:#0f1119;
-  border:1px solid #2c3140;
-  border-radius:14px;
-  padding:11px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+button {
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  transition: all 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.remove{
-  width:auto;
-  margin:0;
-  padding:7px 9px;
-  font-size:13px;
-  background:#252a38;
+.btn-add {
+  padding: 0 20px;
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
 }
 
-.screen{
-  text-align:center;
+.btn-main {
+  width: 100%;
+  padding: 20px;
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 0 20px var(--primary-glow);
+  font-size: 16px;
 }
 
-.label{
-  text-transform:uppercase;
-  letter-spacing:.12em;
-  color:#8991a6;
-  font-size:12px;
-  margin-bottom:8px;
+.btn-main:active { transform: scale(0.96); filter: brightness(1.2); }
+
+.btn-secondary {
+  width: 100%;
+  padding: 16px;
+  background: var(--secondary);
+  color: var(--text-dim);
+  margin-top: 10px;
 }
 
-.name{
-  font-size:36px;
-  font-weight:900;
-  margin:10px 0 14px;
-  line-height:1;
+.btn-ghost {
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 11px;
+  padding: 10px;
+  margin-top: 10px;
 }
 
-.box{
-  background:#0f1119;
-  border:1px solid #303648;
-  border-radius:20px;
-  padding:16px 12px;
-  margin:14px 0;
+.players-list {
+  margin-top: 10px;
 }
 
-.category{
-  display:inline-block;
-  background:#28235f;
-  color:#cfc9ff;
-  padding:7px 12px;
-  border-radius:999px;
-  font-size:14px;
-  font-weight:800;
-  margin-bottom:10px;
+.player-card {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  padding: 14px 16px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.word{
-  font-size:32px;
-  font-weight:950;
-  line-height:1.1;
-  word-break:break-word;
+.player-card span { font-size: 14px; }
+.remove-btn { color: var(--primary); font-size: 12px; }
+
+.screen {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  text-align: center;
 }
 
-.impostor{
-  font-size:28px;
-  font-weight:950;
-  color:#ff6b6b;
-  line-height:1.1;
+.label-small {
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--accent);
+  font-size: 11px;
+  margin-bottom: 10px;
 }
 
-.small{
-  font-size:13px;
-  color:#8e95a8;
-  margin-bottom:0;
+.display-name {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 40px;
+  font-weight: 900;
+  margin: 20px 0;
+  color: white;
 }
+
+.info-box {
+  background: rgba(0,0,0,0.5);
+  border: 1px solid var(--border);
+  padding: 40px 20px;
+  margin: 20px 0;
+  border-radius: 4px;
+  position: relative;
+}
+
+.info-box::before {
+  content: ""; position: absolute; top: -1px; left: -1px; width: 15px; height: 15px;
+  border-top: 2px solid var(--primary); border-left: 2px solid var(--primary);
+}
+
+.category-tag { color: var(--accent); font-size: 12px; margin-bottom: 10px; display: block; }
+.secret-word { font-family: 'Orbitron', sans-serif; font-size: 32px; font-weight: 900; color: white; }
+.impostor-text { font-family: 'Orbitron', sans-serif; font-size: 32px; font-weight: 900; color: var(--primary); animation: blink 1s infinite; }
+
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+.footer-actions {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20px;
+  padding-bottom: var(--safe-area-bottom);
+  background: linear-gradient(transparent, var(--card) 30%);
+}
+
+.reveal-list {
+  text-align: left;
+  margin-top: 20px;
+  border-top: 1px solid var(--border);
+  padding-top: 20px;
+}
+
+.reveal-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  font-size: 13px;
+}
+
+.reveal-role { font-weight: bold; }
+.role-impostor { color: var(--primary); }
+.role-agent { color: var(--accent); }
+
+.hidden { display: none !important; }
 </style>
 </head>
 
 <body>
 <main class="app">
+  <header>
+    <h1>IMPOSTOR</h1>
+  </header>
 
-<section id="setup">
-  <h1>Impostor</h1>
-  <p>adicione os jogadores. todos verão a palavra, menos uma pessoa.</p>
+  <div class="content">
+    <!-- SETUP -->
+    <section id="setup">
+      <div class="input-group">
+        <input id="playerInput" placeholder="NOME DO AGENTE" autocomplete="off">
+        <button id="addBtn" class="btn-add">ADD</button>
+      </div>
+      <div id="count" style="font-size: 10px; color: var(--text-dim); margin-bottom: 10px;">0 AGENTES ATIVOS</div>
+      <div class="players-list" id="playersList"></div>
+      
+      <div style="margin-top: 20px;">
+        <button class="btn-secondary" id="exampleBtn">CARREGAR EQUIPE TESTE</button>
+        <button class="btn-ghost" id="clearBtn">LIMPAR TODOS OS DADOS</button>
+      </div>
+    </section>
 
-  <input id="playerInput" placeholder="nome do jogador">
-  <button id="addBtn">adicionar jogador</button>
+    <!-- PASS SCREEN -->
+    <section id="passScreen" class="hidden screen">
+      <div class="label-small">ENTREGAR DISPOSITIVO PARA</div>
+      <div class="display-name" id="currentName"></div>
+      <div style="color: var(--text-dim); font-size: 12px; margin-top: 10px;">CERTIFIQUE-SE QUE NINGUÉM ESTÁ OLHANDO</div>
+    </section>
 
-  <p id="count">0 jogadores</p>
-  <div class="players" id="playersList"></div>
+    <!-- SECRET SCREEN -->
+    <section id="secretScreen" class="hidden screen">
+      <div class="label-small">DADOS CRIPTOGRAFADOS</div>
+      <div class="info-box" id="secretContent"></div>
+    </section>
 
-  <button id="startBtn">começar</button>
-  <button class="secondary" id="exampleBtn">preencher exemplo</button>
-  <button class="danger" id="clearBtn">limpar nomes</button>
-</section>
-
-<section id="passScreen" class="hidden screen">
-  <div class="label">passe o celular para</div>
-  <div class="name" id="currentName"></div>
-  <p>toque em revelar só quando a tela estiver virada para você.</p>
-
-  <button id="revealBtn">revelar</button>
-  <button class="secondary restartBtn">reiniciar rodada</button>
-</section>
-
-<section id="secretScreen" class="hidden screen">
-  <div class="label">sua informação</div>
-
-  <div class="box" id="secretContent"></div>
-
-  <button id="hideBtn">esconder e passar</button>
-  <button class="secondary restartBtn">reiniciar rodada</button>
-</section>
-
-<section id="endScreen" class="hidden screen">
-  <h1>começou</h1>
-  <p>agora cada pessoa fala uma característica sem entregar a palavra.</p>
-
-  <div class="box">
-    <div class="label">categoria</div>
-    <div class="word" id="finalCategory"></div>
+    <!-- END SCREEN -->
+    <section id="endScreen" class="hidden screen">
+      <div class="label-small">MISSÃO EM CURSO</div>
+      <div class="info-box">
+        <div class="category-tag">CATEGORIA DO ARQUIVO</div>
+        <div class="secret-word" id="finalCategory"></div>
+      </div>
+      
+      <button id="showRevealBtn" class="btn-secondary">REVELAR IDENTIDADES</button>
+      
+      <div id="revealArea" class="hidden reveal-list">
+        <div class="label-small">RELATÓRIO FINAL</div>
+        <div id="revealContent"></div>
+      </div>
+    </section>
   </div>
 
-  <button id="newRoundBtn">nova rodada com os mesmos jogadores</button>
-  <button class="secondary restartBtn">voltar sem apagar nomes</button>
-  <button class="danger" id="clearEndBtn">limpar nomes</button>
-</section>
+  <div class="footer-actions">
+    <button id="startBtn" class="btn-main">INICIAR OPERAÇÃO</button>
+    <button id="revealBtn" class="btn-main hidden">DESCRIPTOGRAFAR</button>
+    <button id="hideBtn" class="btn-main hidden">CONFIRMAR E PASSAR</button>
+    <button id="newRoundBtn" class="btn-main hidden">NOVA RODADA</button>
+    <button id="restartBtn" class="btn-secondary hidden">ABORTAR MISSÃO</button>
+  </div>
 
 </main>
 
 <script>
 const categories = [
-  {name:"comida",words:["pizza","hambúrguer","sushi","lasanha","coxinha","pastel","bolo","brigadeiro","pipoca","taco","macarrão","churrasco","açaí","sorvete","panqueca","batata frita","hot dog","pudim","feijoada","strogonoff"]},
-  {name:"animais",words:["gato","cachorro","leão","tigre","girafa","elefante","macaco","coelho","pinguim","tubarão","golfinho","coruja","cobra","cavalo","urso","jacaré","rato","lobo","raposa","borboleta"]},
-  {name:"lugares",words:["praia","shopping","cinema","escola","hospital","aeroporto","parque","mercado","igreja","museu","biblioteca","restaurante","academia","rodoviária","hotel","farmácia","estádio","balada","teatro","zoológico"]},
-  {name:"objetos",words:["celular","óculos","chave","mochila","garrafa","controle","cadeira","relógio","espelho","caneta","caderno","fone","carregador","travesseiro","guarda-chuva","escova","ventilador","televisão","notebook","anel"]},
-  {name:"filmes e séries",words:["barbie","avatar","shrek","vingadores","wandinha","stranger things","harry potter","titanic","interestelar","coraline","toy story","homem-aranha","jogos vorazes","round 6","breaking bad","friends","divertidamente","matrix","crepúsculo","the last of us"]},
-  {name:"internet",words:["meme","tiktok","reels","emoji","stalker","influencer","trend","comentário","like","vídeo","live","print","filtro","fofoca","perfil","story","viral","hashtag","podcast","cancelamento"]}
+  {name:"COMIDA",words:["PIZZA","HAMBÚRGUER","SUSHI","LASANHA","COXINHA","PASTEL","BOLO","BRIGADEIRO","PIPOCA","TACO","MACARRÃO","CHURRASCO","AÇAÍ","SORVETE","PANQUECA","BATATA FRITA","HOT DOG","PUDIM","FEIJOADA","STROGONOFF"]},
+  {name:"ANIMAIS",words:["GATO","CACHORRO","LEÃO","TIGRE","GIRAFA","ELEFANTE","MACACO","COELHO","PINGUIM","TUBARÃO","GOLFINHO","CORUJA","COBRA","CAVALO","URSO","JACARÉ","RATO","LOBO","RAPOSA","BORBOLETA"]},
+  {name:"LUGARES",words:["PRAIA","SHOPPING","CINEMA","ESCOLA","HOSPITAL","AEROPORTO","PARQUE","MERCADO","IGREJA","MUSEU","BIBLIOTECA","RESTAURANTE","ACADEMIA","RODOVIÁRIA","HOTEL","FARMÁCIA","ESTÁDIO","BALADA","TEATRO","ZOOLÓGICO"]},
+  {name:"OBJETOS",words:["CELULAR","ÓCULOS","CHAVE","MOCHILA","GARRAFA","CONTROLE","CADEIRA","RELÓGIO","ESPELHO","CANETA","CADERNO","FONE","CARREGADOR","TRAVESSEIRO","GUARDA-CHUVA","ESCOVA","VENTILADOR","TELEVISÃO","NOTEBOOK","ANEL"]},
+  {name:"FILMES E SÉRIES",words:["BARBIE","AVATAR","SHREK","VINGADORES","WANDINHA","STRANGER THINGS","HARRY POTTER","TITANIC","INTERESTELAR","CORALINE","TOY STORY","HOMEM-ARANHA","JOGOS VORAZES","ROUND 6","BREAKING BAD","FRIENDS","DIVERTIDAMENTE","MATRIX","CREPÚSCULO","THE LAST OF US"]},
+  {name:"INTERNET",words:["MEME","TIKTOK","REELS","EMOJI","STALKER","INFLUENCER","TREND","COMENTÁRIO","LIKE","VÍDEO","LIVE","PRINT","FILTRO","FOFOCA","PERFIL","STORY","VIRAL","HASHTAG","PODCAST","CANCELAMENTO"]}
 ];
 
 let players = [];
@@ -231,161 +326,109 @@ let impostorIndex = 0;
 let chosenCategory = null;
 let chosenWord = "";
 
-const setup = document.getElementById("setup");
-const passScreen = document.getElementById("passScreen");
-const secretScreen = document.getElementById("secretScreen");
-const endScreen = document.getElementById("endScreen");
+const screens = {
+  setup: document.getElementById("setup"),
+  pass: document.getElementById("passScreen"),
+  secret: document.getElementById("secretScreen"),
+  end: document.getElementById("endScreen")
+};
 
-const input = document.getElementById("playerInput");
-const playersList = document.getElementById("playersList");
-const count = document.getElementById("count");
+const btns = {
+  start: document.getElementById("startBtn"),
+  reveal: document.getElementById("revealBtn"),
+  hide: document.getElementById("hideBtn"),
+  newRound: document.getElementById("newRoundBtn"),
+  restart: document.getElementById("restartBtn")
+};
 
-function randomItem(arr){
-  return arr[Math.floor(Math.random() * arr.length)];
-}
-
-function showOnly(screen){
-  setup.classList.add("hidden");
-  passScreen.classList.add("hidden");
-  secretScreen.classList.add("hidden");
-  endScreen.classList.add("hidden");
-  screen.classList.remove("hidden");
-  window.scrollTo(0,0);
+function showScreen(screenId) {
+  Object.values(screens).forEach(s => s.classList.add("hidden"));
+  screens[screenId].classList.remove("hidden");
+  
+  // Gerenciar botões do footer
+  Object.values(btns).forEach(b => b.classList.add("hidden"));
+  if(screenId === 'setup') btns.start.classList.remove("hidden");
+  if(screenId === 'pass') { btns.reveal.classList.remove("hidden"); btns.restart.classList.remove("hidden"); }
+  if(screenId === 'secret') btns.hide.classList.remove("hidden");
+  if(screenId === 'end') { btns.newRound.classList.remove("hidden"); btns.restart.classList.remove("hidden"); }
 }
 
 function renderPlayers(){
-  playersList.innerHTML = "";
-  count.textContent = players.length + " jogador" + (players.length === 1 ? "" : "es");
-
-  players.forEach((name, index) => {
+  const list = document.getElementById("playersList");
+  list.innerHTML = "";
+  document.getElementById("count").textContent = players.length + " AGENTES ATIVOS";
+  players.forEach((name, i) => {
     const div = document.createElement("div");
-    div.className = "player";
-
-    const text = document.createElement("div");
-    text.textContent = `${index + 1}. ${name}`;
-
-    const btn = document.createElement("button");
-    btn.className = "remove";
-    btn.textContent = "remover";
-    btn.onclick = () => {
-      players.splice(index, 1);
-      renderPlayers();
-    };
-
-    div.appendChild(text);
-    div.appendChild(btn);
-    playersList.appendChild(div);
+    div.className = "player-card";
+    div.innerHTML = `<span>${name.toUpperCase()}</span><span class="remove-btn" onclick="removePlayer(${i})">REMOVER</span>`;
+    list.appendChild(div);
   });
 }
 
-function addPlayer(){
-  const name = input.value.trim();
-  if(!name) return;
+function removePlayer(i) { players.splice(i, 1); renderPlayers(); }
 
-  players.push(name);
-  input.value = "";
-  renderPlayers();
-}
-
-function prepareRound(){
-  chosenCategory = randomItem(categories);
-  chosenWord = randomItem(chosenCategory.words);
-  impostorIndex = Math.floor(Math.random() * players.length);
-  currentIndex = 0;
-}
-
-function startGame(){
-  if(players.length < 3){
-    alert("precisa ter pelo menos 3 jogadores.");
-    return;
-  }
-
-  prepareRound();
-  showPassScreen();
-}
-
-function showPassScreen(){
-  document.getElementById("currentName").textContent = players[currentIndex];
-  showOnly(passScreen);
-}
-
-function showSecret(){
-  const content = document.getElementById("secretContent");
-
-  if(currentIndex === impostorIndex){
-    content.innerHTML = `
-      <div class="category">${chosenCategory.name}</div>
-      <div class="impostor">você é o impostor</div>
-      <p class="small">você só sabe a categoria. tente disfarçar.</p>
-    `;
-  } else {
-    content.innerHTML = `
-      <div class="category">${chosenCategory.name}</div>
-      <div class="word">${chosenWord}</div>
-      <p class="small">não fale a palavra diretamente.</p>
-    `;
-  }
-
-  showOnly(secretScreen);
-}
-
-function hideSecret(){
-  currentIndex++;
-
-  if(currentIndex >= players.length){
-    document.getElementById("finalCategory").textContent = chosenCategory.name;
-    showOnly(endScreen);
-    return;
-  }
-
-  showPassScreen();
-}
-
-function newRound(){
-  prepareRound();
-  showPassScreen();
-}
-
-function restartRound(){
-  currentIndex = 0;
-  impostorIndex = 0;
-  chosenCategory = null;
-  chosenWord = "";
-  renderPlayers();
-  showOnly(setup);
-}
-
-function clearPlayers(){
-  players = [];
-  currentIndex = 0;
-  impostorIndex = 0;
-  chosenCategory = null;
-  chosenWord = "";
-  input.value = "";
-  renderPlayers();
-  showOnly(setup);
-}
-
-document.getElementById("addBtn").onclick = addPlayer;
-document.getElementById("startBtn").onclick = startGame;
-document.getElementById("revealBtn").onclick = showSecret;
-document.getElementById("hideBtn").onclick = hideSecret;
-document.getElementById("newRoundBtn").onclick = newRound;
-document.getElementById("clearBtn").onclick = clearPlayers;
-document.getElementById("clearEndBtn").onclick = clearPlayers;
-
-document.getElementById("exampleBtn").onclick = () => {
-  players = ["Pedro", "Ana", "Lucas", "Julia"];
-  renderPlayers();
+document.getElementById("addBtn").onclick = () => {
+  const val = document.getElementById("playerInput").value.trim();
+  if(val) { players.push(val); document.getElementById("playerInput").value = ""; renderPlayers(); }
 };
 
-document.querySelectorAll(".restartBtn").forEach(btn => {
-  btn.onclick = restartRound;
-});
+function prepareRound(){
+  chosenCategory = categories[Math.floor(Math.random()*categories.length)];
+  chosenWord = chosenCategory.words[Math.floor(Math.random()*chosenCategory.words.length)];
+  impostorIndex = Math.floor(Math.random()*players.length);
+  currentIndex = 0;
+}
 
-input.addEventListener("keydown", e => {
-  if(e.key === "Enter") addPlayer();
-});
+btns.start.onclick = () => {
+  if(players.length < 3) return alert("ERRO: MÍNIMO 3 AGENTES.");
+  prepareRound();
+  showPass();
+};
+
+function showPass(){
+  document.getElementById("currentName").textContent = players[currentIndex].toUpperCase();
+  showScreen('pass');
+}
+
+btns.reveal.onclick = () => {
+  const content = document.getElementById("secretContent");
+  if(currentIndex === impostorIndex){
+    content.innerHTML = `<div class="category-tag">ARQUIVO: ${chosenCategory.name}</div><div class="impostor-text">VOCÊ É O IMPOSTOR</div>`;
+  } else {
+    content.innerHTML = `<div class="category-tag">ARQUIVO: ${chosenCategory.name}</div><div class="secret-word">${chosenWord}</div>`;
+  }
+  showScreen('secret');
+};
+
+btns.hide.onclick = () => {
+  currentIndex++;
+  if(currentIndex >= players.length) {
+    document.getElementById("finalCategory").textContent = chosenCategory.name;
+    document.getElementById("revealArea").classList.add("hidden");
+    showScreen('end');
+  } else {
+    showPass();
+  }
+};
+
+document.getElementById("showRevealBtn").onclick = () => {
+  const area = document.getElementById("revealArea");
+  const content = document.getElementById("revealContent");
+  content.innerHTML = players.map((p, i) => `
+    <div class="reveal-item">
+      <span>${p.toUpperCase()}</span>
+      <span class="reveal-role ${i === impostorIndex ? 'role-impostor' : 'role-agent'}">
+        ${i === impostorIndex ? 'IMPOSTOR' : chosenWord}
+      </span>
+    </div>
+  `).join('');
+  area.classList.remove("hidden");
+};
+
+btns.newRound.onclick = () => { prepareRound(); showPass(); };
+btns.restart.onclick = () => { showScreen('setup'); };
+document.getElementById("clearBtn").onclick = () => { players = []; renderPlayers(); };
+document.getElementById("exampleBtn").onclick = () => { players = ["Alpha", "Bravo", "Charlie", "Delta"]; renderPlayers(); };
 
 renderPlayers();
 </script>
