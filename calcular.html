@@ -177,7 +177,8 @@
             margin-right: 10px;
         }
 
-        .ios-item input[type="number"], 
+        /* INPUTS - FIXED FOR COMMA SUPPORT */
+        .ios-item input, 
         .ios-item select {
             background: none;
             border: none;
@@ -185,12 +186,12 @@
             font-size: 17px;
             text-align: right;
             outline: none;
-            width: 100px;
+            width: 120px;
             font-weight: 500;
             flex-shrink: 0;
         }
 
-        /* Switch Style - FIXED COMPACT SIZE */
+        /* Switch Style */
         .switch {
             position: relative;
             display: inline-block;
@@ -390,12 +391,6 @@
             color: var(--text-color);
             border: 1px solid var(--border-color);
         }
-
-        input::-webkit-outer-spin-button,
-        input::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
     </style>
 </head>
 <body>
@@ -420,17 +415,18 @@
                 <div class="ios-item">
                     <div class="icon-box" style="background: var(--system-blue);"><i data-lucide="dollar-sign"></i></div>
                     <label>Valor/Hora</label>
-                    <input id="valorHora" type="number" step="0.01" placeholder="0,00" inputmode="decimal">
+                    <!-- Changed to text with decimal inputmode for better comma support -->
+                    <input id="valorHora" type="text" placeholder="0,00" inputmode="decimal">
                 </div>
                 <div class="ios-item">
                     <div class="icon-box" style="background: var(--system-orange);"><i data-lucide="clock"></i></div>
                     <label>Horas/Dia</label>
-                    <input id="horasDia" type="number" step="0.1" placeholder="0" inputmode="decimal">
+                    <input id="horasDia" type="text" placeholder="0" inputmode="decimal">
                 </div>
                 <div class="ios-item">
                     <div class="icon-box" style="background: var(--system-green);"><i data-lucide="calendar-check"></i></div>
                     <label>Dias Trabalhados</label>
-                    <input id="diasMes" type="number" placeholder="0" inputmode="numeric">
+                    <input id="diasMes" type="text" placeholder="0" inputmode="numeric">
                 </div>
                 <div class="ios-item">
                     <div class="icon-box" style="background: var(--system-gray);"><i data-lucide="calendar"></i></div>
@@ -498,7 +494,7 @@
                 <div class="ios-item">
                     <div class="icon-box" style="background: var(--system-gray);"><i data-lucide="hash"></i></div>
                     <label>Ano</label>
-                    <input id="anoVT" type="number" inputmode="numeric">
+                    <input id="anoVT" type="text" inputmode="numeric">
                 </div>
             </div>
 
@@ -614,8 +610,13 @@
             return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         }
 
+        // IMPROVED NUMBER PARSING FOR COMMA SUPPORT
         function pegarNumero(el) {
-            return Number(String(el.value).replace(',', '.')) || 0;
+            let val = el.value;
+            if (!val) return 0;
+            // Replace comma with dot and remove any other non-numeric characters except the dot
+            val = val.replace(',', '.');
+            return parseFloat(val) || 0;
         }
 
         function diasNoMes(ano, mes) {
