@@ -14,11 +14,9 @@
             --primary: #0A84FF;
             --success: #30D158;
             --danger: #FF453A;
-            --warning: #FFD60A;
             --bg: #000000;
             --card: rgba(28, 28, 30, .78);
             --card-solid: #1C1C1E;
-            --card-2: rgba(44, 44, 46, .92);
             --line: rgba(255, 255, 255, .10);
             --text: #FFFFFF;
             --text-2: rgba(235, 235, 245, .68);
@@ -63,8 +61,8 @@
             inset: 0;
             z-index: -2;
             background:
-                radial-gradient(circle at 50% -12%, rgba(10, 132, 255, .36), transparent 34%),
-                radial-gradient(circle at 105% 8%, rgba(191, 90, 242, .15), transparent 28%),
+                radial-gradient(circle at 50% -12%, rgba(10, 132, 255, .38), transparent 34%),
+                radial-gradient(circle at 105% 8%, rgba(191, 90, 242, .16), transparent 28%),
                 linear-gradient(180deg, #060608 0%, #000 100%);
         }
 
@@ -141,6 +139,8 @@
             backdrop-filter: blur(22px);
             -webkit-backdrop-filter: blur(22px);
             box-shadow: 0 8px 26px rgba(0, 0, 0, .22);
+            font-size: 24px;
+            font-weight: 700;
         }
 
         .icon-btn:active {
@@ -270,6 +270,7 @@
             left: 14px;
             right: 14px;
             bottom: 14px;
+            text-align: left;
         }
 
         .cat-info span {
@@ -407,8 +408,8 @@
             will-change: transform, opacity;
             transform: translateZ(0);
             transition:
-                transform .30s cubic-bezier(.18,.89,.32,1.18),
-                opacity .20s ease;
+                transform .28s cubic-bezier(.18,.89,.32,1.18),
+                opacity .18s ease;
         }
 
         .word.up {
@@ -438,6 +439,22 @@
             white-space: nowrap;
             backdrop-filter: blur(18px);
             -webkit-backdrop-filter: blur(18px);
+        }
+
+        .debug {
+            position: absolute;
+            left: 50%;
+            bottom: calc(62px + var(--safe-bottom));
+            transform: translateX(-50%);
+            z-index: 61;
+            padding: 7px 11px;
+            border-radius: 999px;
+            background: rgba(0,0,0,.18);
+            border: 1px solid rgba(255,255,255,.10);
+            color: rgba(255,255,255,.58);
+            font-size: 11px;
+            font-weight: 800;
+            white-space: nowrap;
         }
 
         .tap-zone {
@@ -843,9 +860,7 @@
                     <h1>Quem Sou Eu?</h1>
                 </div>
 
-                <button class="icon-btn" onclick="openSettings()" aria-label="Abrir ajustes">
-                    ⚙︎
-                </button>
+                <button class="icon-btn" onclick="openSettings()" aria-label="Abrir ajustes">⚙︎</button>
             </div>
 
             <div class="hero-card">
@@ -876,7 +891,7 @@
 
             <div class="count-box">
                 <div class="count-title">segure parado</div>
-                <div class="count-sub">o iPhone vai usar essa posição como centro. depois, incline bem para marcar.</div>
+                <div class="count-sub">o iPhone vai usar essa posição como centro. depois, incline para cima ou para baixo.</div>
             </div>
         </section>
 
@@ -890,8 +905,8 @@
             <div class="tap-zone top" onclick="tapAction('correct')"></div>
             <div class="tap-zone bottom" onclick="tapAction('wrong')"></div>
 
-            <div class="tap-label top">toque: acerto</div>
-            <div class="tap-label bottom">toque: erro</div>
+            <div class="tap-label top">toque: certo</div>
+            <div class="tap-label bottom">toque: errado</div>
 
             <div class="game-top">
                 <button class="icon-btn" onclick="exitGame()" aria-label="Sair">‹</button>
@@ -900,6 +915,7 @@
             </div>
 
             <div id="wordEl" class="word">GO!</div>
+            <div id="debugEl" class="debug">beta: --</div>
             <div id="gameHint" class="game-hint">calibrando...</div>
         </section>
 
@@ -952,21 +968,21 @@
 
             <div class="setting">
                 <label>inclinação necessária</label>
-                <p>quanto maior, mais precisa inclinar para marcar. teste entre 62 e 76.</p>
+                <p>quanto maior, mais precisa inclinar para marcar. comece em 38.</p>
 
                 <div class="range-row">
-                    <input id="sensitivityInput" type="range" min="45" max="90" value="70" oninput="setSensitivity(this.value)" />
-                    <div id="sensitivityValue" class="range-value">70</div>
+                    <input id="sensitivityInput" type="range" min="20" max="75" value="38" oninput="setSensitivity(this.value)" />
+                    <div id="sensitivityValue" class="range-value">38</div>
                 </div>
             </div>
 
             <div class="setting">
                 <label>zona neutra</label>
-                <p>ignora tremidas quando o celular está quase reto.</p>
+                <p>ignora tremidas quando o celular está quase parado. comece em 16.</p>
 
                 <div class="range-row">
-                    <input id="neutralInput" type="range" min="18" max="50" value="32" oninput="setNeutralZone(this.value)" />
-                    <div id="neutralValue" class="range-value">32</div>
+                    <input id="neutralInput" type="range" min="8" max="35" value="16" oninput="setNeutralZone(this.value)" />
+                    <div id="neutralValue" class="range-value">16</div>
                 </div>
             </div>
 
@@ -974,7 +990,7 @@
                 <div class="toggle-row">
                     <div>
                         <label>inverter sensor</label>
-                        <p>ative se inclinar para baixo estiver marcando como acerto.</p>
+                        <p>ative se para cima estiver marcando errado.</p>
                     </div>
 
                     <button id="invertSwitch" class="switch" onclick="toggleInvert()"></button>
@@ -1003,12 +1019,23 @@
                 </div>
             </div>
 
+            <div class="setting">
+                <div class="toggle-row">
+                    <div>
+                        <label>mostrar beta</label>
+                        <p>mostra o valor do sensor na tela para testar melhor.</p>
+                    </div>
+
+                    <button id="debugSwitch" class="switch" onclick="toggleDebug()"></button>
+                </div>
+            </div>
+
             <div class="actions">
                 <button class="btn primary" onclick="quickSensorTest()">testar sensor</button>
             </div>
 
             <div class="ios-note">
-                dica: espere aparecer “pronto”, incline bem e volte perto do centro para a próxima palavra.
+                regra do jogo: inclinar para cima = certo. inclinar para baixo = errado. se ficar ao contrário, ligue “inverter sensor”.
             </div>
         </div>
     </div>
@@ -1143,22 +1170,22 @@
 
         const DEFAULT_SETTINGS = {
             duration: 75,
-            sensitivity: 70,
-            neutralZone: 32,
+            sensitivity: 38,
+            neutralZone: 16,
             invertSensor: false,
             useSensor: true,
-            vibration: true
+            vibration: true,
+            debug: true
         };
 
         const SENSOR_RULES = {
-            animationTime: 300,
-            cooldown: 420,
-            minSamples: 8,
-            maxSamples: 16,
-            stabilityLimit: 4.2,
-            startDelay: 620,
-            filterSize: 5,
-            spikeLimit: 38
+            animationTime: 280,
+            cooldown: 360,
+            minSamples: 5,
+            maxSamples: 8,
+            stabilityLimit: 6,
+            startDelay: 450,
+            filterSize: 3
         };
 
         let settings = loadSettings();
@@ -1186,7 +1213,6 @@
             stableCount: 0,
             locked: false,
             mustReturnNeutral: false,
-            lastSmooth: null,
             filterValues: []
         };
 
@@ -1194,12 +1220,13 @@
             renderCategories(CATEGORIES);
             updateSettingsUI();
             updateHomeInfo();
+            updateDebugVisibility();
             preventGestures();
         }
 
         function loadSettings() {
             try {
-                const saved = JSON.parse(localStorage.getItem("quemSouEuSettingsV2"));
+                const saved = JSON.parse(localStorage.getItem("quemSouEuSettingsBetaFinal"));
                 return { ...DEFAULT_SETTINGS, ...saved };
             } catch {
                 return { ...DEFAULT_SETTINGS };
@@ -1207,14 +1234,19 @@
         }
 
         function saveSettings() {
-            localStorage.setItem("quemSouEuSettingsV2", JSON.stringify(settings));
+            localStorage.setItem("quemSouEuSettingsBetaFinal", JSON.stringify(settings));
             updateSettingsUI();
             updateHomeInfo();
+            updateDebugVisibility();
         }
 
         function updateHomeInfo() {
             document.getElementById("homeDuration").innerText = settings.duration + "s";
             document.getElementById("homeControl").innerText = settings.useSensor ? "sensor + toque" : "só toque";
+        }
+
+        function updateDebugVisibility() {
+            document.getElementById("debugEl").style.display = settings.debug ? "block" : "none";
         }
 
         function renderCategories(list) {
@@ -1341,11 +1373,11 @@
             sensor.stableCount = 0;
             sensor.locked = true;
             sensor.mustReturnNeutral = false;
-            sensor.lastSmooth = null;
             sensor.filterValues = [];
 
             document.getElementById("gameScreen").classList.add("calibrating");
             setHint(settings.useSensor ? "calibrando..." : "toque em cima ou embaixo");
+            setDebug("beta: --");
 
             setTimeout(() => {
                 sensor.locked = false;
@@ -1360,58 +1392,17 @@
             }, SENSOR_RULES.startDelay);
         }
 
-        function getOrientationAngle() {
-            if (screen.orientation && typeof screen.orientation.angle === "number") {
-                return screen.orientation.angle;
-            }
-
-            if (typeof window.orientation === "number") {
-                return window.orientation;
-            }
-
-            return 0;
-        }
-
-        function getLandscapeDirectionMultiplier() {
-            const angle = getOrientationAngle();
-
-            if (angle === -90 || angle === 270) {
-                return -1;
-            }
-
-            return 1;
-        }
-
         function getMotionValue(event) {
             const beta = event.beta;
-            const gamma = event.gamma;
 
-            const isLandscape = window.innerWidth > window.innerHeight;
-
-            if (isLandscape && typeof gamma === "number") {
-                return gamma * getLandscapeDirectionMultiplier();
+            if (typeof beta !== "number" || Number.isNaN(beta)) {
+                return null;
             }
 
-            if (typeof beta === "number") {
-                return beta;
-            }
-
-            if (typeof gamma === "number") {
-                return gamma;
-            }
-
-            return null;
+            return beta;
         }
 
         function smoothMotionValue(value) {
-            if (sensor.lastSmooth !== null) {
-                const jump = Math.abs(value - sensor.lastSmooth);
-
-                if (jump > SENSOR_RULES.spikeLimit) {
-                    return sensor.lastSmooth;
-                }
-            }
-
             sensor.filterValues.push(value);
 
             if (sensor.filterValues.length > SENSOR_RULES.filterSize) {
@@ -1419,11 +1410,7 @@
             }
 
             const sum = sensor.filterValues.reduce((total, item) => total + item, 0);
-            const smooth = sum / sensor.filterValues.length;
-
-            sensor.lastSmooth = smooth;
-
-            return smooth;
+            return sum / sensor.filterValues.length;
         }
 
         function handleOrientation(event) {
@@ -1434,12 +1421,13 @@
 
             let value = getMotionValue(event);
 
-            if (value === null || Number.isNaN(value)) return;
+            if (value === null) return;
 
             value = smoothMotionValue(value);
 
             if (!sensor.ready) {
                 calibrateSensor(value);
+                setDebug("calibrando beta: " + value.toFixed(1));
                 return;
             }
 
@@ -1452,6 +1440,8 @@
             const absDiff = Math.abs(diff);
             const neutralZone = Number(settings.neutralZone);
             const sensitivity = Number(settings.sensitivity);
+
+            setDebug("beta: " + value.toFixed(1) + " | centro: " + sensor.base.toFixed(1) + " | diff: " + diff.toFixed(1));
 
             if (absDiff <= neutralZone) {
                 sensor.mustReturnNeutral = false;
@@ -1473,9 +1463,18 @@
                 return;
             }
 
-            if (diff > sensitivity) {
+            /*
+                REGRA FINAL:
+                - Para cima = certo
+                - Para baixo = errado
+
+                Se no seu iPhone ficar ao contrário,
+                ligue "inverter sensor" nos ajustes.
+            */
+
+            if (diff < -sensitivity) {
                 performAction("correct", "sensor");
-            } else if (diff < -sensitivity) {
+            } else if (diff > sensitivity) {
                 performAction("wrong", "sensor");
             }
         }
@@ -1499,7 +1498,7 @@
                 sensor.samples.shift();
             }
 
-            if (sensor.samples.length >= SENSOR_RULES.minSamples && sensor.stableCount >= 4) {
+            if (sensor.samples.length >= SENSOR_RULES.minSamples && sensor.stableCount >= 3) {
                 const sum = sensor.samples.reduce((total, item) => total + item, 0);
 
                 sensor.base = sum / sensor.samples.length;
@@ -1514,7 +1513,7 @@
                     if (game.active && sensor.ready) {
                         setHint("incline bem");
                     }
-                }, 420);
+                }, 350);
             }
         }
 
@@ -1662,6 +1661,10 @@
             document.getElementById("gameHint").innerText = text;
         }
 
+        function setDebug(text) {
+            document.getElementById("debugEl").innerText = text;
+        }
+
         function shuffle(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const random = Math.floor(Math.random() * (i + 1));
@@ -1701,6 +1704,7 @@
             document.getElementById("invertSwitch").classList.toggle("on", settings.invertSensor);
             document.getElementById("sensorSwitch").classList.toggle("on", settings.useSensor);
             document.getElementById("vibrationSwitch").classList.toggle("on", settings.vibration);
+            document.getElementById("debugSwitch").classList.toggle("on", settings.debug);
         }
 
         function setDuration(value) {
@@ -1746,6 +1750,11 @@
             saveSettings();
         }
 
+        function toggleDebug() {
+            settings.debug = !settings.debug;
+            saveSettings();
+        }
+
         function quickSensorTest() {
             closeSettings();
 
@@ -1767,7 +1776,7 @@
                     game.isAnimating = false;
                     showScreen("homeScreen");
                 }
-            }, 5200);
+            }, 6000);
         }
 
         function preventGestures() {
