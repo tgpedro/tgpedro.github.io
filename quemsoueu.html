@@ -11,18 +11,23 @@
 
     <style>
         :root {
-            --primary: #007AFF;
-            --success: #34C759;
-            --danger: #FF3B30;
-            --warning: #FFCC00;
+            --primary: #0A84FF;
+            --primary-2: #64D2FF;
+            --success: #30D158;
+            --danger: #FF453A;
+            --warning: #FFD60A;
+
             --bg: #000000;
-            --bg-soft: #101012;
-            --card: #1C1C1E;
-            --card-2: #2C2C2E;
-            --line: rgba(255,255,255,.08);
+            --bg-soft: #0C0C0E;
+            --card: rgba(28, 28, 30, .76);
+            --card-solid: #1C1C1E;
+            --card-2: rgba(44, 44, 46, .88);
+            --line: rgba(255, 255, 255, .10);
+
             --text: #FFFFFF;
-            --text-2: #A1A1A6;
-            --text-3: #6E6E73;
+            --text-2: rgba(235, 235, 245, .68);
+            --text-3: rgba(235, 235, 245, .38);
+
             --safe-top: env(safe-area-inset-top);
             --safe-bottom: env(safe-area-inset-bottom);
         }
@@ -48,14 +53,14 @@
         }
 
         button,
-        input,
-        select {
+        input {
             font: inherit;
         }
 
         button {
             border: none;
             cursor: pointer;
+            color: inherit;
         }
 
         .app-bg {
@@ -63,9 +68,22 @@
             inset: 0;
             z-index: -2;
             background:
-                radial-gradient(circle at 50% -10%, rgba(0,122,255,.28), transparent 35%),
-                radial-gradient(circle at 100% 10%, rgba(88,86,214,.16), transparent 26%),
-                linear-gradient(180deg, #050507 0%, #000 100%);
+                radial-gradient(circle at 50% -12%, rgba(10, 132, 255, .36), transparent 34%),
+                radial-gradient(circle at 105% 8%, rgba(191, 90, 242, .17), transparent 28%),
+                radial-gradient(circle at 0% 40%, rgba(48, 209, 88, .07), transparent 26%),
+                linear-gradient(180deg, #060608 0%, #000 100%);
+        }
+
+        .noise {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            opacity: .045;
+            pointer-events: none;
+            background-image:
+                radial-gradient(circle at 20% 30%, #fff 0 1px, transparent 1px),
+                radial-gradient(circle at 70% 80%, #fff 0 1px, transparent 1px);
+            background-size: 24px 24px;
         }
 
         .screen {
@@ -73,24 +91,23 @@
             inset: 0;
             display: none;
             flex-direction: column;
-            background: transparent;
             padding: calc(18px + var(--safe-top)) 18px calc(18px + var(--safe-bottom));
         }
 
         .screen.active {
             display: flex;
-            animation: screenIn .28s ease both;
+            animation: screenIn .24s ease both;
         }
 
         @keyframes screenIn {
             from {
                 opacity: 0;
-                transform: translateY(8px);
+                transform: scale(.985) translateY(8px);
             }
 
             to {
                 opacity: 1;
-                transform: translateY(0);
+                transform: scale(1) translateY(0);
             }
         }
 
@@ -109,8 +126,8 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 12px;
-            margin-bottom: 20px;
+            gap: 14px;
+            margin-bottom: 18px;
         }
 
         .brand {
@@ -118,89 +135,88 @@
         }
 
         .brand small {
+            display: block;
             color: var(--text-3);
             font-size: 12px;
-            font-weight: 800;
+            font-weight: 850;
+            letter-spacing: .7px;
             text-transform: uppercase;
-            letter-spacing: .8px;
+            margin-bottom: 4px;
         }
 
         .brand h1 {
-            margin-top: 3px;
-            font-size: 34px;
+            font-size: 35px;
+            line-height: .94;
             font-weight: 950;
-            letter-spacing: -1.4px;
-            line-height: .95;
+            letter-spacing: -1.5px;
         }
 
-        .round-btn {
+        .icon-btn {
             width: 46px;
             height: 46px;
             border-radius: 50%;
             display: grid;
             place-items: center;
-            background: rgba(255,255,255,.10);
-            color: white;
-            border: 1px solid rgba(255,255,255,.12);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
             flex-shrink: 0;
+            background: rgba(255, 255, 255, .10);
+            border: 1px solid rgba(255, 255, 255, .13);
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
+            box-shadow: 0 8px 26px rgba(0, 0, 0, .22);
         }
 
-        .round-btn:active {
+        .icon-btn:active {
             transform: scale(.94);
+            background: rgba(255, 255, 255, .16);
         }
 
-        .search-wrap {
-            position: sticky;
-            top: 0;
-            z-index: 20;
-            padding: 8px 0 14px;
-            background: linear-gradient(to bottom, rgba(0,0,0,.96), rgba(0,0,0,.84), transparent);
-        }
-
-        .search {
-            width: 100%;
-            height: 50px;
-            border-radius: 16px;
-            border: 1px solid var(--line);
-            background: rgba(44,44,46,.86);
-            color: white;
-            outline: none;
-            padding: 0 16px;
-            font-size: 16px;
-            font-weight: 650;
-        }
-
-        .search::placeholder {
-            color: var(--text-3);
-        }
-
-        .search:focus {
-            border-color: rgba(0,122,255,.75);
-            background: rgba(44,44,46,.96);
-        }
-
-        .status-card {
-            background: rgba(28,28,30,.78);
-            border: 1px solid var(--line);
-            border-radius: 24px;
-            padding: 16px;
+        .hero-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 30px;
+            padding: 18px;
             margin-bottom: 16px;
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
+            background: linear-gradient(145deg, rgba(28,28,30,.82), rgba(28,28,30,.48));
+            border: 1px solid var(--line);
+            backdrop-filter: blur(28px);
+            -webkit-backdrop-filter: blur(28px);
+            box-shadow: 0 22px 70px rgba(0, 0, 0, .28);
         }
 
-        .status-row {
+        .hero-card::before {
+            content: "";
+            position: absolute;
+            inset: -1px;
+            background:
+                radial-gradient(circle at 20% 0%, rgba(100, 210, 255, .18), transparent 34%),
+                radial-gradient(circle at 100% 100%, rgba(10, 132, 255, .12), transparent 40%);
+            pointer-events: none;
+        }
+
+        .hero-inner {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-title {
+            font-size: 17px;
+            font-weight: 900;
+            letter-spacing: -.3px;
+            margin-bottom: 12px;
+        }
+
+        .hero-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
         }
 
         .mini-stat {
-            background: rgba(255,255,255,.055);
-            border-radius: 18px;
+            min-height: 74px;
+            border-radius: 22px;
             padding: 13px;
+            background: rgba(255, 255, 255, .06);
+            border: 1px solid rgba(255, 255, 255, .06);
         }
 
         .mini-stat span {
@@ -210,29 +226,62 @@
             font-weight: 850;
             text-transform: uppercase;
             letter-spacing: .6px;
-            margin-bottom: 4px;
+            margin-bottom: 5px;
         }
 
         .mini-stat strong {
-            font-size: 17px;
-            font-weight: 900;
+            font-size: 18px;
+            font-weight: 950;
+            letter-spacing: -.4px;
+        }
+
+        .search-wrap {
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            padding: 8px 0 14px;
+            background: linear-gradient(to bottom, rgba(0,0,0,.98), rgba(0,0,0,.86), transparent);
+        }
+
+        .search {
+            width: 100%;
+            height: 52px;
+            border-radius: 18px;
+            border: 1px solid var(--line);
+            background: rgba(44, 44, 46, .82);
+            color: white;
+            outline: none;
+            padding: 0 16px;
+            font-size: 16px;
+            font-weight: 720;
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+        }
+
+        .search::placeholder {
+            color: var(--text-3);
+        }
+
+        .search:focus {
+            border-color: rgba(10,132,255,.76);
+            background: rgba(44, 44, 46, .96);
         }
 
         .categories {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 14px;
-            padding-bottom: 28px;
+            padding-bottom: 30px;
         }
 
         .cat {
+            height: 184px;
             position: relative;
-            height: 190px;
-            border-radius: 26px;
             overflow: hidden;
-            background: var(--card);
-            border: 1px solid rgba(255,255,255,.075);
-            box-shadow: 0 18px 50px rgba(0,0,0,.28);
+            border-radius: 28px;
+            background: var(--card-solid);
+            border: 1px solid rgba(255,255,255,.08);
+            box-shadow: 0 18px 44px rgba(0,0,0,.28);
         }
 
         .cat:active {
@@ -244,7 +293,7 @@
             inset: 0;
             background-size: cover;
             background-position: center;
-            opacity: .58;
+            opacity: .62;
             transform: scale(1.02);
         }
 
@@ -253,8 +302,8 @@
             position: absolute;
             inset: 0;
             background:
-                linear-gradient(to top, rgba(0,0,0,.92), rgba(0,0,0,.14) 62%, rgba(0,0,0,.04)),
-                radial-gradient(circle at 50% 100%, rgba(0,122,255,.20), transparent 45%);
+                linear-gradient(to top, rgba(0,0,0,.94), rgba(0,0,0,.18) 62%, rgba(0,0,0,.03)),
+                radial-gradient(circle at 50% 100%, rgba(10,132,255,.26), transparent 45%);
         }
 
         .cat-info {
@@ -266,54 +315,66 @@
         }
 
         .cat-info span {
-            color: rgba(255,255,255,.68);
+            display: block;
+            color: rgba(235,235,245,.62);
             font-size: 11px;
-            font-weight: 850;
-            text-transform: uppercase;
+            font-weight: 900;
             letter-spacing: .6px;
+            text-transform: uppercase;
+            margin-bottom: 4px;
         }
 
         .cat-info h3 {
-            margin-top: 3px;
             font-size: 20px;
-            line-height: 1;
-            letter-spacing: -.35px;
+            line-height: .98;
             font-weight: 950;
+            letter-spacing: -.5px;
         }
 
         .empty {
             grid-column: 1 / -1;
+            padding: 50px 0;
             text-align: center;
             color: var(--text-3);
-            padding: 50px 0;
-            font-weight: 750;
+            font-weight: 800;
         }
 
         .count-screen {
             justify-content: center;
             align-items: center;
             text-align: center;
-            gap: 18px;
+            gap: 20px;
         }
 
         .count-number {
-            font-size: 138px;
-            line-height: .9;
+            font-size: 132px;
+            line-height: .86;
             font-weight: 950;
             letter-spacing: -5px;
             color: var(--primary);
-            text-shadow: 0 20px 60px rgba(0,122,255,.24);
+            text-shadow: 0 24px 68px rgba(10,132,255,.30);
+        }
+
+        .count-box {
+            width: min(360px, 100%);
+            border-radius: 28px;
+            padding: 18px;
+            background: rgba(28,28,30,.72);
+            border: 1px solid var(--line);
+            backdrop-filter: blur(28px);
+            -webkit-backdrop-filter: blur(28px);
         }
 
         .count-title {
-            font-size: 22px;
-            font-weight: 900;
-            letter-spacing: -.4px;
+            font-size: 21px;
+            font-weight: 950;
+            letter-spacing: -.5px;
+            margin-bottom: 6px;
         }
 
         .count-sub {
             color: var(--text-2);
-            max-width: 320px;
+            font-size: 14px;
             line-height: 1.35;
             font-weight: 650;
         }
@@ -324,7 +385,7 @@
             align-items: center;
             justify-content: center;
             background: var(--primary);
-            transition: background .25s ease;
+            transition: background .18s ease;
             touch-action: none;
         }
 
@@ -337,84 +398,89 @@
         }
 
         .game.calibrating {
-            background: #0A62D0;
+            background: #0867D7;
         }
 
         .game-top {
             position: absolute;
-            top: calc(16px + var(--safe-top));
-            left: 16px;
-            right: 16px;
-            z-index: 40;
+            top: calc(14px + var(--safe-top));
+            left: 14px;
+            right: 14px;
+            z-index: 50;
             display: flex;
             align-items: center;
             justify-content: space-between;
             pointer-events: none;
         }
 
-        .game-top .round-btn {
+        .game-top .icon-btn {
             pointer-events: auto;
         }
 
         .timer {
-            min-width: 86px;
+            min-width: 88px;
             height: 48px;
+            padding: 0 18px;
             display: grid;
             place-items: center;
             border-radius: 999px;
-            background: rgba(0,0,0,.22);
-            border: 1px solid rgba(255,255,255,.13);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            background: rgba(0, 0, 0, .22);
+            border: 1px solid rgba(255,255,255,.15);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
             font-size: 24px;
             font-weight: 950;
-            text-shadow: 0 2px 12px rgba(0,0,0,.24);
+            letter-spacing: -.5px;
+            box-shadow: 0 10px 30px rgba(0,0,0,.18);
         }
 
         .word {
-            z-index: 10;
+            z-index: 15;
             width: 100%;
             max-width: 980px;
-            padding: 0 30px;
+            padding: 0 32px;
             text-align: center;
-            font-size: clamp(48px, 11vw, 104px);
-            line-height: .9;
+            font-size: clamp(48px, 11vw, 106px);
+            line-height: .88;
             font-weight: 950;
             letter-spacing: -3px;
             text-transform: uppercase;
             overflow-wrap: anywhere;
-            text-shadow: 0 8px 30px rgba(0,0,0,.22);
+            text-shadow: 0 10px 34px rgba(0,0,0,.22);
+            will-change: transform, opacity;
+            transform: translateZ(0);
             transition:
-                transform .42s cubic-bezier(.18,.89,.32,1.26),
-                opacity .28s ease;
+                transform .34s cubic-bezier(.18,.89,.32,1.20),
+                opacity .22s ease;
         }
 
         .word.up {
-            transform: translateY(-110vh) rotate(-5deg);
+            transform: translate3d(0, -112vh, 0) rotate(-4deg);
             opacity: 0;
         }
 
         .word.down {
-            transform: translateY(110vh) rotate(5deg);
+            transform: translate3d(0, 112vh, 0) rotate(4deg);
             opacity: 0;
         }
 
         .game-hint {
             position: absolute;
             left: 50%;
-            bottom: calc(22px + var(--safe-bottom));
+            bottom: calc(20px + var(--safe-bottom));
             transform: translateX(-50%);
-            z-index: 45;
+            z-index: 60;
+            max-width: calc(100% - 30px);
             padding: 10px 15px;
             border-radius: 999px;
             background: rgba(0,0,0,.24);
-            border: 1px solid rgba(255,255,255,.12);
-            color: rgba(255,255,255,.88);
+            border: 1px solid rgba(255,255,255,.14);
+            color: rgba(255,255,255,.9);
             font-size: 13px;
             font-weight: 850;
             white-space: nowrap;
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
         }
 
         .tap-zone {
@@ -437,20 +503,20 @@
             position: absolute;
             right: 16px;
             z-index: 13;
-            color: rgba(255,255,255,.42);
+            color: rgba(255,255,255,.38);
             font-size: 11px;
-            font-weight: 900;
+            font-weight: 950;
+            letter-spacing: .8px;
             text-transform: uppercase;
-            letter-spacing: .7px;
             pointer-events: none;
         }
 
         .tap-label.top {
-            top: calc(78px + var(--safe-top));
+            top: calc(76px + var(--safe-top));
         }
 
         .tap-label.bottom {
-            bottom: calc(68px + var(--safe-bottom));
+            bottom: calc(66px + var(--safe-bottom));
         }
 
         .orientation {
@@ -463,24 +529,24 @@
             justify-content: center;
             flex-direction: column;
             text-align: center;
-            padding: 24px;
+            padding: 26px;
         }
 
-        .orientation .icon {
+        .orientation .phone {
             font-size: 58px;
             margin-bottom: 14px;
         }
 
         .orientation h2 {
-            font-size: 26px;
+            font-size: 27px;
             font-weight: 950;
             letter-spacing: -.6px;
-            margin-bottom: 8px;
+            margin-bottom: 7px;
         }
 
         .orientation p {
             color: var(--text-2);
-            max-width: 310px;
+            max-width: 320px;
             line-height: 1.35;
             font-weight: 650;
         }
@@ -499,19 +565,20 @@
 
         .result-head {
             text-align: center;
-            margin: 26px 0 18px;
+            margin: 28px 0 18px;
         }
 
         .result-head h2 {
-            font-size: 38px;
+            font-size: 40px;
+            line-height: .96;
             font-weight: 950;
-            letter-spacing: -1.2px;
+            letter-spacing: -1.3px;
         }
 
         .result-head p {
-            margin-top: 6px;
             color: var(--text-2);
             font-weight: 700;
+            margin-top: 8px;
         }
 
         .score {
@@ -522,24 +589,26 @@
         }
 
         .score-box {
-            background: rgba(28,28,30,.84);
-            border: 1px solid var(--line);
-            border-radius: 24px;
-            padding: 18px;
+            border-radius: 28px;
+            padding: 20px;
             text-align: center;
+            background: rgba(28,28,30,.74);
+            border: 1px solid var(--line);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
         }
 
         .score-box strong {
             display: block;
-            font-size: 46px;
+            font-size: 48px;
             line-height: 1;
             font-weight: 950;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
         }
 
         .score-box span {
             color: var(--text-2);
-            font-weight: 800;
+            font-weight: 850;
         }
 
         .history {
@@ -550,15 +619,17 @@
         }
 
         .hist-item {
-            background: rgba(28,28,30,.84);
+            background: rgba(28,28,30,.78);
             border: 1px solid var(--line);
-            border-radius: 18px;
+            border-radius: 20px;
             padding: 15px 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 14px;
-            font-weight: 800;
+            font-weight: 850;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
         }
 
         .hist-item span:first-child {
@@ -583,29 +654,34 @@
             width: 100%;
             height: 58px;
             border-radius: 20px;
-            color: white;
-            font-weight: 950;
             font-size: 16px;
-            text-transform: uppercase;
+            font-weight: 950;
             letter-spacing: .2px;
+            text-transform: uppercase;
         }
 
         .btn.primary {
             background: var(--primary);
+            color: white;
         }
 
         .btn.soft {
             background: rgba(255,255,255,.10);
             border: 1px solid var(--line);
+            color: white;
+        }
+
+        .btn:active {
+            transform: scale(.985);
         }
 
         .modal {
             position: fixed;
             inset: 0;
-            z-index: 2000;
+            z-index: 2200;
             display: none;
             align-items: flex-end;
-            background: rgba(0,0,0,.52);
+            background: rgba(0,0,0,.56);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
         }
@@ -617,15 +693,16 @@
         .sheet {
             width: 100%;
             max-height: 88vh;
-            background: rgba(18,18,20,.96);
-            border: 1px solid rgba(255,255,255,.10);
-            border-bottom: 0;
-            border-radius: 30px 30px 0 0;
-            padding: 18px 18px calc(18px + var(--safe-bottom));
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
             touch-action: pan-y;
-            animation: sheetIn .26s ease both;
+            padding: 10px 16px calc(18px + var(--safe-bottom));
+            border-radius: 32px 32px 0 0;
+            background: rgba(18,18,20,.96);
+            border: 1px solid rgba(255,255,255,.12);
+            border-bottom: 0;
+            box-shadow: 0 -30px 80px rgba(0,0,0,.46);
+            animation: sheetIn .24s ease both;
         }
 
         @keyframes sheetIn {
@@ -638,6 +715,14 @@
             }
         }
 
+        .grabber {
+            width: 42px;
+            height: 5px;
+            border-radius: 999px;
+            background: rgba(255,255,255,.22);
+            margin: 0 auto 16px;
+        }
+
         .sheet-head {
             display: flex;
             align-items: center;
@@ -646,24 +731,24 @@
         }
 
         .sheet-head h2 {
-            font-size: 26px;
+            font-size: 28px;
             font-weight: 950;
-            letter-spacing: -.7px;
+            letter-spacing: -.8px;
         }
 
         .setting {
             background: rgba(255,255,255,.055);
             border: 1px solid rgba(255,255,255,.075);
-            border-radius: 22px;
+            border-radius: 24px;
             padding: 15px;
             margin-bottom: 12px;
         }
 
         .setting label {
             display: block;
-            color: var(--text);
+            color: white;
             font-size: 15px;
-            font-weight: 900;
+            font-weight: 950;
             margin-bottom: 5px;
         }
 
@@ -671,30 +756,31 @@
             color: var(--text-2);
             font-size: 13px;
             line-height: 1.35;
-            font-weight: 600;
+            font-weight: 650;
             margin-bottom: 12px;
         }
 
         .segmented {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            padding: 4px;
             gap: 4px;
-            border-radius: 16px;
+            padding: 4px;
+            border-radius: 17px;
             background: rgba(0,0,0,.26);
         }
 
         .segmented button {
-            height: 40px;
-            border-radius: 13px;
+            height: 42px;
+            border-radius: 14px;
             background: transparent;
             color: var(--text-2);
-            font-weight: 850;
+            font-weight: 900;
         }
 
         .segmented button.active {
             background: rgba(255,255,255,.16);
             color: white;
+            box-shadow: 0 6px 18px rgba(0,0,0,.15);
         }
 
         .toggle-row {
@@ -706,12 +792,12 @@
 
         .switch {
             position: relative;
-            width: 56px;
-            height: 34px;
+            width: 58px;
+            height: 35px;
             border-radius: 999px;
-            background: rgba(255,255,255,.18);
+            background: rgba(120,120,128,.32);
             flex-shrink: 0;
-            transition: background .2s ease;
+            transition: background .18s ease;
         }
 
         .switch::after {
@@ -719,11 +805,12 @@
             position: absolute;
             top: 3px;
             left: 3px;
-            width: 28px;
-            height: 28px;
+            width: 29px;
+            height: 29px;
             border-radius: 50%;
             background: white;
-            transition: transform .2s ease;
+            box-shadow: 0 3px 10px rgba(0,0,0,.28);
+            transition: transform .18s ease;
         }
 
         .switch.on {
@@ -731,14 +818,14 @@
         }
 
         .switch.on::after {
-            transform: translateX(22px);
+            transform: translateX(23px);
         }
 
         .range-row {
             display: grid;
             grid-template-columns: 1fr auto;
-            gap: 14px;
             align-items: center;
+            gap: 14px;
         }
 
         input[type="range"] {
@@ -747,22 +834,22 @@
         }
 
         .range-value {
-            min-width: 54px;
+            min-width: 56px;
             height: 38px;
-            border-radius: 13px;
-            background: rgba(0,0,0,.25);
+            border-radius: 14px;
             display: grid;
             place-items: center;
-            font-weight: 900;
+            background: rgba(0,0,0,.28);
+            font-weight: 950;
         }
 
-        .about {
+        .ios-note {
             color: var(--text-3);
             font-size: 12px;
             text-align: center;
             line-height: 1.35;
-            padding: 8px 6px 0;
-            font-weight: 600;
+            font-weight: 650;
+            padding: 8px 4px 0;
         }
 
         @media (max-width: 420px) {
@@ -776,8 +863,8 @@
             }
 
             .cat {
-                height: 168px;
-                border-radius: 23px;
+                height: 166px;
+                border-radius: 24px;
             }
 
             .cat-info h3 {
@@ -799,6 +886,7 @@
 
 <body>
     <div class="app-bg"></div>
+    <div class="noise"></div>
 
     <main>
         <section id="homeScreen" class="screen active scroll">
@@ -808,7 +896,7 @@
                     <h1>Quem Sou Eu?</h1>
                 </div>
 
-                <button class="round-btn" onclick="openSettings()" aria-label="Abrir ajustes">
+                <button class="icon-btn" onclick="openSettings()" aria-label="Abrir ajustes">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
                         <path d="M12 15.5A3.5 3.5 0 1 0 12 8.5a3.5 3.5 0 0 0 0 7Z" stroke="white" stroke-width="2"/>
                         <path d="M19.4 15a1.8 1.8 0 0 0 .36 1.98l.04.04a2.18 2.18 0 0 1-3.08 3.08l-.04-.04A1.8 1.8 0 0 0 14.7 19.7a1.8 1.8 0 0 0-1.1 1.65V21.5a2.18 2.18 0 0 1-4.36 0v-.06A1.8 1.8 0 0 0 8.14 19.8a1.8 1.8 0 0 0-1.98.36l-.04.04a2.18 2.18 0 0 1-3.08-3.08l.04-.04A1.8 1.8 0 0 0 3.44 15a1.8 1.8 0 0 0-1.65-1.1H1.64a2.18 2.18 0 0 1 0-4.36h.06A1.8 1.8 0 0 0 3.35 8.44a1.8 1.8 0 0 0-.36-1.98l-.04-.04a2.18 2.18 0 0 1 3.08-3.08l.04.04A1.8 1.8 0 0 0 8.05 3.74a1.8 1.8 0 0 0 1.1-1.65V1.94a2.18 2.18 0 0 1 4.36 0V2a1.8 1.8 0 0 0 1.1 1.65 1.8 1.8 0 0 0 1.98-.36l.04-.04a2.18 2.18 0 0 1 3.08 3.08l-.04.04a1.8 1.8 0 0 0-.36 1.98 1.8 1.8 0 0 0 1.65 1.1h.15a2.18 2.18 0 0 1 0 4.36h-.06A1.8 1.8 0 0 0 19.4 15Z" stroke="white" stroke-width="1.7" stroke-linecap="round"/>
@@ -816,16 +904,20 @@
                 </button>
             </div>
 
-            <div class="status-card">
-                <div class="status-row">
-                    <div class="mini-stat">
-                        <span>rodada</span>
-                        <strong id="homeDuration">75s</strong>
-                    </div>
+            <div class="hero-card">
+                <div class="hero-inner">
+                    <div class="hero-title">pronto para jogar</div>
 
-                    <div class="mini-stat">
-                        <span>controle</span>
-                        <strong id="homeControl">sensor + toque</strong>
+                    <div class="hero-grid">
+                        <div class="mini-stat">
+                            <span>rodada</span>
+                            <strong id="homeDuration">75s</strong>
+                        </div>
+
+                        <div class="mini-stat">
+                            <span>controle</span>
+                            <strong id="homeControl">sensor + toque</strong>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -839,17 +931,18 @@
 
         <section id="countScreen" class="screen count-screen">
             <div id="countNumber" class="count-number">3</div>
-            <div>
-                <div class="count-title">segure o celular parado</div>
-                <div class="count-sub">o app vai usar essa posição como centro antes de começar</div>
+
+            <div class="count-box">
+                <div class="count-title">segure parado</div>
+                <div class="count-sub">o iPhone vai usar essa posição como centro. depois, incline bem para marcar.</div>
             </div>
         </section>
 
         <section id="gameScreen" class="screen game">
             <div class="orientation">
-                <div class="icon">📱</div>
+                <div class="phone">📱</div>
                 <h2>vire o celular</h2>
-                <p>para jogar no estilo testa, use o iPhone deitado em paisagem.</p>
+                <p>use o iPhone deitado em paisagem para jogar no estilo testa.</p>
             </div>
 
             <div class="tap-zone top" onclick="tapAction('correct')"></div>
@@ -859,7 +952,7 @@
             <div class="tap-label bottom">toque: erro</div>
 
             <div class="game-top">
-                <button class="round-btn" onclick="exitGame()" aria-label="Sair">
+                <button class="icon-btn" onclick="exitGame()" aria-label="Sair">
                     <svg width="14" height="22" viewBox="0 0 14 22" fill="none">
                         <path d="M11.5 2L2.5 11L11.5 20" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
@@ -867,7 +960,7 @@
 
                 <div id="gameTimer" class="timer">75s</div>
 
-                <button class="round-btn" onclick="openSettings()" aria-label="Ajustes">
+                <button class="icon-btn" onclick="openSettings()" aria-label="Ajustes">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
                         <path d="M12 15.5A3.5 3.5 0 1 0 12 8.5a3.5 3.5 0 0 0 0 7Z" stroke="white" stroke-width="2"/>
                         <path d="M19.4 15a1.8 1.8 0 0 0 .36 1.98l.04.04a2.18 2.18 0 0 1-3.08 3.08l-.04-.04A1.8 1.8 0 0 0 14.7 19.7a1.8 1.8 0 0 0-1.1 1.65V21.5a2.18 2.18 0 0 1-4.36 0v-.06A1.8 1.8 0 0 0 8.14 19.8a1.8 1.8 0 0 0-1.98.36l-.04.04a2.18 2.18 0 0 1-3.08-3.08l.04-.04A1.8 1.8 0 0 0 3.44 15a1.8 1.8 0 0 0-1.65-1.1H1.64a2.18 2.18 0 0 1 0-4.36h.06A1.8 1.8 0 0 0 3.35 8.44a1.8 1.8 0 0 0-.36-1.98l-.04-.04a2.18 2.18 0 0 1 3.08-3.08l.04.04A1.8 1.8 0 0 0 8.05 3.74a1.8 1.8 0 0 0 1.1-1.65V1.94a2.18 2.18 0 0 1 4.36 0V2a1.8 1.8 0 0 0 1.1 1.65 1.8 1.8 0 0 0 1.98-.36l.04-.04a2.18 2.18 0 0 1 3.08 3.08l-.04.04a1.8 1.8 0 0 0-.36 1.98 1.8 1.8 0 0 0 1.65 1.1h.15a2.18 2.18 0 0 1 0 4.36h-.06A1.8 1.8 0 0 0 19.4 15Z" stroke="white" stroke-width="1.7" stroke-linecap="round"/>
@@ -908,15 +1001,18 @@
 
     <div id="settingsModal" class="modal" onclick="closeSettingsByBackdrop(event)">
         <div class="sheet">
+            <div class="grabber"></div>
+
             <div class="sheet-head">
                 <h2>Ajustes</h2>
-                <button class="round-btn" onclick="closeSettings()" aria-label="Fechar">×</button>
+                <button class="icon-btn" onclick="closeSettings()" aria-label="Fechar">×</button>
             </div>
 
             <div class="setting">
                 <label>tempo da rodada</label>
-                <p>define quanto tempo cada partida vai durar.</p>
-                <div class="segmented" id="durationButtons">
+                <p>define quanto tempo cada partida dura.</p>
+
+                <div id="durationButtons" class="segmented">
                     <button onclick="setDuration(60)">60s</button>
                     <button onclick="setDuration(75)">75s</button>
                     <button onclick="setDuration(90)">90s</button>
@@ -924,11 +1020,22 @@
             </div>
 
             <div class="setting">
-                <label>sensibilidade do sensor</label>
-                <p>quanto maior, mais precisa inclinar o iPhone para marcar.</p>
+                <label>inclinação necessária</label>
+                <p>quanto maior, mais precisa inclinar para marcar. no iPhone, 62–70 costuma ficar melhor.</p>
+
                 <div class="range-row">
-                    <input id="sensitivityInput" type="range" min="45" max="80" value="62" oninput="setSensitivity(this.value)" />
-                    <div id="sensitivityValue" class="range-value">62</div>
+                    <input id="sensitivityInput" type="range" min="45" max="85" value="66" oninput="setSensitivity(this.value)" />
+                    <div id="sensitivityValue" class="range-value">66</div>
+                </div>
+            </div>
+
+            <div class="setting">
+                <label>zona neutra</label>
+                <p>ignora pequenas tremidas quando o celular está quase reto.</p>
+
+                <div class="range-row">
+                    <input id="neutralInput" type="range" min="18" max="45" value="28" oninput="setNeutralZone(this.value)" />
+                    <div id="neutralValue" class="range-value">28</div>
                 </div>
             </div>
 
@@ -938,6 +1045,7 @@
                         <label>inverter sensor</label>
                         <p>ative se inclinar para baixo estiver marcando como acerto.</p>
                     </div>
+
                     <button id="invertSwitch" class="switch" onclick="toggleInvert()"></button>
                 </div>
             </div>
@@ -948,6 +1056,7 @@
                         <label>usar sensor</label>
                         <p>se desligar, o jogo funciona só por toque: cima acerta, baixo erra.</p>
                     </div>
+
                     <button id="sensorSwitch" class="switch" onclick="toggleSensor()"></button>
                 </div>
             </div>
@@ -956,18 +1065,19 @@
                 <div class="toggle-row">
                     <div>
                         <label>vibração</label>
-                        <p>feedback rápido quando acerta ou erra.</p>
+                        <p>feedback rápido quando marca uma palavra.</p>
                     </div>
+
                     <button id="vibrationSwitch" class="switch" onclick="toggleVibration()"></button>
                 </div>
             </div>
 
             <div class="actions">
-                <button class="btn primary" onclick="testCalibration()">testar calibração</button>
+                <button class="btn primary" onclick="quickSensorTest()">testar sensor</button>
             </div>
 
-            <div class="about">
-                dica: no iPhone, deixe o celular deitado em paisagem, espere “pronto” e incline de verdade. se o lado ficar trocado, ative “inverter sensor”.
+            <div class="ios-note">
+                dica: espere aparecer “pronto”, incline bem e volte perto do centro para a próxima palavra.
             </div>
         </div>
     </div>
@@ -984,7 +1094,7 @@
                     "Anitta", "Ivete Sangalo", "Silvio Santos", "Faustão", "Gisele Bündchen", "Will Smith", "Rihanna", "Lady Gaga",
                     "Katy Perry", "Justin Bieber", "Ed Sheeran", "Zendaya", "Tom Holland", "Robert Downey Jr", "Chris Evans",
                     "Brad Pitt", "Angelina Jolie", "Meryl Streep", "Johnny Depp", "Keanu Reeves", "Gal Gadot", "Margot Robbie",
-                    "Ryan Reynolds", "Hugh Jackman", "Bruna Marquezine", "Juliette", "Ludmilla", "Pabllo Vittar"
+                    "Ryan Reynolds", "Hugh Jackman", "Bruna Marquezine", "Ludmilla", "Pabllo Vittar", "Pedro Pascal"
                 ]
             },
             {
@@ -996,8 +1106,8 @@
                     "Jurassic Park", "De Volta para o Futuro", "Forrest Gump", "O Iluminado", "Psicose", "Pulp Fiction",
                     "Kill Bill", "Star Wars", "Harry Potter", "Coringa", "O Rei Leão", "Toy Story", "Procurando Nemo",
                     "Shrek", "Batman", "Superman", "Mulher-Maravilha", "Pantera Negra", "O Poderoso Chefão", "Clube da Luta",
-                    "Parasita", "Cidade de Deus", "O Senhor dos Anéis", "O Hobbit", "Duna", "Oppenheimer", "Barbie", "Top Gun",
-                    "Missão Impossível", "John Wick", "Velozes e Furiosos", "Divertida Mente", "Frozen", "Moana"
+                    "Parasita", "Cidade de Deus", "O Senhor dos Anéis", "O Hobbit", "Duna", "Oppenheimer", "Barbie",
+                    "Top Gun", "Missão Impossível", "John Wick", "Velozes e Furiosos", "Divertida Mente", "Frozen", "Moana"
                 ]
             },
             {
@@ -1009,8 +1119,8 @@
                     "Dark", "The Crown", "Sherlock", "Dexter", "House", "Grey's Anatomy", "Suits", "Peaky Blinders",
                     "The Boys", "Succession", "The Last of Us", "The Mandalorian", "Black Mirror", "La Casa de Papel",
                     "Elite", "Sex Education", "Euphoria", "Ted Lasso", "The Bear", "The White Lotus", "Cobra Kai",
-                    "The Witcher", "The Walking Dead", "Vikings", "Better Call Saul", "Narcos", "Ozark", "Loki", "The Flash",
-                    "Arrow", "Supernatural", "Todo Mundo Odeia o Chris", "Chaves"
+                    "The Witcher", "The Walking Dead", "Vikings", "Better Call Saul", "Narcos", "Ozark", "Loki",
+                    "Todo Mundo Odeia o Chris", "Chaves", "Supernatural"
                 ]
             },
             {
@@ -1102,10 +1212,20 @@
 
         const DEFAULT_SETTINGS = {
             duration: 75,
-            sensitivity: 62,
+            sensitivity: 66,
+            neutralZone: 28,
             invertSensor: true,
             useSensor: true,
             vibration: true
+        };
+
+        const SENSOR_RULES = {
+            animationTime: 340,
+            cooldown: 500,
+            minSamples: 8,
+            maxSamples: 16,
+            stabilityLimit: 4.2,
+            startDelay: 620
         };
 
         let settings = loadSettings();
@@ -1118,7 +1238,7 @@
             history: [],
             timeLeft: settings.duration,
             timer: null,
-            isProcessing: false,
+            isAnimating: false,
             lastAction: 0
         };
 
@@ -1129,27 +1249,17 @@
             ready: false,
             base: null,
             samples: [],
-            locked: false,
             lastValue: null,
             stableCount: 0,
-            lastNeutralAt: 0,
-            testMode: false
-        };
-
-        const SENSOR_RULES = {
-            startDelay: 700,
-            minSamples: 8,
-            maxSamples: 16,
-            stabilityLimit: 3.8,
-            deadZone: 34,
-            cooldown: 980
+            locked: false,
+            mustReturnNeutral: false
         };
 
         function init() {
             renderCategories(CATEGORIES);
             updateSettingsUI();
             updateHomeInfo();
-            bindPreventZoom();
+            preventGestures();
         }
 
         function loadSettings() {
@@ -1181,26 +1291,28 @@
                 return;
             }
 
-            list.forEach(cat => {
-                const el = document.createElement("button");
-                el.className = "cat";
-                el.onclick = () => startSequence(cat.id);
-                el.innerHTML = `
-                    <div class="cat-img" style="background-image: url('${cat.img}')"></div>
+            list.forEach(category => {
+                const button = document.createElement("button");
+                button.className = "cat";
+                button.onclick = () => startSequence(category.id);
+
+                button.innerHTML = `
+                    <div class="cat-img" style="background-image: url('${category.img}')"></div>
                     <div class="cat-info">
-                        <span>${cat.words.length} palavras</span>
-                        <h3>${cat.name}</h3>
+                        <span>${category.words.length} palavras</span>
+                        <h3>${category.name}</h3>
                     </div>
                 `;
-                grid.appendChild(el);
+
+                grid.appendChild(button);
             });
         }
 
         function filterCategories() {
             const query = document.getElementById("searchInput").value.trim().toLowerCase();
 
-            const filtered = CATEGORIES.filter(cat => {
-                return cat.name.toLowerCase().includes(query);
+            const filtered = CATEGORIES.filter(category => {
+                return category.name.toLowerCase().includes(query);
             });
 
             renderCategories(filtered);
@@ -1223,9 +1335,9 @@
             game.index = 0;
             game.history = [];
             game.timeLeft = settings.duration;
-            game.active = false;
-            game.isProcessing = false;
+            game.isAnimating = false;
             game.lastAction = 0;
+            game.active = false;
 
             clearInterval(game.timer);
 
@@ -1241,13 +1353,13 @@
             const countEl = document.getElementById("countNumber");
             countEl.innerText = count;
 
-            const interval = setInterval(() => {
+            const countdown = setInterval(() => {
                 count--;
 
                 if (count > 0) {
                     countEl.innerText = count;
                 } else {
-                    clearInterval(interval);
+                    clearInterval(countdown);
                     startGame();
                 }
             }, 1000);
@@ -1260,8 +1372,8 @@
 
             try {
                 if (typeof DeviceOrientationEvent.requestPermission === "function") {
-                    const permission = await DeviceOrientationEvent.requestPermission();
-                    sensor.permissionGranted = permission === "granted";
+                    const result = await DeviceOrientationEvent.requestPermission();
+                    sensor.permissionGranted = result === "granted";
                 } else {
                     sensor.permissionGranted = true;
                 }
@@ -1272,10 +1384,9 @@
 
         function startGame() {
             game.active = true;
-
             showScreen("gameScreen");
             renderWord();
-            resetSensor("calibrando...");
+            beginCalibration();
 
             game.timer = setInterval(() => {
                 game.timeLeft--;
@@ -1287,37 +1398,24 @@
             }, 1000);
         }
 
-        function renderWord() {
-            if (game.index >= game.words.length) {
-                game.words = shuffle([...game.words]);
-                game.index = 0;
-            }
-
-            const wordEl = document.getElementById("wordEl");
-            wordEl.className = "word";
-            wordEl.innerText = game.words[game.index] || "fim";
-        }
-
-        function resetSensor(message) {
+        function beginCalibration() {
             sensor.ready = false;
             sensor.base = null;
             sensor.samples = [];
-            sensor.locked = true;
             sensor.lastValue = null;
             sensor.stableCount = 0;
-            sensor.lastNeutralAt = Date.now();
+            sensor.locked = true;
+            sensor.mustReturnNeutral = false;
 
-            const gameScreen = document.getElementById("gameScreen");
-            gameScreen.classList.add("calibrating");
-
-            setHint(settings.useSensor ? message : "toque em cima ou embaixo");
+            document.getElementById("gameScreen").classList.add("calibrating");
+            setHint(settings.useSensor ? "calibrando..." : "toque em cima ou embaixo");
 
             setTimeout(() => {
                 sensor.locked = false;
 
                 if (!settings.useSensor) {
+                    document.getElementById("gameScreen").classList.remove("calibrating");
                     setHint("toque em cima ou embaixo");
-                    gameScreen.classList.remove("calibrating");
                     return;
                 }
 
@@ -1329,9 +1427,9 @@
             const beta = event.beta;
             const gamma = event.gamma;
 
-            const landscape = window.innerWidth > window.innerHeight;
+            const isLandscape = window.innerWidth > window.innerHeight;
 
-            if (landscape && typeof gamma === "number") {
+            if (isLandscape && typeof gamma === "number") {
                 return gamma;
             }
 
@@ -1349,7 +1447,7 @@
         function handleOrientation(event) {
             if (!game.active) return;
             if (!settings.useSensor) return;
-            if (game.isProcessing) return;
+            if (game.isAnimating) return;
             if (sensor.locked) return;
 
             const value = getMotionValue(event);
@@ -1357,7 +1455,7 @@
             if (value === null || Number.isNaN(value)) return;
 
             if (!sensor.ready) {
-                calibrate(value);
+                calibrateSensor(value);
                 return;
             }
 
@@ -1367,31 +1465,38 @@
                 diff *= -1;
             }
 
-            const absoluteDiff = Math.abs(diff);
+            const absDiff = Math.abs(diff);
+            const neutralZone = Number(settings.neutralZone);
+            const sensitivity = Number(settings.sensitivity);
 
-            if (absoluteDiff < SENSOR_RULES.deadZone) {
-                sensor.lastNeutralAt = Date.now();
-                setHint("incline bem");
+            if (absDiff <= neutralZone) {
+                sensor.mustReturnNeutral = false;
+
+                if (!game.isAnimating) {
+                    setHint("incline bem");
+                }
+
                 return;
             }
 
-            if (absoluteDiff < Number(settings.sensitivity)) {
+            if (sensor.mustReturnNeutral) {
+                setHint("volte ao centro");
+                return;
+            }
+
+            if (absDiff < sensitivity) {
                 setHint("incline mais");
                 return;
             }
 
-            const timeSinceNeutral = Date.now() - sensor.lastNeutralAt;
-
-            if (timeSinceNeutral < 120) return;
-
-            if (diff > Number(settings.sensitivity)) {
-                performAction("correct");
-            } else if (diff < -Number(settings.sensitivity)) {
-                performAction("wrong");
+            if (diff > sensitivity) {
+                performAction("correct", "sensor");
+            } else if (diff < -sensitivity) {
+                performAction("wrong", "sensor");
             }
         }
 
-        function calibrate(value) {
+        function calibrateSensor(value) {
             if (sensor.lastValue !== null) {
                 const movement = Math.abs(value - sensor.lastValue);
 
@@ -1411,44 +1516,49 @@
             }
 
             if (sensor.samples.length >= SENSOR_RULES.minSamples && sensor.stableCount >= 4) {
-                const sum = sensor.samples.reduce((acc, item) => acc + item, 0);
+                const sum = sensor.samples.reduce((total, item) => total + item, 0);
+
                 sensor.base = sum / sensor.samples.length;
                 sensor.ready = true;
-                sensor.lastNeutralAt = Date.now();
+                sensor.mustReturnNeutral = false;
 
                 document.getElementById("gameScreen").classList.remove("calibrating");
+
                 setHint("pronto");
 
                 setTimeout(() => {
                     if (game.active && sensor.ready) {
                         setHint("incline bem");
                     }
-                }, 650);
+                }, 480);
             }
         }
 
         function tapAction(type) {
             if (!game.active) return;
-            performAction(type);
+            performAction(type, "tap");
         }
 
-        function performAction(type) {
+        function performAction(type, source) {
             const now = Date.now();
 
             if (!game.active) return;
-            if (game.isProcessing) return;
+            if (game.isAnimating) return;
             if (now - game.lastAction < SENSOR_RULES.cooldown) return;
 
-            game.isProcessing = true;
+            game.isAnimating = true;
             game.lastAction = now;
-            sensor.locked = true;
 
-            const currentWord = game.words[game.index];
+            if (source === "sensor") {
+                sensor.mustReturnNeutral = true;
+            }
+
+            const word = game.words[game.index];
             const gameScreen = document.getElementById("gameScreen");
             const wordEl = document.getElementById("wordEl");
 
             game.history.push({
-                word: currentWord,
+                word,
                 status: type
             });
 
@@ -1459,44 +1569,49 @@
                 wordEl.classList.add("up");
 
                 if (settings.vibration && navigator.vibrate) {
-                    navigator.vibrate(70);
+                    navigator.vibrate(60);
                 }
             } else {
                 gameScreen.classList.add("wrong");
                 wordEl.classList.add("down");
 
                 if (settings.vibration && navigator.vibrate) {
-                    navigator.vibrate([45, 45, 45]);
+                    navigator.vibrate([38, 36, 38]);
                 }
             }
 
             setTimeout(() => {
                 gameScreen.classList.remove("correct", "wrong");
+
                 game.index++;
                 renderWord();
 
-                game.isProcessing = false;
+                game.isAnimating = false;
 
-                if (game.active) {
-                    resetSensor("centralizando...");
+                if (source === "sensor") {
+                    setHint("volte ao centro");
+                } else {
+                    setHint(settings.useSensor ? "incline bem" : "toque em cima ou embaixo");
                 }
-            }, 720);
+            }, SENSOR_RULES.animationTime);
         }
 
-        function exitGame() {
-            clearInterval(game.timer);
+        function renderWord() {
+            if (game.index >= game.words.length) {
+                game.words = shuffle([...game.words]);
+                game.index = 0;
+            }
 
-            game.active = false;
-            game.isProcessing = false;
-
-            showScreen("homeScreen");
+            const wordEl = document.getElementById("wordEl");
+            wordEl.className = "word";
+            wordEl.innerText = game.words[game.index] || "fim";
         }
 
         function finishGame() {
             clearInterval(game.timer);
 
             game.active = false;
-            game.isProcessing = false;
+            game.isAnimating = false;
 
             const correct = game.history.filter(item => item.status === "correct").length;
             const wrong = game.history.filter(item => item.status === "wrong").length;
@@ -1515,15 +1630,26 @@
                 game.history.forEach(item => {
                     const div = document.createElement("div");
                     div.className = `hist-item ${item.status}`;
+
                     div.innerHTML = `
                         <span>${item.word}</span>
                         <span>${item.status === "correct" ? "✅" : "❌"}</span>
                     `;
+
                     list.appendChild(div);
                 });
             }
 
             showScreen("resultsScreen");
+        }
+
+        function exitGame() {
+            clearInterval(game.timer);
+
+            game.active = false;
+            game.isAnimating = false;
+
+            showScreen("homeScreen");
         }
 
         function restartSameCategory() {
@@ -1539,7 +1665,7 @@
             clearInterval(game.timer);
 
             game.active = false;
-            game.isProcessing = false;
+            game.isAnimating = false;
 
             showScreen("homeScreen");
         }
@@ -1550,8 +1676,8 @@
 
         function shuffle(array) {
             for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
+                const random = Math.floor(Math.random() * (i + 1));
+                [array[i], array[random]] = [array[random], array[i]];
             }
 
             return array;
@@ -1581,6 +1707,9 @@
             document.getElementById("sensitivityInput").value = settings.sensitivity;
             document.getElementById("sensitivityValue").innerText = settings.sensitivity;
 
+            document.getElementById("neutralInput").value = settings.neutralZone;
+            document.getElementById("neutralValue").innerText = settings.neutralZone;
+
             document.getElementById("invertSwitch").classList.toggle("on", settings.invertSensor);
             document.getElementById("sensorSwitch").classList.toggle("on", settings.useSensor);
             document.getElementById("vibrationSwitch").classList.toggle("on", settings.vibration);
@@ -1601,12 +1730,17 @@
             saveSettings();
         }
 
+        function setNeutralZone(value) {
+            settings.neutralZone = Number(value);
+            saveSettings();
+        }
+
         function toggleInvert() {
             settings.invertSensor = !settings.invertSensor;
             saveSettings();
 
             if (game.active) {
-                resetSensor("recalibrando...");
+                beginCalibration();
             }
         }
 
@@ -1615,7 +1749,7 @@
             saveSettings();
 
             if (game.active) {
-                resetSensor(settings.useSensor ? "recalibrando..." : "toque em cima ou embaixo");
+                beginCalibration();
             }
         }
 
@@ -1624,32 +1758,31 @@
             saveSettings();
         }
 
-        function testCalibration() {
+        function quickSensorTest() {
             closeSettings();
 
-            if (game.active) {
-                resetSensor("testando...");
-                return;
-            }
-
-            showScreen("gameScreen");
             game.active = true;
-            game.isProcessing = false;
+            game.isAnimating = false;
+            game.words = ["TESTE"];
+            game.index = 0;
+            game.history = [];
             game.timeLeft = settings.duration;
 
             document.getElementById("gameTimer").innerText = settings.duration + "s";
-            document.getElementById("wordEl").innerText = "TESTE";
-            document.getElementById("wordEl").className = "word";
-
-            resetSensor("calibrando...");
+            showScreen("gameScreen");
+            renderWord();
+            beginCalibration();
 
             setTimeout(() => {
-                game.active = false;
-                showScreen("homeScreen");
-            }, 5000);
+                if (game.words[game.index] === "TESTE") {
+                    game.active = false;
+                    game.isAnimating = false;
+                    showScreen("homeScreen");
+                }
+            }, 5200);
         }
 
-        function bindPreventZoom() {
+        function preventGestures() {
             document.addEventListener("gesturestart", event => event.preventDefault());
 
             document.addEventListener("touchmove", event => {
@@ -1663,11 +1796,11 @@
 
         window.addEventListener("keydown", event => {
             if (event.key === "ArrowUp") {
-                performAction("correct");
+                performAction("correct", "tap");
             }
 
             if (event.key === "ArrowDown") {
-                performAction("wrong");
+                performAction("wrong", "tap");
             }
 
             if (event.key === "Escape") {
