@@ -76,13 +76,13 @@
 
         .screen.active {
             display: flex;
-            animation: screenIn .24s ease both;
+            animation: screenIn .18s ease both;
         }
 
         @keyframes screenIn {
             from {
                 opacity: 0;
-                transform: scale(.985) translateY(8px);
+                transform: scale(.99) translateY(4px);
             }
 
             to {
@@ -344,7 +344,7 @@
             align-items: center;
             justify-content: center;
             background: var(--primary);
-            transition: background .16s ease;
+            transition: background .08s linear;
             touch-action: none;
         }
 
@@ -405,21 +405,6 @@
             text-transform: uppercase;
             overflow-wrap: anywhere;
             text-shadow: 0 10px 34px rgba(0,0,0,.22);
-            will-change: transform, opacity;
-            transform: translateZ(0);
-            transition:
-                transform .28s cubic-bezier(.18,.89,.32,1.18),
-                opacity .18s ease;
-        }
-
-        .word.up {
-            transform: translate3d(0, -112vh, 0) rotate(-4deg);
-            opacity: 0;
-        }
-
-        .word.down {
-            transform: translate3d(0, 112vh, 0) rotate(4deg);
-            opacity: 0;
         }
 
         .game-hint {
@@ -1179,13 +1164,13 @@
         };
 
         const SENSOR_RULES = {
-            animationTime: 280,
-            cooldown: 360,
-            minSamples: 5,
-            maxSamples: 8,
-            stabilityLimit: 6,
-            startDelay: 450,
-            filterSize: 3
+            cooldown: 180,
+            flashTime: 90,
+            minSamples: 4,
+            maxSamples: 6,
+            stabilityLimit: 8,
+            startDelay: 300,
+            filterSize: 1
         };
 
         let settings = loadSettings();
@@ -1198,7 +1183,7 @@
             history: [],
             timeLeft: settings.duration,
             timer: null,
-            isAnimating: false,
+            isProcessing: false,
             lastAction: 0
         };
 
@@ -1226,7 +1211,7 @@
 
         function loadSettings() {
             try {
-                const saved = JSON.parse(localStorage.getItem("quemSouEuSettingsBetaFinal"));
+                const saved = JSON.parse(localStorage.getItem("quemSouEuNoAnimation"));
                 return { ...DEFAULT_SETTINGS, ...saved };
             } catch {
                 return { ...DEFAULT_SETTINGS };
@@ -1234,7 +1219,7 @@
         }
 
         function saveSettings() {
-            localStorage.setItem("quemSouEuSettingsBetaFinal", JSON.stringify(settings));
+            localStorage.setItem("quemSouEuNoAnimation", JSON.stringify(settings));
             updateSettingsUI();
             updateHomeInfo();
             updateDebugVisibility();
@@ -1302,7 +1287,7 @@
             game.index = 0;
             game.history = [];
             game.timeLeft = settings.duration;
-            game.isAnimating = false;
+            game.isProcessing = false;
             game.lastAction = 0;
             game.active = false;
 
@@ -1403,6 +1388,10 @@
         }
 
         function smoothMotionValue(value) {
+            if (SENSOR_RULES.filterSize <= 1) {
+                return value;
+            }
+
             sensor.filterValues.push(value);
 
             if (sensor.filterValues.length > SENSOR_RULES.filterSize) {
@@ -1416,7 +1405,7 @@
         function handleOrientation(event) {
             if (!game.active) return;
             if (!settings.useSensor) return;
-            if (game.isAnimating) return;
+            if (game.isProcessing) return;
             if (sensor.locked) return;
 
             let value = getMotionValue(event);
@@ -1445,11 +1434,7 @@
 
             if (absDiff <= neutralZone) {
                 sensor.mustReturnNeutral = false;
-
-                if (!game.isAnimating) {
-                    setHint("incline bem");
-                }
-
+                setHint("incline bem");
                 return;
             }
 
@@ -1462,15 +1447,6 @@
                 setHint("incline mais");
                 return;
             }
-
-            /*
-                REGRA FINAL:
-                - Para cima = certo
-                - Para baixo = errado
-
-                Se no seu iPhone ficar ao contrário,
-                ligue "inverter sensor" nos ajustes.
-            */
 
             if (diff < -sensitivity) {
                 performAction("correct", "sensor");
@@ -1498,7 +1474,7 @@
                 sensor.samples.shift();
             }
 
-            if (sensor.samples.length >= SENSOR_RULES.minSamples && sensor.stableCount >= 3) {
+            if (sensor.samples.length >= SENSOR_RULES.minSamples && sensor.stableCount >= 2) {
                 const sum = sensor.samples.reduce((total, item) => total + item, 0);
 
                 sensor.base = sum / sensor.samples.length;
@@ -1513,7 +1489,7 @@
                     if (game.active && sensor.ready) {
                         setHint("incline bem");
                     }
-                }, 350);
+                }, 180);
             }
         }
 
@@ -1526,10 +1502,10 @@
             const now = Date.now();
 
             if (!game.active) return;
-            if (game.isAnimating) return;
+            if (game.isProcessing) return;
             if (now - game.lastAction < SENSOR_RULES.cooldown) return;
 
-            game.isAnimating = true;
+            game.isProcessing = true;
             game.lastAction = now;
 
             if (source === "sensor") {
@@ -1538,7 +1514,6 @@
 
             const word = game.words[game.index];
             const gameScreen = document.getElementById("gameScreen");
-            const wordEl = document.getElementById("wordEl");
 
             game.history.push({
                 word,
@@ -1549,37 +1524,34 @@
 
             if (type === "correct") {
                 gameScreen.classList.add("correct");
-                wordEl.classList.add("up");
             } else {
                 gameScreen.classList.add("wrong");
-                wordEl.classList.add("down");
             }
 
             haptic(type);
 
+            game.index++;
+            renderWord();
+
             setTimeout(() => {
                 gameScreen.classList.remove("correct", "wrong");
-
-                game.index++;
-                renderWord();
-
-                game.isAnimating = false;
+                game.isProcessing = false;
 
                 if (source === "sensor") {
                     setHint("volte ao centro");
                 } else {
                     setHint(settings.useSensor ? "incline bem" : "toque em cima ou embaixo");
                 }
-            }, SENSOR_RULES.animationTime);
+            }, SENSOR_RULES.flashTime);
         }
 
         function haptic(type) {
             if (!settings.vibration || !navigator.vibrate) return;
 
             if (type === "correct") {
-                navigator.vibrate(45);
+                navigator.vibrate(35);
             } else {
-                navigator.vibrate([35, 30, 35]);
+                navigator.vibrate([25, 20, 25]);
             }
         }
 
@@ -1590,7 +1562,6 @@
             }
 
             const wordEl = document.getElementById("wordEl");
-            wordEl.className = "word";
             wordEl.innerText = game.words[game.index] || "fim";
         }
 
@@ -1598,7 +1569,7 @@
             clearInterval(game.timer);
 
             game.active = false;
-            game.isAnimating = false;
+            game.isProcessing = false;
 
             const correct = game.history.filter(item => item.status === "correct").length;
             const wrong = game.history.filter(item => item.status === "wrong").length;
@@ -1634,7 +1605,7 @@
             clearInterval(game.timer);
 
             game.active = false;
-            game.isAnimating = false;
+            game.isProcessing = false;
 
             showScreen("homeScreen");
         }
@@ -1652,7 +1623,7 @@
             clearInterval(game.timer);
 
             game.active = false;
-            game.isAnimating = false;
+            game.isProcessing = false;
 
             showScreen("homeScreen");
         }
@@ -1759,7 +1730,7 @@
             closeSettings();
 
             game.active = true;
-            game.isAnimating = false;
+            game.isProcessing = false;
             game.words = ["TESTE"];
             game.index = 0;
             game.history = [];
@@ -1773,7 +1744,7 @@
             setTimeout(() => {
                 if (game.active && game.words[game.index] === "TESTE") {
                     game.active = false;
-                    game.isAnimating = false;
+                    game.isProcessing = false;
                     showScreen("homeScreen");
                 }
             }, 6000);
