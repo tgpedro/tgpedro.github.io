@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="true">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Quem Sou Eu?" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="theme-color" content="#000000" />
     <title>Quem Sou Eu?</title>
 
     <style>
@@ -14,10 +16,13 @@
             --danger: #FF3B30;
             --warning: #FFCC00;
             --bg: #000000;
-            --card-bg: #1C1C1E;
-            --card-soft: #2C2C2E;
+            --bg-soft: #101012;
+            --card: #1C1C1E;
+            --card-2: #2C2C2E;
+            --line: rgba(255,255,255,.08);
             --text: #FFFFFF;
-            --text-sec: #8E8E93;
+            --text-2: #A1A1A6;
+            --text-3: #6E6E73;
             --safe-top: env(safe-area-inset-top);
             --safe-bottom: env(safe-area-inset-bottom);
         }
@@ -27,45 +32,57 @@
             padding: 0;
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
             user-select: none;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", Arial, sans-serif;
         }
 
-        body, html {
+        html,
+        body {
             width: 100%;
             height: 100%;
-            background-color: var(--bg);
-            color: var(--text);
             overflow: hidden;
             position: fixed;
+            background: var(--bg);
+            color: var(--text);
             touch-action: none;
         }
 
-        .bg-glow {
+        button,
+        input,
+        select {
+            font: inherit;
+        }
+
+        button {
+            border: none;
+            cursor: pointer;
+        }
+
+        .app-bg {
             position: fixed;
             inset: 0;
-            background: radial-gradient(circle at 50% -20%, #1c1c1e 0%, #000000 100%);
-            z-index: -1;
+            z-index: -2;
+            background:
+                radial-gradient(circle at 50% -10%, rgba(0,122,255,.28), transparent 35%),
+                radial-gradient(circle at 100% 10%, rgba(88,86,214,.16), transparent 26%),
+                linear-gradient(180deg, #050507 0%, #000 100%);
         }
 
         .screen {
             position: absolute;
             inset: 0;
-            width: 100%;
-            height: 100%;
             display: none;
             flex-direction: column;
-            z-index: 10;
-            padding: calc(20px + var(--safe-top)) 20px calc(20px + var(--safe-bottom));
-            background: var(--bg);
+            background: transparent;
+            padding: calc(18px + var(--safe-top)) 18px calc(18px + var(--safe-bottom));
         }
 
         .screen.active {
             display: flex;
-            animation: fadeIn 0.35s ease;
+            animation: screenIn .28s ease both;
         }
 
-        @keyframes fadeIn {
+        @keyframes screenIn {
             from {
                 opacity: 0;
                 transform: translateY(8px);
@@ -77,237 +94,327 @@
             }
         }
 
-        .home-screen {
+        .scroll {
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
             touch-action: pan-y;
+            scrollbar-width: none;
         }
 
-        .hero {
-            text-align: center;
-            margin: 40px 0 20px;
+        .scroll::-webkit-scrollbar {
+            display: none;
         }
 
-        .hero h1 {
-            font-size: 42px;
-            font-weight: 900;
-            letter-spacing: -1.5px;
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .brand {
+            min-width: 0;
+        }
+
+        .brand small {
+            color: var(--text-3);
+            font-size: 12px;
+            font-weight: 800;
             text-transform: uppercase;
-            background: linear-gradient(180deg, #FFF 0%, #AAA 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            letter-spacing: .8px;
         }
 
-        .hero p {
-            margin-top: 8px;
-            color: var(--text-sec);
-            font-size: 14px;
-            font-weight: 600;
+        .brand h1 {
+            margin-top: 3px;
+            font-size: 34px;
+            font-weight: 950;
+            letter-spacing: -1.4px;
+            line-height: .95;
         }
 
-        .search-container {
-            margin-bottom: 25px;
+        .round-btn {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            background: rgba(255,255,255,.10);
+            color: white;
+            border: 1px solid rgba(255,255,255,.12);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            flex-shrink: 0;
+        }
+
+        .round-btn:active {
+            transform: scale(.94);
+        }
+
+        .search-wrap {
             position: sticky;
             top: 0;
-            z-index: 100;
-            background: var(--bg);
-            padding: 10px 0;
+            z-index: 20;
+            padding: 8px 0 14px;
+            background: linear-gradient(to bottom, rgba(0,0,0,.96), rgba(0,0,0,.84), transparent);
         }
 
-        .search-bar {
+        .search {
             width: 100%;
-            background: #2C2C2E;
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 14px;
-            padding: 14px 18px;
+            height: 50px;
+            border-radius: 16px;
+            border: 1px solid var(--line);
+            background: rgba(44,44,46,.86);
             color: white;
-            font-size: 17px;
             outline: none;
-            transition: border-color 0.3s, background 0.3s;
+            padding: 0 16px;
+            font-size: 16px;
+            font-weight: 650;
         }
 
-        .search-bar:focus {
-            border-color: var(--primary);
-            background: #303033;
+        .search::placeholder {
+            color: var(--text-3);
         }
 
-        .categories-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-            padding-bottom: 40px;
+        .search:focus {
+            border-color: rgba(0,122,255,.75);
+            background: rgba(44,44,46,.96);
         }
 
-        .cat-card {
-            background: var(--card-bg);
+        .status-card {
+            background: rgba(28,28,30,.78);
+            border: 1px solid var(--line);
             border-radius: 24px;
-            overflow: hidden;
-            position: relative;
-            aspect-ratio: 0.85;
-            border: 1px solid rgba(255,255,255,0.05);
-            transition: transform 0.2s, border-color 0.2s;
+            padding: 16px;
+            margin-bottom: 16px;
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
         }
 
-        .cat-card:active {
-            transform: scale(0.94);
-            border-color: rgba(255,255,255,0.18);
+        .status-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .mini-stat {
+            background: rgba(255,255,255,.055);
+            border-radius: 18px;
+            padding: 13px;
+        }
+
+        .mini-stat span {
+            display: block;
+            color: var(--text-3);
+            font-size: 11px;
+            font-weight: 850;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            margin-bottom: 4px;
+        }
+
+        .mini-stat strong {
+            font-size: 17px;
+            font-weight: 900;
+        }
+
+        .categories {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+            padding-bottom: 28px;
+        }
+
+        .cat {
+            position: relative;
+            height: 190px;
+            border-radius: 26px;
+            overflow: hidden;
+            background: var(--card);
+            border: 1px solid rgba(255,255,255,.075);
+            box-shadow: 0 18px 50px rgba(0,0,0,.28);
+        }
+
+        .cat:active {
+            transform: scale(.965);
         }
 
         .cat-img {
-            width: 100%;
-            height: 100%;
+            position: absolute;
+            inset: 0;
             background-size: cover;
             background-position: center;
-            opacity: 0.62;
+            opacity: .58;
             transform: scale(1.02);
+        }
+
+        .cat::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(to top, rgba(0,0,0,.92), rgba(0,0,0,.14) 62%, rgba(0,0,0,.04)),
+                radial-gradient(circle at 50% 100%, rgba(0,122,255,.20), transparent 45%);
         }
 
         .cat-info {
             position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 15px;
-            background: linear-gradient(to top, rgba(0,0,0,0.95), transparent);
-        }
-
-        .cat-info h3 {
-            font-size: 18px;
-            font-weight: 800;
-            margin-bottom: 2px;
+            z-index: 2;
+            left: 14px;
+            right: 14px;
+            bottom: 14px;
         }
 
         .cat-info span {
+            color: rgba(255,255,255,.68);
             font-size: 11px;
-            color: var(--text-sec);
-            font-weight: 700;
+            font-weight: 850;
             text-transform: uppercase;
+            letter-spacing: .6px;
         }
 
-        .empty-state {
-            color: var(--text-sec);
-            text-align: center;
-            padding: 40px 0;
+        .cat-info h3 {
+            margin-top: 3px;
+            font-size: 20px;
+            line-height: 1;
+            letter-spacing: -.35px;
+            font-weight: 950;
+        }
+
+        .empty {
             grid-column: 1 / -1;
-            font-weight: 600;
+            text-align: center;
+            color: var(--text-3);
+            padding: 50px 0;
+            font-weight: 750;
         }
 
-        .countdown-screen {
+        .count-screen {
             justify-content: center;
             align-items: center;
+            text-align: center;
             gap: 18px;
         }
 
-        #countText {
-            font-size: 160px;
-            font-weight: 900;
+        .count-number {
+            font-size: 138px;
+            line-height: .9;
+            font-weight: 950;
+            letter-spacing: -5px;
             color: var(--primary);
-            line-height: 1;
+            text-shadow: 0 20px 60px rgba(0,122,255,.24);
         }
 
-        .count-hint {
-            color: var(--text-sec);
-            font-weight: 700;
-            text-align: center;
-            max-width: 280px;
+        .count-title {
+            font-size: 22px;
+            font-weight: 900;
+            letter-spacing: -.4px;
+        }
+
+        .count-sub {
+            color: var(--text-2);
+            max-width: 320px;
             line-height: 1.35;
+            font-weight: 650;
         }
 
-        .game-screen {
-            background-color: var(--primary);
+        .game {
             padding: 0;
-            justify-content: center;
-            align-items: center;
-            transition: background-color 0.35s ease;
             overflow: hidden;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary);
+            transition: background .25s ease;
             touch-action: none;
         }
 
-        .game-screen.correct {
-            background-color: var(--success) !important;
+        .game.correct {
+            background: var(--success);
         }
 
-        .game-screen.wrong {
-            background-color: var(--danger) !important;
+        .game.wrong {
+            background: var(--danger);
         }
 
-        .game-screen.calibrating {
-            background-color: #1f7df2 !important;
+        .game.calibrating {
+            background: #0A62D0;
         }
 
-        .ios-back-circle {
+        .game-top {
             position: absolute;
-            top: calc(20px + var(--safe-top));
-            left: 20px;
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.15);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
+            top: calc(16px + var(--safe-top));
+            left: 16px;
+            right: 16px;
+            z-index: 40;
             display: flex;
-            justify-content: center;
             align-items: center;
-            border: 1px solid rgba(255,255,255,0.2);
-            z-index: 100;
+            justify-content: space-between;
+            pointer-events: none;
         }
 
-        .ios-back-circle svg {
-            width: 12px;
-            height: 20px;
-            margin-right: 2px;
+        .game-top .round-btn {
+            pointer-events: auto;
         }
 
-        .timer-bar {
-            position: absolute;
-            top: calc(30px + var(--safe-top));
-            font-size: 36px;
-            font-weight: 900;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            z-index: 50;
-        }
-
-        .sensor-status {
-            position: absolute;
-            bottom: calc(24px + var(--safe-bottom));
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 10px 14px;
+        .timer {
+            min-width: 86px;
+            height: 48px;
+            display: grid;
+            place-items: center;
             border-radius: 999px;
-            background: rgba(0,0,0,0.22);
-            color: rgba(255,255,255,0.9);
-            font-size: 13px;
-            font-weight: 700;
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            z-index: 70;
-            white-space: nowrap;
-            opacity: 0.9;
+            background: rgba(0,0,0,.22);
+            border: 1px solid rgba(255,255,255,.13);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            font-size: 24px;
+            font-weight: 950;
+            text-shadow: 0 2px 12px rgba(0,0,0,.24);
         }
 
-        .word-main {
-            font-size: clamp(42px, 13vw, 88px);
-            font-weight: 900;
+        .word {
+            z-index: 10;
+            width: 100%;
+            max-width: 980px;
+            padding: 0 30px;
             text-align: center;
-            padding: 0 40px;
-            line-height: 0.92;
-            letter-spacing: -2px;
+            font-size: clamp(48px, 11vw, 104px);
+            line-height: .9;
+            font-weight: 950;
+            letter-spacing: -3px;
             text-transform: uppercase;
-            transition: transform 0.38s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
-            max-width: 100%;
-            word-break: keep-all;
             overflow-wrap: anywhere;
-            text-shadow: 0 4px 18px rgba(0,0,0,0.18);
+            text-shadow: 0 8px 30px rgba(0,0,0,.22);
+            transition:
+                transform .42s cubic-bezier(.18,.89,.32,1.26),
+                opacity .28s ease;
         }
 
-        .slide-up {
-            transform: translateY(-100vh) rotate(-4deg);
+        .word.up {
+            transform: translateY(-110vh) rotate(-5deg);
             opacity: 0;
         }
 
-        .slide-down {
-            transform: translateY(100vh) rotate(4deg);
+        .word.down {
+            transform: translateY(110vh) rotate(5deg);
             opacity: 0;
+        }
+
+        .game-hint {
+            position: absolute;
+            left: 50%;
+            bottom: calc(22px + var(--safe-bottom));
+            transform: translateX(-50%);
+            z-index: 45;
+            padding: 10px 15px;
+            border-radius: 999px;
+            background: rgba(0,0,0,.24);
+            border: 1px solid rgba(255,255,255,.12);
+            color: rgba(255,255,255,.88);
+            font-size: 13px;
+            font-weight: 850;
+            white-space: nowrap;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
         }
 
         .tap-zone {
@@ -315,7 +422,7 @@
             left: 0;
             width: 100%;
             height: 50%;
-            z-index: 20;
+            z-index: 12;
         }
 
         .tap-zone.top {
@@ -329,248 +436,538 @@
         .tap-label {
             position: absolute;
             right: 16px;
-            font-size: 12px;
-            font-weight: 800;
-            color: rgba(255,255,255,0.55);
-            letter-spacing: 0.5px;
+            z-index: 13;
+            color: rgba(255,255,255,.42);
+            font-size: 11px;
+            font-weight: 900;
             text-transform: uppercase;
-            z-index: 25;
+            letter-spacing: .7px;
             pointer-events: none;
         }
 
         .tap-label.top {
-            top: calc(86px + var(--safe-top));
+            top: calc(78px + var(--safe-top));
         }
 
         .tap-label.bottom {
-            bottom: calc(70px + var(--safe-bottom));
+            bottom: calc(68px + var(--safe-bottom));
         }
 
-        .results-screen {
+        .orientation {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            text-align: center;
+            padding: 24px;
+        }
+
+        .orientation .icon {
+            font-size: 58px;
+            margin-bottom: 14px;
+        }
+
+        .orientation h2 {
+            font-size: 26px;
+            font-weight: 950;
+            letter-spacing: -.6px;
+            margin-bottom: 8px;
+        }
+
+        .orientation p {
+            color: var(--text-2);
+            max-width: 310px;
+            line-height: 1.35;
+            font-weight: 650;
+        }
+
+        @media (orientation: portrait) {
+            .game .orientation {
+                display: flex;
+            }
+        }
+
+        .results {
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
             touch-action: pan-y;
         }
 
-        .res-header {
+        .result-head {
             text-align: center;
-            margin: 28px 0 25px;
+            margin: 26px 0 18px;
         }
 
-        .res-header h2 {
-            font-size: 34px;
-            font-weight: 900;
-            letter-spacing: -0.8px;
+        .result-head h2 {
+            font-size: 38px;
+            font-weight: 950;
+            letter-spacing: -1.2px;
         }
 
-        .res-header p {
+        .result-head p {
             margin-top: 6px;
-            color: var(--text-sec);
-            font-weight: 600;
+            color: var(--text-2);
+            font-weight: 700;
         }
 
-        .res-grid {
+        .score {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
-            margin-bottom: 25px;
+            margin-bottom: 18px;
         }
 
-        .res-box {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 20px;
+        .score-box {
+            background: rgba(28,28,30,.84);
+            border: 1px solid var(--line);
+            border-radius: 24px;
+            padding: 18px;
             text-align: center;
         }
 
-        .res-box .val {
-            font-size: 42px;
-            font-weight: 900;
+        .score-box strong {
             display: block;
+            font-size: 46px;
+            line-height: 1;
+            font-weight: 950;
+            margin-bottom: 5px;
         }
 
-        .res-list {
+        .score-box span {
+            color: var(--text-2);
+            font-weight: 800;
+        }
+
+        .history {
             display: flex;
             flex-direction: column;
             gap: 10px;
-            margin-bottom: 30px;
+            margin: 18px 0 18px;
         }
 
-        .res-item {
-            background: var(--card-bg);
-            padding: 16px 20px;
-            border-radius: 16px;
+        .hist-item {
+            background: rgba(28,28,30,.84);
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            padding: 15px 16px;
             display: flex;
+            align-items: center;
             justify-content: space-between;
             gap: 14px;
-            font-weight: 600;
+            font-weight: 800;
         }
 
-        .res-item span:first-child {
+        .hist-item span:first-child {
             overflow-wrap: anywhere;
         }
 
-        .res-item.correct {
+        .hist-item.correct {
             border-left: 4px solid var(--success);
         }
 
-        .res-item.wrong {
+        .hist-item.wrong {
             border-left: 4px solid var(--danger);
         }
 
-        .btn-row {
+        .actions {
             display: grid;
-            grid-template-columns: 1fr;
-            gap: 12px;
-            padding-bottom: 20px;
+            gap: 10px;
+            padding-bottom: 22px;
         }
 
-        .btn-restart,
-        .btn-home {
-            color: white;
-            border: none;
-            padding: 20px;
-            border-radius: 20px;
-            font-size: 17px;
-            font-weight: 800;
-            text-transform: uppercase;
+        .btn {
             width: 100%;
+            height: 58px;
+            border-radius: 20px;
+            color: white;
+            font-weight: 950;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: .2px;
         }
 
-        .btn-restart {
+        .btn.primary {
             background: var(--primary);
         }
 
-        .btn-home {
-            background: var(--card-soft);
+        .btn.soft {
+            background: rgba(255,255,255,.10);
+            border: 1px solid var(--line);
         }
 
-        .orientation-lock {
+        .modal {
             position: fixed;
             inset: 0;
-            background: #000;
-            z-index: 10000;
+            z-index: 2000;
             display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 24px;
+            align-items: flex-end;
+            background: rgba(0,0,0,.52);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
 
-        .orientation-lock h2 {
-            font-weight: 900;
-            font-size: 28px;
-            margin-bottom: 8px;
+        .modal.active {
+            display: flex;
         }
 
-        .orientation-lock p {
-            color: var(--text-sec);
-            font-weight: 600;
-            max-width: 300px;
-            line-height: 1.35;
+        .sheet {
+            width: 100%;
+            max-height: 88vh;
+            background: rgba(18,18,20,.96);
+            border: 1px solid rgba(255,255,255,.10);
+            border-bottom: 0;
+            border-radius: 30px 30px 0 0;
+            padding: 18px 18px calc(18px + var(--safe-bottom));
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            touch-action: pan-y;
+            animation: sheetIn .26s ease both;
         }
 
-        @media (orientation: portrait) {
-            .game-screen .orientation-lock {
-                display: flex;
+        @keyframes sheetIn {
+            from {
+                transform: translateY(100%);
             }
+
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        .sheet-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+        }
+
+        .sheet-head h2 {
+            font-size: 26px;
+            font-weight: 950;
+            letter-spacing: -.7px;
+        }
+
+        .setting {
+            background: rgba(255,255,255,.055);
+            border: 1px solid rgba(255,255,255,.075);
+            border-radius: 22px;
+            padding: 15px;
+            margin-bottom: 12px;
+        }
+
+        .setting label {
+            display: block;
+            color: var(--text);
+            font-size: 15px;
+            font-weight: 900;
+            margin-bottom: 5px;
+        }
+
+        .setting p {
+            color: var(--text-2);
+            font-size: 13px;
+            line-height: 1.35;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .segmented {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            padding: 4px;
+            gap: 4px;
+            border-radius: 16px;
+            background: rgba(0,0,0,.26);
+        }
+
+        .segmented button {
+            height: 40px;
+            border-radius: 13px;
+            background: transparent;
+            color: var(--text-2);
+            font-weight: 850;
+        }
+
+        .segmented button.active {
+            background: rgba(255,255,255,.16);
+            color: white;
+        }
+
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+        }
+
+        .switch {
+            position: relative;
+            width: 56px;
+            height: 34px;
+            border-radius: 999px;
+            background: rgba(255,255,255,.18);
+            flex-shrink: 0;
+            transition: background .2s ease;
+        }
+
+        .switch::after {
+            content: "";
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: white;
+            transition: transform .2s ease;
+        }
+
+        .switch.on {
+            background: var(--primary);
+        }
+
+        .switch.on::after {
+            transform: translateX(22px);
+        }
+
+        .range-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 14px;
+            align-items: center;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: var(--primary);
+        }
+
+        .range-value {
+            min-width: 54px;
+            height: 38px;
+            border-radius: 13px;
+            background: rgba(0,0,0,.25);
+            display: grid;
+            place-items: center;
+            font-weight: 900;
+        }
+
+        .about {
+            color: var(--text-3);
+            font-size: 12px;
+            text-align: center;
+            line-height: 1.35;
+            padding: 8px 6px 0;
+            font-weight: 600;
         }
 
         @media (max-width: 420px) {
-            .hero h1 {
-                font-size: 36px;
+            .screen {
+                padding-left: 15px;
+                padding-right: 15px;
             }
 
-            .categories-grid {
-                gap: 12px;
+            .brand h1 {
+                font-size: 31px;
             }
 
-            .cat-card {
-                border-radius: 20px;
+            .cat {
+                height: 168px;
+                border-radius: 23px;
             }
 
-            .word-main {
-                padding: 0 24px;
-                font-size: clamp(38px, 12vw, 70px);
+            .cat-info h3 {
+                font-size: 18px;
             }
 
-            #countText {
-                font-size: 130px;
+            .word {
+                font-size: clamp(40px, 13vw, 76px);
+                padding: 0 22px;
+                letter-spacing: -2px;
+            }
+
+            .count-number {
+                font-size: 118px;
             }
         }
     </style>
 </head>
 
 <body>
-    <div class="bg-glow"></div>
+    <div class="app-bg"></div>
 
-    <div class="app-container">
-        <div id="homeScreen" class="screen active home-screen">
-            <div class="hero">
-                <h1>Quem Sou Eu?</h1>
-                <p>escolha uma categoria e vire o celular para jogar</p>
+    <main>
+        <section id="homeScreen" class="screen active scroll">
+            <div class="topbar">
+                <div class="brand">
+                    <small>party game</small>
+                    <h1>Quem Sou Eu?</h1>
+                </div>
+
+                <button class="round-btn" onclick="openSettings()" aria-label="Abrir ajustes">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 15.5A3.5 3.5 0 1 0 12 8.5a3.5 3.5 0 0 0 0 7Z" stroke="white" stroke-width="2"/>
+                        <path d="M19.4 15a1.8 1.8 0 0 0 .36 1.98l.04.04a2.18 2.18 0 0 1-3.08 3.08l-.04-.04A1.8 1.8 0 0 0 14.7 19.7a1.8 1.8 0 0 0-1.1 1.65V21.5a2.18 2.18 0 0 1-4.36 0v-.06A1.8 1.8 0 0 0 8.14 19.8a1.8 1.8 0 0 0-1.98.36l-.04.04a2.18 2.18 0 0 1-3.08-3.08l.04-.04A1.8 1.8 0 0 0 3.44 15a1.8 1.8 0 0 0-1.65-1.1H1.64a2.18 2.18 0 0 1 0-4.36h.06A1.8 1.8 0 0 0 3.35 8.44a1.8 1.8 0 0 0-.36-1.98l-.04-.04a2.18 2.18 0 0 1 3.08-3.08l.04.04A1.8 1.8 0 0 0 8.05 3.74a1.8 1.8 0 0 0 1.1-1.65V1.94a2.18 2.18 0 0 1 4.36 0V2a1.8 1.8 0 0 0 1.1 1.65 1.8 1.8 0 0 0 1.98-.36l.04-.04a2.18 2.18 0 0 1 3.08 3.08l-.04.04a1.8 1.8 0 0 0-.36 1.98 1.8 1.8 0 0 0 1.65 1.1h.15a2.18 2.18 0 0 1 0 4.36h-.06A1.8 1.8 0 0 0 19.4 15Z" stroke="white" stroke-width="1.7" stroke-linecap="round"/>
+                    </svg>
+                </button>
             </div>
 
-            <div class="search-container">
-                <input type="text" id="searchInput" class="search-bar" placeholder="Pesquisar categorias..." oninput="filterCategories()">
+            <div class="status-card">
+                <div class="status-row">
+                    <div class="mini-stat">
+                        <span>rodada</span>
+                        <strong id="homeDuration">75s</strong>
+                    </div>
+
+                    <div class="mini-stat">
+                        <span>controle</span>
+                        <strong id="homeControl">sensor + toque</strong>
+                    </div>
+                </div>
             </div>
 
-            <div id="categoriesGrid" class="categories-grid"></div>
-        </div>
-
-        <div id="countdownScreen" class="screen countdown-screen">
-            <div id="countText">3</div>
-            <div class="count-hint">deixe o celular parado na posição inicial</div>
-        </div>
-
-        <div id="gameScreen" class="screen game-screen">
-            <div class="orientation-lock">
-                <div style="font-size: 60px; margin-bottom: 20px;">📱</div>
-                <h2>VIRE O CELULAR</h2>
-                <p>o jogo funciona melhor com o celular deitado em paisagem</p>
+            <div class="search-wrap">
+                <input id="searchInput" class="search" type="text" placeholder="Pesquisar categorias..." oninput="filterCategories()" />
             </div>
 
-            <div class="tap-zone top" onclick="handleTapAction('correct')"></div>
-            <div class="tap-zone bottom" onclick="handleTapAction('wrong')"></div>
+            <div id="categoriesGrid" class="categories"></div>
+        </section>
+
+        <section id="countScreen" class="screen count-screen">
+            <div id="countNumber" class="count-number">3</div>
+            <div>
+                <div class="count-title">segure o celular parado</div>
+                <div class="count-sub">o app vai usar essa posição como centro antes de começar</div>
+            </div>
+        </section>
+
+        <section id="gameScreen" class="screen game">
+            <div class="orientation">
+                <div class="icon">📱</div>
+                <h2>vire o celular</h2>
+                <p>para jogar no estilo testa, use o iPhone deitado em paisagem.</p>
+            </div>
+
+            <div class="tap-zone top" onclick="tapAction('correct')"></div>
+            <div class="tap-zone bottom" onclick="tapAction('wrong')"></div>
 
             <div class="tap-label top">toque: acerto</div>
             <div class="tap-label bottom">toque: erro</div>
 
-            <div class="ios-back-circle" onclick="exitGame()">
-                <svg viewBox="0 0 12 21" fill="none">
-                    <path d="M10.5 19.5L1.5 10.5L10.5 1.5" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
+            <div class="game-top">
+                <button class="round-btn" onclick="exitGame()" aria-label="Sair">
+                    <svg width="14" height="22" viewBox="0 0 14 22" fill="none">
+                        <path d="M11.5 2L2.5 11L11.5 20" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+
+                <div id="gameTimer" class="timer">75s</div>
+
+                <button class="round-btn" onclick="openSettings()" aria-label="Ajustes">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 15.5A3.5 3.5 0 1 0 12 8.5a3.5 3.5 0 0 0 0 7Z" stroke="white" stroke-width="2"/>
+                        <path d="M19.4 15a1.8 1.8 0 0 0 .36 1.98l.04.04a2.18 2.18 0 0 1-3.08 3.08l-.04-.04A1.8 1.8 0 0 0 14.7 19.7a1.8 1.8 0 0 0-1.1 1.65V21.5a2.18 2.18 0 0 1-4.36 0v-.06A1.8 1.8 0 0 0 8.14 19.8a1.8 1.8 0 0 0-1.98.36l-.04.04a2.18 2.18 0 0 1-3.08-3.08l.04-.04A1.8 1.8 0 0 0 3.44 15a1.8 1.8 0 0 0-1.65-1.1H1.64a2.18 2.18 0 0 1 0-4.36h.06A1.8 1.8 0 0 0 3.35 8.44a1.8 1.8 0 0 0-.36-1.98l-.04-.04a2.18 2.18 0 0 1 3.08-3.08l.04.04A1.8 1.8 0 0 0 8.05 3.74a1.8 1.8 0 0 0 1.1-1.65V1.94a2.18 2.18 0 0 1 4.36 0V2a1.8 1.8 0 0 0 1.1 1.65 1.8 1.8 0 0 0 1.98-.36l.04-.04a2.18 2.18 0 0 1 3.08 3.08l-.04.04a1.8 1.8 0 0 0-.36 1.98 1.8 1.8 0 0 0 1.65 1.1h.15a2.18 2.18 0 0 1 0 4.36h-.06A1.8 1.8 0 0 0 19.4 15Z" stroke="white" stroke-width="1.7" stroke-linecap="round"/>
+                    </svg>
+                </button>
             </div>
 
-            <div id="gameTimer" class="timer-bar">75s</div>
-            <div id="wordMain" class="word-main">GO!</div>
-            <div id="sensorStatus" class="sensor-status">calibrando...</div>
-        </div>
+            <div id="wordEl" class="word">GO!</div>
+            <div id="gameHint" class="game-hint">calibrando...</div>
+        </section>
 
-        <div id="resultsScreen" class="screen results-screen">
-            <div class="res-header">
+        <section id="resultsScreen" class="screen results">
+            <div class="result-head">
                 <h2>Resultado</h2>
-                <p id="resSummary">fim da rodada</p>
+                <p id="resultSummary">fim da rodada</p>
             </div>
 
-            <div class="res-grid">
-                <div class="res-box">
-                    <span id="resCorrect" class="val" style="color: var(--success)">0</span>
-                    <span>Acertos</span>
+            <div class="score">
+                <div class="score-box">
+                    <strong id="scoreCorrect" style="color: var(--success)">0</strong>
+                    <span>acertos</span>
                 </div>
 
-                <div class="res-box">
-                    <span id="resWrong" class="val" style="color: var(--danger)">0</span>
-                    <span>Erros</span>
+                <div class="score-box">
+                    <strong id="scoreWrong" style="color: var(--danger)">0</strong>
+                    <span>erros</span>
                 </div>
             </div>
 
-            <div id="resList" class="res-list"></div>
+            <div id="historyList" class="history"></div>
 
-            <div class="btn-row">
-                <button class="btn-restart" onclick="restartSameCategory()">Jogar novamente</button>
-                <button class="btn-home" onclick="backHomeFromResults()">Trocar categoria</button>
+            <div class="actions">
+                <button class="btn primary" onclick="restartSameCategory()">jogar novamente</button>
+                <button class="btn soft" onclick="backHome()">trocar categoria</button>
+            </div>
+        </section>
+    </main>
+
+    <div id="settingsModal" class="modal" onclick="closeSettingsByBackdrop(event)">
+        <div class="sheet">
+            <div class="sheet-head">
+                <h2>Ajustes</h2>
+                <button class="round-btn" onclick="closeSettings()" aria-label="Fechar">×</button>
+            </div>
+
+            <div class="setting">
+                <label>tempo da rodada</label>
+                <p>define quanto tempo cada partida vai durar.</p>
+                <div class="segmented" id="durationButtons">
+                    <button onclick="setDuration(60)">60s</button>
+                    <button onclick="setDuration(75)">75s</button>
+                    <button onclick="setDuration(90)">90s</button>
+                </div>
+            </div>
+
+            <div class="setting">
+                <label>sensibilidade do sensor</label>
+                <p>quanto maior, mais precisa inclinar o iPhone para marcar.</p>
+                <div class="range-row">
+                    <input id="sensitivityInput" type="range" min="45" max="80" value="62" oninput="setSensitivity(this.value)" />
+                    <div id="sensitivityValue" class="range-value">62</div>
+                </div>
+            </div>
+
+            <div class="setting">
+                <div class="toggle-row">
+                    <div>
+                        <label>inverter sensor</label>
+                        <p>ative se inclinar para baixo estiver marcando como acerto.</p>
+                    </div>
+                    <button id="invertSwitch" class="switch" onclick="toggleInvert()"></button>
+                </div>
+            </div>
+
+            <div class="setting">
+                <div class="toggle-row">
+                    <div>
+                        <label>usar sensor</label>
+                        <p>se desligar, o jogo funciona só por toque: cima acerta, baixo erra.</p>
+                    </div>
+                    <button id="sensorSwitch" class="switch" onclick="toggleSensor()"></button>
+                </div>
+            </div>
+
+            <div class="setting">
+                <div class="toggle-row">
+                    <div>
+                        <label>vibração</label>
+                        <p>feedback rápido quando acerta ou erra.</p>
+                    </div>
+                    <button id="vibrationSwitch" class="switch" onclick="toggleVibration()"></button>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="btn primary" onclick="testCalibration()">testar calibração</button>
+            </div>
+
+            <div class="about">
+                dica: no iPhone, deixe o celular deitado em paisagem, espere “pronto” e incline de verdade. se o lado ficar trocado, ative “inverter sensor”.
             </div>
         </div>
     </div>
@@ -580,70 +977,70 @@
             {
                 id: "celebridades",
                 name: "Celebridades",
-                img: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663518097424/qUJuCChaqOabwsis.png",
+                img: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=900&auto=format&fit=crop",
                 words: [
                     "Cristiano Ronaldo", "Messi", "Neymar", "Shakira", "Beyoncé", "Taylor Swift", "The Weeknd", "Bad Bunny",
-                    "Billie Eilish", "Drake", "Ariana Grande", "Dwayne Johnson", "Tom Cruise", "Leonardo DiCaprio",
-                    "Scarlett Johansson", "Anitta", "Ivete Sangalo", "Silvio Santos", "Faustão", "Gisele Bündchen",
-                    "Will Smith", "Rihanna", "Lady Gaga", "Katy Perry", "Justin Bieber", "Ed Sheeran", "Zendaya",
-                    "Tom Holland", "Robert Downey Jr", "Chris Evans", "Brad Pitt", "Angelina Jolie", "Meryl Streep",
-                    "Johnny Depp", "Keanu Reeves", "The Rock", "Gal Gadot", "Margot Robbie", "Ryan Reynolds", "Hugh Jackman"
+                    "Billie Eilish", "Drake", "Ariana Grande", "The Rock", "Tom Cruise", "Leonardo DiCaprio", "Scarlett Johansson",
+                    "Anitta", "Ivete Sangalo", "Silvio Santos", "Faustão", "Gisele Bündchen", "Will Smith", "Rihanna", "Lady Gaga",
+                    "Katy Perry", "Justin Bieber", "Ed Sheeran", "Zendaya", "Tom Holland", "Robert Downey Jr", "Chris Evans",
+                    "Brad Pitt", "Angelina Jolie", "Meryl Streep", "Johnny Depp", "Keanu Reeves", "Gal Gadot", "Margot Robbie",
+                    "Ryan Reynolds", "Hugh Jackman", "Bruna Marquezine", "Juliette", "Ludmilla", "Pabllo Vittar"
                 ]
             },
             {
                 id: "filmes",
                 name: "Filmes",
-                img: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663518097424/wzmEQWiPvIopDzNy.png",
+                img: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=900&auto=format&fit=crop",
                 words: [
                     "Avatar", "Titanic", "Homem-Aranha", "Vingadores", "Interestelar", "Matrix", "Inception", "Gladiador",
                     "Jurassic Park", "De Volta para o Futuro", "Forrest Gump", "O Iluminado", "Psicose", "Pulp Fiction",
                     "Kill Bill", "Star Wars", "Harry Potter", "Coringa", "O Rei Leão", "Toy Story", "Procurando Nemo",
-                    "Shrek", "Batman", "Superman", "Mulher-Maravilha", "Pantera Negra", "O Poderoso Chefão",
-                    "Clube da Luta", "Parasita", "Cidade de Deus", "O Senhor dos Anéis", "O Hobbit", "Duna",
-                    "Oppenheimer", "Barbie", "Top Gun", "Missão Impossível", "John Wick", "Velozes e Furiosos"
+                    "Shrek", "Batman", "Superman", "Mulher-Maravilha", "Pantera Negra", "O Poderoso Chefão", "Clube da Luta",
+                    "Parasita", "Cidade de Deus", "O Senhor dos Anéis", "O Hobbit", "Duna", "Oppenheimer", "Barbie", "Top Gun",
+                    "Missão Impossível", "John Wick", "Velozes e Furiosos", "Divertida Mente", "Frozen", "Moana"
                 ]
             },
             {
                 id: "series",
                 name: "Séries",
-                img: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663518097424/xefNzoYSkGXVQQEl.png",
+                img: "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=900&auto=format&fit=crop",
                 words: [
                     "Game of Thrones", "Breaking Bad", "Stranger Things", "The Office", "Friends", "Wandinha", "Round 6",
                     "Dark", "The Crown", "Sherlock", "Dexter", "House", "Grey's Anatomy", "Suits", "Peaky Blinders",
                     "The Boys", "Succession", "The Last of Us", "The Mandalorian", "Black Mirror", "La Casa de Papel",
-                    "Elite", "Sex Education", "Euphoria", "Ted Lasso", "The Bear", "Beef", "The White Lotus",
-                    "Cobra Kai", "The Witcher", "The Walking Dead", "Vikings", "Better Call Saul", "Narcos",
-                    "Ozark", "The Umbrella Academy", "Loki", "The Flash", "Arrow", "Supernatural"
+                    "Elite", "Sex Education", "Euphoria", "Ted Lasso", "The Bear", "The White Lotus", "Cobra Kai",
+                    "The Witcher", "The Walking Dead", "Vikings", "Better Call Saul", "Narcos", "Ozark", "Loki", "The Flash",
+                    "Arrow", "Supernatural", "Todo Mundo Odeia o Chris", "Chaves"
                 ]
             },
             {
                 id: "animais",
                 name: "Animais",
-                img: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663518097424/qlmYbZNvZJhsdMXv.png",
+                img: "https://images.unsplash.com/photo-1474511320723-9a56873867b5?w=900&auto=format&fit=crop",
                 words: [
                     "Leão", "Tigre", "Golfinho", "Pinguim", "Águia", "Cobra", "Elefante", "Girafa", "Urso Panda", "Lobo",
                     "Raposa", "Macaco", "Tubarão", "Coruja", "Pavão", "Canguru", "Hipopótamo", "Zebra", "Crocodilo",
                     "Tartaruga", "Baleia", "Orca", "Polvo", "Água-viva", "Camaleão", "Esquilo", "Castor", "Lontra",
                     "Suricato", "Panda Vermelho", "Coala", "Ornitorrinco", "Preguiça", "Tamanduá", "Tatu", "Arara",
-                    "Tucano", "Beija-flor", "Guepardo", "Rinoceronte"
+                    "Tucano", "Beija-flor", "Guepardo", "Rinoceronte", "Capivara", "Cavalo", "Gato", "Cachorro"
                 ]
             },
             {
                 id: "comida",
                 name: "Comida",
-                img: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663518097424/QKfqaGbLQPkbfrZd.png",
+                img: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=900&auto=format&fit=crop",
                 words: [
                     "Pizza", "Hambúrguer", "Sushi", "Lasanha", "Coxinha", "Açaí", "Brigadeiro", "Churrasco", "Tacos",
                     "Macarrão", "Feijoada", "Pastel", "Bolo", "Sorvete", "Panqueca", "Pão de Queijo", "Tapioca",
-                    "Guacamole", "Paella", "Ramen", "Hot Dog", "Nuggets", "Batata Frita", "Pipoca", "Donut",
-                    "Croissant", "Waffle", "Churros", "Pudim", "Mousse", "Risoto", "Estrogonofe", "Quibe", "Esfiha",
-                    "Falafel", "Hummus", "Ceviche", "Poke", "Fondue", "Brownie"
+                    "Guacamole", "Paella", "Ramen", "Hot Dog", "Nuggets", "Batata Frita", "Pipoca", "Donut", "Croissant",
+                    "Waffle", "Churros", "Pudim", "Mousse", "Risoto", "Estrogonofe", "Quibe", "Esfiha", "Falafel",
+                    "Ceviche", "Poke", "Fondue", "Brownie", "Cuscuz", "Miojo", "Arroz e Feijão"
                 ]
             },
             {
                 id: "esportes",
                 name: "Esportes",
-                img: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663518097424/UwoUDiRhRTxzsHYf.png",
+                img: "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=900&auto=format&fit=crop",
                 words: [
                     "Futebol", "Basquete", "Tênis", "Natação", "Boxe", "Skate", "Surfe", "Yoga", "Corrida", "Ciclismo",
                     "Vôlei", "Badminton", "Golfe", "Snowboard", "Escalada", "Karatê", "Judô", "Fórmula 1", "MotoGP",
@@ -661,7 +1058,7 @@
                     "Escova de dentes", "Guarda-chuva", "Mochila", "Óculos", "Relógio", "Chave", "Carteira", "Caneta",
                     "Lápis", "Tesoura", "Espelho", "Travesseiro", "Cobertor", "Sapato", "Boné", "Fone de ouvido",
                     "Carregador", "Televisão", "Sofá", "Copo", "Prato", "Panela", "Garrafa", "Lâmpada", "Caderno",
-                    "Livro", "Bicicleta", "Câmera", "Violão", "Caixa de som", "Perfume", "Sabonete"
+                    "Livro", "Bicicleta", "Câmera", "Violão", "Caixa de som", "Perfume", "Sabonete", "Air Fryer"
                 ]
             },
             {
@@ -673,10 +1070,45 @@
                     "Biblioteca", "Padaria", "Farmácia", "Restaurante", "Parque", "Zoológico", "Estádio", "Academia",
                     "Supermercado", "Banco", "Hotel", "Piscina", "Teatro", "Circo", "Salão de beleza", "Barbearia",
                     "Posto de gasolina", "Delegacia", "Correio", "Feira", "Floresta", "Montanha", "Cachoeira",
-                    "Fazenda", "Castelo", "Ilha", "Metrô", "Elevador", "Escritório", "Sala de aula"
+                    "Fazenda", "Castelo", "Ilha", "Metrô", "Elevador", "Escritório", "Sala de aula", "Balada"
+                ]
+            },
+            {
+                id: "internet",
+                name: "Internet",
+                img: "https://images.unsplash.com/photo-1516321497487-e288fb19713f?w=900&auto=format&fit=crop",
+                words: [
+                    "TikTok", "Instagram", "YouTube", "Twitter", "Threads", "WhatsApp", "Telegram", "Discord", "Reddit",
+                    "Netflix", "Spotify", "CapCut", "Canva", "Google", "ChatGPT", "Memes", "Trend", "Influencer",
+                    "Live", "Story", "Reels", "Comentário fixado", "Print", "Cancelamento", "Hater", "Fanfic",
+                    "Gameplay", "Streamer", "Podcast", "Filtro", "Hashtag", "Viral", "Emoji", "Sticker", "DM",
+                    "Perfil fake", "Close friends", "Algoritmo", "Notificação", "Unboxing"
+                ]
+            },
+            {
+                id: "adulto-leve",
+                name: "+18 leve",
+                img: "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=900&auto=format&fit=crop",
+                words: [
+                    "Crush", "Flerte", "Beijo", "Primeiro encontro", "Date ruim", "Ex", "Ciúmes", "Pedido de namoro",
+                    "DR", "Segredo", "Fofoca", "Vergonha", "Cantada", "Vácuo", "Print", "Stalker", "Amor proibido",
+                    "Friendzone", "Término", "Reconciliação", "Traição", "Mentira", "Pessoa tóxica", "Clima estranho",
+                    "Mensagem apagada", "Conversante", "Solteiro", "Casal", "Rolê", "Festa", "Karaokê", "Dança",
+                    "Mico", "Confissão", "Indireta", "Bloqueio", "Desbloquear", "Emoji suspeito", "Curtir story",
+                    "Responder story", "Chamar no privado", "Pedido estranho", "Segundas intenções", "Climão"
                 ]
             }
         ];
+
+        const DEFAULT_SETTINGS = {
+            duration: 75,
+            sensitivity: 62,
+            invertSensor: true,
+            useSensor: true,
+            vibration: true
+        };
+
+        let settings = loadSettings();
 
         const game = {
             active: false,
@@ -684,42 +1116,60 @@
             words: [],
             index: 0,
             history: [],
-            timeLeft: 75,
+            timeLeft: settings.duration,
             timer: null,
             isProcessing: false,
             lastAction: 0
         };
 
-        const SENSORS = {
-            START_DELAY: 1300,
-            COOLDOWN: 950,
-            REQUIRED_DIFF: 34,
-            RETURN_TO_NEUTRAL: 16,
-            MIN_STABLE_READINGS: 5,
-            MAX_BASE_SAMPLES: 12
-        };
-
         const sensor = {
-            supported: false,
+            supported: typeof DeviceOrientationEvent !== "undefined",
             permissionAsked: false,
             permissionGranted: false,
             ready: false,
-            locked: false,
             base: null,
             samples: [],
-            stableReadings: 0,
+            locked: false,
             lastValue: null,
-            usingGamma: false,
-            messageTimer: null
+            stableCount: 0,
+            lastNeutralAt: 0,
+            testMode: false
+        };
+
+        const SENSOR_RULES = {
+            startDelay: 700,
+            minSamples: 8,
+            maxSamples: 16,
+            stabilityLimit: 3.8,
+            deadZone: 34,
+            cooldown: 980
         };
 
         function init() {
             renderCategories(CATEGORIES);
-            prepareSensorSupport();
+            updateSettingsUI();
+            updateHomeInfo();
+            bindPreventZoom();
         }
 
-        function prepareSensorSupport() {
-            sensor.supported = typeof DeviceOrientationEvent !== "undefined";
+        function loadSettings() {
+            try {
+                const saved = JSON.parse(localStorage.getItem("quemSouEuSettings"));
+                return { ...DEFAULT_SETTINGS, ...saved };
+            } catch {
+                return { ...DEFAULT_SETTINGS };
+            }
+        }
+
+        function saveSettings() {
+            localStorage.setItem("quemSouEuSettings", JSON.stringify(settings));
+            updateSettingsUI();
+            updateHomeInfo();
+        }
+
+        function updateHomeInfo() {
+            document.getElementById("homeDuration").innerText = settings.duration + "s";
+            document.getElementById("homeControl").innerText = settings.useSensor ? "sensor + toque" : "só toque";
         }
 
         function renderCategories(list) {
@@ -727,65 +1177,75 @@
             grid.innerHTML = "";
 
             if (!list.length) {
-                grid.innerHTML = `<div class="empty-state">nenhuma categoria encontrada</div>`;
+                grid.innerHTML = `<div class="empty">nenhuma categoria encontrada</div>`;
                 return;
             }
 
             list.forEach(cat => {
-                const card = document.createElement("div");
-                card.className = "cat-card";
-                card.innerHTML = `
+                const el = document.createElement("button");
+                el.className = "cat";
+                el.onclick = () => startSequence(cat.id);
+                el.innerHTML = `
                     <div class="cat-img" style="background-image: url('${cat.img}')"></div>
                     <div class="cat-info">
                         <span>${cat.words.length} palavras</span>
                         <h3>${cat.name}</h3>
                     </div>
                 `;
-                card.onclick = () => startSequence(cat.id);
-                grid.appendChild(card);
+                grid.appendChild(el);
             });
         }
 
         function filterCategories() {
             const query = document.getElementById("searchInput").value.trim().toLowerCase();
-            const filtered = CATEGORIES.filter(c => c.name.toLowerCase().includes(query));
+
+            const filtered = CATEGORIES.filter(cat => {
+                return cat.name.toLowerCase().includes(query);
+            });
+
             renderCategories(filtered);
         }
 
         function showScreen(id) {
-            document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+            document.querySelectorAll(".screen").forEach(screen => {
+                screen.classList.remove("active");
+            });
+
             document.getElementById(id).classList.add("active");
         }
 
-        async function startSequence(catId) {
-            const cat = CATEGORIES.find(c => c.id === catId);
-            if (!cat) return;
+        async function startSequence(categoryId) {
+            const category = CATEGORIES.find(item => item.id === categoryId);
+            if (!category) return;
 
-            game.categoryId = catId;
-            game.words = shuffle([...cat.words]);
+            game.categoryId = categoryId;
+            game.words = shuffle([...category.words]);
             game.index = 0;
             game.history = [];
-            game.timeLeft = 75;
+            game.timeLeft = settings.duration;
             game.active = false;
             game.isProcessing = false;
             game.lastAction = 0;
 
             clearInterval(game.timer);
-            document.getElementById("gameTimer").innerText = "75s";
 
-            await requestSensorPermission();
+            document.getElementById("gameTimer").innerText = game.timeLeft + "s";
 
-            showScreen("countdownScreen");
+            if (settings.useSensor) {
+                await requestSensorPermission();
+            }
+
+            showScreen("countScreen");
 
             let count = 3;
-            const txt = document.getElementById("countText");
-            txt.innerText = count;
+            const countEl = document.getElementById("countNumber");
+            countEl.innerText = count;
 
             const interval = setInterval(() => {
                 count--;
 
                 if (count > 0) {
-                    txt.innerText = count;
+                    countEl.innerText = count;
                 } else {
                     clearInterval(interval);
                     startGame();
@@ -800,263 +1260,264 @@
 
             try {
                 if (typeof DeviceOrientationEvent.requestPermission === "function") {
-                    const result = await DeviceOrientationEvent.requestPermission();
-                    sensor.permissionGranted = result === "granted";
+                    const permission = await DeviceOrientationEvent.requestPermission();
+                    sensor.permissionGranted = permission === "granted";
                 } else {
                     sensor.permissionGranted = true;
                 }
-            } catch (err) {
+            } catch {
                 sensor.permissionGranted = false;
             }
         }
 
         function startGame() {
             game.active = true;
+
             showScreen("gameScreen");
             renderWord();
-            resetSensorCalibration();
+            resetSensor("calibrando...");
 
             game.timer = setInterval(() => {
                 game.timeLeft--;
                 document.getElementById("gameTimer").innerText = game.timeLeft + "s";
 
                 if (game.timeLeft <= 0) {
-                    finish();
+                    finishGame();
                 }
             }, 1000);
         }
 
-        function resetSensorCalibration() {
+        function renderWord() {
+            if (game.index >= game.words.length) {
+                game.words = shuffle([...game.words]);
+                game.index = 0;
+            }
+
+            const wordEl = document.getElementById("wordEl");
+            wordEl.className = "word";
+            wordEl.innerText = game.words[game.index] || "fim";
+        }
+
+        function resetSensor(message) {
             sensor.ready = false;
-            sensor.locked = true;
             sensor.base = null;
             sensor.samples = [];
-            sensor.stableReadings = 0;
+            sensor.locked = true;
             sensor.lastValue = null;
-            sensor.usingGamma = false;
+            sensor.stableCount = 0;
+            sensor.lastNeutralAt = Date.now();
 
-            const screen = document.getElementById("gameScreen");
-            screen.classList.add("calibrating");
+            const gameScreen = document.getElementById("gameScreen");
+            gameScreen.classList.add("calibrating");
 
-            setSensorStatus("calibrando...");
+            setHint(settings.useSensor ? message : "toque em cima ou embaixo");
 
             setTimeout(() => {
                 sensor.locked = false;
-                setSensorStatus("segure parado");
-            }, SENSORS.START_DELAY);
-        }
 
-        function calibrateFromValue(value) {
-            if (sensor.ready || sensor.locked) return;
-
-            if (typeof value !== "number" || Number.isNaN(value)) return;
-
-            sensor.samples.push(value);
-
-            if (sensor.samples.length > SENSORS.MAX_BASE_SAMPLES) {
-                sensor.samples.shift();
-            }
-
-            if (sensor.lastValue !== null) {
-                const movement = Math.abs(value - sensor.lastValue);
-
-                if (movement < 2.8) {
-                    sensor.stableReadings++;
-                } else {
-                    sensor.stableReadings = 0;
+                if (!settings.useSensor) {
+                    setHint("toque em cima ou embaixo");
+                    gameScreen.classList.remove("calibrating");
+                    return;
                 }
-            }
 
-            sensor.lastValue = value;
-
-            if (sensor.samples.length >= 6 && sensor.stableReadings >= SENSORS.MIN_STABLE_READINGS) {
-                const total = sensor.samples.reduce((sum, item) => sum + item, 0);
-                sensor.base = total / sensor.samples.length;
-                sensor.ready = true;
-
-                document.getElementById("gameScreen").classList.remove("calibrating");
-                setSensorStatus("pronto");
-
-                setTimeout(() => {
-                    if (game.active) setSensorStatus("incline ou toque");
-                }, 800);
-            }
+                setHint("segure parado");
+            }, SENSOR_RULES.startDelay);
         }
 
-        function getMotionValue(e) {
-            const beta = e.beta;
-            const gamma = e.gamma;
+        function getMotionValue(event) {
+            const beta = event.beta;
+            const gamma = event.gamma;
 
-            if (beta === null && gamma === null) return null;
+            const landscape = window.innerWidth > window.innerHeight;
 
-            const isLandscape = Math.abs(window.orientation || 0) === 90 || window.innerWidth > window.innerHeight;
-
-            if (isLandscape && typeof gamma === "number") {
-                sensor.usingGamma = true;
+            if (landscape && typeof gamma === "number") {
                 return gamma;
             }
 
             if (typeof beta === "number") {
-                sensor.usingGamma = false;
                 return beta;
             }
 
-            return gamma;
+            if (typeof gamma === "number") {
+                return gamma;
+            }
+
+            return null;
         }
 
-        function handleOrientation(e) {
-            if (!game.active || game.isProcessing) return;
+        function handleOrientation(event) {
+            if (!game.active) return;
+            if (!settings.useSensor) return;
+            if (game.isProcessing) return;
+            if (sensor.locked) return;
 
-            const value = getMotionValue(e);
-            if (value === null || typeof value !== "number" || Number.isNaN(value)) return;
+            const value = getMotionValue(event);
+
+            if (value === null || Number.isNaN(value)) return;
 
             if (!sensor.ready) {
-                calibrateFromValue(value);
+                calibrate(value);
                 return;
             }
 
-            if (sensor.locked || sensor.base === null) return;
+            let diff = value - sensor.base;
 
-            const diff = value - sensor.base;
-            const absDiff = Math.abs(diff);
-
-            if (absDiff < SENSORS.RETURN_TO_NEUTRAL) {
-                sensor.locked = false;
+            if (settings.invertSensor) {
+                diff *= -1;
             }
 
-            if (absDiff < SENSORS.REQUIRED_DIFF) return;
+            const absoluteDiff = Math.abs(diff);
 
-            if (diff > 0) {
-                triggerSensorAction("correct");
-            } else {
-                triggerSensorAction("wrong");
+            if (absoluteDiff < SENSOR_RULES.deadZone) {
+                sensor.lastNeutralAt = Date.now();
+                setHint("incline bem");
+                return;
+            }
+
+            if (absoluteDiff < Number(settings.sensitivity)) {
+                setHint("incline mais");
+                return;
+            }
+
+            const timeSinceNeutral = Date.now() - sensor.lastNeutralAt;
+
+            if (timeSinceNeutral < 120) return;
+
+            if (diff > Number(settings.sensitivity)) {
+                performAction("correct");
+            } else if (diff < -Number(settings.sensitivity)) {
+                performAction("wrong");
             }
         }
 
-        function triggerSensorAction(type) {
-            if (sensor.locked) return;
+        function calibrate(value) {
+            if (sensor.lastValue !== null) {
+                const movement = Math.abs(value - sensor.lastValue);
 
-            sensor.locked = true;
-            handleAction(type);
-
-            setTimeout(() => {
-                sensor.base = null;
-                sensor.samples = [];
-                sensor.stableReadings = 0;
-                sensor.lastValue = null;
-                sensor.ready = false;
-                sensor.locked = false;
-
-                if (game.active) {
-                    document.getElementById("gameScreen").classList.add("calibrating");
-                    setSensorStatus("recentralizando...");
+                if (movement <= SENSOR_RULES.stabilityLimit) {
+                    sensor.stableCount++;
+                } else {
+                    sensor.stableCount = 0;
+                    sensor.samples = [];
                 }
-            }, 320);
-        }
-
-        function handleTapAction(type) {
-            if (!game.active || game.isProcessing) return;
-            handleAction(type);
-        }
-
-        function renderWord() {
-            const el = document.getElementById("wordMain");
-
-            if (game.index >= game.words.length) {
-                game.words = shuffle(game.words);
-                game.index = 0;
             }
 
-            el.innerText = game.words[game.index];
-            el.className = "word-main";
+            sensor.lastValue = value;
+            sensor.samples.push(value);
+
+            if (sensor.samples.length > SENSOR_RULES.maxSamples) {
+                sensor.samples.shift();
+            }
+
+            if (sensor.samples.length >= SENSOR_RULES.minSamples && sensor.stableCount >= 4) {
+                const sum = sensor.samples.reduce((acc, item) => acc + item, 0);
+                sensor.base = sum / sensor.samples.length;
+                sensor.ready = true;
+                sensor.lastNeutralAt = Date.now();
+
+                document.getElementById("gameScreen").classList.remove("calibrating");
+                setHint("pronto");
+
+                setTimeout(() => {
+                    if (game.active && sensor.ready) {
+                        setHint("incline bem");
+                    }
+                }, 650);
+            }
         }
 
-        function handleAction(type) {
+        function tapAction(type) {
+            if (!game.active) return;
+            performAction(type);
+        }
+
+        function performAction(type) {
             const now = Date.now();
 
-            if (game.isProcessing || !game.active || now - game.lastAction < SENSORS.COOLDOWN) return;
+            if (!game.active) return;
+            if (game.isProcessing) return;
+            if (now - game.lastAction < SENSOR_RULES.cooldown) return;
 
             game.isProcessing = true;
             game.lastAction = now;
+            sensor.locked = true;
 
-            const screen = document.getElementById("gameScreen");
-            const wordEl = document.getElementById("wordMain");
-
-            screen.classList.remove("calibrating");
+            const currentWord = game.words[game.index];
+            const gameScreen = document.getElementById("gameScreen");
+            const wordEl = document.getElementById("wordEl");
 
             game.history.push({
-                word: game.words[game.index],
+                word: currentWord,
                 status: type
             });
 
+            gameScreen.classList.remove("calibrating");
+
             if (type === "correct") {
-                screen.classList.add("correct");
-                wordEl.classList.add("slide-up");
+                gameScreen.classList.add("correct");
+                wordEl.classList.add("up");
 
-                if (navigator.vibrate) navigator.vibrate(80);
+                if (settings.vibration && navigator.vibrate) {
+                    navigator.vibrate(70);
+                }
             } else {
-                screen.classList.add("wrong");
-                wordEl.classList.add("slide-down");
+                gameScreen.classList.add("wrong");
+                wordEl.classList.add("down");
 
-                if (navigator.vibrate) navigator.vibrate([45, 45, 45]);
+                if (settings.vibration && navigator.vibrate) {
+                    navigator.vibrate([45, 45, 45]);
+                }
             }
 
             setTimeout(() => {
-                screen.classList.remove("correct", "wrong");
+                gameScreen.classList.remove("correct", "wrong");
                 game.index++;
                 renderWord();
+
                 game.isProcessing = false;
 
                 if (game.active) {
-                    resetMiniCalibration();
+                    resetSensor("centralizando...");
                 }
-            }, 760);
-        }
-
-        function resetMiniCalibration() {
-            sensor.ready = false;
-            sensor.base = null;
-            sensor.samples = [];
-            sensor.stableReadings = 0;
-            sensor.lastValue = null;
-            sensor.locked = false;
-
-            document.getElementById("gameScreen").classList.add("calibrating");
-            setSensorStatus("segure parado");
+            }, 720);
         }
 
         function exitGame() {
             clearInterval(game.timer);
+
             game.active = false;
             game.isProcessing = false;
+
             showScreen("homeScreen");
         }
 
-        function finish() {
+        function finishGame() {
             clearInterval(game.timer);
+
             game.active = false;
             game.isProcessing = false;
 
-            const correct = game.history.filter(h => h.status === "correct").length;
-            const wrong = game.history.filter(h => h.status === "wrong").length;
+            const correct = game.history.filter(item => item.status === "correct").length;
+            const wrong = game.history.filter(item => item.status === "wrong").length;
             const total = correct + wrong;
 
-            document.getElementById("resCorrect").innerText = correct;
-            document.getElementById("resWrong").innerText = wrong;
-            document.getElementById("resSummary").innerText = total ? `${total} palavras jogadas` : "nenhuma palavra marcada";
+            document.getElementById("scoreCorrect").innerText = correct;
+            document.getElementById("scoreWrong").innerText = wrong;
+            document.getElementById("resultSummary").innerText = total ? `${total} palavras jogadas` : "nenhuma palavra marcada";
 
-            const list = document.getElementById("resList");
+            const list = document.getElementById("historyList");
             list.innerHTML = "";
 
             if (!game.history.length) {
-                list.innerHTML = `<div class="empty-state">nenhum resultado nesta rodada</div>`;
+                list.innerHTML = `<div class="empty">nenhum resultado nesta rodada</div>`;
             } else {
-                game.history.forEach(h => {
+                game.history.forEach(item => {
                     const div = document.createElement("div");
-                    div.className = `res-item ${h.status}`;
+                    div.className = `hist-item ${item.status}`;
                     div.innerHTML = `
-                        <span>${h.word}</span>
-                        <span>${h.status === "correct" ? "✅" : "❌"}</span>
+                        <span>${item.word}</span>
+                        <span>${item.status === "correct" ? "✅" : "❌"}</span>
                     `;
                     list.appendChild(div);
                 });
@@ -1074,15 +1535,17 @@
             startSequence(game.categoryId);
         }
 
-        function backHomeFromResults() {
+        function backHome() {
             clearInterval(game.timer);
+
             game.active = false;
+            game.isProcessing = false;
+
             showScreen("homeScreen");
         }
 
-        function setSensorStatus(text) {
-            const el = document.getElementById("sensorStatus");
-            el.innerText = text;
+        function setHint(text) {
+            document.getElementById("gameHint").innerText = text;
         }
 
         function shuffle(array) {
@@ -1094,18 +1557,127 @@
             return array;
         }
 
+        function openSettings() {
+            document.getElementById("settingsModal").classList.add("active");
+            updateSettingsUI();
+        }
+
+        function closeSettings() {
+            document.getElementById("settingsModal").classList.remove("active");
+        }
+
+        function closeSettingsByBackdrop(event) {
+            if (event.target.id === "settingsModal") {
+                closeSettings();
+            }
+        }
+
+        function updateSettingsUI() {
+            document.querySelectorAll("#durationButtons button").forEach(button => {
+                const value = Number(button.innerText.replace("s", ""));
+                button.classList.toggle("active", value === Number(settings.duration));
+            });
+
+            document.getElementById("sensitivityInput").value = settings.sensitivity;
+            document.getElementById("sensitivityValue").innerText = settings.sensitivity;
+
+            document.getElementById("invertSwitch").classList.toggle("on", settings.invertSensor);
+            document.getElementById("sensorSwitch").classList.toggle("on", settings.useSensor);
+            document.getElementById("vibrationSwitch").classList.toggle("on", settings.vibration);
+        }
+
+        function setDuration(value) {
+            settings.duration = Number(value);
+            saveSettings();
+
+            if (!game.active) {
+                game.timeLeft = settings.duration;
+                document.getElementById("gameTimer").innerText = game.timeLeft + "s";
+            }
+        }
+
+        function setSensitivity(value) {
+            settings.sensitivity = Number(value);
+            saveSettings();
+        }
+
+        function toggleInvert() {
+            settings.invertSensor = !settings.invertSensor;
+            saveSettings();
+
+            if (game.active) {
+                resetSensor("recalibrando...");
+            }
+        }
+
+        function toggleSensor() {
+            settings.useSensor = !settings.useSensor;
+            saveSettings();
+
+            if (game.active) {
+                resetSensor(settings.useSensor ? "recalibrando..." : "toque em cima ou embaixo");
+            }
+        }
+
+        function toggleVibration() {
+            settings.vibration = !settings.vibration;
+            saveSettings();
+        }
+
+        function testCalibration() {
+            closeSettings();
+
+            if (game.active) {
+                resetSensor("testando...");
+                return;
+            }
+
+            showScreen("gameScreen");
+            game.active = true;
+            game.isProcessing = false;
+            game.timeLeft = settings.duration;
+
+            document.getElementById("gameTimer").innerText = settings.duration + "s";
+            document.getElementById("wordEl").innerText = "TESTE";
+            document.getElementById("wordEl").className = "word";
+
+            resetSensor("calibrando...");
+
+            setTimeout(() => {
+                game.active = false;
+                showScreen("homeScreen");
+            }, 5000);
+        }
+
+        function bindPreventZoom() {
+            document.addEventListener("gesturestart", event => event.preventDefault());
+
+            document.addEventListener("touchmove", event => {
+                if (game.active) {
+                    event.preventDefault();
+                }
+            }, { passive: false });
+        }
+
         window.addEventListener("deviceorientation", handleOrientation);
 
-        window.addEventListener("keydown", (e) => {
-            if (e.key === "ArrowUp") handleAction("correct");
-            if (e.key === "ArrowDown") handleAction("wrong");
-            if (e.key === "Escape") exitGame();
-        });
+        window.addEventListener("keydown", event => {
+            if (event.key === "ArrowUp") {
+                performAction("correct");
+            }
 
-        document.addEventListener("gesturestart", e => e.preventDefault());
-        document.addEventListener("touchmove", e => {
-            if (game.active) e.preventDefault();
-        }, { passive: false });
+            if (event.key === "ArrowDown") {
+                performAction("wrong");
+            }
+
+            if (event.key === "Escape") {
+                if (document.getElementById("settingsModal").classList.contains("active")) {
+                    closeSettings();
+                } else if (game.active) {
+                    exitGame();
+                }
+            }
+        });
 
         init();
     </script>
