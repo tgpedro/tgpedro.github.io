@@ -1,1 +1,3593 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#000000">
+<title>vida</title>
+<style>
+/* ============================
+   CSS VARIABLES & RESET
+   ============================ */
+:root {
+  --accent: #0A84FF;
+  --accent-rgb: 10, 132, 255;
+  --bg: #F2F2F7;
+  --bg2: #FFFFFF;
+  --bg3: #F2F2F7;
+  --card: rgba(255,255,255,0.72);
+  --card-border: rgba(0,0,0,0.07);
+  --text: #1C1C1E;
+  --text2: #3A3A3C;
+  --text3: #6C6C70;
+  --text4: #AEAEB2;
+  --separator: rgba(60,60,67,0.12);
+  --shadow: 0 4px 24px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
+  --shadow-lg: 0 12px 48px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.06);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --radius-lg: 22px;
+  --nav-h: 83px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --font: -apple-system, 'SF Pro Display', 'SF Pro Text', BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+  --blur: blur(24px) saturate(1.8);
+  --transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+  --green: #30D158;
+  --red: #FF453A;
+  --orange: #FF9F0A;
+  --purple: #BF5AF2;
+  --teal: #5AC8FA;
+  --pink: #FF375F;
+  --indigo: #5E5CE6;
+}
+[data-theme="dark"] {
+  --bg: #000000;
+  --bg2: #1C1C1E;
+  --bg3: #2C2C2E;
+  --card: rgba(28,28,30,0.85);
+  --card-border: rgba(255,255,255,0.1);
+  --text: #FFFFFF;
+  --text2: #EBEBF5;
+  --text3: #EBEBF599;
+  --text4: #EBEBF54D;
+  --separator: rgba(84,84,88,0.6);
+  --shadow: 0 4px 24px rgba(0,0,0,0.4), 0 1px 4px rgba(0,0,0,0.2);
+  --shadow-lg: 0 12px 48px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.3);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:var(--font);
+  background:var(--bg);
+  color:var(--text);
+  min-height:100dvh;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+  padding-bottom:var(--nav-h);
+}
+button{cursor:pointer;border:none;background:none;font-family:var(--font);font-size:inherit;}
+input,textarea,select{font-family:var(--font);outline:none;border:none;background:none;}
+a{color:inherit;text-decoration:none;}
+img{max-width:100%;}
 
+/* ============================
+   BACKGROUND
+   ============================ */
+#bg-layer{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:var(--bg);
+  transition:background 0.4s;
+}
+[data-theme="light"] #bg-layer{
+  background:linear-gradient(135deg,#f5f7fa 0%,#e8edf5 50%,#f0f4f8 100%);
+}
+[data-theme="dark"] #bg-layer{
+  background:linear-gradient(135deg,#000 0%,#0d0d14 60%,#000 100%);
+}
+
+/* ============================
+   APP CONTAINER
+   ============================ */
+#app{position:relative;z-index:1;min-height:100dvh;}
+.screen{display:none;min-height:calc(100dvh - var(--nav-h));padding:0 0 24px;}
+.screen.active{display:block;animation:fadeIn 0.22s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+/* ============================
+   NAVIGATION BAR
+   ============================ */
+#nav-bar{
+  position:fixed;bottom:0;left:0;right:0;z-index:1000;
+  height:var(--nav-h);
+  background:var(--card);
+  backdrop-filter:var(--blur);
+  -webkit-backdrop-filter:var(--blur);
+  border-top:1px solid var(--card-border);
+  display:flex;align-items:flex-start;padding-top:8px;
+  padding-bottom:var(--safe-bottom);
+}
+.nav-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:6px 4px;cursor:pointer;
+  transition:var(--transition);position:relative;
+}
+.nav-icon{
+  width:26px;height:26px;display:flex;align-items:center;justify-content:center;
+  border-radius:8px;transition:var(--transition);
+  font-size:20px;
+}
+.nav-label{font-size:10px;color:var(--text3);font-weight:500;letter-spacing:0.01em;}
+.nav-item.active .nav-icon{background:var(--accent);color:#fff;}
+.nav-item.active .nav-label{color:var(--accent);}
+
+/* ============================
+   HEADER
+   ============================ */
+.screen-header{
+  padding:56px 20px 12px;
+  position:sticky;top:0;z-index:100;
+  background:var(--card);
+  backdrop-filter:var(--blur);
+  -webkit-backdrop-filter:var(--blur);
+  border-bottom:1px solid var(--separator);
+}
+.screen-header h1{font-size:28px;font-weight:700;letter-spacing:-0.5px;}
+.screen-header p{font-size:14px;color:var(--text3);margin-top:2px;}
+
+/* ============================
+   CARDS & LAYOUT
+   ============================ */
+.content{padding:16px 16px 0;}
+.card{
+  background:var(--card);
+  backdrop-filter:var(--blur);
+  -webkit-backdrop-filter:var(--blur);
+  border-radius:var(--radius);
+  border:1px solid var(--card-border);
+  box-shadow:var(--shadow);
+  padding:16px;
+  margin-bottom:12px;
+  transition:var(--transition);
+}
+.card:active{transform:scale(0.985);}
+.card-title{font-size:13px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+.card-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--separator);}
+.card-row:last-child{border-bottom:none;padding-bottom:0;}
+.card-row:first-child{padding-top:0;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+@media(min-width:600px){
+  .content{max-width:680px;margin:0 auto;padding:20px 20px 0;}
+  .grid-2{grid-template-columns:repeat(3,1fr);}
+}
+@media(min-width:900px){
+  .content{max-width:860px;}
+  .grid-2{grid-template-columns:repeat(4,1fr);}
+}
+
+/* ============================
+   FORM ELEMENTS
+   ============================ */
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:13px;color:var(--text3);font-weight:500;margin-bottom:6px;}
+.field input,.field textarea,.field select{
+  width:100%;padding:12px 14px;
+  background:var(--bg3);
+  border-radius:var(--radius-sm);
+  border:1px solid var(--separator);
+  color:var(--text);font-size:15px;
+  transition:var(--transition);
+}
+.field input:focus,.field textarea:focus,.field select:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(var(--accent-rgb),0.15);
+}
+.field textarea{resize:vertical;min-height:80px;}
+.field select{appearance:none;cursor:pointer;}
+
+/* ============================
+   BUTTONS
+   ============================ */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:12px 20px;border-radius:var(--radius-sm);font-size:15px;font-weight:600;
+  transition:var(--transition);cursor:pointer;
+}
+.btn:active{transform:scale(0.96);}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{filter:brightness(1.1);}
+.btn-secondary{background:var(--bg3);color:var(--text);border:1px solid var(--separator);}
+.btn-danger{background:var(--red);color:#fff;}
+.btn-green{background:var(--green);color:#fff;}
+.btn-ghost{color:var(--accent);padding:8px 12px;}
+.btn-icon{
+  width:36px;height:36px;border-radius:50%;padding:0;
+  background:var(--bg3);color:var(--text3);font-size:16px;
+  display:inline-flex;align-items:center;justify-content:center;
+  border:1px solid var(--separator);
+}
+.btn-full{width:100%;}
+.btn-sm{padding:8px 14px;font-size:13px;border-radius:8px;}
+.fab{
+  position:fixed;bottom:calc(var(--nav-h) + 16px);right:16px;z-index:500;
+  width:52px;height:52px;border-radius:50%;
+  background:var(--accent);color:#fff;font-size:26px;
+  box-shadow:0 4px 16px rgba(var(--accent-rgb),0.4);
+  display:flex;align-items:center;justify-content:center;
+  transition:var(--transition);
+}
+.fab:active{transform:scale(0.92);}
+
+/* ============================
+   MODAL
+   ============================ */
+.modal-overlay{
+  position:fixed;inset:0;z-index:2000;
+  background:rgba(0,0,0,0.5);
+  backdrop-filter:blur(4px);
+  display:none;align-items:flex-end;justify-content:center;
+  padding:0;
+}
+.modal-overlay.show{display:flex;animation:overlayIn 0.2s ease;}
+@keyframes overlayIn{from{opacity:0;}to{opacity:1;}}
+.modal{
+  background:var(--bg2);
+  border-radius:var(--radius-lg) var(--radius-lg) 0 0;
+  width:100%;max-width:600px;max-height:90dvh;
+  overflow-y:auto;padding:20px 20px calc(20px + var(--safe-bottom));
+  animation:slideUp 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes slideUp{from{transform:translateY(100%);}to{transform:none;}}
+.modal-handle{
+  width:36px;height:4px;background:var(--separator);border-radius:2px;
+  margin:0 auto 16px;
+}
+.modal-title{font-size:18px;font-weight:700;margin-bottom:16px;letter-spacing:-0.3px;}
+.modal-actions{display:flex;gap:10px;margin-top:20px;}
+.modal-actions .btn{flex:1;}
+@media(min-width:600px){
+  .modal-overlay{align-items:center;}
+  .modal{border-radius:var(--radius-lg);max-height:80dvh;margin:20px;}
+}
+
+/* ============================
+   TOAST
+   ============================ */
+#toast-container{
+  position:fixed;top:60px;left:50%;transform:translateX(-50%);
+  z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none;
+}
+.toast{
+  background:var(--text);color:var(--bg);
+  padding:10px 18px;border-radius:100px;
+  font-size:14px;font-weight:500;
+  box-shadow:var(--shadow-lg);white-space:nowrap;
+  animation:toastIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  pointer-events:auto;
+}
+.toast.hide{animation:toastOut 0.2s ease forwards;}
+@keyframes toastIn{from{opacity:0;transform:scale(0.85)translateY(-8px);}to{opacity:1;transform:none;}}
+@keyframes toastOut{to{opacity:0;transform:scale(0.85)translateY(-8px);}}
+.toast.success{background:var(--green);}
+.toast.error{background:var(--red);}
+.toast.warning{background:var(--orange);}
+
+/* ============================
+   BADGES & TAGS
+   ============================ */
+.badge{
+  display:inline-flex;align-items:center;padding:3px 8px;
+  border-radius:100px;font-size:11px;font-weight:600;
+}
+.badge-accent{background:rgba(var(--accent-rgb),0.15);color:var(--accent);}
+.badge-green{background:rgba(48,209,88,0.15);color:var(--green);}
+.badge-red{background:rgba(255,69,58,0.15);color:var(--red);}
+.badge-orange{background:rgba(255,159,10,0.15);color:var(--orange);}
+.badge-gray{background:var(--bg3);color:var(--text3);}
+.tag{
+  display:inline-flex;align-items:center;padding:4px 10px;
+  border-radius:100px;font-size:12px;font-weight:500;
+  background:var(--bg3);color:var(--text3);margin:2px;cursor:pointer;
+}
+.tag.active{background:rgba(var(--accent-rgb),0.15);color:var(--accent);}
+
+/* ============================
+   EMPTY STATE
+   ============================ */
+.empty{
+  text-align:center;padding:48px 24px;
+  color:var(--text3);
+}
+.empty-icon{font-size:40px;margin-bottom:12px;opacity:0.5;}
+.empty h3{font-size:17px;font-weight:600;color:var(--text2);margin-bottom:6px;}
+.empty p{font-size:14px;}
+
+/* ============================
+   CHECKBOX
+   ============================ */
+.check-circle{
+  width:22px;height:22px;border-radius:50%;
+  border:2px solid var(--separator);display:flex;
+  align-items:center;justify-content:center;
+  flex-shrink:0;transition:var(--transition);cursor:pointer;
+}
+.check-circle.done{background:var(--green);border-color:var(--green);}
+.check-circle.done::after{content:'✓';color:#fff;font-size:12px;font-weight:700;}
+
+/* ============================
+   PRIORITY DOTS
+   ============================ */
+.prio{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.prio-low{background:var(--green);}
+.prio-med{background:var(--orange);}
+.prio-high{background:var(--red);}
+
+/* ============================
+   SWITCH / TOGGLE
+   ============================ */
+.switch{
+  width:48px;height:28px;border-radius:14px;
+  background:var(--separator);position:relative;
+  cursor:pointer;transition:var(--transition);flex-shrink:0;
+}
+.switch.on{background:var(--green);}
+.switch::after{
+  content:'';position:absolute;width:22px;height:22px;
+  border-radius:50%;background:#fff;top:3px;left:3px;
+  box-shadow:0 1px 4px rgba(0,0,0,0.25);
+  transition:var(--transition);
+}
+.switch.on::after{transform:translateX(20px);}
+
+/* ============================
+   SEARCH BAR
+   ============================ */
+.search-bar{
+  display:flex;align-items:center;gap:8px;
+  background:var(--bg3);border-radius:var(--radius-sm);
+  padding:10px 14px;margin-bottom:14px;
+  border:1px solid var(--separator);
+}
+.search-bar svg{flex-shrink:0;color:var(--text4);}
+.search-bar input{flex:1;font-size:15px;color:var(--text);background:none;}
+.search-bar input::placeholder{color:var(--text4);}
+
+/* ============================
+   PROGRESS BAR
+   ============================ */
+.progress-bar{height:6px;background:var(--separator);border-radius:3px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:3px;background:var(--accent);transition:width 0.5s ease;}
+
+/* ============================
+   SEGMENT CONTROL
+   ============================ */
+.segment{
+  display:flex;background:var(--bg3);border-radius:var(--radius-sm);
+  padding:2px;margin-bottom:14px;
+}
+.segment-btn{
+  flex:1;padding:8px;text-align:center;font-size:13px;font-weight:500;
+  border-radius:8px;cursor:pointer;transition:var(--transition);color:var(--text3);
+}
+.segment-btn.active{background:var(--bg2);color:var(--text);box-shadow:var(--shadow);}
+
+/* ============================
+   CALENDAR SPECIFIC
+   ============================ */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:8px;}
+.cal-header{text-align:center;font-size:11px;font-weight:600;color:var(--text3);padding:4px 0;text-transform:uppercase;}
+.cal-day{
+  aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:400;border-radius:50%;cursor:pointer;
+  position:relative;transition:var(--transition);color:var(--text);
+}
+.cal-day:hover{background:var(--bg3);}
+.cal-day.today{background:var(--accent);color:#fff;font-weight:700;}
+.cal-day.selected:not(.today){background:rgba(var(--accent-rgb),0.15);color:var(--accent);font-weight:600;}
+.cal-day.other-month{color:var(--text4);}
+.cal-day.has-event::after{
+  content:'';width:5px;height:5px;border-radius:50%;
+  background:var(--accent);position:absolute;bottom:2px;
+}
+.cal-day.today.has-event::after{background:#fff;}
+
+/* ============================
+   FINANCE SPECIFIC
+   ============================ */
+.fin-amount{font-size:28px;font-weight:700;letter-spacing:-0.5px;}
+.fin-label{font-size:13px;color:var(--text3);}
+.fin-positive{color:var(--green);}
+.fin-negative{color:var(--red);}
+
+/* ============================
+   VAULT SPECIFIC
+   ============================ */
+.vault-lock{
+  text-align:center;padding:80px 20px;
+}
+.vault-lock-icon{
+  font-size:64px;margin-bottom:20px;
+}
+.vault-item{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 0;border-bottom:1px solid var(--separator);
+}
+.vault-item:last-child{border-bottom:none;}
+.vault-avatar{
+  width:40px;height:40px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:17px;font-weight:700;color:#fff;flex-shrink:0;
+}
+
+/* ============================
+   POMODORO TIMER
+   ============================ */
+.timer-ring{
+  width:180px;height:180px;position:relative;margin:0 auto 20px;
+}
+.timer-ring svg{transform:rotate(-90deg);}
+.timer-ring circle{fill:none;stroke:var(--separator);stroke-width:8;}
+.timer-ring circle.progress{stroke:var(--accent);stroke-linecap:round;transition:stroke-dashoffset 1s linear;}
+.timer-time{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:40px;font-weight:700;letter-spacing:-1px;
+}
+
+/* ============================
+   SETTINGS ROWS
+   ============================ */
+.settings-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:13px 0;border-bottom:1px solid var(--separator);gap:12px;
+}
+.settings-row:last-child{border-bottom:none;}
+.settings-row-info{flex:1;}
+.settings-row-label{font-size:15px;font-weight:500;color:var(--text);}
+.settings-row-sub{font-size:13px;color:var(--text3);margin-top:2px;}
+
+/* ============================
+   SCROLLBAR
+   ============================ */
+::-webkit-scrollbar{width:0;height:0;}
+
+/* ============================
+   ANIMATIONS
+   ============================ */
+.pulse{animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.5;}}
+
+/* ============================
+   CONFIRM DIALOG
+   ============================ */
+.confirm-overlay{
+  position:fixed;inset:0;z-index:3000;
+  background:rgba(0,0,0,0.5);backdrop-filter:blur(8px);
+  display:none;align-items:center;justify-content:center;padding:20px;
+}
+.confirm-overlay.show{display:flex;}
+.confirm-box{
+  background:var(--bg2);border-radius:var(--radius-lg);
+  padding:24px;max-width:320px;width:100%;
+  animation:scaleIn 0.25s cubic-bezier(0.34,1.56,0.64,1);
+  text-align:center;
+}
+@keyframes scaleIn{from{opacity:0;transform:scale(0.8);}to{opacity:1;transform:none;}}
+.confirm-title{font-size:17px;font-weight:700;margin-bottom:8px;}
+.confirm-msg{font-size:14px;color:var(--text3);margin-bottom:20px;}
+.confirm-actions{display:flex;gap:10px;}
+.confirm-actions .btn{flex:1;}
+
+/* ============================
+   STATUS INDICATOR
+   ============================ */
+#sync-status{
+  position:fixed;top:12px;right:16px;z-index:900;
+  display:flex;align-items:center;gap:5px;
+  font-size:11px;font-weight:500;color:var(--text4);
+}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--text4);}
+.sync-dot.ok{background:var(--green);}
+.sync-dot.err{background:var(--red);}
+.sync-dot.busy{background:var(--orange);animation:pulse 1s infinite;}
+
+/* ============================
+   COLOR PICKER ROW
+   ============================ */
+.color-row{display:flex;gap:8px;flex-wrap:wrap;}
+.color-swatch{
+  width:28px;height:28px;border-radius:50%;cursor:pointer;
+  transition:var(--transition);border:2px solid transparent;
+}
+.color-swatch.selected{border-color:var(--text);transform:scale(1.1);}
+
+/* ============================
+   HOME SCREEN
+   ============================ */
+#home-header{
+  padding:56px 20px 20px;
+  background:var(--card);
+  backdrop-filter:var(--blur);
+  -webkit-backdrop-filter:var(--blur);
+}
+.greeting{font-size:30px;font-weight:700;letter-spacing:-0.5px;margin-bottom:2px;}
+.home-sub{font-size:15px;color:var(--text3);}
+.home-time{font-size:13px;color:var(--text4);margin-top:4px;}
+.quick-actions{display:flex;gap:8px;overflow-x:auto;padding:0 0 4px;scrollbar-width:none;}
+.quick-btn{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  padding:12px 14px;background:var(--card);border-radius:var(--radius-sm);
+  border:1px solid var(--card-border);flex-shrink:0;
+  font-size:12px;color:var(--text3);font-weight:500;
+  transition:var(--transition);min-width:66px;
+}
+.quick-btn-icon{font-size:22px;}
+.quick-btn:active{transform:scale(0.93);}
+
+/* ============================
+   NOTE CARD
+   ============================ */
+.note-card{
+  background:var(--card);border-radius:var(--radius);
+  border:1px solid var(--card-border);padding:14px;margin-bottom:10px;
+  cursor:pointer;transition:var(--transition);
+}
+.note-card:active{transform:scale(0.985);}
+.note-card-title{font-size:15px;font-weight:600;margin-bottom:4px;}
+.note-card-preview{font-size:13px;color:var(--text3);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+.note-card-meta{font-size:11px;color:var(--text4);margin-top:8px;display:flex;align-items:center;gap:8px;}
+.note-pinned{color:var(--accent);}
+
+/* ============================
+   SHORTCUT GRID
+   ============================ */
+.shortcut-item{
+  background:var(--card);border-radius:var(--radius);
+  border:1px solid var(--card-border);padding:14px 10px;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  cursor:pointer;transition:var(--transition);text-align:center;
+  position:relative;
+}
+.shortcut-item:active{transform:scale(0.93);}
+.shortcut-favicon{
+  width:44px;height:44px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;font-weight:800;color:#fff;
+  overflow:hidden;flex-shrink:0;
+}
+.shortcut-name{font-size:12px;font-weight:500;color:var(--text2);word-break:break-word;line-height:1.3;}
+.shortcut-star{
+  position:absolute;top:6px;right:6px;
+  font-size:12px;color:var(--orange);
+}
+
+/* ============================
+   STUDY
+   ============================ */
+.subject-card{
+  display:flex;align-items:center;gap:12px;
+  padding:12px;background:var(--card);
+  border-radius:var(--radius);border:1px solid var(--card-border);
+  margin-bottom:8px;cursor:pointer;transition:var(--transition);
+}
+.subject-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
+.session-item{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 0;border-bottom:1px solid var(--separator);
+}
+
+/* ============================
+   TOOLS PANEL
+   ============================ */
+.tool-card{
+  background:var(--card);border-radius:var(--radius);
+  border:1px solid var(--card-border);padding:20px;margin-bottom:12px;
+}
+.tool-title{font-size:16px;font-weight:700;margin-bottom:12px;}
+.calc-display{
+  background:var(--bg3);border-radius:var(--radius-sm);
+  padding:12px 16px;font-size:24px;font-weight:600;text-align:right;
+  margin-bottom:10px;min-height:52px;word-break:break-all;letter-spacing:-0.5px;
+}
+.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
+.calc-btn{
+  padding:14px;border-radius:var(--radius-sm);font-size:17px;font-weight:500;
+  background:var(--bg3);color:var(--text);text-align:center;cursor:pointer;
+  transition:var(--transition);border:none;font-family:var(--font);
+}
+.calc-btn:active{transform:scale(0.92);}
+.calc-btn.op{background:rgba(var(--accent-rgb),0.15);color:var(--accent);}
+.calc-btn.eq{background:var(--accent);color:#fff;}
+.calc-btn.clr{background:rgba(255,69,58,0.12);color:var(--red);}
+
+/* ACCENT COLORS */
+.ac-0{--accent:#0A84FF;--accent-rgb:10,132,255;}
+.ac-1{--accent:#30D158;--accent-rgb:48,209,88;}
+.ac-2{--accent:#FF9F0A;--accent-rgb:255,159,10;}
+.ac-3{--accent:#FF375F;--accent-rgb:255,55,95;}
+.ac-4{--accent:#BF5AF2;--accent-rgb:191,90,242;}
+.ac-5{--accent:#5E5CE6;--accent-rgb:94,92,230;}
+.ac-6{--accent:#5AC8FA;--accent-rgb:90,200,250;}
+.ac-7{--accent:#FF6B35;--accent-rgb:255,107,53;}
+
+</style>
+</head>
+<body data-theme="auto">
+<div id="bg-layer"></div>
+<div id="app">
+
+  <!-- TOAST CONTAINER -->
+  <div id="toast-container"></div>
+
+  <!-- SYNC STATUS -->
+  <div id="sync-status">
+    <div class="sync-dot" id="sync-dot"></div>
+    <span id="sync-label">local</span>
+  </div>
+
+  <!-- CONFIRM DIALOG -->
+  <div class="confirm-overlay" id="confirm-overlay">
+    <div class="confirm-box">
+      <div class="confirm-title" id="confirm-title">tem certeza?</div>
+      <div class="confirm-msg" id="confirm-msg"></div>
+      <div class="confirm-actions">
+        <button class="btn btn-secondary" onclick="closeConfirm()">cancelar</button>
+        <button class="btn btn-danger" id="confirm-ok-btn">excluir</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL GLOBAL -->
+  <div class="modal-overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
+    <div class="modal" id="modal-box">
+      <div class="modal-handle"></div>
+      <div id="modal-content"></div>
+    </div>
+  </div>
+
+  <!-- ========================
+       SCREEN: HOME
+       ======================== -->
+  <div class="screen active" id="screen-home">
+    <div id="home-header">
+      <div class="greeting" id="greeting">olá</div>
+      <div class="home-sub" id="home-date"></div>
+      <div class="home-time" id="home-time"></div>
+    </div>
+    <div class="content" style="margin-top:14px;">
+      <!-- Quick actions -->
+      <div class="card-title" style="padding:0 2px 8px;">ação rápida</div>
+      <div class="quick-actions" id="quick-actions">
+        <button class="quick-btn" onclick="quickAdd('task')"><span class="quick-btn-icon">✓</span>tarefa</button>
+        <button class="quick-btn" onclick="quickAdd('note')"><span class="quick-btn-icon">📝</span>nota</button>
+        <button class="quick-btn" onclick="quickAdd('event')"><span class="quick-btn-icon">📅</span>evento</button>
+        <button class="quick-btn" onclick="quickAdd('shortcut')"><span class="quick-btn-icon">🔗</span>atalho</button>
+        <button class="quick-btn" onclick="quickAdd('expense')"><span class="quick-btn-icon">💸</span>gasto</button>
+        <button class="quick-btn" onclick="quickAdd('password')"><span class="quick-btn-icon">🔐</span>senha</button>
+      </div>
+
+      <!-- Today tasks -->
+      <div class="card" style="margin-top:14px;">
+        <div class="card-title">tarefas de hoje</div>
+        <div id="home-tasks"></div>
+      </div>
+
+      <!-- Today events -->
+      <div class="card">
+        <div class="card-title">próximos eventos</div>
+        <div id="home-events"></div>
+      </div>
+
+      <!-- Recent notes -->
+      <div class="card">
+        <div class="card-title">notas recentes</div>
+        <div id="home-notes"></div>
+      </div>
+
+      <!-- Finance summary -->
+      <div class="card">
+        <div class="card-title">resumo financeiro</div>
+        <div id="home-finance"></div>
+      </div>
+
+      <!-- Favorite shortcuts -->
+      <div class="card">
+        <div class="card-title">atalhos favoritos</div>
+        <div id="home-shortcuts" class="grid-3" style="gap:8px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================
+       SCREEN: CALENDAR
+       ======================== -->
+  <div class="screen" id="screen-calendar">
+    <div class="screen-header">
+      <h1>calendário</h1>
+    </div>
+    <div class="content">
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <button class="btn-icon" id="cal-prev">‹</button>
+          <span id="cal-month-label" style="font-weight:700;font-size:16px;"></span>
+          <button class="btn-icon" id="cal-next">›</button>
+        </div>
+        <div class="cal-grid" id="cal-headers"></div>
+        <div class="cal-grid" id="cal-days"></div>
+        <!-- Legend -->
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--separator);">
+          <span style="font-size:11px;color:var(--text3);display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block;"></span>eventos</span>
+          <span style="font-size:11px;color:var(--text3);display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block;"></span>tarefas</span>
+          <span style="font-size:11px;color:var(--text3);display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:var(--orange);display:inline-block;"></span>contas</span>
+        </div>
+      </div>
+      <!-- Selected day events -->
+      <div id="cal-day-events"></div>
+    </div>
+    <button class="fab" onclick="openAddEvent()">+</button>
+  </div>
+
+  <!-- ========================
+       SCREEN: TASKS
+       ======================== -->
+  <div class="screen" id="screen-tasks">
+    <div class="screen-header">
+      <h1>tarefas</h1>
+    </div>
+    <div class="content">
+      <div class="segment" id="task-filter-seg">
+        <div class="segment-btn active" data-filter="today" onclick="setTaskFilter('today')">hoje</div>
+        <div class="segment-btn" data-filter="week" onclick="setTaskFilter('week')">semana</div>
+        <div class="segment-btn" data-filter="late" onclick="setTaskFilter('late')">atrasadas</div>
+        <div class="segment-btn" data-filter="all" onclick="setTaskFilter('all')">todas</div>
+      </div>
+      <div id="tasks-list"></div>
+    </div>
+    <button class="fab" onclick="openAddTask()">+</button>
+  </div>
+
+  <!-- ========================
+       SCREEN: NOTES
+       ======================== -->
+  <div class="screen" id="screen-notes">
+    <div class="screen-header">
+      <h1>notas</h1>
+    </div>
+    <div class="content">
+      <div class="search-bar">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" placeholder="buscar notas..." id="notes-search" oninput="renderNotes()">
+      </div>
+      <div id="notes-tags" style="margin-bottom:10px;"></div>
+      <div id="notes-list"></div>
+    </div>
+    <button class="fab" onclick="openAddNote()">+</button>
+  </div>
+
+  <!-- ========================
+       SCREEN: SHORTCUTS
+       ======================== -->
+  <div class="screen" id="screen-shortcuts">
+    <div class="screen-header">
+      <h1>atalhos</h1>
+    </div>
+    <div class="content">
+      <div class="search-bar">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" placeholder="buscar atalhos..." id="shortcuts-search" oninput="renderShortcuts()">
+      </div>
+      <div id="shortcuts-grid" class="grid-3" style="gap:8px;"></div>
+    </div>
+    <button class="fab" onclick="openAddShortcut()">+</button>
+  </div>
+
+  <!-- ========================
+       SCREEN: MORE / TOOLS
+       ======================== -->
+  <div class="screen" id="screen-more">
+    <div class="screen-header">
+      <h1>ferramentas</h1>
+    </div>
+    <div class="content">
+      <!-- Sub-nav -->
+      <div class="segment" id="more-seg">
+        <div class="segment-btn active" data-tab="studies" onclick="setMoreTab('studies')">estudos</div>
+        <div class="segment-btn" data-tab="finance" onclick="setMoreTab('finance')">finanças</div>
+        <div class="segment-btn" data-tab="vault" onclick="setMoreTab('vault')">cofre</div>
+        <div class="segment-btn" data-tab="tools" onclick="setMoreTab('tools')">tools</div>
+      </div>
+
+      <!-- STUDIES -->
+      <div id="tab-studies">
+        <div class="segment" id="study-seg">
+          <div class="segment-btn active" data-stab="subjects" onclick="setStudyTab('subjects')">matérias</div>
+          <div class="segment-btn" data-stab="sessions" onclick="setStudyTab('sessions')">sessões</div>
+          <div class="segment-btn" data-stab="focus" onclick="setStudyTab('focus')">foco</div>
+        </div>
+        <div id="study-subjects"></div>
+        <div id="study-sessions" style="display:none;"></div>
+        <div id="study-focus" style="display:none;"></div>
+        <button class="fab" id="study-fab" onclick="openStudyAction()">+</button>
+      </div>
+
+      <!-- FINANCE -->
+      <div id="tab-finance" style="display:none;">
+        <div id="finance-summary"></div>
+        <div class="segment" id="finance-seg">
+          <div class="segment-btn active" data-ftab="entries" onclick="setFinanceTab('entries')">lançamentos</div>
+          <div class="segment-btn" data-ftab="salary" onclick="setFinanceTab('salary')">salário</div>
+          <div class="segment-btn" data-ftab="transport" onclick="setFinanceTab('transport')">transporte</div>
+        </div>
+        <div id="finance-entries"></div>
+        <div id="finance-salary" style="display:none;"></div>
+        <div id="finance-transport" style="display:none;"></div>
+        <button class="fab" id="finance-fab" onclick="openAddEntry()">+</button>
+      </div>
+
+      <!-- VAULT -->
+      <div id="tab-vault" style="display:none;">
+        <div id="vault-panel"></div>
+      </div>
+
+      <!-- TOOLS -->
+      <div id="tab-tools" style="display:none;">
+        <div id="tools-panel"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================
+       SCREEN: PROFILE/SETTINGS
+       ======================== -->
+  <div class="screen" id="screen-profile">
+    <div class="screen-header">
+      <h1>perfil</h1>
+    </div>
+    <div class="content" id="profile-content"></div>
+  </div>
+
+  <!-- ========================
+       NAVIGATION BAR
+       ======================== -->
+  <nav id="nav-bar">
+    <div class="nav-item active" data-screen="home" onclick="navigate('home')">
+      <div class="nav-icon">⊙</div>
+      <span class="nav-label">início</span>
+    </div>
+    <div class="nav-item" data-screen="calendar" onclick="navigate('calendar')">
+      <div class="nav-icon">📅</div>
+      <span class="nav-label">calendário</span>
+    </div>
+    <div class="nav-item" data-screen="tasks" onclick="navigate('tasks')">
+      <div class="nav-icon">✓</div>
+      <span class="nav-label">tarefas</span>
+    </div>
+    <div class="nav-item" data-screen="notes" onclick="navigate('notes')">
+      <div class="nav-icon">📝</div>
+      <span class="nav-label">notas</span>
+    </div>
+    <div class="nav-item" data-screen="shortcuts" onclick="navigate('shortcuts')">
+      <div class="nav-icon">⚡</div>
+      <span class="nav-label">atalhos</span>
+    </div>
+    <div class="nav-item" data-screen="more" onclick="navigate('more')">
+      <div class="nav-icon">⋯</div>
+      <span class="nav-label">mais</span>
+    </div>
+    <div class="nav-item" data-screen="profile" onclick="navigate('profile')">
+      <div class="nav-icon">👤</div>
+      <span class="nav-label">perfil</span>
+    </div>
+  </nav>
+
+</div><!-- /#app -->
+
+<script>
+// ============================================================
+//   GLOBAL STATE
+// ============================================================
+const AppState = {
+  profile: { name: '', theme: 'auto', accentColor: '#0A84FF', accentClass: 'ac-0' },
+  shortcuts: [],
+  events: [],
+  tasks: [],
+  notes: [],
+  studies: { subjects: [], sessions: [], focusSettings: { work: 25, short: 5, long: 15 } },
+  finance: { entries: [], transports: [], salarySettings: {} },
+  vault: { encrypted: null, unlocked: false, items: [] },
+  settings: { supabaseUrl: '', supabaseAnonKey: '', localUserId: '', notifications: false }
+};
+
+let currentScreen = 'home';
+let currentNoteTag = '';
+let currentTaskFilter = 'today';
+let currentMoreTab = 'studies';
+let currentStudyTab = 'subjects';
+let currentFinanceTab = 'entries';
+let calendarYear = new Date().getFullYear();
+let calendarMonth = new Date().getMonth();
+let calendarSelected = null;
+let supabase = null;
+let vaultKey = null;
+let vaultLockTimer = null;
+let pomodoroInterval = null;
+let pomodoroState = { running: false, mode: 'work', remaining: 25*60, total: 25*60, cycles: 0 };
+let calcDisplay = '0';
+let calcOp = null;
+let calcPrev = null;
+let calcNewNum = false;
+let confirmCallback = null;
+
+// ============================================================
+//   UTILITY FUNCTIONS
+// ============================================================
+function generateId() {
+  return Date.now().toString(36) + Math.random().toString(36).substr(2, 6);
+}
+
+function escapeHTML(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+
+function formatCurrency(val) {
+  return Number(val || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
+function formatDuration(sec) {
+  const h = Math.floor(sec / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  const s = sec % 60;
+  if (h > 0) return `${h}h ${m}m`;
+  return `${m}m ${s}s`;
+}
+
+function todayStr() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function getWeekRange() {
+  const now = new Date();
+  const day = now.getDay();
+  const start = new Date(now);
+  start.setDate(now.getDate() - day);
+  const end = new Date(start);
+  end.setDate(start.getDate() + 6);
+  return { start: start.toISOString().slice(0,10), end: end.toISOString().slice(0,10) };
+}
+
+function showToast(msg, type = '') {
+  const c = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = 'toast' + (type ? ' ' + type : '');
+  t.textContent = msg;
+  c.appendChild(t);
+  setTimeout(() => {
+    t.classList.add('hide');
+    setTimeout(() => t.remove(), 300);
+  }, 2800);
+}
+
+function openModal(content, onClose) {
+  document.getElementById('modal-content').innerHTML = content;
+  document.getElementById('modal-overlay').classList.add('show');
+  if (onClose) document.getElementById('modal-overlay')._onClose = onClose;
+  else delete document.getElementById('modal-overlay')._onClose;
+}
+
+function closeModal() {
+  const overlay = document.getElementById('modal-overlay');
+  const cb = overlay._onClose;
+  overlay.classList.remove('show');
+  if (cb) cb();
+}
+
+function handleOverlayClick(e) {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+}
+
+function confirmAction(title, msg, label, cb) {
+  document.getElementById('confirm-title').textContent = title;
+  document.getElementById('confirm-msg').textContent = msg;
+  document.getElementById('confirm-ok-btn').textContent = label || 'excluir';
+  document.getElementById('confirm-overlay').classList.add('show');
+  confirmCallback = cb;
+}
+
+function closeConfirm() {
+  document.getElementById('confirm-overlay').classList.remove('show');
+  confirmCallback = null;
+}
+
+document.getElementById('confirm-ok-btn').onclick = () => {
+  if (confirmCallback) confirmCallback();
+  closeConfirm();
+};
+
+// ============================================================
+//   STORAGE
+// ============================================================
+function saveLocal() {
+  const toSave = {
+    profile: AppState.profile,
+    shortcuts: AppState.shortcuts,
+    events: AppState.events,
+    tasks: AppState.tasks,
+    notes: AppState.notes,
+    studies: AppState.studies,
+    finance: AppState.finance,
+    vault: { encrypted: AppState.vault.encrypted },
+    settings: AppState.settings
+  };
+  localStorage.setItem('vida_app_data', JSON.stringify(toSave));
+}
+
+function loadLocal() {
+  try {
+    const raw = localStorage.getItem('vida_app_data');
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    if (data.profile) Object.assign(AppState.profile, data.profile);
+    if (data.shortcuts) AppState.shortcuts = data.shortcuts;
+    if (data.events) AppState.events = data.events;
+    if (data.tasks) AppState.tasks = data.tasks;
+    if (data.notes) AppState.notes = data.notes;
+    if (data.studies) Object.assign(AppState.studies, data.studies);
+    if (data.finance) Object.assign(AppState.finance, data.finance);
+    if (data.vault) AppState.vault.encrypted = data.vault.encrypted;
+    if (data.settings) Object.assign(AppState.settings, data.settings);
+  } catch(e) { console.warn('loadLocal err', e); }
+}
+
+function saveDataKey(key, value) {
+  AppState[key] = value;
+  saveLocal();
+  syncToSupabase();
+}
+
+function getDataKey(key) {
+  return AppState[key];
+}
+
+// ============================================================
+//   SUPABASE
+// ============================================================
+function initSupabase() {
+  const url = AppState.settings.supabaseUrl;
+  const key = AppState.settings.supabaseAnonKey;
+  if (!url || !key) { updateSyncStatus('local'); return; }
+  try {
+    if (window.supabaseJs) {
+      supabase = window.supabaseJs.createClient(url, key);
+      updateSyncStatus('ok');
+    }
+  } catch(e) {
+    updateSyncStatus('err');
+    supabase = null;
+  }
+}
+
+function updateSyncStatus(status) {
+  const dot = document.getElementById('sync-dot');
+  const label = document.getElementById('sync-label');
+  dot.className = 'sync-dot';
+  if (status === 'ok') { dot.classList.add('ok'); label.textContent = 'sincronizado'; }
+  else if (status === 'err') { dot.classList.add('err'); label.textContent = 'erro'; }
+  else if (status === 'busy') { dot.classList.add('busy'); label.textContent = 'sincronizando'; }
+  else { label.textContent = 'local'; }
+}
+
+async function syncToSupabase() {
+  if (!supabase || !AppState.settings.localUserId) return;
+  updateSyncStatus('busy');
+  try {
+    const payload = {
+      user_id: AppState.settings.localUserId,
+      data_key: 'main',
+      data_value: {
+        profile: AppState.profile,
+        shortcuts: AppState.shortcuts,
+        events: AppState.events,
+        tasks: AppState.tasks,
+        notes: AppState.notes,
+        studies: AppState.studies,
+        finance: AppState.finance,
+        vault: { encrypted: AppState.vault.encrypted },
+        settings: AppState.settings
+      },
+      updated_at: new Date().toISOString()
+    };
+    const { error } = await supabase.from('app_data').upsert(payload, { onConflict: 'user_id,data_key' });
+    if (error) throw error;
+    updateSyncStatus('ok');
+  } catch(e) {
+    updateSyncStatus('err');
+    showToast('erro ao sincronizar', 'error');
+  }
+}
+
+async function syncFromSupabase() {
+  if (!supabase || !AppState.settings.localUserId) return;
+  updateSyncStatus('busy');
+  try {
+    const { data, error } = await supabase
+      .from('app_data')
+      .select('data_value')
+      .eq('user_id', AppState.settings.localUserId)
+      .eq('data_key', 'main')
+      .single();
+    if (error) throw error;
+    if (data?.data_value) {
+      const d = data.data_value;
+      if (d.profile) Object.assign(AppState.profile, d.profile);
+      if (d.shortcuts) AppState.shortcuts = d.shortcuts;
+      if (d.events) AppState.events = d.events;
+      if (d.tasks) AppState.tasks = d.tasks;
+      if (d.notes) AppState.notes = d.notes;
+      if (d.studies) Object.assign(AppState.studies, d.studies);
+      if (d.finance) Object.assign(AppState.finance, d.finance);
+      if (d.vault) AppState.vault.encrypted = d.vault.encrypted;
+      saveLocal();
+      render();
+    }
+    updateSyncStatus('ok');
+    showToast('dados sincronizados', 'success');
+  } catch(e) {
+    updateSyncStatus('err');
+    showToast('erro ao buscar dados', 'error');
+  }
+}
+
+// ============================================================
+//   NAVIGATION
+// ============================================================
+function navigate(screen) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('screen-' + screen).classList.add('active');
+  document.querySelector(`.nav-item[data-screen="${screen}"]`)?.classList.add('active');
+  currentScreen = screen;
+  renderScreen(screen);
+}
+
+function renderScreen(screen) {
+  switch(screen) {
+    case 'home': renderHome(); break;
+    case 'calendar': renderCalendar(); break;
+    case 'tasks': renderTasks(); break;
+    case 'notes': renderNotes(); break;
+    case 'shortcuts': renderShortcuts(); break;
+    case 'more': renderMore(); break;
+    case 'profile': renderSettings(); break;
+  }
+}
+
+function render() {
+  renderScreen(currentScreen);
+}
+
+// ============================================================
+//   THEME & APPEARANCE
+// ============================================================
+function applyTheme() {
+  const t = AppState.profile.theme;
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const dark = t === 'dark' || (t === 'auto' && prefersDark);
+  document.body.setAttribute('data-theme', dark ? 'dark' : 'light');
+  // accent
+  document.body.className = '';
+  document.body.classList.add(AppState.profile.accentClass || 'ac-0');
+  document.body.setAttribute('data-theme', dark ? 'dark' : 'light');
+}
+
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme);
+
+// ============================================================
+//   HOME SCREEN
+// ============================================================
+function updateClock() {
+  const now = new Date();
+  const h = now.getHours();
+  let greeting = 'boa noite';
+  if (h >= 5 && h < 12) greeting = 'bom dia';
+  else if (h >= 12 && h < 18) greeting = 'boa tarde';
+  const name = AppState.profile.name ? `, ${escapeHTML(AppState.profile.name)}` : '';
+  const el = document.getElementById('greeting');
+  if (el) el.textContent = greeting + name;
+  const dateEl = document.getElementById('home-date');
+  if (dateEl) {
+    const days = ['domingo','segunda','terça','quarta','quinta','sexta','sábado'];
+    const months = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+    dateEl.textContent = `${days[now.getDay()]}, ${now.getDate()} de ${months[now.getMonth()]}`;
+  }
+  const timeEl = document.getElementById('home-time');
+  if (timeEl) {
+    timeEl.textContent = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  }
+}
+
+function renderHome() {
+  updateClock();
+  renderHomeTasks();
+  renderHomeEvents();
+  renderHomeNotes();
+  renderHomeFinance();
+  renderHomeShortcuts();
+}
+
+function renderHomeTasks() {
+  const el = document.getElementById('home-tasks');
+  if (!el) return;
+  const today = todayStr();
+  const tasks = AppState.tasks.filter(t => t.date === today && t.status !== 'done').slice(0, 4);
+  if (!tasks.length) { el.innerHTML = '<div style="color:var(--text3);font-size:14px;padding:4px 0;">nenhuma tarefa para hoje</div>'; return; }
+  el.innerHTML = tasks.map(t => `
+    <div class="card-row">
+      <div class="check-circle ${t.status==='done'?'done':''}" onclick="toggleTask('${t.id}',event)"></div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:14px;font-weight:500;${t.status==='done'?'text-decoration:line-through;color:var(--text3);':''}">${escapeHTML(t.title)}</div>
+      </div>
+      <div class="prio prio-${t.priority||'med'}"></div>
+    </div>
+  `).join('');
+}
+
+function renderHomeEvents() {
+  const el = document.getElementById('home-events');
+  if (!el) return;
+  const today = todayStr();
+  const events = AppState.events.filter(e => e.date >= today).sort((a,b) => a.date.localeCompare(b.date)).slice(0, 3);
+  if (!events.length) { el.innerHTML = '<div style="color:var(--text3);font-size:14px;padding:4px 0;">sem eventos próximos</div>'; return; }
+  el.innerHTML = events.map(e => `
+    <div class="card-row">
+      <div style="width:10px;height:10px;border-radius:50%;background:${escapeHTML(e.color||'var(--accent)')};flex-shrink:0;"></div>
+      <div style="flex:1;">
+        <div style="font-size:14px;font-weight:500;">${escapeHTML(e.title)}</div>
+        <div style="font-size:12px;color:var(--text3);">${formatDate(e.date)}${e.time?' · '+escapeHTML(e.time):''}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderHomeNotes() {
+  const el = document.getElementById('home-notes');
+  if (!el) return;
+  const notes = [...AppState.notes].sort((a,b) => (b.updatedAt||b.createdAt||'').localeCompare(a.updatedAt||a.createdAt||'')).slice(0, 3);
+  if (!notes.length) { el.innerHTML = '<div style="color:var(--text3);font-size:14px;padding:4px 0;">nenhuma nota</div>'; return; }
+  el.innerHTML = notes.map(n => `
+    <div class="card-row" onclick="openEditNote('${n.id}')">
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHTML(n.title||'sem título')}</div>
+        <div style="font-size:12px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHTML((n.content||'').slice(0,50))}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderHomeFinance() {
+  const el = document.getElementById('home-finance');
+  if (!el) return;
+  const now = new Date();
+  const month = now.getMonth(); const year = now.getFullYear();
+  const entries = AppState.finance.entries.filter(e => {
+    const d = new Date(e.date+'T00:00:00');
+    return d.getMonth()===month && d.getFullYear()===year;
+  });
+  const income = entries.filter(e => e.type==='income').reduce((s,e) => s+Number(e.value||0), 0);
+  const expense = entries.filter(e => e.type==='expense').reduce((s,e) => s+Number(e.value||0), 0);
+  const balance = income - expense;
+  el.innerHTML = `
+    <div class="grid-2" style="grid-template-columns:1fr 1fr 1fr;gap:8px;">
+      <div style="text-align:center;">
+        <div style="font-size:11px;color:var(--text3);">entradas</div>
+        <div style="font-size:15px;font-weight:700;color:var(--green);">${formatCurrency(income)}</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:11px;color:var(--text3);">saídas</div>
+        <div style="font-size:15px;font-weight:700;color:var(--red);">${formatCurrency(expense)}</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:11px;color:var(--text3);">saldo</div>
+        <div style="font-size:15px;font-weight:700;color:${balance>=0?'var(--green)':'var(--red)'};">${formatCurrency(balance)}</div>
+      </div>
+    </div>
+  `;
+}
+
+function renderHomeShortcuts() {
+  const el = document.getElementById('home-shortcuts');
+  if (!el) return;
+  const favs = AppState.shortcuts.filter(s => s.favorite).slice(0, 6);
+  if (!favs.length) { el.innerHTML = '<div style="color:var(--text3);font-size:14px;padding:4px 0;grid-column:1/-1;">sem atalhos favoritos</div>'; return; }
+  el.innerHTML = favs.map(s => `
+    <div class="shortcut-item" onclick="window.open('${escapeHTML(s.url)}','_blank')">
+      <div class="shortcut-favicon" style="background:${escapeHTML(s.color||'var(--accent)')}">
+        <img src="https://www.google.com/s2/favicons?domain=${encodeURIComponent(s.url)}&sz=32" onerror="this.style.display='none';this.nextSibling.style.display='flex';" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">
+        <span style="display:none;">${escapeHTML((s.name||'?').charAt(0).toUpperCase())}</span>
+      </div>
+      <div class="shortcut-name">${escapeHTML(s.name)}</div>
+    </div>
+  `).join('');
+}
+
+// ============================================================
+//   QUICK ADD
+// ============================================================
+function quickAdd(type) {
+  switch(type) {
+    case 'task': openAddTask(); break;
+    case 'note': openAddNote(); break;
+    case 'event': openAddEvent(); break;
+    case 'shortcut': openAddShortcut(); break;
+    case 'expense': openAddEntry('expense'); break;
+    case 'password': navigate('more'); setTimeout(()=>{ setMoreTab('vault'); },100); break;
+  }
+}
+
+// ============================================================
+//   CALENDAR
+// ============================================================
+function renderCalendar() {
+  renderCalendarGrid();
+  if (calendarSelected) renderCalendarDayEvents(calendarSelected);
+  else renderCalendarDayEvents(todayStr());
+}
+
+function renderCalendarGrid() {
+  const months = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  document.getElementById('cal-month-label').textContent = `${months[calendarMonth]} ${calendarYear}`;
+
+  const hdrs = ['D','S','T','Q','Q','S','S'];
+  document.getElementById('cal-headers').innerHTML = hdrs.map(h => `<div class="cal-header">${h}</div>`).join('');
+
+  const firstDay = new Date(calendarYear, calendarMonth, 1).getDay();
+  const daysInMonth = new Date(calendarYear, calendarMonth+1, 0).getDate();
+  const daysInPrev = new Date(calendarYear, calendarMonth, 0).getDate();
+  const today = todayStr();
+
+  // Build event/task sets for indicators
+  const eventDates = new Set(AppState.events.map(e => e.date));
+  const taskDates = new Set(AppState.tasks.filter(t=>t.status!=='done').map(t => t.date));
+  const financeDates = new Set(AppState.finance.entries.filter(e=>e.recurrent).map(e=>e.date));
+
+  let cells = '';
+  // Prev month days
+  for (let i = firstDay - 1; i >= 0; i--) {
+    cells += `<div class="cal-day other-month">${daysInPrev - i}</div>`;
+  }
+  // Current month days
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${calendarYear}-${String(calendarMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday = dateStr === today;
+    const isSelected = dateStr === calendarSelected;
+    const hasEv = eventDates.has(dateStr);
+    const hasTk = taskDates.has(dateStr);
+    let cls = 'cal-day';
+    if (isToday) cls += ' today';
+    else if (isSelected) cls += ' selected';
+    if (hasEv || hasTk) cls += ' has-event';
+    cells += `<div class="${cls}" onclick="selectCalDay('${dateStr}')">${d}</div>`;
+  }
+  // Fill remaining
+  const total = firstDay + daysInMonth;
+  const remaining = total % 7 === 0 ? 0 : 7 - (total % 7);
+  for (let i = 1; i <= remaining; i++) {
+    cells += `<div class="cal-day other-month">${i}</div>`;
+  }
+  document.getElementById('cal-days').innerHTML = cells;
+
+  document.getElementById('cal-prev').onclick = () => {
+    calendarMonth--;
+    if (calendarMonth < 0) { calendarMonth = 11; calendarYear--; }
+    renderCalendarGrid();
+  };
+  document.getElementById('cal-next').onclick = () => {
+    calendarMonth++;
+    if (calendarMonth > 11) { calendarMonth = 0; calendarYear++; }
+    renderCalendarGrid();
+  };
+}
+
+function selectCalDay(dateStr) {
+  calendarSelected = dateStr;
+  renderCalendarGrid();
+  renderCalendarDayEvents(dateStr);
+}
+
+function renderCalendarDayEvents(dateStr) {
+  const el = document.getElementById('cal-day-events');
+  if (!el) return;
+  const events = AppState.events.filter(e => e.date === dateStr);
+  const tasks = AppState.tasks.filter(t => t.date === dateStr);
+  if (!events.length && !tasks.length) {
+    el.innerHTML = `<div class="card"><div style="text-align:center;padding:16px;color:var(--text3);font-size:14px;">nada neste dia</div></div>`;
+    return;
+  }
+  let html = `<div class="card"><div class="card-title">${formatDate(dateStr)}</div>`;
+  events.forEach(e => {
+    html += `<div class="card-row">
+      <div style="width:10px;height:10px;border-radius:50%;background:${escapeHTML(e.color||'var(--accent)')};flex-shrink:0;"></div>
+      <div style="flex:1;">
+        <div style="font-size:14px;font-weight:500;">${escapeHTML(e.title)}</div>
+        ${e.time?`<div style="font-size:12px;color:var(--text3);">${escapeHTML(e.time)}</div>`:''}
+        ${e.description?`<div style="font-size:12px;color:var(--text3);">${escapeHTML(e.description)}</div>`:''}
+      </div>
+      <div style="display:flex;gap:6px;">
+        <button class="btn-icon" style="font-size:13px;" onclick="openEditEvent('${e.id}')">✏️</button>
+        <button class="btn-icon" style="font-size:13px;" onclick="deleteEvent('${e.id}')">🗑️</button>
+      </div>
+    </div>`;
+  });
+  tasks.forEach(t => {
+    html += `<div class="card-row">
+      <div class="check-circle ${t.status==='done'?'done':''}" onclick="toggleTask('${t.id}',event)"></div>
+      <div style="flex:1;">
+        <div style="font-size:14px;font-weight:500;${t.status==='done'?'text-decoration:line-through;color:var(--text3);':''}">${escapeHTML(t.title)}</div>
+        ${t.time?`<div style="font-size:12px;color:var(--text3);">${escapeHTML(t.time)}</div>`:''}
+      </div>
+      <div class="prio prio-${t.priority||'med'}"></div>
+    </div>`;
+  });
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+function openAddEvent(dateStr) {
+  const date = dateStr || calendarSelected || todayStr();
+  openModal(`
+    <div class="modal-title">novo evento</div>
+    <div class="field"><label>título</label><input id="ev-title" placeholder="nome do evento..." maxlength="80"></div>
+    <div class="field"><label>data</label><input type="date" id="ev-date" value="${escapeHTML(date)}"></div>
+    <div class="field"><label>horário</label><input type="time" id="ev-time"></div>
+    <div class="field"><label>descrição</label><textarea id="ev-desc" rows="2" placeholder="detalhes..."></textarea></div>
+    <div class="field"><label>categoria</label>
+      <select id="ev-cat">
+        <option value="geral">geral</option>
+        <option value="trabalho">trabalho</option>
+        <option value="pessoal">pessoal</option>
+        <option value="saude">saúde</option>
+        <option value="financeiro">financeiro</option>
+        <option value="estudo">estudo</option>
+      </select>
+    </div>
+    <div class="field"><label>cor</label>
+      <div class="color-row" id="ev-color-row">
+        ${['#0A84FF','#30D158','#FF9F0A','#FF375F','#BF5AF2','#5E5CE6'].map(c=>
+          `<div class="color-swatch${c==='#0A84FF'?' selected':''}" style="background:${c};" data-color="${c}" onclick="pickEventColor('${c}')"></div>`
+        ).join('')}
+      </div>
+    </div>
+    <div class="field"><label>recorrência</label>
+      <select id="ev-recur">
+        <option value="">sem recorrência</option>
+        <option value="daily">diário</option>
+        <option value="weekly">semanal</option>
+        <option value="monthly">mensal</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">cancelar</button>
+      <button class="btn btn-primary" onclick="saveEvent()">salvar</button>
+    </div>
+  `);
+  window._evColorSelected = '#0A84FF';
+}
+
+function pickEventColor(c) {
+  window._evColorSelected = c;
+  document.querySelectorAll('#ev-color-row .color-swatch').forEach(s => {
+    s.classList.toggle('selected', s.dataset.color === c);
+  });
+}
+
+function saveEvent() {
+  const title = document.getElementById('ev-title')?.value.trim();
+  const date = document.getElementById('ev-date')?.value;
+  if (!title || !date) { showToast('preencha título e data', 'warning'); return; }
+  const id = document.getElementById('ev-id')?.value;
+  const event = {
+    id: id || generateId(),
+    title, date,
+    time: document.getElementById('ev-time')?.value || '',
+    description: document.getElementById('ev-desc')?.value.trim() || '',
+    category: document.getElementById('ev-cat')?.value || 'geral',
+    color: window._evColorSelected || '#0A84FF',
+    recur: document.getElementById('ev-recur')?.value || '',
+    createdAt: id ? undefined : new Date().toISOString()
+  };
+  if (id) {
+    const idx = AppState.events.findIndex(e => e.id === id);
+    if (idx >= 0) { Object.assign(AppState.events[idx], event); AppState.events[idx].id = id; }
+  } else {
+    if (!event.createdAt) event.createdAt = new Date().toISOString();
+    AppState.events.push(event);
+  }
+  saveLocal(); syncToSupabase();
+  closeModal();
+  showToast('evento salvo', 'success');
+  renderCalendar();
+  if (currentScreen === 'home') renderHome();
+}
+
+function openEditEvent(id) {
+  const e = AppState.events.find(ev => ev.id === id);
+  if (!e) return;
+  openModal(`
+    <div class="modal-title">editar evento</div>
+    <input type="hidden" id="ev-id" value="${escapeHTML(e.id)}">
+    <div class="field"><label>título</label><input id="ev-title" value="${escapeHTML(e.title)}" maxlength="80"></div>
+    <div class="field"><label>data</label><input type="date" id="ev-date" value="${escapeHTML(e.date)}"></div>
+    <div class="field"><label>horário</label><input type="time" id="ev-time" value="${escapeHTML(e.time||'')}"></div>
+    <div class="field"><label>descrição</label><textarea id="ev-desc" rows="2">${escapeHTML(e.description||'')}</textarea></div>
+    <div class="field"><label>categoria</label>
+      <select id="ev-cat">
+        ${['geral','trabalho','pessoal','saude','financeiro','estudo'].map(c=>`<option value="${c}"${e.category===c?' selected':''}>${c}</option>`).join('')}
+      </select>
+    </div>
+    <div class="field"><label>cor</label>
+      <div class="color-row" id="ev-color-row">
+        ${['#0A84FF','#30D158','#FF9F0A','#FF375F','#BF5AF2','#5E5CE6'].map(c=>
+          `<div class="color-swatch${e.color===c?' selected':''}" style="background:${c};" data-color="${c}" onclick="pickEventColor('${c}')"></div>`
+        ).join('')}
+      </div>
+    </div>
+    <div class="field"><label>recorrência</label>
+      <select id="ev-recur">
+        <option value="">sem recorrência</option>
+        <option value="daily" ${e.recur==='daily'?'selected':''}>diário</option>
+        <option value="weekly" ${e.recur==='weekly'?'selected':''}>semanal</option>
+        <option value="monthly" ${e.recur==='monthly'?'selected':''}>mensal</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">cancelar</button>
+      <button class="btn btn-primary" onclick="saveEvent()">salvar</button>
+    </div>
+  `);
+  window._evColorSelected = e.color || '#0A84FF';
+}
+
+function deleteEvent(id) {
+  confirmAction('excluir evento?', 'esta ação não pode ser desfeita.', 'excluir', () => {
+    AppState.events = AppState.events.filter(e => e.id !== id);
+    saveLocal(); syncToSupabase();
+    showToast('evento excluído');
+    renderCalendar();
+  });
+}
+
+// ============================================================
+//   TASKS
+// ============================================================
+function setTaskFilter(f) {
+  currentTaskFilter = f;
+  document.querySelectorAll('#task-filter-seg .segment-btn').forEach(b => b.classList.toggle('active', b.dataset.filter === f));
+  renderTasks();
+}
+
+function renderTasks() {
+  const el = document.getElementById('tasks-list');
+  if (!el) return;
+  const today = todayStr();
+  const week = getWeekRange();
+  let tasks = [...AppState.tasks];
+  switch(currentTaskFilter) {
+    case 'today': tasks = tasks.filter(t => t.date === today && t.status !== 'done'); break;
+    case 'week': tasks = tasks.filter(t => t.date >= week.start && t.date <= week.end && t.status !== 'done'); break;
+    case 'late': tasks = tasks.filter(t => t.date < today && t.status !== 'done'); break;
+    case 'done': tasks = tasks.filter(t => t.status === 'done'); break;
+    case 'all': break;
+  }
+  tasks.sort((a,b) => {
+    const pmap = {high:0,med:1,low:2};
+    const pa = pmap[a.priority||'med']; const pb = pmap[b.priority||'med'];
+    if (pa !== pb) return pa - pb;
+    return (a.date||'').localeCompare(b.date||'');
+  });
+  if (!tasks.length) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">✓</div><h3>nada por aqui</h3><p>adicione sua primeira tarefa</p></div>`;
+    return;
+  }
+  el.innerHTML = tasks.map(t => `
+    <div class="card" style="${t.status==='done'?'opacity:0.6;':''}">
+      <div style="display:flex;align-items:flex-start;gap:12px;">
+        <div class="check-circle ${t.status==='done'?'done':''}" onclick="toggleTask('${t.id}',event)" style="margin-top:2px;"></div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:15px;font-weight:600;${t.status==='done'?'text-decoration:line-through;color:var(--text3);':''}">${escapeHTML(t.title)}</div>
+          ${t.description?`<div style="font-size:13px;color:var(--text3);margin-top:3px;">${escapeHTML(t.description)}</div>`:''}
+          <div style="display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap;">
+            ${t.date?`<span style="font-size:11px;color:var(--text4);">${formatDate(t.date)}${t.time?' '+escapeHTML(t.time):''}</span>`:''}
+            ${t.category?`<span class="badge badge-gray">${escapeHTML(t.category)}</span>`:''}
+            <span class="badge ${t.priority==='high'?'badge-red':t.priority==='low'?'badge-green':'badge-orange'}">${t.priority==='high'?'alta':t.priority==='low'?'baixa':'média'}</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:4px;flex-shrink:0;">
+          <button class="btn-icon" style="font-size:12px;" onclick="openEditTask('${t.id}')">✏️</button>
+          <button class="btn-icon" style="font-size:12px;" onclick="deleteTask('${t.id}')">🗑️</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openAddTask(prefill) {
+  const today = todayStr();
+  openModal(`
+    <div class="modal-title">nova tarefa</div>
+    <div class="field"><label>título</label><input id="tk-title" placeholder="o que fazer..." maxlength="100" value="${prefill?escapeHTML(prefill):''}"></div>
+    <div class="field"><label>descrição</label><textarea id="tk-desc" rows="2" placeholder="detalhes opcionais..."></textarea></div>
+    <div class="field"><label>data</label><input type="date" id="tk-date" value="${today}"></div>
+    <div class="field"><label>horário</label><input type="time" id="tk-time"></div>
+    <div class="field"><label>prioridade</label>
+      <select id="tk-prio">
+        <option value="low">baixa</option>
+        <option value="med" selected>média</option>
+        <option value="high">alta</option>
+      </select>
+    </div>
+    <div class="field"><label>categoria</label><input id="tk-cat" placeholder="ex: pessoal, trabalho..." maxlength="40"></div>
+    <div class="field"><label>recorrência</label>
+      <select id="tk-recur">
+        <option value="">sem recorrência</option>
+        <option value="daily">diário</option>
+        <option value="weekly">semanal</option>
+        <option value="monthly">mensal</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">cancelar</button>
+      <button class="btn btn-primary" onclick="saveTask()">salvar</button>
+    </div>
+  `);
+}
+
+function openEditTask(id) {
+  const t = AppState.tasks.find(x => x.id === id);
+  if (!t) return;
+  openModal(`
+    <div class="modal-title">editar tarefa</div>
+    <input type="hidden" id="tk-id" value="${escapeHTML(t.id)}">
+    <div class="field"><label>título</label><input id="tk-title" value="${escapeHTML(t.title)}" maxlength="100"></div>
+    <div class="field"><label>descrição</label><textarea id="tk-desc" rows="2">${escapeHTML(t.description||'')}</textarea></div>
+    <div class="field"><label>data</label><input type="date" id="tk-date" value="${escapeHTML(t.date||'')}"></div>
+    <div class="field"><label>horário</label><input type="time" id="tk-time" value="${escapeHTML(t.time||'')}"></div>
+    <div class="field"><label>prioridade</label>
+      <select id="tk-prio">
+        <option value="low" ${t.priority==='low'?'selected':''}>baixa</option>
+        <option value="med" ${t.priority==='med'||!t.priority?'selected':''}>média</option>
+        <option value="high" ${t.priority==='high'?'selected':''}>alta</option>
+      </select>
+    </div>
+    <div class="field"><label>categoria</label><input id="tk-cat" value="${escapeHTML(t.category||'')}" maxlength="40"></div>
+    <div class="field"><label>status</label>
+      <select id="tk-status">
+        <option value="pending" ${t.status==='pending'||!t.status?'selected':''}>pendente</option>
+        <option value="doing" ${t.status==='doing'?'selected':''}>em andamento</option>
+        <option value="done" ${t.status==='done'?'selected':''}>concluída</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">cancelar</button>
+      <button class="btn btn-primary" onclick="saveTask()">salvar</button>
+    </div>
+  `);
+}
+
+function saveTask() {
+  const title = document.getElementById('tk-title')?.value.trim();
+  if (!title) { showToast('título obrigatório', 'warning'); return; }
+  const id = document.getElementById('tk-id')?.value;
+  const task = {
+    id: id || generateId(),
+    title,
+    description: document.getElementById('tk-desc')?.value.trim() || '',
+    date: document.getElementById('tk-date')?.value || '',
+    time: document.getElementById('tk-time')?.value || '',
+    priority: document.getElementById('tk-prio')?.value || 'med',
+    category: document.getElementById('tk-cat')?.value.trim() || '',
+    status: document.getElementById('tk-status')?.value || 'pending',
+    recur: document.getElementById('tk-recur')?.value || ''
+  };
+  if (id) {
+    const idx = AppState.tasks.findIndex(t => t.id === id);
+    if (idx >= 0) Object.assign(AppState.tasks[idx], task);
+  } else {
+    task.status = 'pending';
+    task.createdAt = new Date().toISOString();
+    AppState.tasks.push(task);
+  }
+  saveLocal(); syncToSupabase();
+  closeModal();
+  showToast('tarefa salva', 'success');
+  renderTasks();
+  if (currentScreen === 'home') renderHome();
+}
+
+function toggleTask(id, e) {
+  if (e) e.stopPropagation();
+  const t = AppState.tasks.find(x => x.id === id);
+  if (!t) return;
+  t.status = t.status === 'done' ? 'pending' : 'done';
+  t.updatedAt = new Date().toISOString();
+  saveLocal(); syncToSupabase();
+  renderTasks();
+  if (currentScreen === 'home') renderHome();
+}
+
+function deleteTask(id) {
+  confirmAction('excluir tarefa?', '', 'excluir', () => {
+    AppState.tasks = AppState.tasks.filter(t => t.id !== id);
+    saveLocal(); syncToSupabase();
+    showToast('tarefa excluída');
+    renderTasks();
+  });
+}
+
+// ============================================================
+//   NOTES
+// ============================================================
+function renderNotes() {
+  const el = document.getElementById('notes-list');
+  if (!el) return;
+  const query = (document.getElementById('notes-search')?.value || '').toLowerCase();
+  let notes = AppState.notes.filter(n => {
+    if (query && !n.title?.toLowerCase().includes(query) && !n.content?.toLowerCase().includes(query)) return false;
+    if (currentNoteTag && !n.tags?.includes(currentNoteTag)) return false;
+    return true;
+  }).sort((a,b) => {
+    if (a.pinned && !b.pinned) return -1;
+    if (!a.pinned && b.pinned) return 1;
+    return (b.updatedAt||b.createdAt||'').localeCompare(a.updatedAt||a.createdAt||'');
+  });
+
+  // Tags
+  const allTags = [...new Set(AppState.notes.flatMap(n => n.tags || []))];
+  const tagsEl = document.getElementById('notes-tags');
+  if (tagsEl) {
+    tagsEl.innerHTML = allTags.length ? allTags.map(tag =>
+      `<span class="tag ${currentNoteTag===tag?'active':''}" onclick="filterNoteTag('${escapeHTML(tag)}')">${escapeHTML(tag)}</span>`
+    ).join('') + `<span class="tag ${!currentNoteTag?'active':''}" onclick="filterNoteTag('')">todas</span>` : '';
+  }
+
+  if (!notes.length) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">📝</div><h3>nenhuma nota</h3><p>crie sua primeira nota</p></div>`;
+    return;
+  }
+  el.innerHTML = notes.map(n => `
+    <div class="note-card" onclick="openEditNote('${n.id}')">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div class="note-card-title">${escapeHTML(n.title||'sem título')}</div>
+        <div style="display:flex;gap:4px;align-items:center;">
+          ${n.pinned?`<span style="font-size:14px;color:var(--orange);">📌</span>`:''}
+          <button class="btn-icon" style="font-size:12px;" onclick="deleteNote('${n.id}',event)">🗑️</button>
+        </div>
+      </div>
+      <div class="note-card-preview">${escapeHTML(n.content||'')}</div>
+      <div class="note-card-meta">
+        <span>${formatDate(n.updatedAt?.slice(0,10)||n.createdAt?.slice(0,10)||'')}</span>
+        ${(n.tags||[]).map(t=>`<span class="badge badge-gray">${escapeHTML(t)}</span>`).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterNoteTag(tag) {
+  currentNoteTag = tag;
+  renderNotes();
+}
+
+function openAddNote() {
+  openNoteEditor(null);
+}
+
+function openEditNote(id) {
+  openNoteEditor(id);
+}
+
+function openNoteEditor(id) {
+  const n = id ? AppState.notes.find(x => x.id === id) : null;
+  openModal(`
+    <div class="modal-title">${n?'editar nota':'nova nota'}</div>
+    ${n?`<input type="hidden" id="nt-id" value="${escapeHTML(n.id)}">`:''}
+    <div class="field"><label>título</label><input id="nt-title" placeholder="título da nota..." maxlength="100" value="${n?escapeHTML(n.title||''):''}"></div>
+    <div class="field"><label>conteúdo</label><textarea id="nt-content" rows="6" placeholder="escreva aqui...">${n?escapeHTML(n.content||''):''}</textarea></div>
+    <div class="field"><label>tags (separadas por vírgula)</label><input id="nt-tags" placeholder="ex: pessoal, trabalho..." value="${n?(n.tags||[]).map(t=>escapeHTML(t)).join(', '):''}"></div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+      <div class="switch ${n?.pinned?'on':''}" id="nt-pin-sw" onclick="toggleSwitch('nt-pin-sw')"></div>
+      <span style="font-size:14px;color:var(--text2);">fixar nota</span>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">cancelar</button>
+      <button class="btn btn-primary" onclick="saveNote()">salvar</button>
+    </div>
+  `);
+}
+
+function toggleSwitch(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.toggle('on');
+}
+
+function saveNote() {
+  const title = document.getElementById('nt-title')?.value.trim();
+  const content = document.getElementById('nt-content')?.value.trim();
+  if (!title && !content) { showToast('nota vazia', 'warning'); return; }
+  const id = document.getElementById('nt-id')?.value;
+  const tagsRaw = document.getElementById('nt-tags')?.value.trim();
+  const tags = tagsRaw ? tagsRaw.split(',').map(t => t.trim()).filter(Boolean) : [];
+  const pinned = document.getElementById('nt-pin-sw')?.classList.contains('on') || false;
+  const note = {
+    id: id || generateId(),
+    title: title || 'sem título',
+    content: content || '',
+    tags, pinned,
+    updatedAt: new Date().toISOString()
+  };
+  if (id) {
+    const idx = AppState.notes.findIndex(n => n.id === id);
+    if (idx >= 0) { note.createdAt = AppState.notes[idx].createdAt; Object.assign(AppState.notes[idx], note); }
+  } else {
+    note.createdAt = new Date().toISOString();
+    AppState.notes.push(note);
+  }
+  saveLocal(); syncToSupabase();
+  closeModal();
+  showToast('nota salva', 'success');
+  renderNotes();
+  if (currentScreen === 'home') renderHome();
+}
+
+function deleteNote(id, e) {
+  if (e) e.stopPropagation();
+  confirmAction('excluir nota?', '', 'excluir', () => {
+    AppState.notes = AppState.notes.filter(n => n.id !== id);
+    saveLocal(); syncToSupabase();
+    showToast('nota excluída');
+    renderNotes();
+  });
+}
+
+// ============================================================
+//   SHORTCUTS
+// ============================================================
+function renderShortcuts() {
+  const el = document.getElementById('shortcuts-grid');
+  if (!el) return;
+  const q = (document.getElementById('shortcuts-search')?.value || '').toLowerCase();
+  let items = AppState.shortcuts.filter(s => !q || s.name?.toLowerCase().includes(q) || s.url?.toLowerCase().includes(q));
+  // Favorites first
+  items = [...items.filter(s=>s.favorite), ...items.filter(s=>!s.favorite)];
+  if (!items.length) {
+    el.innerHTML = '<div class="empty" style="grid-column:1/-1;"><div class="empty-icon">⚡</div><h3>sem atalhos</h3><p>adicione seus links favoritos</p></div>';
+    return;
+  }
+  el.innerHTML = items.map(s => `
+    <div class="shortcut-item" onclick="openLink('${escapeHTML(s.url)}')">
+      ${s.favorite?'<div class="shortcut-star">★</div>':''}
+      <div class="shortcut-favicon" style="background:${escapeHTML(s.color||'var(--accent)')};">
+        <img src="https://www.google.com/s2/favicons?domain=${encodeURIComponent(s.url)}&sz=32"
+          onerror="this.style.display='none';this.nextSibling.style.display='flex';"
+          style="width:100%;height:100%;object-fit:cover;border-radius:8px;">
+        <span style="display:none;width:100%;height:100%;align-items:center;justify-content:center;border-radius:8px;">${escapeHTML((s.name||'?').charAt(0).toUpperCase())}</span>
+      </div>
+      <div class="shortcut-name">${escapeHTML(s.name)}</div>
+      <div style="display:flex;gap:4px;margin-top:4px;">
+        <button class="btn-icon" style="font-size:11px;width:26px;height:26px;" onclick="toggleShortcutFav('${s.id}',event)">★</button>
+        <button class="btn-icon" style="font-size:11px;width:26px;height:26px;" onclick="openEditShortcut('${s.id}',event)">✏️</button>
+        <button class="btn-icon" style="font-size:11px;width:26px;height:26px;" onclick="deleteShortcut('${s.id}',event)">🗑️</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openLink(url) {
+  if (!url) return;
+  if (!url.startsWith('http')) url = 'https://' + url;
+  window.open(url, '_blank');
+}
+
+function openAddShortcut() {
+  openModal(`
+    <div class="modal-title">novo atalho</div>
+    <div class="field"><label>nome</label><input id="sc-name" placeholder="ex: Gmail" maxlength="60"></div>
+    <div class="field"><label>URL</label><input id="sc-url" type="url" placeholder="https://..." maxlength="200"></div>
+    <div class="field"><label>categoria</label>
+      <select id="sc-cat">
+        <option value="pessoal">pessoal</option>
+        <option value="trabalho">trabalho</option>
+        <option value="estudo">estudo</option>
+        <option value="financeiro">financeiro</option>
+        <option value="ferramentas">ferramentas</option>
+      </select>
+    </div>
+    <div class="field"><label>cor</label>
+      <div class="color-row" id="sc-color-row">
+        ${['#0A84FF','#30D158','#FF9F0A','#FF375F','#BF5AF2','#5E5CE6','#FF6B35','#5AC8FA'].map(c=>
+          `<div class="color-swatch${c==='#0A84FF'?' selected':''}" style="background:${c};" data-color="${c}" onclick="pickScColor('${c}')"></div>`
+        ).join('')}
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+      <div class="switch" id="sc-fav-sw" onclick="toggleSwitch('sc-fav-sw')"></div>
+      <span style="font-size:14px;">favorito</span>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">cancelar</button>
+      <button class="btn btn-primary" onclick="saveShortcut()">salvar</button>
+    </div>
+  `);
+  window._scColorSelected = '#0A84FF';
+}
+
+function openEditShortcut(id, e) {
+  if (e) e.stopPropagation();
+  const s = AppState.shortcuts.find(x => x.id === id);
+  if (!s) return;
+  openModal(`
+    <div class="modal-title">editar atalho</div>
+    <input type="hidden" id="sc-id" value="${escapeHTML(s.id)}">
+    <div class="field"><label>nome</label><input id="sc-name" value="${escapeHTML(s.name)}" maxlength="60"></div>
+    <div class="field"><label>URL</label><input id="sc-url" type="url" value="${escapeHTML(s.url)}" maxlength="200"></div>
+    <div class="field"><label>categoria</label>
+      <select id="sc-cat">
+        ${['pessoal','trabalho','estudo','financeiro','ferramentas'].map(c=>`<option value="${c}"${s.category===c?' selected':''}>${c}</option>`).join('')}
+      </select>
+    </div>
+    <div class="field"><label>cor</label>
+      <div class="color-row" id="sc-color-row">
+        ${['#0A84FF','#30D158','#FF9F0A','#FF375F','#BF5AF2','#5E5CE6','#FF6B35','#5AC8FA'].map(c=>
+          `<div class="color-swatch${s.color===c?' selected':''}" style="background:${c};" data-color="${c}" onclick="pickScColor('${c}')"></div>`
+        ).join('')}
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+      <div class="switch ${s.favorite?'on':''}" id="sc-fav-sw" onclick="toggleSwitch('sc-fav-sw')"></div>
+      <span style="font-size:14px;">favorito</span>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">cancelar</button>
+      <button class="btn btn-primary" onclick="saveShortcut()">salvar</button>
+    </div>
+  `);
+  window._scColorSelected = s.color || '#0A84FF';
+}
+
+function pickScColor(c) {
+  window._scColorSelected = c;
+  document.querySelectorAll('#sc-color-row .color-swatch').forEach(s => s.classList.toggle('selected', s.dataset.color === c));
+}
+
+function saveShortcut() {
+  const name = document.getElementById('sc-name')?.value.trim();
+  let url = document.getElementById('sc-url')?.value.trim();
+  if (!name || !url) { showToast('nome e URL obrigatórios', 'warning'); return; }
+  if (!url.startsWith('http')) url = 'https://' + url;
+  const id = document.getElementById('sc-id')?.value;
+  const sc = {
+    id: id || generateId(),
+    name, url,
+    category: document.getElementById('sc-cat')?.value || 'pessoal',
+    color: window._scColorSelected || '#0A84FF',
+    favorite: document.getElementById('sc-fav-sw')?.classList.contains('on') || false
+  };
+  if (id) {
+    const idx = AppState.shortcuts.findIndex(s => s.id === id);
+    if (idx >= 0) Object.assign(AppState.shortcuts[idx], sc);
+  } else {
+    AppState.shortcuts.push(sc);
+  }
+  saveLocal(); syncToSupabase();
+  closeModal();
+  showToast('atalho salvo', 'success');
+  renderShortcuts();
+  if (currentScreen === 'home') renderHome();
+}
+
+function toggleShortcutFav(id, e) {
+  if (e) e.stopPropagation();
+  const s = AppState.shortcuts.find(x => x.id === id);
+  if (!s) return;
+  s.favorite = !s.favorite;
+  saveLocal(); syncToSupabase();
+  renderShortcuts();
+}
+
+function deleteShortcut(id, e) {
+  if (e) e.stopPropagation();
+  confirmAction('excluir atalho?', '', 'excluir', () => {
+    AppState.shortcuts = AppState.shortcuts.filter(s => s.id !== id);
+    saveLocal(); syncToSupabase();
+    showToast('atalho excluído');
+    renderShortcuts();
+  });
+}
+
+// ============================================================
+//   MORE SCREEN (STUDIES / FINANCE / VAULT / TOOLS)
+// ============================================================
+function setMoreTab(tab) {
+  currentMoreTab = tab;
+  ['studies','finance','vault','tools'].forEach(t => {
+    document.getElementById('tab-'+t).style.display = t===tab?'block':'none';
+    document.getElementById('study-fab')?.style && (document.getElementById('study-fab').style.display = tab==='studies'?'flex':'none');
+    document.getElementById('finance-fab')?.style && (document.getElementById('finance-fab').style.display = tab==='finance'?'flex':'none');
+  });
+  document.querySelectorAll('#more-seg .segment-btn').forEach(b => b.classList.toggle('active', b.dataset.tab===tab));
+  switch(tab) {
+    case 'studies': renderStudies(); break;
+    case 'finance': renderFinance(); break;
+    case 'vault': renderVault(); break;
+    case 'tools': renderTools(); break;
+  }
+}
+
+function renderMore() {
+  setMoreTab(currentMoreTab);
+}
+
+// ============================================================
+//   STUDIES
+// ============================================================
+function setStudyTab(tab) {
+  currentStudyTab = tab;
+  document.getElementById('study-subjects').style.display = tab==='subjects'?'block':'none';
+  document.getElementById('study-sessions').style.display = tab==='sessions'?'block':'none';
+  document.getElementById('study-focus').style.display = tab==='focus'?'block':'none';
+  document.querySelectorAll('#study-seg .segment-btn').forEach(b => b.classList.toggle('active', b.dataset.stab===tab));
+  switch(tab) {
+    case 'subjects': renderSubjects(); break;
+    case 'sessions': renderSessions(); break;
+    case 'focus': renderFocus(); break;
+  }
+}
+
+function renderStudies() {
+  setStudyTab(currentStudyTab);
+}
+
+function openStudyAction() {
+  if (currentStudyTab === 'subjects') openAddSubject();
+  else if (currentStudyTab === 'sessions') openAddSession();
+}
+
+function renderSubjects() {
+  const el = document.getElementById('study-subjects');
+  if (!el) return;
+  const subjects = AppState.studies.subjects;
+  if (!subjects.length) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">📚</div><h3>nenhuma matéria</h3><p>adicione suas matérias de estudo</p></div>`;
+    return;
+  }
+  // Today & week totals
+  const today = todayStr();
+  const week = getWeekRange();
+  const todaySecs = AppState.studies.sessions.filter(s=>s.date===today).reduce((t,s)=>t+s.duration,0);
+  const weekSecs = AppState.studies.sessions.filter(s=>s.date>=week.start&&s.date<=week.end).reduce((t,s)=>t+s.duration,0);
+  el.innerHTML = `
+    <div class="card" style="margin-bottom:14px;">
+      <div class="grid-2" style="grid-template-columns:1fr 1fr;gap:10px;">
+        <div style="text-align:center;">
+          <div style="font-size:11px;color:var(--text3);">hoje</div>
+          <div style="font-size:20px;font-weight:700;color:var(--accent);">${formatDuration(todaySecs)}</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:11px;color:var(--text3);">semana</div>
+          <div style="font-size:20px;font-weight:700;color:var(--accent);">${formatDuration(weekSecs)}</div>
+        </div>
+      </div>
+    </div>
+  ` + subjects.map(s => {
+    const sessions = AppState.studies.sessions.filter(sess => sess.subjectId === s.id);
+    const total = sessions.reduce((t,sess)=>t+sess.duration,0);
+    const lastDate = sessions.sort((a,b)=>b.date.localeCompare(a.date))[0]?.date;
+    return `
+      <div class="subject-card" onclick="openEditSubject('${s.id}')">
+        <div class="subject-dot" style="background:${escapeHTML(s.color||'var(--accent)')};"></div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:600;font-size:15px;">${escapeHTML(s.name)}</div>
+          <div style="font-size:12px;color:var(--text3);">${formatDuration(total)} estudados${lastDate?' · último: '+formatDate(lastDate):''}</div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <span class="badge ${s.priority==='high'?'badge-red':s.priority==='low'?'badge-green':'badge-orange'}">${s.priority==='high'?'alta':s.priority==='low'?'baixa':'média'}</span>
+          <button class="btn-icon" style="font-size:12px;" onclick="deleteSubject('${s.id}',event)">🗑️</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function openAddSubject() {
+  openModal(`
+    <div class="modal-title">nova matéria</div>
+    <div class="field"><label>nome</label><input id="subj-name" placeholder="ex: Matemática" maxlength="60"></div>
+    <div class="field"><label>prioridade</label>
+      <select id="subj-prio">
+        <option value="low">baixa</option>
+        <option value="med" selected>média</option>
+        <option value="high">alta</option>
+      </select>
+    </div>
+    <div class="field"><label>cor</label>
+      <div class="color-row" id="subj-color-row">
+        ${['#0A84FF','#30D158','#FF9F0A','#FF375F','#BF5AF2','#5E5CE6'].map(c=>
+          `<div class="color-swatch${c==='#0A84FF'?' selected':''}" style="background:${c};" data-color="${c}" onclick="pickSubjColor('${c}')"></div>`
+        ).join('')}
+      </div>
+    </div>
+    <div class="field"><label>observações</label><textarea id="subj-obs" rows="2" placeholder="notas..."></textarea></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">cancelar</button>
+      <button class="btn btn-primary" onclick="saveSubject()">salvar</button>
+    </div>
+  `);
+  window._subjColorSelected = '#0A84FF';
+}
+
+function openEditSubject(id) {
+  const s = AppState.studies.subjects.find(x => x.id === id);
+  if (!s) return;
+  openModal(`
+    <div class="modal-title">editar matéria</div>
+    <input type="hidden" id="subj-id" value="${escapeHTML(s.id)}">
+    <div class="field"><label>nome</label><input id="subj-name" value="${escapeHTML(s.name)}" maxlength="60"></div>
+    <div class="field"><label>prioridade</label>
+      <select id="subj-prio">
+        <option value="low" ${s.priority==='low'?'selected':''}>baixa</option>
+        <option value="med" ${s.priority==='med'||!s.priority?'selected':''}>média</option>
+        <option value="high" ${s.priority==='high'?'selected':''}>alta</option>
+      </select>
+    </div>
+    <div class="field"><label>cor</label>
+      <div class="color-row" id="subj-color-row">
+        ${['#0A84FF','#30D158','#FF9F0A','#FF375F','#BF5AF2','#5E5CE6'].map(c=>
+          `<div class="color-swatch${s.color===c?' selected':''}" style="background:${c};" data-color="${c}" onclick="pickSubjColor('${c}')"></div>`
+        ).join('')}
+      </div>
+    </div>
+    <div class="field"><label>observações</label><textarea id="subj-obs" rows="2">${escapeHTML(s.observations||'')}</textarea></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">cancelar</button>
+      <button class="btn btn-primary" onclick="saveSubject()">salvar</button>
+    </div>
+  `);
+  window._subjColorSelected = s.color || '#0A84FF';
+}
+
+function pickSubjColor(c) {
+  window._subjColorSelected = c;
+  document.querySelectorAll('#subj-color-row .color-swatch').forEach(s => s.classList.toggle('selected', s.dataset.color===c));
+}
+
+function saveSubject() {
+  const name = document.getElementById('subj-name')?.value.trim();
+  if (!name) { showToast('nome obrigatório', 'warning'); return; }
+  const id = document.getElementById('subj-id')?.value;
+  const subj = {
+    id: id || generateId(),
+    name, priority: document.getElementById('subj-prio')?.value||'med',
+    color: window._subjColorSelected||'#0A84FF',
+    observations: document.getElementById('subj-obs')?.value.trim()||''
+  };
+  if (!AppState.studies.subjects) AppState.studies.subjects = [];
+  if (id) {
+    const idx = AppState.studies.subjects.findIndex(s=>s.id===id);
+    if (idx>=0) Object.assign(AppState.studies.subjects[idx], subj);
+  } else {
+    AppState.studies.subjects.push(subj);
+  }
+  saveLocal(); syncToSupabase();
+  closeModal();
+  showToast('matéria salva', 'success');
+  renderSubjects();
+}
+
+function deleteSubject(id, e) {
+  if (e) e.stopPropagation();
+  confirmAction('excluir matéria?', 'as sessões vinculadas também serão excluídas.', 'excluir', () => {
+    AppState.studies.subjects = AppState.studies.subjects.filter(s=>s.id!==id);
+    AppState.studies.sessions = AppState.studies.sessions.filter(s=>s.subjectId!==id);
+    saveLocal(); syncToSupabase();
+    showToast('matéria excluída');
+    renderSubjects();
+  });
+}
+
+function renderSessions() {
+  const el = document.getElementById('study-sessions');
+  if (!el) return;
+  const sessions = [...(AppState.studies.sessions||[])].sort((a,b)=>b.date.localeCompare(a.date));
+  if (!sessions.length) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">⏱️</div><h3>nenhuma sessão</h3><p>registre seu estudo</p></div>`;
+    return;
+  }
+  el.innerHTML = sessions.map(s => {
+    const subj = AppState.studies.subjects.find(x=>x.id===s.subjectId);
+    return `
+      <div class="session-item">
+        <div style="width:10px;height:10px;border-radius:50%;background:${escapeHTML(subj?.color||'var(--accent)')};flex-shrink:0;"></div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:500;">${escapeHTML(subj?.name||'desconhecida')}</div>
+          <div style="font-size:12px;color:var(--text3);">${formatDate(s.date)} · ${formatDuration(s.duration)}</div>
+          ${s.observation?`<div style="font-size:12px;color:var(--text3);">${escapeHTML(s.observation)}</div>`:''}
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          ${s.focus?`<span class="badge badge-accent">${escapeHTML(s.focus)}/5</span>`:''}
+          <button class="btn-icon" style="font-size:12px;" onclick="deleteSession('${s.id}')">🗑️</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function openAddSession() {
+  const subjects = AppState.studies.subjects;
+  if (!subjects.length) { showToast('adicione uma matéria primeiro', 'warning'); return; }
+  openModal(`
+    <div class="modal-title">nova sessão</div>
+    <div class="field"><label>matéria</label>
+      <select id="sess-subj">
+        ${subjects.map(s=>`<option value="${s.id}">${escapeHTML(s.name)}</option>`).join('')}
+      </select>
+    </div>
+    <div class="field"><label>data</label><input type="date" id="sess-date" value="${todayStr()}"></div>
+    <div class="field"><label>duração (minutos)</label><input type="number" id="sess-dur" min="1" value="30"></div>
+    <div class="field"><label>nível de foco (1-5)</label><input type="number" id="sess-focus" min="1" max="5" value="3"></div>
+    <div class="field"><label>observação</label><textarea id="sess-obs" rows="2" placeholder="como foi?"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">cancelar</button>
+      <button class="btn btn-primary" onclick="saveSession()">salvar</button>
+    </div>
+  `);
+}
+
+function saveSession() {
+  const subjId = document.getElementById('sess-subj')?.value;
+  const dur = parseInt(document.getElementById('sess-dur')?.value)||0;
+  const date = document.getElementById('sess-date')?.value;
+  if (!subjId || !dur || !date) { showToast('preencha os campos', 'warning'); return; }
+  if (!AppState.studies.sessions) AppState.studies.sessions = [];
+  AppState.studies.sessions.push({
+    id: generateId(),
+    subjectId: subjId,
+    duration: dur * 60, // store in seconds
+    date, focus: document.getElementById('sess-focus')?.value||'',
+    observation: document.getElementById('sess-obs')?.value.trim()||'',
+    createdAt: new Date().toISOString()
+  });
+  saveLocal(); syncToSupabase();
+  closeModal();
+  showToast('sessão registrada', 'success');
+  renderSessions();
+}
+
+function deleteSession(id) {
+  confirmAction('excluir sessão?', '', 'excluir', () => {
+    AppState.studies.sessions = AppState.studies.sessions.filter(s=>s.id!==id);
+    saveLocal(); syncToSupabase();
+    showToast('sessão excluída');
+    renderSessions();
+  });
+}
+
+// POMODORO / FOCUS
+function renderFocus() {
+  const el = document.getElementById('study-focus');
+  if (!el) return;
+  const fs = AppState.studies.focusSettings || { work: 25, short: 5, long: 15 };
+  const modeLabels = { work: 'foco', short: 'pausa curta', long: 'pausa longa' };
+  const total = pomodoroState.total;
+  const remaining = pomodoroState.remaining;
+  const radius = 80;
+  const circ = 2 * Math.PI * radius;
+  const progress = total > 0 ? (1 - remaining / total) * circ : 0;
+
+  el.innerHTML = `
+    <div class="card" style="text-align:center;">
+      <div style="font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">
+        ${modeLabels[pomodoroState.mode] || 'foco'} · ciclo ${pomodoroState.cycles}
+      </div>
+      <div class="timer-ring">
+        <svg width="180" height="180" viewBox="0 0 180 180">
+          <circle cx="90" cy="90" r="${radius}" stroke-width="8"/>
+          <circle class="progress" cx="90" cy="90" r="${radius}" stroke-width="8"
+            stroke="var(--accent)"
+            stroke-dasharray="${circ}"
+            stroke-dashoffset="${circ - progress}"
+            stroke-linecap="round"/>
+        </svg>
+        <div class="timer-time">${String(Math.floor(remaining/60)).padStart(2,'0')}:${String(remaining%60).padStart(2,'0')}</div>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:center;margin-bottom:16px;">
+        <button class="btn btn-secondary btn-sm" onclick="setPomodoroMode('work')">foco</button>
+        <button class="btn btn-secondary btn-sm" onclick="setPomodoroMode('short')">pausa curta</button>
+        <button class="btn btn-secondary btn-sm" onclick="setPomodoroMode('long')">pausa longa</button>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:center;">
+        <button class="btn ${pomodoroState.running?'btn-secondary':'btn-primary'}" onclick="togglePomodoro()">
+          ${pomodoroState.running?'⏸ pausar':'▶ iniciar'}
+        </button>
+        <button class="btn btn-secondary" onclick="resetPomodoro()">↺ reiniciar</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">configurações</div>
+      <div class="card-row">
+        <div style="flex:1;font-size:14px;">tempo de foco (min)</div>
+        <input type="number" min="1" max="60" value="${fs.work||25}" id="pom-work" style="width:60px;padding:6px;background:var(--bg3);border-radius:8px;border:1px solid var(--separator);text-align:center;color:var(--text);">
+      </div>
+      <div class="card-row">
+        <div style="flex:1;font-size:14px;">pausa curta (min)</div>
+        <input type="number" min="1" max="30" value="${fs.short||5}" id="pom-short" style="width:60px;padding:6px;background:var(--bg3);border-radius:8px;border:1px solid var(--separator);text-align:center;color:var(--text);">
+      </div>
+      <div class="card-row">
+        <div style="flex:1;font-size:14px;">pausa longa (min)</div>
+        <input type="number" min="1" max="60" value="${fs.long||15}" id="pom-long" style="width:60px;padding:6px;background:var(--bg3);border-radius:8px;border:1px solid var(--separator);text-align:center;color:var(--text);">
+      </div>
+      <button class="btn btn-secondary btn-sm" style="margin-top:8px;" onclick="savePomodoroSettings()">salvar configurações</button>
+    </div>
+  `;
+}
+
+function savePomodoroSettings() {
+  const w = parseInt(document.getElementById('pom-work')?.value)||25;
+  const s = parseInt(document.getElementById('pom-short')?.value)||5;
+  const l = parseInt(document.getElementById('pom-long')?.value)||15;
+  AppState.studies.focusSettings = { work: w, short: s, long: l };
+  saveLocal();
+  showToast('configurações salvas', 'success');
+}
+
+function setPomodoroMode(mode) {
+  const fs = AppState.studies.focusSettings || { work: 25, short: 5, long: 15 };
+  const mins = mode==='work'?fs.work:mode==='short'?fs.short:fs.long;
+  stopPomodoro();
+  pomodoroState.mode = mode;
+  pomodoroState.remaining = (mins||25)*60;
+  pomodoroState.total = pomodoroState.remaining;
+  pomodoroState.running = false;
+  renderFocus();
+}
+
+function togglePomodoro() {
+  if (pomodoroState.running) stopPomodoro();
+  else startPomodoro();
+}
+
+function startPomodoro() {
+  pomodoroState.running = true;
+  pomodoroInterval = setInterval(() => {
+    if (pomodoroState.remaining <= 0) {
+      stopPomodoro();
+      if (pomodoroState.mode === 'work') pomodoroState.cycles++;
+      showToast('tempo finalizado! 🎉', 'success');
+      playBeep();
+      if (currentMoreTab === 'studies' && currentStudyTab === 'focus') renderFocus();
+      return;
+    }
+    pomodoroState.remaining--;
+    if (currentMoreTab === 'studies' && currentStudyTab === 'focus') renderFocus();
+  }, 1000);
+  renderFocus();
+}
+
+function stopPomodoro() {
+  pomodoroState.running = false;
+  if (pomodoroInterval) { clearInterval(pomodoroInterval); pomodoroInterval = null; }
+}
+
+function resetPomodoro() {
+  stopPomodoro();
+  const fs = AppState.studies.focusSettings || { work: 25, short: 5, long: 15 };
+  const mins = pomodoroState.mode==='work'?fs.work:pomodoroState.mode==='short'?fs.short:fs.long;
+  pomodoroState.remaining = (mins||25)*60;
+  pomodoroState.total = pomodoroState.remaining;
+  renderFocus();
+}
+
+function playBeep() {
+  try {
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.frequency.value = 880;
+    osc.type = 'sine';
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.5);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 1.5);
+  } catch(e) {}
+}
+
+// ============================================================
+//   FINANCE
+// ============================================================
+function renderFinance() {
+  renderFinanceSummary();
+  setFinanceTab(currentFinanceTab);
+}
+
+function renderFinanceSummary() {
+  const el = document.getElementById('finance-summary');
+  if (!el) return;
+  const now = new Date();
+  const month = now.getMonth(); const year = now.getFullYear();
+  const entries = AppState.finance.entries.filter(e => {
+    const d = new Date(e.date+'T00:00:00');
+    return d.getMonth()===month && d.getFullYear()===year;
+  });
+  const income = entries.filter(e=>e.type==='income').reduce((s,e)=>s+Number(e.value||0),0);
+  const expense = entries.filter(e=>e.type==='expense').reduce((s,e)=>s+Number(e.value||0),0);
+  const balance = income - expense;
+
+  // Categories summary
+  const cats = {};
+  entries.filter(e=>e.type==='expense').forEach(e => {
+    cats[e.category||'outros'] = (cats[e.category||'outros']||0) + Number(e.value||0);
+  });
+
+  el.innerHTML = `
+    <div class="card" style="margin-bottom:14px;">
+      <div style="text-align:center;margin-bottom:12px;">
+        <div style="font-size:11px;color:var(--text3);">saldo do mês</div>
+        <div style="font-size:36px;font-weight:800;letter-spacing:-1px;color:${balance>=0?'var(--green)':'var(--red)'};">${formatCurrency(balance)}</div>
+      </div>
+      <div class="grid-2" style="grid-template-columns:1fr 1fr;gap:10px;">
+        <div style="background:rgba(48,209,88,0.1);border-radius:12px;padding:12px;text-align:center;">
+          <div style="font-size:11px;color:var(--green);">entradas</div>
+          <div style="font-size:18px;font-weight:700;color:var(--green);">${formatCurrency(income)}</div>
+        </div>
+        <div style="background:rgba(255,69,58,0.1);border-radius:12px;padding:12px;text-align:center;">
+          <div style="font-size:11px;color:var(--red);">saídas</div>
+          <div style="font-size:18px;font-weight:700;color:var(--red);">${formatCurrency(expense)}</div>
+        </div>
+      </div>
+      ${Object.keys(cats).length ? `
+        <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--separator);">
+          <div style="font-size:12px;color:var(--text3);margin-bottom:8px;">por categoria</div>
+          ${Object.entries(cats).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([cat,val])=>`
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+              <div style="flex:1;font-size:13px;">${escapeHTML(cat)}</div>
+              <div style="font-size:13px;font-weight:600;color:var(--red);">${formatCurrency(val)}</div>
+            </div>
+            <div class="progress-bar" style="margin-bottom:6px;">
+              <div class="progress-fill" style="width:${expense?Math.min(100,(val/expense)*100):0}%;background:var(--red);"></div>
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
+    </div>
+  `;
+}
+
+function setFinanceTab(tab) {
+  currentFinanceTab = tab;
+  document.getElementById('finance-entries').style.display = tab==='entries'?'block':'none';
+  document.getElementById('finance-salary').style.display = tab==='salary'?'block':'none';
+  document.getElementById('finance-transport').style.display = tab==='transport'?'block':'none';
+  document.querySelectorAll('#finance-seg .segment-btn').forEach(b=>b.classList.toggle('active',b.dataset.ftab===tab));
+  document.getElementById('finance-fab').style.display = tab==='entries'?'flex':'none';
+  switch(tab) {
+    case 'entries': renderEntries(); break;
+    case 'salary': renderSalaryCalc(); break;
+    case 'transport': renderTransportCalc(); break;
+  }
+}
+
+function renderEntries() {
+  const el = document.getElementById('finance-entries');
+  if (!el) return;
+  const entries = [...AppState.finance.entries].sort((a,b)=>b.date.localeCompare(a.date));
+  if (!entries.length) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">💸</div><h3>sem lançamentos</h3><p>registre entradas e saídas</p></div>`;
+    return;
+  }
+  el.innerHTML = entries.map(e => `
+    <div class="card-row" style="background:var(--card);border-radius:var(--radius-sm);padding:12px;margin-bottom:8px;border:1px solid var(--card-border);">
+      <div style="width:36px;height:36px;border-radius:10px;background:${e.type==='income'?'rgba(48,209,88,0.15)':'rgba(255,69,58,0.15)'};display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">
+        ${e.type==='income'?'↑':'↓'}
+      </div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:14px;font-weight:500;">${escapeHTML(e.description||e.category||'')}</div>
+        <div style="font-size:12px;color:var(--text3);">${formatDate(e.date)} · ${escapeHTML(e.category||'')}</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;">
+        <div style="font-size:15px;font-weight:700;color:${e.type==='income'?'var(--green)':'var(--red)'};">${e.type==='income'?'+':'-'}${formatCurrency(e.value)}</div>
+        <div style="display:flex;gap:4px;margin-top:4px;">
+          <button class="btn-icon" style="font-size:11px;width:24px;height:24px;" onclick="openEditEntry('${e.id}')">✏️</button>
+          <button class="btn-icon" style="font-size:11px;width:24px;height:24px;" onclick="deleteEntry('${e.id}')">🗑️</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openAddEntry(defaultType) {
+  const type = defaultType || 'expense';
+  openModal(`
+    <div class="modal-title">novo lançamento</div>
+    <div class="field"><label>tipo</label>
+      <select id="en-type">
+        <option value="expense" ${type==='expense'?'selected':''}>saída</option>
+        <option value="income" ${type==='income'?'selected':''}>entrada</option>
+      </select>
+    </div>
+    <div class="field"><label>valor (R$)</label><input type="number" id="en-val" min="0" step="0.01" placeholder="0,00"></div>
+    <div class="field"><label>descrição</label><input id="en-desc" placeholder="descrição..." maxlength="80"></div>
+    <div class="field"><label>categoria</label>
+      <select id="en-cat">
+        <option value="alimentação">alimentação</option>
+        <option value="transporte">transporte</option>
+        <option value="moradia">moradia</option>
+        <option value="saúde">saúde</option>
+        <option value="lazer">lazer</option>
+        <option value="estudo">estudo</option>
+        <option value="contas">contas</option>
+        <option value="salário">salário</option>
+        <option value="outros">outros</option>
+      </select>
+    </div>
+    <div class="field"><label>data</label><input type="date" id="en-date" value="${todayStr()}"></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">cancelar</button>
+      <button class="btn btn-primary" onclick="saveEntry()">salvar</button>
+    </div>
+  `);
+}
+
+function openEditEntry(id) {
+  const e = AppState.finance.entries.find(x=>x.id===id);
+  if (!e) return;
+  openModal(`
+    <div class="modal-title">editar lançamento</div>
+    <input type="hidden" id="en-id" value="${escapeHTML(e.id)}">
+    <div class="field"><label>tipo</label>
+      <select id="en-type">
+        <option value="expense" ${e.type==='expense'?'selected':''}>saída</option>
+        <option value="income" ${e.type==='income'?'selected':''}>entrada</option>
+      </select>
+    </div>
+    <div class="field"><label>valor (R$)</label><input type="number" id="en-val" value="${e.value}" min="0" step="0.01"></div>
+    <div class="field"><label>descrição</label><input id="en-desc" value="${escapeHTML(e.description||'')}" maxlength="80"></div>
+    <div class="field"><label>categoria</label>
+      <select id="en-cat">
+        ${['alimentação','transporte','moradia','saúde','lazer','estudo','contas','salário','outros'].map(c=>`<option value="${c}"${e.category===c?' selected':''}>${c}</option>`).join('')}
+      </select>
+    </div>
+    <div class="field"><label>data</label><input type="date" id="en-date" value="${escapeHTML(e.date)}"></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">cancelar</button>
+      <button class="btn btn-primary" onclick="saveEntry()">salvar</button>
+    </div>
+  `);
+}
+
+function saveEntry() {
+  const val = parseFloat(document.getElementById('en-val')?.value);
+  const date = document.getElementById('en-date')?.value;
+  if (!val || !date) { showToast('preencha os campos', 'warning'); return; }
+  const id = document.getElementById('en-id')?.value;
+  const entry = {
+    id: id || generateId(),
+    type: document.getElementById('en-type')?.value||'expense',
+    value: val,
+    description: document.getElementById('en-desc')?.value.trim()||'',
+    category: document.getElementById('en-cat')?.value||'outros',
+    date, createdAt: new Date().toISOString()
+  };
+  if (!AppState.finance.entries) AppState.finance.entries = [];
+  if (id) {
+    const idx = AppState.finance.entries.findIndex(e=>e.id===id);
+    if (idx>=0) Object.assign(AppState.finance.entries[idx], entry);
+  } else {
+    AppState.finance.entries.push(entry);
+  }
+  saveLocal(); syncToSupabase();
+  closeModal();
+  showToast('lançamento salvo', 'success');
+  renderFinance();
+}
+
+function deleteEntry(id) {
+  confirmAction('excluir lançamento?', '', 'excluir', () => {
+    AppState.finance.entries = AppState.finance.entries.filter(e=>e.id!==id);
+    saveLocal(); syncToSupabase();
+    showToast('lançamento excluído');
+    renderFinance();
+  });
+}
+
+function renderSalaryCalc() {
+  const el = document.getElementById('finance-salary');
+  if (!el) return;
+  const ss = AppState.finance.salarySettings || {};
+  el.innerHTML = `
+    <div class="tool-card">
+      <div class="tool-title">calculadora de salário</div>
+      <div class="field"><label>valor por hora (R$)</label><input type="number" id="sal-hr" value="${ss.hourly||''}" step="0.01" min="0" placeholder="0,00" oninput="calcSalary()"></div>
+      <div class="field"><label>horas por dia</label><input type="number" id="sal-hpd" value="${ss.hoursDay||8}" min="1" max="24" oninput="calcSalary()"></div>
+      <div class="field"><label>dias no mês</label><input type="number" id="sal-days" value="${ss.daysMonth||22}" min="1" max="31" oninput="calcSalary()"></div>
+      <div class="field"><label>desconto VT (%)</label><input type="number" id="sal-vt" value="${ss.vtPct||6}" min="0" max="100" step="0.1" oninput="calcSalary()"></div>
+      <div class="field"><label>desconto INSS (%)</label><input type="number" id="sal-inss" value="${ss.inssPct||7.5}" min="0" max="30" step="0.1" oninput="calcSalary()"></div>
+      <div class="field"><label>adiantamento (R$)</label><input type="number" id="sal-adv" value="${ss.advance||''}" min="0" step="0.01" placeholder="0,00" oninput="calcSalary()"></div>
+      <div id="sal-result" style="margin-top:8px;"></div>
+      <button class="btn btn-secondary btn-sm" onclick="saveSalarySettings()">salvar configurações</button>
+    </div>
+  `;
+  calcSalary();
+}
+
+function calcSalary() {
+  const hr = parseFloat(document.getElementById('sal-hr')?.value)||0;
+  const hpd = parseFloat(document.getElementById('sal-hpd')?.value)||8;
+  const days = parseFloat(document.getElementById('sal-days')?.value)||22;
+  const vtPct = parseFloat(document.getElementById('sal-vt')?.value)||0;
+  const inssPct = parseFloat(document.getElementById('sal-inss')?.value)||0;
+  const adv = parseFloat(document.getElementById('sal-adv')?.value)||0;
+  const gross = hr * hpd * days;
+  const vtDisc = gross * vtPct / 100;
+  const inssDisc = gross * inssPct / 100;
+  const net = gross - vtDisc - inssDisc;
+  const remaining = net - adv;
+  const el = document.getElementById('sal-result');
+  if (!el) return;
+  el.innerHTML = `
+    <div style="background:var(--bg3);border-radius:var(--radius-sm);padding:14px;margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--separator);"><span style="font-size:13px;color:var(--text3);">bruto</span><span style="font-weight:600;">${formatCurrency(gross)}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--separator);"><span style="font-size:13px;color:var(--text3);">- VT</span><span style="color:var(--red);">${formatCurrency(vtDisc)}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--separator);"><span style="font-size:13px;color:var(--text3);">- INSS</span><span style="color:var(--red);">${formatCurrency(inssDisc)}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--separator);"><span style="font-size:13px;color:var(--text3);">líquido</span><span style="font-weight:700;color:var(--green);">${formatCurrency(net)}</span></div>
+      ${adv?`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--separator);"><span style="font-size:13px;color:var(--text3);">- adiantamento</span><span style="color:var(--red);">${formatCurrency(adv)}</span></div>`:''}
+      <div style="display:flex;justify-content:space-between;padding:6px 0;"><span style="font-size:14px;font-weight:700;">a receber</span><span style="font-size:18px;font-weight:800;color:var(--green);">${formatCurrency(remaining)}</span></div>
+    </div>
+  `;
+}
+
+function saveSalarySettings() {
+  AppState.finance.salarySettings = {
+    hourly: parseFloat(document.getElementById('sal-hr')?.value)||0,
+    hoursDay: parseFloat(document.getElementById('sal-hpd')?.value)||8,
+    daysMonth: parseFloat(document.getElementById('sal-days')?.value)||22,
+    vtPct: parseFloat(document.getElementById('sal-vt')?.value)||0,
+    inssPct: parseFloat(document.getElementById('sal-inss')?.value)||0,
+    advance: parseFloat(document.getElementById('sal-adv')?.value)||0
+  };
+  saveLocal();
+  showToast('configurações salvas', 'success');
+}
+
+function renderTransportCalc() {
+  const el = document.getElementById('finance-transport');
+  if (!el) return;
+  const transports = AppState.finance.transports || [];
+  el.innerHTML = `
+    <div class="card" style="margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div class="card-title" style="margin-bottom:0;">meus transportes</div>
+        <button class="btn btn-secondary btn-sm" onclick="openAddTransport()">+ adicionar</button>
+      </div>
+      ${transports.length ? transports.map(t => `
+        <div style="background:var(--bg3);border-radius:var(--radius-sm);padding:12px;margin-bottom:8px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <div style="font-weight:600;font-size:15px;">${escapeHTML(t.name)}</div>
+            <button class="btn-icon" style="font-size:12px;" onclick="deleteTransport('${t.id}')">🗑️</button>
+          </div>
+          <div style="display:flex;gap:16px;flex-wrap:wrap;">
+            <div><div style="font-size:11px;color:var(--text3);">inteiro</div><div style="font-weight:600;">${formatCurrency(t.full)}</div></div>
+            <div><div style="font-size:11px;color:var(--text3);">meia</div><div style="font-weight:600;">${formatCurrency(t.half)}</div></div>
+            <div><div style="font-size:11px;color:var(--text3);">dias/mês</div><div style="font-weight:600;">${t.days||22}</div></div>
+            <div><div style="font-size:11px;color:var(--text3);">modo</div><div style="font-weight:600;">${t.roundtrip?'ida e volta':'só ida'}</div></div>
+          </div>
+          <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--separator);">
+            <div style="display:flex;justify-content:space-between;">
+              <span style="font-size:13px;color:var(--text3);">total/mês estimado</span>
+              <span style="font-weight:700;color:var(--red);">${formatCurrency(calcTransportTotal(t))}</span>
+            </div>
+          </div>
+        </div>
+      `).join('') : '<div style="text-align:center;color:var(--text3);font-size:14px;padding:12px;">nenhum transporte cadastrado</div>'}
+      ${transports.length ? `
+        <div style="padding-top:10px;border-top:2px solid var(--separator);display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-weight:700;font-size:15px;">total geral</span>
+          <span style="font-weight:800;font-size:18px;color:var(--red);">${formatCurrency(transports.reduce((s,t)=>s+calcTransportTotal(t),0))}</span>
+        </div>
+      ` : ''}
+    </div>
+  `;
+}
+
+function calcTransportTotal(t) {
+  const price = t.useHalf ? Number(t.half||0) : Number(t.full||0);
+  const trips = t.roundtrip ? 2 : 1;
+  return price * trips * Number(t.days||22);
+}
+
+function openAddTransport() {
+  openModal(`
+    <div class="modal-title">novo transporte</div>
+    <div class="field"><label>nome</label><input id="tr-name" placeholder="ex: ônibus linha 123" maxlength="60"></div>
+    <div class="field"><label>valor inteiro (R$)</label><input type="number" id="tr-full" min="0" step="0.01" placeholder="0,00"></div>
+    <div class="field"><label>valor meia (R$)</label><input type="number" id="tr-half" min="0" step="0.01" placeholder="0,00"></div>
+    <div class="field"><label>dias por mês</label><input type="number" id="tr-days" min="1" max="31" value="22"></div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+      <div class="switch on" id="tr-rt-sw" onclick="toggleSwitch('tr-rt-sw')"></div>
+      <span style="font-size:14px;">ida e volta</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+      <div class="switch" id="tr-half-sw" onclick="toggleSwitch('tr-half-sw')"></div>
+      <span style="font-size:14px;">usar meia passagem</span>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">cancelar</button>
+      <button class="btn btn-primary" onclick="saveTransport()">salvar</button>
+    </div>
+  `);
+}
+
+function saveTransport() {
+  const name = document.getElementById('tr-name')?.value.trim();
+  if (!name) { showToast('nome obrigatório', 'warning'); return; }
+  if (!AppState.finance.transports) AppState.finance.transports = [];
+  AppState.finance.transports.push({
+    id: generateId(), name,
+    full: parseFloat(document.getElementById('tr-full')?.value)||0,
+    half: parseFloat(document.getElementById('tr-half')?.value)||0,
+    days: parseInt(document.getElementById('tr-days')?.value)||22,
+    roundtrip: document.getElementById('tr-rt-sw')?.classList.contains('on'),
+    useHalf: document.getElementById('tr-half-sw')?.classList.contains('on')
+  });
+  saveLocal(); syncToSupabase();
+  closeModal();
+  showToast('transporte salvo', 'success');
+  renderTransportCalc();
+}
+
+function deleteTransport(id) {
+  confirmAction('excluir transporte?', '', 'excluir', () => {
+    AppState.finance.transports = AppState.finance.transports.filter(t=>t.id!==id);
+    saveLocal(); syncToSupabase();
+    showToast('transporte excluído');
+    renderTransportCalc();
+  });
+}
+
+// ============================================================
+//   VAULT / COFRE
+// ============================================================
+function renderVault() {
+  const el = document.getElementById('vault-panel');
+  if (!el) return;
+  if (!AppState.vault.unlocked) {
+    renderVaultLock(el);
+  } else {
+    renderVaultOpen(el);
+    resetVaultTimer();
+  }
+}
+
+function renderVaultLock(el) {
+  const hasData = !!AppState.vault.encrypted;
+  el.innerHTML = `
+    <div class="vault-lock">
+      <div class="vault-lock-icon">🔒</div>
+      <h2 style="font-size:22px;font-weight:700;margin-bottom:8px;">${hasData?'desbloquear cofre':'criar cofre'}</h2>
+      <p style="color:var(--text3);font-size:14px;margin-bottom:24px;">${hasData?'insira sua senha mestra':'crie uma senha mestra para proteger seus dados'}</p>
+      <div class="field" style="text-align:left;max-width:300px;margin:0 auto 12px;">
+        <label>${hasData?'senha mestra':'nova senha mestra'}</label>
+        <input type="password" id="vault-pw" placeholder="senha mestra..." style="width:100%;padding:12px 14px;background:var(--bg3);border-radius:var(--radius-sm);border:1px solid var(--separator);color:var(--text);font-size:15px;">
+      </div>
+      ${!hasData?`
+        <div class="field" style="text-align:left;max-width:300px;margin:0 auto 12px;">
+          <label>confirmar senha</label>
+          <input type="password" id="vault-pw2" placeholder="confirmar senha..." style="width:100%;padding:12px 14px;background:var(--bg3);border-radius:var(--radius-sm);border:1px solid var(--separator);color:var(--text);font-size:15px;">
+        </div>
+      `:''}
+      <button class="btn btn-primary" style="max-width:300px;width:100%;margin-top:8px;" onclick="${hasData?'unlockVault()':'createVault()'}">
+        ${hasData?'desbloquear':'criar cofre'}
+      </button>
+      <p style="font-size:11px;color:var(--text4);margin-top:20px;max-width:260px;margin-left:auto;margin-right:auto;line-height:1.5;">
+        o cofre usa criptografia local (AES-GCM). se você esquecer a senha mestra, não será possível recuperar os dados.
+      </p>
+    </div>
+  `;
+  document.getElementById('vault-pw')?.addEventListener('keydown', e => { if(e.key==='Enter') hasData?unlockVault():createVault(); });
+}
+
+function renderVaultOpen(el) {
+  const items = AppState.vault.items || [];
+  el.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <div class="card-title" style="margin-bottom:0;">senhas (${items.length})</div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-secondary btn-sm" onclick="lockVault()">🔒 bloquear</button>
+        <button class="btn btn-primary btn-sm" onclick="openAddVaultItem()">+ nova</button>
+      </div>
+    </div>
+    <div class="search-bar" style="margin-bottom:12px;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" placeholder="buscar senhas..." id="vault-search" oninput="filterVaultItems()">
+    </div>
+    <div id="vault-items-list">
+      ${renderVaultItems(items)}
+    </div>
+  `;
+}
+
+function filterVaultItems() {
+  const q = document.getElementById('vault-search')?.value.toLowerCase() || '';
+  const items = (AppState.vault.items||[]).filter(i => !q || i.name?.toLowerCase().includes(q) || i.login?.toLowerCase().includes(q));
+  const el = document.getElementById('vault-items-list');
+  if (el) el.innerHTML = renderVaultItems(items);
+}
+
+function renderVaultItems(items) {
+  if (!items.length) return `<div class="empty"><div class="empty-icon">🔐</div><h3>cofre vazio</h3><p>adicione sua primeira senha</p></div>`;
+  return items.map(item => {
+    const colors = ['#0A84FF','#30D158','#FF9F0A','#BF5AF2','#FF375F'];
+    const color = colors[item.name?.charCodeAt(0)%colors.length] || '#0A84FF';
+    return `
+      <div class="vault-item">
+        <div class="vault-avatar" style="background:${color};">${escapeHTML((item.name||'?').charAt(0).toUpperCase())}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:15px;font-weight:600;">${escapeHTML(item.name||'')}</div>
+          <div style="font-size:13px;color:var(--text3);">${escapeHTML(item.login||'')}</div>
+        </div>
+        <div style="display:flex;gap:4px;flex-shrink:0;">
+          <button class="btn-icon" style="font-size:12px;" onclick="copyVaultField('${escapeHTML(item.id)}','login')" title="copiar login">👤</button>
+          <button class="btn-icon" style="font-size:12px;" onclick="copyVaultField('${escapeHTML(item.id)}','password')" title="copiar senha">🔑</button>
+          <button class="btn-icon" style="font-size:12px;" onclick="openViewVaultItem('${escapeHTML(item.id)}')">👁️</button>
+          <button class="btn-icon" style="font-size:12px;" onclick="deleteVaultItem('${escapeHTML(item.id)}')">🗑️</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function createVault() {
+  const pw = document.getElementById('vault-pw')?.value;
+  const pw2 = document.getElementById('vault-pw2')?.value;
+  if (!pw || pw.length < 4) { showToast('senha muito curta', 'warning'); return; }
+  if (pw !== pw2) { showToast('senhas não conferem', 'warning'); return; }
+  try {
+    vaultKey = await deriveKey(pw, await getSalt(true));
+    AppState.vault.items = [];
+    AppState.vault.unlocked = true;
+    await saveVaultData();
+    showToast('cofre criado', 'success');
+    renderVault();
+  } catch(e) {
+    showToast('erro ao criar cofre', 'error');
+  }
+}
+
+async function unlockVault() {
+  const pw = document.getElementById('vault-pw')?.value;
+  if (!pw) { showToast('insira a senha', 'warning'); return; }
+  try {
+    const key = await deriveKey(pw, await getSalt(false));
+    const decrypted = await decryptData(AppState.vault.encrypted, key);
+    AppState.vault.items = JSON.parse(decrypted);
+    AppState.vault.unlocked = true;
+    vaultKey = key;
+    showToast('cofre desbloqueado', 'success');
+    renderVault();
+  } catch(e) {
+    showToast('senha incorreta', 'error');
+  }
+}
+
+function lockVault() {
+  AppState.vault.unlocked = false;
+  AppState.vault.items = [];
+  vaultKey = null;
+  if (vaultLockTimer) clearTimeout(vaultLockTimer);
+  renderVault();
+}
+
+function resetVaultTimer() {
+  if (vaultLockTimer) clearTimeout(vaultLockTimer);
+  vaultLockTimer = setTimeout(lockVault, 5 * 60 * 1000); // 5 min inactivity
+}
+
+async function saveVaultData() {
+  if (!vaultKey || !AppState.vault.unlocked) return;
+  const data = JSON.stringify(AppState.vault.items);
+  AppState.vault.encrypted = await encryptData(data, vaultKey);
+  saveLocal();
+  syncToSupabase();
+}
+
+function openAddVaultItem() {
+  resetVaultTimer();
+  openModal(`
+    <div class="modal-title">nova senha</div>
+    <div class="field"><label>serviço / nome</label><input id="vi-name" placeholder="ex: Gmail" maxlength="60"></div>
+    <div class="field"><label>login / email</label><input id="vi-login" type="email" placeholder="seu@email.com" maxlength="120"></div>
+    <div class="field"><label>senha</label>
+      <div style="display:flex;gap:8px;">
+        <input type="password" id="vi-password" placeholder="senha..." maxlength="200" style="flex:1;padding:12px 14px;background:var(--bg3);border-radius:var(--radius-sm);border:1px solid var(--separator);color:var(--text);font-size:15px;">
+        <button class="btn-icon" onclick="togglePassVis('vi-password')" style="flex-shrink:0;">👁️</button>
+        <button class="btn btn-secondary btn-sm" onclick="genPasswordIntoField('vi-password')" style="flex-shrink:0;">gerar</button>
+      </div>
+    </div>
+    <div class="field"><label>URL</label><input id="vi-url" type="url" placeholder="https://..." maxlength="200"></div>
+    <div class="field"><label>categoria</label>
+      <select id="vi-cat">
+        <option value="pessoal">pessoal</option>
+        <option value="trabalho">trabalho</option>
+        <option value="financeiro">financeiro</option>
+        <option value="estudo">estudo</option>
+        <option value="outros">outros</option>
+      </select>
+    </div>
+    <div class="field"><label>observações</label><textarea id="vi-obs" rows="2" placeholder="notas..."></textarea></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">cancelar</button>
+      <button class="btn btn-primary" onclick="saveVaultItem()">salvar</button>
+    </div>
+  `);
+}
+
+function openViewVaultItem(id) {
+  resetVaultTimer();
+  const item = (AppState.vault.items||[]).find(i=>i.id===id);
+  if (!item) return;
+  openModal(`
+    <div class="modal-title">${escapeHTML(item.name||'')}</div>
+    <div class="card-row">
+      <div style="flex:1;"><div style="font-size:12px;color:var(--text3);">login</div><div style="font-size:15px;font-weight:500;">${escapeHTML(item.login||'')}</div></div>
+      <button class="btn-icon" onclick="copyText('${escapeHTML(item.login||'')}','login copiado')">📋</button>
+    </div>
+    <div class="card-row">
+      <div style="flex:1;"><div style="font-size:12px;color:var(--text3);">senha</div><div id="vi-view-pw" style="font-size:15px;font-weight:500;letter-spacing:0.1em;">••••••••</div></div>
+      <button class="btn-icon" onclick="toggleViewVaultPw('${escapeHTML(item.id)}')">👁️</button>
+      <button class="btn-icon" onclick="copyText('${escapeHTML(item.password||'')}','senha copiada')">📋</button>
+    </div>
+    ${item.url?`<div class="card-row"><div style="flex:1;"><div style="font-size:12px;color:var(--text3);">url</div><a href="${escapeHTML(item.url)}" target="_blank" style="font-size:14px;color:var(--accent);">${escapeHTML(item.url)}</a></div></div>`:''}
+    ${item.observations?`<div class="card-row"><div><div style="font-size:12px;color:var(--text3);">observações</div><div style="font-size:14px;margin-top:2px;">${escapeHTML(item.observations)}</div></div></div>`:''}
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">fechar</button>
+      <button class="btn btn-danger" onclick="deleteVaultItemInModal('${escapeHTML(item.id)}')">excluir</button>
+    </div>
+  `);
+  window._vaultViewPwVisible = false;
+  window._vaultViewItemId = id;
+}
+
+function toggleViewVaultPw(id) {
+  const item = (AppState.vault.items||[]).find(i=>i.id===id);
+  if (!item) return;
+  window._vaultViewPwVisible = !window._vaultViewPwVisible;
+  const el = document.getElementById('vi-view-pw');
+  if (el) el.textContent = window._vaultViewPwVisible ? (item.password||'') : '••••••••';
+}
+
+function deleteVaultItemInModal(id) {
+  closeModal();
+  deleteVaultItem(id);
+}
+
+function deleteVaultItem(id) {
+  confirmAction('excluir senha?', 'esta ação não pode ser desfeita.', 'excluir', async () => {
+    AppState.vault.items = AppState.vault.items.filter(i=>i.id!==id);
+    await saveVaultData();
+    showToast('senha excluída');
+    renderVault();
+  });
+}
+
+async function saveVaultItem() {
+  const name = document.getElementById('vi-name')?.value.trim();
+  if (!name) { showToast('nome obrigatório', 'warning'); return; }
+  const item = {
+    id: generateId(),
+    name, login: document.getElementById('vi-login')?.value.trim()||'',
+    password: document.getElementById('vi-password')?.value||'',
+    url: document.getElementById('vi-url')?.value.trim()||'',
+    category: document.getElementById('vi-cat')?.value||'pessoal',
+    observations: document.getElementById('vi-obs')?.value.trim()||'',
+    createdAt: new Date().toISOString()
+  };
+  if (!AppState.vault.items) AppState.vault.items = [];
+  AppState.vault.items.push(item);
+  await saveVaultData();
+  closeModal();
+  showToast('senha salva', 'success');
+  renderVault();
+}
+
+function copyVaultField(id, field) {
+  resetVaultTimer();
+  const item = (AppState.vault.items||[]).find(i=>i.id===id);
+  if (!item) return;
+  const val = field==='login' ? item.login : item.password;
+  copyText(val, field==='login'?'login copiado':'senha copiada');
+}
+
+function copyText(text, msg) {
+  if (!text) return;
+  navigator.clipboard.writeText(text).then(()=>showToast(msg||'copiado','success')).catch(()=>{
+    const t = document.createElement('textarea');
+    t.value = text; document.body.appendChild(t); t.select();
+    document.execCommand('copy'); document.body.removeChild(t);
+    showToast(msg||'copiado','success');
+  });
+}
+
+function togglePassVis(fieldId) {
+  const el = document.getElementById(fieldId);
+  if (el) el.type = el.type==='password'?'text':'password';
+}
+
+function genPasswordIntoField(fieldId) {
+  const el = document.getElementById(fieldId);
+  if (el) { el.value = generatePassword(16, true, true, true, true); el.type = 'text'; }
+}
+
+function generatePassword(len=16, upper=true, lower=true, nums=true, syms=false) {
+  let chars = '';
+  if (upper) chars += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  if (lower) chars += 'abcdefghijklmnopqrstuvwxyz';
+  if (nums) chars += '0123456789';
+  if (syms) chars += '!@#$%^&*()_+-=[]{}|;:,.<>?';
+  if (!chars) chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  const arr = new Uint8Array(len);
+  crypto.getRandomValues(arr);
+  return Array.from(arr, b => chars[b % chars.length]).join('');
+}
+
+// WEB CRYPTO
+function getSalt(create = false) {
+  const key = 'vida_vault_salt';
+  if (create) {
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    localStorage.setItem(key, Array.from(salt).join(','));
+    return Promise.resolve(salt);
+  } else {
+    const raw = localStorage.getItem(key);
+    if (!raw) throw new Error('salt not found');
+    return Promise.resolve(new Uint8Array(raw.split(',').map(Number)));
+  }
+}
+
+async function deriveKey(password, salt) {
+  const enc = new TextEncoder();
+  const keyMaterial = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt, iterations: 200000, hash: 'SHA-256' },
+    keyMaterial,
+    { name: 'AES-GCM', length: 256 },
+    false, ['encrypt', 'decrypt']
+  );
+}
+
+async function encryptData(data, key) {
+  const enc = new TextEncoder();
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const encrypted = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, enc.encode(data));
+  const buf = new Uint8Array(iv.length + encrypted.byteLength);
+  buf.set(iv, 0);
+  buf.set(new Uint8Array(encrypted), iv.length);
+  return btoa(String.fromCharCode(...buf));
+}
+
+async function decryptData(b64, key) {
+  const buf = new Uint8Array(atob(b64).split('').map(c => c.charCodeAt(0)));
+  const iv = buf.slice(0, 12);
+  const data = buf.slice(12);
+  const dec = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, data);
+  return new TextDecoder().decode(dec);
+}
+
+// ============================================================
+//   TOOLS
+// ============================================================
+function renderTools() {
+  const el = document.getElementById('tab-tools');
+  if (!el) return;
+  el.innerHTML = `
+    <div id="tools-panel">
+      <!-- CALCULATOR -->
+      <div class="tool-card">
+        <div class="tool-title">calculadora</div>
+        <div class="calc-display" id="calc-disp">0</div>
+        <div class="calc-grid">
+          <button class="calc-btn clr" onclick="calcInput('AC')">AC</button>
+          <button class="calc-btn op" onclick="calcInput('+/-')">±</button>
+          <button class="calc-btn op" onclick="calcInput('%')">%</button>
+          <button class="calc-btn op" onclick="calcInput('÷')">÷</button>
+          <button class="calc-btn" onclick="calcInput('7')">7</button>
+          <button class="calc-btn" onclick="calcInput('8')">8</button>
+          <button class="calc-btn" onclick="calcInput('9')">9</button>
+          <button class="calc-btn op" onclick="calcInput('×')">×</button>
+          <button class="calc-btn" onclick="calcInput('4')">4</button>
+          <button class="calc-btn" onclick="calcInput('5')">5</button>
+          <button class="calc-btn" onclick="calcInput('6')">6</button>
+          <button class="calc-btn op" onclick="calcInput('−')">−</button>
+          <button class="calc-btn" onclick="calcInput('1')">1</button>
+          <button class="calc-btn" onclick="calcInput('2')">2</button>
+          <button class="calc-btn" onclick="calcInput('3')">3</button>
+          <button class="calc-btn op" onclick="calcInput('+')">+</button>
+          <button class="calc-btn" style="grid-column:span 2;" onclick="calcInput('0')">0</button>
+          <button class="calc-btn" onclick="calcInput('.')">.</button>
+          <button class="calc-btn eq" onclick="calcInput('=')">=</button>
+        </div>
+      </div>
+
+      <!-- DATE COUNTER -->
+      <div class="tool-card">
+        <div class="tool-title">contador de dias</div>
+        <div class="grid-2" style="grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+          <div class="field" style="margin:0;"><label>data inicial</label><input type="date" id="dt-from" style="padding:10px;background:var(--bg3);border-radius:8px;border:1px solid var(--separator);color:var(--text);width:100%;" onchange="calcDays()"></div>
+          <div class="field" style="margin:0;"><label>data final</label><input type="date" id="dt-to" style="padding:10px;background:var(--bg3);border-radius:8px;border:1px solid var(--separator);color:var(--text);width:100%;" onchange="calcDays()"></div>
+        </div>
+        <div id="dt-result" style="text-align:center;font-size:28px;font-weight:800;color:var(--accent);"></div>
+      </div>
+
+      <!-- PASSWORD GENERATOR -->
+      <div class="tool-card">
+        <div class="tool-title">gerador de senha</div>
+        <div class="field"><label>tamanho: <span id="pg-len-label">16</span></label>
+          <input type="range" id="pg-len" min="8" max="64" value="16" oninput="document.getElementById('pg-len-label').textContent=this.value;genPw();" style="width:100%;accent-color:var(--accent);">
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;"><input type="checkbox" id="pg-upper" checked onchange="genPw()"> maiúsculas</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;"><input type="checkbox" id="pg-lower" checked onchange="genPw()"> minúsculas</label>
+          <label style="display:flex;align-items:center;gap=6px;font-size:13px;"><input type="checkbox" id="pg-nums" checked onchange="genPw()"> números</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;"><input type="checkbox" id="pg-syms" onchange="genPw()"> símbolos</label>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <div style="flex:1;background:var(--bg3);border-radius:var(--radius-sm);padding:12px;font-size:14px;font-family:monospace;word-break:break-all;border:1px solid var(--separator);" id="pg-result"></div>
+          <button class="btn-icon" onclick="copyPw()" style="flex-shrink:0;">📋</button>
+          <button class="btn-icon" onclick="genPw()" style="flex-shrink:0;">↺</button>
+        </div>
+      </div>
+
+      <!-- QUICK NOTE -->
+      <div class="tool-card">
+        <div class="tool-title">bloco rápido</div>
+        <textarea id="quick-note" rows="5" placeholder="notas rápidas... (salvo automaticamente)" style="width:100%;padding:12px;background:var(--bg3);border-radius:var(--radius-sm);border:1px solid var(--separator);color:var(--text);font-size:14px;resize:vertical;" oninput="saveQuickNote()">${escapeHTML(localStorage.getItem('vida_quick_note')||'')}</textarea>
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          <button class="btn btn-secondary btn-sm" onclick="clearQuickNote()">limpar</button>
+          <button class="btn btn-primary btn-sm" onclick="saveQuickNoteAsNote()">salvar como nota</button>
+        </div>
+      </div>
+    </div>
+  `;
+  genPw();
+  const today = todayStr();
+  document.getElementById('dt-from').value = today;
+  document.getElementById('dt-to').value = today;
+}
+
+// Calculator
+function calcInput(val) {
+  const disp = document.getElementById('calc-disp');
+  if (val === 'AC') { calcDisplay = '0'; calcOp = null; calcPrev = null; calcNewNum = false; }
+  else if (val === '+/-') { calcDisplay = String(-parseFloat(calcDisplay)||0); }
+  else if (val === '%') { calcDisplay = String(parseFloat(calcDisplay)/100); }
+  else if (['÷','×','−','+'].includes(val)) {
+    if (calcOp && !calcNewNum) {
+      calcDisplay = String(applyOp(calcPrev, parseFloat(calcDisplay), calcOp));
+    }
+    calcPrev = parseFloat(calcDisplay); calcOp = val; calcNewNum = true;
+  } else if (val === '=') {
+    if (calcOp && calcPrev !== null) {
+      calcDisplay = String(applyOp(calcPrev, parseFloat(calcDisplay), calcOp));
+      calcOp = null; calcPrev = null; calcNewNum = true;
+    }
+  } else if (val === '.') {
+    if (calcNewNum) { calcDisplay = '0.'; calcNewNum = false; }
+    else if (!calcDisplay.includes('.')) calcDisplay += '.';
+  } else {
+    if (calcNewNum || calcDisplay === '0') { calcDisplay = val; calcNewNum = false; }
+    else calcDisplay += val;
+    if (calcDisplay.length > 12) calcDisplay = calcDisplay.slice(0, 12);
+  }
+  // Format display
+  const num = parseFloat(calcDisplay);
+  if (disp) disp.textContent = isNaN(num) ? calcDisplay : calcDisplay;
+}
+
+function applyOp(a, b, op) {
+  if (op === '+') return a + b;
+  if (op === '−') return a - b;
+  if (op === '×') return a * b;
+  if (op === '÷') return b !== 0 ? a / b : 0;
+  return b;
+}
+
+function calcDays() {
+  const from = document.getElementById('dt-from')?.value;
+  const to = document.getElementById('dt-to')?.value;
+  const el = document.getElementById('dt-result');
+  if (!el) return;
+  if (!from || !to) { el.textContent = ''; return; }
+  const diff = Math.round((new Date(to) - new Date(from)) / 86400000);
+  el.textContent = Math.abs(diff) + ' dias';
+  el.style.color = diff < 0 ? 'var(--red)' : 'var(--accent)';
+}
+
+function genPw() {
+  const len = parseInt(document.getElementById('pg-len')?.value)||16;
+  const upper = document.getElementById('pg-upper')?.checked;
+  const lower = document.getElementById('pg-lower')?.checked;
+  const nums = document.getElementById('pg-nums')?.checked;
+  const syms = document.getElementById('pg-syms')?.checked;
+  const pw = generatePassword(len, upper, lower, nums, syms);
+  const el = document.getElementById('pg-result');
+  if (el) { el.textContent = pw; el._pw = pw; }
+}
+
+function copyPw() {
+  const el = document.getElementById('pg-result');
+  copyText(el?._pw || el?.textContent, 'senha copiada');
+}
+
+function saveQuickNote() {
+  localStorage.setItem('vida_quick_note', document.getElementById('quick-note')?.value||'');
+}
+
+function clearQuickNote() {
+  const el = document.getElementById('quick-note');
+  if (el) el.value = '';
+  localStorage.removeItem('vida_quick_note');
+}
+
+function saveQuickNoteAsNote() {
+  const content = document.getElementById('quick-note')?.value.trim();
+  if (!content) { showToast('bloco vazio', 'warning'); return; }
+  AppState.notes.push({
+    id: generateId(),
+    title: 'nota rápida ' + new Date().toLocaleDateString('pt-BR'),
+    content, tags: ['rápida'],
+    pinned: false,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  });
+  saveLocal(); syncToSupabase();
+  showToast('salvo como nota', 'success');
+}
+
+// ============================================================
+//   SETTINGS / PROFILE
+// ============================================================
+function renderSettings() {
+  const el = document.getElementById('profile-content');
+  if (!el) return;
+  const p = AppState.profile;
+  const s = AppState.settings;
+  const accentColors = [
+    {cls:'ac-0',c:'#0A84FF',name:'azul'},
+    {cls:'ac-1',c:'#30D158',name:'verde'},
+    {cls:'ac-2',c:'#FF9F0A',name:'laranja'},
+    {cls:'ac-3',c:'#FF375F',name:'rosa'},
+    {cls:'ac-4',c:'#BF5AF2',name:'roxo'},
+    {cls:'ac-5',c:'#5E5CE6',name:'índigo'},
+    {cls:'ac-6',c:'#5AC8FA',name:'ciano'},
+    {cls:'ac-7',c:'#FF6B35',name:'coral'}
+  ];
+  el.innerHTML = `
+    <!-- PROFILE -->
+    <div class="card">
+      <div class="card-title">perfil</div>
+      <div class="settings-row">
+        <div class="settings-row-info"><div class="settings-row-label">nome</div></div>
+        <input id="pf-name" value="${escapeHTML(p.name||'')}" placeholder="seu nome..."
+          style="text-align:right;font-size:15px;color:var(--text);background:none;border:none;outline:none;max-width:160px;"
+          onblur="saveProfileName()">
+      </div>
+    </div>
+
+    <!-- APPEARANCE -->
+    <div class="card">
+      <div class="card-title">aparência</div>
+      <div class="settings-row">
+        <div class="settings-row-info"><div class="settings-row-label">tema</div></div>
+        <select id="pf-theme" style="background:var(--bg3);border:1px solid var(--separator);border-radius:8px;padding:6px 10px;font-size:14px;color:var(--text);" onchange="saveTheme()">
+          <option value="auto" ${p.theme==='auto'?'selected':''}>automático</option>
+          <option value="light" ${p.theme==='light'?'selected':''}>claro</option>
+          <option value="dark" ${p.theme==='dark'?'selected':''}>escuro</option>
+        </select>
+      </div>
+      <div class="settings-row">
+        <div class="settings-row-info"><div class="settings-row-label">cor de destaque</div></div>
+        <div class="color-row">
+          ${accentColors.map(ac=>`
+            <div class="color-swatch${(p.accentClass||'ac-0')===ac.cls?' selected':''}"
+              style="background:${ac.c};" title="${ac.name}"
+              onclick="setAccentColor('${ac.cls}','${ac.c}')"></div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTIFICATIONS -->
+    <div class="card">
+      <div class="card-title">notificações</div>
+      <div class="settings-row">
+        <div class="settings-row-info">
+          <div class="settings-row-label">ativar notificações</div>
+          <div class="settings-row-sub">requer permissão do navegador</div>
+        </div>
+        <div class="switch ${s.notifications?'on':''}" id="notif-sw" onclick="toggleNotifications()"></div>
+      </div>
+    </div>
+
+    <!-- SUPABASE -->
+    <div class="card">
+      <div class="card-title">supabase (opcional)</div>
+      <div class="settings-row">
+        <div class="settings-row-info"><div class="settings-row-label">user ID</div><div class="settings-row-sub">${escapeHTML(s.localUserId||'não definido')}</div></div>
+        <button class="btn btn-secondary btn-sm" onclick="genUserId()">gerar</button>
+      </div>
+      <div class="field"><label>URL do projeto</label><input id="sb-url" value="${escapeHTML(s.supabaseUrl||'')}" placeholder="https://xxx.supabase.co"></div>
+      <div class="field"><label>anon public key</label><input id="sb-key" type="password" value="${escapeHTML(s.supabaseAnonKey||'')}" placeholder="eyJ..."></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">
+        <button class="btn btn-secondary btn-sm" onclick="saveSupabaseConfig()">salvar config</button>
+        <button class="btn btn-secondary btn-sm" onclick="testSupabase()">testar conexão</button>
+        <button class="btn btn-primary btn-sm" onclick="syncFromSupabase()">sincronizar agora</button>
+      </div>
+    </div>
+
+    <!-- DATA -->
+    <div class="card">
+      <div class="card-title">dados</div>
+      <div class="settings-row" onclick="exportData()">
+        <div class="settings-row-info"><div class="settings-row-label">exportar backup JSON</div></div>
+        <span style="color:var(--accent);font-size:18px;">↓</span>
+      </div>
+      <div class="settings-row" onclick="importData()">
+        <div class="settings-row-info"><div class="settings-row-label">importar backup JSON</div></div>
+        <span style="color:var(--accent);font-size:18px;">↑</span>
+      </div>
+      <div class="settings-row" onclick="clearAllData()">
+        <div class="settings-row-info"><div class="settings-row-label" style="color:var(--red);">apagar todos os dados</div></div>
+        <span style="color:var(--red);font-size:18px;">⚠️</span>
+      </div>
+    </div>
+
+    <!-- VAULT -->
+    <div class="card">
+      <div class="card-title">cofre</div>
+      <div class="settings-row" onclick="navigate('more');setTimeout(()=>{setMoreTab('vault');},100);">
+        <div class="settings-row-info"><div class="settings-row-label">gerenciar cofre</div></div>
+        <span style="color:var(--text3);">›</span>
+      </div>
+      <div class="settings-row" onclick="resetVaultData()">
+        <div class="settings-row-info"><div class="settings-row-label" style="color:var(--red);">resetar cofre</div><div class="settings-row-sub">apaga todos os dados criptografados</div></div>
+        <span style="color:var(--red);">⚠️</span>
+      </div>
+    </div>
+
+    <!-- ABOUT -->
+    <div class="card">
+      <div class="card-title">sobre</div>
+      <div class="settings-row">
+        <div class="settings-row-label">vida app</div>
+        <span style="color:var(--text4);">v1.0.0</span>
+      </div>
+      <div class="settings-row">
+        <div class="settings-row-label">armazenamento</div>
+        <span style="color:var(--text4);">localStorage</span>
+      </div>
+    </div>
+
+    <input type="file" id="import-file" accept=".json" style="display:none;" onchange="handleImport(event)">
+  `;
+}
+
+function saveProfileName() {
+  AppState.profile.name = document.getElementById('pf-name')?.value.trim()||'';
+  saveLocal();
+  showToast('nome salvo', 'success');
+  updateClock();
+}
+
+function saveTheme() {
+  AppState.profile.theme = document.getElementById('pf-theme')?.value||'auto';
+  applyTheme();
+  saveLocal();
+}
+
+function setAccentColor(cls, hex) {
+  AppState.profile.accentClass = cls;
+  AppState.profile.accentColor = hex;
+  applyTheme();
+  saveLocal();
+  renderSettings();
+}
+
+function toggleNotifications() {
+  const sw = document.getElementById('notif-sw');
+  if (!AppState.settings.notifications) {
+    Notification.requestPermission().then(p => {
+      AppState.settings.notifications = p === 'granted';
+      if (sw) sw.classList.toggle('on', AppState.settings.notifications);
+      saveLocal();
+      showToast(AppState.settings.notifications ? 'notificações ativas' : 'permissão negada', AppState.settings.notifications ? 'success' : 'warning');
+    });
+  } else {
+    AppState.settings.notifications = false;
+    if (sw) sw.classList.remove('on');
+    saveLocal();
+  }
+}
+
+function genUserId() {
+  AppState.settings.localUserId = generateId() + generateId();
+  saveLocal();
+  renderSettings();
+  showToast('ID gerado', 'success');
+}
+
+function saveSupabaseConfig() {
+  AppState.settings.supabaseUrl = document.getElementById('sb-url')?.value.trim()||'';
+  AppState.settings.supabaseAnonKey = document.getElementById('sb-key')?.value.trim()||'';
+  saveLocal();
+  initSupabase();
+  showToast('configuração salva', 'success');
+}
+
+async function testSupabase() {
+  if (!supabase) { showToast('supabase não configurado', 'warning'); return; }
+  try {
+    await supabase.from('app_data').select('id').limit(1);
+    showToast('conexão ok ✓', 'success');
+    updateSyncStatus('ok');
+  } catch(e) {
+    showToast('falha na conexão', 'error');
+    updateSyncStatus('err');
+  }
+}
+
+function exportData() {
+  const data = {
+    _version: '1.0.0',
+    _exported: new Date().toISOString(),
+    profile: AppState.profile,
+    shortcuts: AppState.shortcuts,
+    events: AppState.events,
+    tasks: AppState.tasks,
+    notes: AppState.notes,
+    studies: AppState.studies,
+    finance: AppState.finance,
+    vault: { encrypted: AppState.vault.encrypted }
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `vida-backup-${todayStr()}.json`;
+  a.click();
+  showToast('backup exportado', 'success');
+}
+
+function importData() {
+  document.getElementById('import-file')?.click();
+}
+
+function handleImport(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      confirmAction('importar dados?', 'os dados atuais serão substituídos.', 'importar', () => {
+        if (data.profile) Object.assign(AppState.profile, data.profile);
+        if (data.shortcuts) AppState.shortcuts = data.shortcuts;
+        if (data.events) AppState.events = data.events;
+        if (data.tasks) AppState.tasks = data.tasks;
+        if (data.notes) AppState.notes = data.notes;
+        if (data.studies) Object.assign(AppState.studies, data.studies);
+        if (data.finance) Object.assign(AppState.finance, data.finance);
+        if (data.vault) AppState.vault.encrypted = data.vault.encrypted;
+        saveLocal();
+        applyTheme();
+        render();
+        showToast('dados importados', 'success');
+      });
+    } catch(err) {
+      showToast('arquivo inválido', 'error');
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+function clearAllData() {
+  confirmAction('apagar tudo?', 'esta ação remove todos os seus dados permanentemente.', 'apagar tudo', () => {
+    localStorage.clear();
+    location.reload();
+  });
+}
+
+function resetVaultData() {
+  confirmAction('resetar cofre?', 'todos os dados do cofre serão perdidos.', 'resetar', () => {
+    AppState.vault = { encrypted: null, unlocked: false, items: [] };
+    localStorage.removeItem('vida_vault_salt');
+    vaultKey = null;
+    saveLocal();
+    showToast('cofre resetado');
+  });
+}
+
+// ============================================================
+//   CLOCK TICKER
+// ============================================================
+setInterval(() => {
+  if (currentScreen === 'home') updateClock();
+}, 10000);
+
+// ============================================================
+//   INIT
+// ============================================================
+function init() {
+  loadLocal();
+  applyTheme();
+
+  // Ensure arrays exist
+  if (!AppState.shortcuts) AppState.shortcuts = [];
+  if (!AppState.events) AppState.events = [];
+  if (!AppState.tasks) AppState.tasks = [];
+  if (!AppState.notes) AppState.notes = [];
+  if (!AppState.studies.subjects) AppState.studies.subjects = [];
+  if (!AppState.studies.sessions) AppState.studies.sessions = [];
+  if (!AppState.finance.entries) AppState.finance.entries = [];
+  if (!AppState.finance.transports) AppState.finance.transports = [];
+
+  // Generate localUserId if missing
+  if (!AppState.settings.localUserId) {
+    AppState.settings.localUserId = generateId() + generateId();
+    saveLocal();
+  }
+
+  // Init supabase if configured
+  if (AppState.settings.supabaseUrl && AppState.settings.supabaseAnonKey) {
+    initSupabase();
+  }
+
+  // Render home
+  renderHome();
+
+  // Update clock immediately
+  updateClock();
+
+  // PWA manifest via blob
+  try {
+    const manifest = {
+      name: 'vida',
+      short_name: 'vida',
+      description: 'app pessoal de vida',
+      start_url: '.',
+      display: 'standalone',
+      background_color: '#000000',
+      theme_color: '#000000',
+      icons: [{ src: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">⊙</text></svg>', sizes: '192x192', type: 'image/svg+xml' }]
+    };
+    const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+    const link = document.createElement('link');
+    link.rel = 'manifest';
+    link.href = URL.createObjectURL(blob);
+    document.head.appendChild(link);
+  } catch(e) {}
+}
+
+// Wait for DOM
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
