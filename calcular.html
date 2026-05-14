@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Calculadora iOS 18</title>
-    <!-- Lucide Icons for SF Symbols feel -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
@@ -12,6 +11,7 @@
             --system-red: #FF3B30;
             --system-green: #34C759;
             --system-orange: #FF9500;
+            --system-purple: #AF52DE;
             --system-gray: #8E8E93;
             --bg-color: #F2F2F7;
             --card-bg: rgba(255, 255, 255, 0.8);
@@ -45,8 +45,9 @@
 
         body {
             background-color: var(--bg-color);
-            background-image: radial-gradient(circle at top right, rgba(0, 122, 255, 0.12), transparent),
-                              radial-gradient(circle at bottom left, rgba(52, 199, 89, 0.12), transparent);
+            background-image:
+                radial-gradient(circle at top right, rgba(0, 122, 255, 0.12), transparent),
+                radial-gradient(circle at bottom left, rgba(52, 199, 89, 0.12), transparent);
             background-attachment: fixed;
             color: var(--text-color);
             padding: calc(20px + var(--safe-area-top)) 16px calc(110px + var(--safe-area-bottom));
@@ -72,7 +73,6 @@
             letter-spacing: -1px;
         }
 
-        /* Tab Switcher */
         .tab-container {
             background: var(--tab-bg);
             backdrop-filter: var(--glass-effect);
@@ -131,7 +131,6 @@
             letter-spacing: 0.5px;
         }
 
-        /* iOS List Group */
         .ios-list {
             background-color: var(--card-bg);
             backdrop-filter: var(--glass-effect);
@@ -177,8 +176,7 @@
             margin-right: 10px;
         }
 
-        /* INPUTS - FIXED FOR COMMA SUPPORT */
-        .ios-item input, 
+        .ios-item input,
         .ios-item select {
             background: none;
             border: none;
@@ -186,12 +184,11 @@
             font-size: 17px;
             text-align: right;
             outline: none;
-            width: 120px;
+            width: 130px;
             font-weight: 500;
             flex-shrink: 0;
         }
 
-        /* Switch Style */
         .switch {
             position: relative;
             display: inline-block;
@@ -238,7 +235,6 @@
             transform: translateX(20px);
         }
 
-        /* Calendar */
         .calendar-container {
             padding: 16px;
         }
@@ -247,7 +243,19 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 12px;
             margin-bottom: 16px;
+        }
+
+        .calendar-header strong {
+            font-size: 16px;
+        }
+
+        .calendar-note {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin: -6px 0 12px;
+            line-height: 1.35;
         }
 
         .calendar-grid {
@@ -271,16 +279,62 @@
             font-size: 15px;
             border-radius: 10px;
             transition: all 0.2s;
+            user-select: none;
+            cursor: pointer;
+            color: var(--text-color);
+            background: rgba(118, 118, 128, 0.08);
+            border: 1px solid transparent;
+        }
+
+        .day:hover {
+            border-color: rgba(0, 122, 255, 0.35);
+        }
+
+        .day.today {
+            border-color: rgba(52, 199, 89, 0.7);
         }
 
         .day.thursday {
-            background-color: var(--system-blue);
-            color: white;
+            color: var(--system-blue);
             font-weight: 700;
-            box-shadow: 0 4px 10px rgba(0, 122, 255, 0.3);
+            background: rgba(0, 122, 255, 0.08);
         }
 
-        /* Result Cards */
+        .day.selected {
+            background-color: var(--system-blue);
+            color: white;
+            font-weight: 800;
+            box-shadow: 0 4px 10px rgba(0, 122, 255, 0.3);
+            transform: scale(1.04);
+        }
+
+        .empty-day {
+            aspect-ratio: 1;
+        }
+
+        .mini-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            padding: 0 16px 16px;
+        }
+
+        .mini-btn {
+            height: 40px;
+            border: 0;
+            border-radius: 13px;
+            background: var(--tab-bg);
+            color: var(--text-color);
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .mini-btn:active {
+            transform: scale(0.98);
+            opacity: 0.75;
+        }
+
         .result-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -346,7 +400,52 @@
             margin-top: 4px;
         }
 
-        /* Action Buttons */
+        .summary-card {
+            background: var(--card-bg);
+            backdrop-filter: var(--glass-effect);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 18px;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        }
+
+        .summary-title {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 9px 0;
+            border-bottom: 0.5px solid var(--border-color);
+            font-size: 16px;
+        }
+
+        .summary-row:last-child {
+            border-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .summary-row span:first-child {
+            color: var(--text-secondary);
+        }
+
+        .summary-row strong {
+            font-size: 18px;
+        }
+
+        .summary-row.final strong {
+            color: var(--system-green);
+            font-size: 22px;
+        }
+
         .action-bar {
             position: fixed;
             bottom: calc(20px + var(--safe-area-bottom));
@@ -408,14 +507,12 @@
             </button>
         </div>
 
-        <!-- ABA SALÁRIO -->
         <div id="tab-salario" class="tab-content active">
             <div class="section-title">Configurações</div>
             <div class="ios-list">
                 <div class="ios-item">
                     <div class="icon-box" style="background: var(--system-blue);"><i data-lucide="dollar-sign"></i></div>
                     <label>Valor/Hora</label>
-                    <!-- Changed to text with decimal inputmode for better comma support -->
                     <input id="valorHora" type="text" placeholder="0,00" inputmode="decimal">
                 </div>
                 <div class="ios-item">
@@ -480,9 +577,24 @@
                     <div id="salarioLiquido" class="value">R$ 0,00</div>
                 </div>
             </div>
+
+            <div class="summary-card">
+                <div class="summary-title">Resumo geral</div>
+                <div class="summary-row">
+                    <span>Líquido</span>
+                    <strong id="resumoLiquidoSalario">R$ 0,00</strong>
+                </div>
+                <div class="summary-row">
+                    <span>Passagens usadas</span>
+                    <strong id="resumoPassagensSalario">R$ 0,00</strong>
+                </div>
+                <div class="summary-row final">
+                    <span>Valor disponível</span>
+                    <strong id="resumoSobraSalario">R$ 0,00</strong>
+                </div>
+            </div>
         </div>
 
-        <!-- ABA VALE TRANSPORTE -->
         <div id="tab-vt" class="tab-content">
             <div class="section-title">Período</div>
             <div class="ios-list">
@@ -506,6 +618,7 @@
                     <select id="tarifaParaty">
                         <option value="7.25">R$ 7,25</option>
                         <option value="3.625">R$ 3,63 (50%)</option>
+                        <option value="0">Não usar</option>
                     </select>
                 </div>
                 <div class="ios-item">
@@ -514,6 +627,16 @@
                     <select id="tarifaInterna">
                         <option value="5.20">R$ 5,20</option>
                         <option value="2.50">R$ 2,50 (50%)</option>
+                        <option value="0">Não usar</option>
+                    </select>
+                </div>
+                <div class="ios-item">
+                    <div class="icon-box" style="background: var(--system-purple);"><i data-lucide="repeat-2"></i></div>
+                    <label>Viagens por dia</label>
+                    <select id="viagensPorDia">
+                        <option value="2">2 vezes</option>
+                        <option value="1">1 vez</option>
+                        <option value="4">4 vezes</option>
                     </select>
                 </div>
             </div>
@@ -522,9 +645,10 @@
             <div class="ios-list">
                 <div class="calendar-container">
                     <div class="calendar-header">
-                        <strong id="tituloCalendario">Maio 2024</strong>
-                        <span id="totalQuintas" style="color: var(--system-blue); font-weight: 600;">0 quintas</span>
+                        <strong id="tituloCalendario">Maio 2026</strong>
+                        <span id="totalDiasSelecionados" style="color: var(--system-blue); font-weight: 600;">0 selecionados</span>
                     </div>
+                    <p class="calendar-note">Toque em qualquer dia usado para transporte. Quintas ficam só destacadas para facilitar.</p>
                     <div class="calendar-grid">
                         <div class="weekday">D</div><div class="weekday">S</div><div class="weekday">T</div>
                         <div class="weekday">Q</div><div class="weekday">Q</div><div class="weekday">S</div>
@@ -532,20 +656,48 @@
                     </div>
                     <div id="diasCalendarioVisual" class="calendar-grid" style="margin-top: 8px;"></div>
                 </div>
+                <div class="mini-actions">
+                    <button class="mini-btn" onclick="selecionarTodasQuintas()">Selecionar quintas</button>
+                    <button class="mini-btn" onclick="limparDias()">Limpar dias</button>
+                </div>
             </div>
 
             <div class="result-grid">
                 <div class="widget">
-                    <div class="widget-title"><i data-lucide="calendar-range"></i> Quintas</div>
-                    <div id="quintasResultado" class="widget-value">0</div>
+                    <div class="widget-title"><i data-lucide="calendar-range"></i> Dias usados</div>
+                    <div id="diasResultado" class="widget-value">0</div>
                 </div>
                 <div class="widget">
-                    <div class="widget-title"><i data-lucide="coins"></i> Por Quinta</div>
-                    <div id="valorPorQuinta" class="widget-value">R$ 0,00</div>
+                    <div class="widget-title"><i data-lucide="coins"></i> Por dia</div>
+                    <div id="valorPorDia" class="widget-value">R$ 0,00</div>
+                </div>
+                <div class="widget">
+                    <div class="widget-title"><i data-lucide="ticket"></i> Paraty</div>
+                    <div id="totalParaty" class="widget-value">R$ 0,00</div>
+                </div>
+                <div class="widget">
+                    <div class="widget-title"><i data-lucide="map-pin"></i> Interno</div>
+                    <div id="totalInterno" class="widget-value">R$ 0,00</div>
                 </div>
                 <div class="total-banner green">
-                    <div class="label">Total VT Quintas</div>
+                    <div class="label">Passagens usadas</div>
                     <div id="valeUsado" class="value">R$ 0,00</div>
+                </div>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-title">Resumo geral</div>
+                <div class="summary-row">
+                    <span>Líquido</span>
+                    <strong id="resumoLiquidoTransporte">R$ 0,00</strong>
+                </div>
+                <div class="summary-row">
+                    <span>Passagens usadas</span>
+                    <strong id="resumoPassagensTransporte">R$ 0,00</strong>
+                </div>
+                <div class="summary-row final">
+                    <span>Valor disponível</span>
+                    <strong id="resumoSobraTransporte">R$ 0,00</strong>
                 </div>
             </div>
         </div>
@@ -561,7 +713,6 @@
     </div>
 
     <script>
-        // Initialize Lucide Icons
         lucide.createIcons();
 
         const elements = {
@@ -576,51 +727,100 @@
             anoVT: document.getElementById('anoVT'),
             tarifaParaty: document.getElementById('tarifaParaty'),
             tarifaInterna: document.getElementById('tarifaInterna'),
+            viagensPorDia: document.getElementById('viagensPorDia'),
             salarioBruto: document.getElementById('salarioBruto'),
             totalDescontos: document.getElementById('totalDescontos'),
             salarioLiquido: document.getElementById('salarioLiquido'),
             tituloCalendario: document.getElementById('tituloCalendario'),
-            totalQuintas: document.getElementById('totalQuintas'),
+            totalDiasSelecionados: document.getElementById('totalDiasSelecionados'),
             diasCalendarioVisual: document.getElementById('diasCalendarioVisual'),
-            quintasResultado: document.getElementById('quintasResultado'),
-            valorPorQuinta: document.getElementById('valorPorQuinta'),
-            valeUsado: document.getElementById('valeUsado')
+            diasResultado: document.getElementById('diasResultado'),
+            valorPorDia: document.getElementById('valorPorDia'),
+            totalParaty: document.getElementById('totalParaty'),
+            totalInterno: document.getElementById('totalInterno'),
+            valeUsado: document.getElementById('valeUsado'),
+            resumoLiquidoSalario: document.getElementById('resumoLiquidoSalario'),
+            resumoPassagensSalario: document.getElementById('resumoPassagensSalario'),
+            resumoSobraSalario: document.getElementById('resumoSobraSalario'),
+            resumoLiquidoTransporte: document.getElementById('resumoLiquidoTransporte'),
+            resumoPassagensTransporte: document.getElementById('resumoPassagensTransporte'),
+            resumoSobraTransporte: document.getElementById('resumoSobraTransporte')
         };
 
         let currentTab = 'salario';
+        let diasSelecionados = new Set();
+        let ultimoSalarioLiquido = 0;
+        let ultimasPassagens = 0;
 
-        const nomesMeses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+        const nomesMeses = [
+            'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+            'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+        ];
 
         function switchTab(tab) {
             currentTab = tab;
             document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            
+
             if (tab === 'salario') {
                 document.querySelector('.tab-button:nth-child(1)').classList.add('active');
                 document.getElementById('tab-salario').classList.add('active');
             } else {
                 document.querySelector('.tab-button:nth-child(2)').classList.add('active');
                 document.getElementById('tab-vt').classList.add('active');
-                atualizarCalendario();
+                atualizarCalendario(false);
+                calcularVT();
             }
+
+            atualizarResumoGeral();
         }
 
         function formatarDinheiro(valor) {
             return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         }
 
-        // IMPROVED NUMBER PARSING FOR COMMA SUPPORT
         function pegarNumero(el) {
             let val = el.value;
             if (!val) return 0;
-            // Replace comma with dot and remove any other non-numeric characters except the dot
-            val = val.replace(',', '.');
+            val = String(val).replace(',', '.').replace(/[^\d.-]/g, '');
             return parseFloat(val) || 0;
         }
 
         function diasNoMes(ano, mes) {
             return new Date(ano, mes + 1, 0).getDate();
+        }
+
+        function chaveData(ano, mes, dia) {
+            return `${ano}-${String(mes + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+        }
+
+        function diasDoMesAtual() {
+            const mes = Number(elements.mesVT.value);
+            const ano = pegarNumero(elements.anoVT) || new Date().getFullYear();
+            const totalDias = diasNoMes(ano, mes);
+            const dias = [];
+
+            for (let dia = 1; dia <= totalDias; dia++) {
+                dias.push(chaveData(ano, mes, dia));
+            }
+
+            return dias;
+        }
+
+        function quintasDoMesAtual() {
+            const mes = Number(elements.mesVT.value);
+            const ano = pegarNumero(elements.anoVT) || new Date().getFullYear();
+            const totalDias = diasNoMes(ano, mes);
+            const quintas = [];
+
+            for (let dia = 1; dia <= totalDias; dia++) {
+                const data = new Date(ano, mes, dia);
+                if (data.getDay() === 4) {
+                    quintas.push(chaveData(ano, mes, dia));
+                }
+            }
+
+            return quintas;
         }
 
         function prepararMeses() {
@@ -630,38 +830,99 @@
                 option.textContent = nome;
                 elements.mesVT.appendChild(option);
             });
+
             const hoje = new Date();
             elements.mesVT.value = hoje.getMonth();
             elements.anoVT.value = hoje.getFullYear();
             elements.diasCalendario.value = diasNoMes(hoje.getFullYear(), hoje.getMonth());
+
+            diasSelecionados = new Set(quintasDoMesAtual());
         }
 
-        function atualizarCalendario() {
+        function atualizarCalendario(manterSelecao = true) {
             const mes = Number(elements.mesVT.value);
             const ano = pegarNumero(elements.anoVT) || new Date().getFullYear();
             const totalDias = diasNoMes(ano, mes);
             const primeiroDiaSemana = new Date(ano, mes, 1).getDay();
+            const hoje = new Date();
+
+            if (!manterSelecao) {
+                const permitidos = new Set(diasDoMesAtual());
+                diasSelecionados = new Set([...diasSelecionados].filter(data => permitidos.has(data)));
+
+                if (diasSelecionados.size === 0) {
+                    diasSelecionados = new Set(quintasDoMesAtual());
+                }
+            }
+
             elements.tituloCalendario.textContent = `${nomesMeses[mes]} ${ano}`;
             elements.diasCalendarioVisual.innerHTML = '';
-            let quintas = 0;
+
             for (let i = 0; i < primeiroDiaSemana; i++) {
                 const empty = document.createElement('div');
-                empty.className = 'day';
+                empty.className = 'empty-day';
                 elements.diasCalendarioVisual.appendChild(empty);
             }
+
             for (let dia = 1; dia <= totalDias; dia++) {
                 const data = new Date(ano, mes, dia);
+                const key = chaveData(ano, mes, dia);
                 const dayEl = document.createElement('div');
+
                 dayEl.className = 'day';
+                dayEl.textContent = dia;
+
                 if (data.getDay() === 4) {
                     dayEl.classList.add('thursday');
-                    quintas++;
                 }
-                dayEl.textContent = dia;
+
+                if (
+                    hoje.getFullYear() === ano &&
+                    hoje.getMonth() === mes &&
+                    hoje.getDate() === dia
+                ) {
+                    dayEl.classList.add('today');
+                }
+
+                if (diasSelecionados.has(key)) {
+                    dayEl.classList.add('selected');
+                }
+
+                dayEl.addEventListener('click', () => {
+                    if (diasSelecionados.has(key)) {
+                        diasSelecionados.delete(key);
+                    } else {
+                        diasSelecionados.add(key);
+                    }
+
+                    atualizarCalendario(true);
+                    calcularVT();
+                });
+
                 elements.diasCalendarioVisual.appendChild(dayEl);
             }
-            elements.totalQuintas.textContent = `${quintas} ${quintas === 1 ? 'quinta' : 'quintas'}`;
-            return quintas;
+
+            const selecionados = contarDiasSelecionadosDoMes();
+            elements.totalDiasSelecionados.textContent = `${selecionados} ${selecionados === 1 ? 'selecionado' : 'selecionados'}`;
+            return selecionados;
+        }
+
+        function contarDiasSelecionadosDoMes() {
+            const permitidos = new Set(diasDoMesAtual());
+            return [...diasSelecionados].filter(data => permitidos.has(data)).length;
+        }
+
+        function selecionarTodasQuintas() {
+            diasSelecionados = new Set(quintasDoMesAtual());
+            atualizarCalendario(true);
+            calcularVT();
+        }
+
+        function limparDias() {
+            const permitidos = new Set(diasDoMesAtual());
+            diasSelecionados = new Set([...diasSelecionados].filter(data => !permitidos.has(data)));
+            atualizarCalendario(true);
+            calcularVT();
         }
 
         function calcularSalario() {
@@ -670,41 +931,97 @@
             const descINSS = elements.inss.checked ? bruto * 0.07 : 0;
             const adiantamentoValor = elements.adiantamento.checked ? (elements.diasCalendario.value === '31' ? 203 : 196) : 0;
             const totalDescontos = descVT + descINSS + adiantamentoValor;
+
+            ultimoSalarioLiquido = bruto - totalDescontos;
+
             elements.salarioBruto.textContent = formatarDinheiro(bruto);
             elements.totalDescontos.textContent = '-' + formatarDinheiro(totalDescontos);
-            elements.salarioLiquido.textContent = formatarDinheiro(bruto - totalDescontos);
+            elements.salarioLiquido.textContent = formatarDinheiro(ultimoSalarioLiquido);
+
+            atualizarResumoGeral();
         }
 
         function calcularVT() {
-            const quintas = atualizarCalendario();
-            const valorDaQuinta = (pegarNumero(elements.tarifaParaty) + pegarNumero(elements.tarifaInterna)) * 2;
-            elements.valorPorQuinta.textContent = formatarDinheiro(valorDaQuinta);
-            elements.quintasResultado.textContent = quintas;
-            elements.valeUsado.textContent = formatarDinheiro(valorDaQuinta * quintas);
+            const dias = atualizarCalendario(true);
+            const viagens = pegarNumero(elements.viagensPorDia);
+            const tarifaParaty = pegarNumero(elements.tarifaParaty);
+            const tarifaInterna = pegarNumero(elements.tarifaInterna);
+
+            const paratyPorDia = tarifaParaty * viagens;
+            const internoPorDia = tarifaInterna * viagens;
+            const valorDoDia = paratyPorDia + internoPorDia;
+
+            const totalParaty = paratyPorDia * dias;
+            const totalInterno = internoPorDia * dias;
+            const totalGeral = totalParaty + totalInterno;
+
+            ultimasPassagens = totalGeral;
+
+            elements.valorPorDia.textContent = formatarDinheiro(valorDoDia);
+            elements.diasResultado.textContent = dias;
+            elements.totalParaty.textContent = formatarDinheiro(totalParaty);
+            elements.totalInterno.textContent = formatarDinheiro(totalInterno);
+            elements.valeUsado.textContent = formatarDinheiro(totalGeral);
+
+            atualizarResumoGeral();
+        }
+
+        function atualizarResumoGeral() {
+            /*
+                O valor das passagens é apenas um controle separado.
+                Ele não diminui o salário líquido aqui, porque o vale-transporte
+                já entra no cálculo do salário pelo desconto de 6,5%.
+            */
+            const valorDisponivel = ultimoSalarioLiquido;
+
+            elements.resumoLiquidoSalario.textContent = formatarDinheiro(ultimoSalarioLiquido);
+            elements.resumoPassagensSalario.textContent = formatarDinheiro(ultimasPassagens);
+            elements.resumoSobraSalario.textContent = formatarDinheiro(valorDisponivel);
+
+            elements.resumoLiquidoTransporte.textContent = formatarDinheiro(ultimoSalarioLiquido);
+            elements.resumoPassagensTransporte.textContent = formatarDinheiro(ultimasPassagens);
+            elements.resumoSobraTransporte.textContent = formatarDinheiro(valorDisponivel);
         }
 
         function calcularAtual() {
-            if (currentTab === 'salario') calcularSalario();
-            else calcularVT();
+            calcularSalario();
+            calcularVT();
         }
 
         function limparAtual() {
             if (currentTab === 'salario') {
-                elements.valorHora.value = ''; elements.horasDia.value = ''; elements.diasMes.value = '';
+                elements.valorHora.value = '';
+                elements.horasDia.value = '';
+                elements.diasMes.value = '';
                 calcularSalario();
             } else {
                 const hoje = new Date();
-                elements.mesVT.value = hoje.getMonth(); elements.anoVT.value = hoje.getFullYear();
+                elements.mesVT.value = hoje.getMonth();
+                elements.anoVT.value = hoje.getFullYear();
+                diasSelecionados = new Set(quintasDoMesAtual());
                 calcularVT();
             }
         }
 
-        // Auto-calculate
         [elements.valorHora, elements.horasDia, elements.diasMes, elements.diasCalendario, elements.valeTransporte, elements.inss, elements.adiantamento].forEach(el => {
             el.addEventListener('input', calcularSalario);
+            el.addEventListener('change', calcularSalario);
         });
-        [elements.mesVT, elements.anoVT, elements.tarifaParaty, elements.tarifaInterna].forEach(el => {
+
+        [elements.mesVT, elements.anoVT].forEach(el => {
+            el.addEventListener('input', () => {
+                atualizarCalendario(false);
+                calcularVT();
+            });
+            el.addEventListener('change', () => {
+                atualizarCalendario(false);
+                calcularVT();
+            });
+        });
+
+        [elements.tarifaParaty, elements.tarifaInterna, elements.viagensPorDia].forEach(el => {
             el.addEventListener('input', calcularVT);
+            el.addEventListener('change', calcularVT);
         });
 
         prepararMeses();
