@@ -1,0 +1,1713 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Cofre Pessoal</title>
+    <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #f5f5f7 0%, #ffffff 100%);
+            color: #1d1d1f;
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            background: #f5f5f7;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: #ffffff;
+            border-right: 1px solid #e5e5e7;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            background: #ffffff;
+            border-bottom: 1px solid #e5e5e7;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1d1d1f;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .sidebar-header {
+            padding: 20px 16px;
+            border-bottom: 1px solid #e5e5e7;
+            background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
+            color: white;
+        }
+
+        .sidebar-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .sidebar-header p {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .categories {
+            flex: 1;
+            padding: 12px 8px;
+            overflow-y: auto;
+        }
+
+        .category-btn {
+            width: 100%;
+            padding: 12px 16px;
+            margin-bottom: 6px;
+            border: none;
+            background: transparent;
+            color: #1d1d1f;
+            text-align: left;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .category-btn:hover {
+            background: #f5f5f7;
+        }
+
+        .category-btn.active {
+            background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
+            color: white;
+        }
+
+        .category-icon {
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .content {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            background: #f5f5f7;
+        }
+
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e5e5e7;
+            transition: all 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1d1d1f;
+        }
+
+        .card-subtitle {
+            font-size: 13px;
+            color: #86868b;
+            margin-top: 4px;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-icon {
+            background: #f5f5f7;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            color: #1d1d1f;
+        }
+
+        .btn-icon:hover {
+            background: #e5e5e7;
+        }
+
+        .btn-icon.danger:hover {
+            background: #ff3b30;
+            color: white;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f5f5f7;
+            color: #1d1d1f;
+            border: 1px solid #e5e5e7;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e5e7;
+        }
+
+        .btn-danger {
+            background: #ff3b30;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #ff453a;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .modal-header {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #1d1d1f;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: #f5f5f7;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1d1d1f;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e5e5e7;
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            background: #f5f5f7;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            background: white;
+            border-color: #007AFF;
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .form-actions .btn {
+            flex: 1;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #86868b;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1d1d1f;
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            font-size: 15px;
+            margin-bottom: 20px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #e5e5e7;
+            border-top-color: #007AFF;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                border-right: none;
+                border-bottom: 1px solid #e5e5e7;
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+                padding: 12px;
+            }
+
+            .sidebar-header {
+                grid-column: 1 / -1;
+                margin-bottom: 12px;
+            }
+
+            .categories {
+                grid-column: 1 / -1;
+                padding: 0;
+                display: flex;
+                gap: 8px;
+                overflow-x: auto;
+            }
+
+            .category-btn {
+                margin-bottom: 0;
+                white-space: nowrap;
+                flex-shrink: 0;
+            }
+
+            .content {
+                padding: 16px;
+            }
+
+            .header {
+                padding: 12px 16px;
+            }
+
+            .header h1 {
+                font-size: 18px;
+            }
+        }
+
+        .text-muted {
+            color: #86868b;
+            font-size: 13px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            background: #f5f5f7;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #1d1d1f;
+        }
+
+        .badge.success {
+            background: #d1f4d1;
+            color: #00a000;
+        }
+
+        .badge.warning {
+            background: #fff4d1;
+            color: #ff9500;
+        }
+
+        .badge.danger {
+            background: #ffd1d1;
+            color: #ff3b30;
+        }
+
+        .password-field {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #007AFF;
+            font-size: 18px;
+        }
+
+        .password-field input {
+            padding-right: 40px;
+        }
+
+        .copy-feedback {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #34c759;
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            animation: slideIn 0.3s ease;
+            z-index: 2000;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .search-box {
+            padding: 12px 16px;
+            border-bottom: 1px solid #e5e5e7;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #e5e5e7;
+            border-radius: 8px;
+            font-size: 14px;
+            background: #f5f5f7;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            background: white;
+            border-color: #007AFF;
+        }
+
+        .sidebar-footer {
+            padding: 12px 8px;
+            border-top: 1px solid #e5e5e7;
+            display: flex;
+            gap: 8px;
+        }
+
+        .sidebar-footer .btn {
+            flex: 1;
+            justify-content: center;
+            font-size: 13px;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>🔐 Cofre Pessoal</h2>
+                <p id="user-email">Conectando...</p>
+            </div>
+
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder="Buscar...">
+            </div>
+
+            <div class="categories">
+                <button class="category-btn active" data-category="dashboard">
+                    <span class="category-icon">📊</span>
+                    Dashboard
+                </button>
+                <button class="category-btn" data-category="senhas">
+                    <span class="category-icon">🔑</span>
+                    Senhas
+                </button>
+                <button class="category-btn" data-category="documentos">
+                    <span class="category-icon">📄</span>
+                    Documentos
+                </button>
+                <button class="category-btn" data-category="contatos">
+                    <span class="category-icon">👥</span>
+                    Contatos
+                </button>
+                <button class="category-btn" data-category="cartoes">
+                    <span class="category-icon">💳</span>
+                    Cartões
+                </button>
+                <button class="category-btn" data-category="notas">
+                    <span class="category-icon">📝</span>
+                    Notas
+                </button>
+                <button class="category-btn" data-category="contas">
+                    <span class="category-icon">🏦</span>
+                    Contas
+                </button>
+            </div>
+
+            <div class="sidebar-footer">
+                <button class="btn btn-secondary" style="flex: 1;" onclick="showSettings()">⚙️ Config</button>
+                <button class="btn btn-danger" style="flex: 1;" onclick="logout()">Sair</button>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="header">
+                <h1 id="page-title">Dashboard</h1>
+                <div class="header-actions">
+                    <button class="btn btn-primary" id="add-btn" onclick="openAddModal()">+ Adicionar</button>
+                </div>
+            </div>
+
+            <div class="content">
+                <div class="content-section active" id="dashboard">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+                        <div class="card" style="text-align: center; padding: 24px;">
+                            <div style="font-size: 32px; margin-bottom: 8px;">🔑</div>
+                            <div style="font-size: 24px; font-weight: 700; color: #007AFF;" id="count-senhas">0</div>
+                            <div class="text-muted">Senhas Salvas</div>
+                        </div>
+                        <div class="card" style="text-align: center; padding: 24px;">
+                            <div style="font-size: 32px; margin-bottom: 8px;">📄</div>
+                            <div style="font-size: 24px; font-weight: 700; color: #34c759;" id="count-documentos">0</div>
+                            <div class="text-muted">Documentos</div>
+                        </div>
+                        <div class="card" style="text-align: center; padding: 24px;">
+                            <div style="font-size: 32px; margin-bottom: 8px;">💳</div>
+                            <div style="font-size: 24px; font-weight: 700; color: #ff9500;" id="count-cartoes">0</div>
+                            <div class="text-muted">Cartões</div>
+                        </div>
+                        <div class="card" style="text-align: center; padding: 24px;">
+                            <div style="font-size: 32px; margin-bottom: 8px;">👥</div>
+                            <div style="font-size: 24px; font-weight: 700; color: #ff3b30;" id="count-contatos">0</div>
+                            <div class="text-muted">Contatos</div>
+                        </div>
+                    </div>
+
+                    <h2 style="font-size: 18px; font-weight: 600; margin-bottom: 12px; color: #1d1d1f;">Últimas Adições</h2>
+                    <div id="recent-items"></div>
+                </div>
+
+                <div class="content-section" id="senhas">
+                    <div id="senhas-list"></div>
+                </div>
+
+                <div class="content-section" id="documentos">
+                    <div id="documentos-list"></div>
+                </div>
+
+                <div class="content-section" id="contatos">
+                    <div id="contatos-list"></div>
+                </div>
+
+                <div class="content-section" id="cartoes">
+                    <div id="cartoes-list"></div>
+                </div>
+
+                <div class="content-section" id="notas">
+                    <div id="notas-list"></div>
+                </div>
+
+                <div class="content-section" id="contas">
+                    <div id="contas-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="auth-modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">🔐 Cofre Pessoal</div>
+            <div id="auth-form">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="auth-email" placeholder="seu@email.com">
+                </div>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <div class="password-field">
+                        <input type="password" id="auth-password" placeholder="Digite sua senha">
+                        <button class="toggle-password" onclick="togglePasswordVisibility('auth-password')">👁️</button>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 12px; margin-top: 20px;">
+                    <button class="btn btn-primary" style="flex: 1;" onclick="login()">Entrar</button>
+                    <button class="btn btn-secondary" style="flex: 1;" onclick="toggleAuthMode()">Cadastro</button>
+                </div>
+                <div id="auth-message" style="margin-top: 12px; padding: 12px; border-radius: 8px; display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="add-modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeAddModal()">✕</button>
+            <div class="modal-header">Adicionar Item</div>
+            <div id="add-form"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="edit-modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeEditModal()">✕</button>
+            <div class="modal-header">Editar Item</div>
+            <div id="edit-form"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="settings-modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeSettings()">✕</button>
+            <div class="modal-header">⚙️ Configurações</div>
+            <div class="form-group">
+                <label>Sua Senha</label>
+                <div class="password-field">
+                    <input type="password" id="settings-password" placeholder="Digite sua nova senha">
+                    <button class="toggle-password" onclick="togglePasswordVisibility('settings-password')">👁️</button>
+                </div>
+            </div>
+            <button class="btn btn-primary" style="width: 100%;" onclick="updatePassword()">Atualizar Senha</button>
+            <hr style="margin: 20px 0; border: none; border-top: 1px solid #e5e5e7;">
+            <div style="padding: 12px; background: #fff4d1; border-radius: 8px; margin-bottom: 16px;">
+                <p style="font-size: 13px; color: #ff9500; font-weight: 600;">⚠️ Aviso</p>
+                <p style="font-size: 13px; color: #ff9500; margin-top: 4px;">Seus dados estão armazenados no Supabase. Ative o Row Level Security (RLS) para máxima segurança.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://xtrzaxtwwseeysmqkcuk.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh0cnpheHR3d3NlZXlzbXFrY3VrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzODU0NjEsImV4cCI6MjA5Mzk2MTQ2MX0.7n2dkpdjys4dfxyoLEAUexCcoQbGWjYOeGOeqbxrAHY';
+        const { createClient } = window.supabase;
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let currentUser = null;
+        let currentCategory = 'dashboard';
+        let editingItemId = null;
+        let editingCategory = null;
+
+        window.addEventListener('load', async () => {
+            setupEventListeners();
+            await checkAuth();
+        });
+
+        async function checkAuth() {
+            const userEmailEl = document.getElementById('user-email');
+            const authModal = document.getElementById('auth-modal');
+
+            userEmailEl.textContent = 'Verificando...';
+
+            try {
+                const { data: { user }, error } = await supabaseClient.auth.getUser();
+
+                if (error) {
+                    console.error('Erro ao verificar usuário:', error);
+                    currentUser = null;
+                    userEmailEl.textContent = 'Erro ao conectar';
+                    authModal.classList.add('active');
+                    return;
+                }
+
+                if (!user) {
+                    currentUser = null;
+                    userEmailEl.textContent = 'Não conectado';
+                    authModal.classList.add('active');
+                    return;
+                }
+
+                currentUser = user;
+                userEmailEl.textContent = user.email || 'Conectado';
+                authModal.classList.remove('active');
+
+                await loadDashboard();
+            } catch (error) {
+                console.error('Falha geral na autenticação:', error);
+                currentUser = null;
+                userEmailEl.textContent = 'Erro ao conectar';
+                authModal.classList.add('active');
+            }
+        }
+
+        async function login() {
+            const email = document.getElementById('auth-email').value.trim();
+            const password = document.getElementById('auth-password').value;
+
+            if (!email || !password) {
+                showAuthMessage('Preencha todos os campos', 'danger');
+                return;
+            }
+
+            try {
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email,
+                    password
+                });
+
+                if (error) throw error;
+
+                currentUser = data.user;
+                document.getElementById('auth-modal').classList.remove('active');
+                document.getElementById('user-email').textContent = data.user.email || email;
+                await loadDashboard();
+            } catch (error) {
+                showAuthMessage(error.message, 'danger');
+            }
+        }
+
+        async function signup() {
+            const email = document.getElementById('auth-email').value.trim();
+            const password = document.getElementById('auth-password').value;
+
+            if (!email || !password) {
+                showAuthMessage('Preencha todos os campos', 'danger');
+                return;
+            }
+
+            try {
+                const { error } = await supabaseClient.auth.signUp({
+                    email,
+                    password
+                });
+
+                if (error) throw error;
+
+                showAuthMessage('Cadastro realizado! Verifique seu email.', 'success');
+                setTimeout(() => toggleAuthMode(), 2000);
+            } catch (error) {
+                showAuthMessage(error.message, 'danger');
+            }
+        }
+
+        async function logout() {
+            if (confirm('Tem certeza que deseja sair?')) {
+                await supabaseClient.auth.signOut();
+                currentUser = null;
+                document.getElementById('user-email').textContent = 'Não conectado';
+                document.getElementById('auth-modal').classList.add('active');
+                document.getElementById('auth-email').value = '';
+                document.getElementById('auth-password').value = '';
+            }
+        }
+
+        function toggleAuthMode() {
+            const authForm = document.getElementById('auth-form');
+            const isLoginMode = authForm.innerHTML.includes('onclick="login()"');
+
+            if (isLoginMode) {
+                authForm.innerHTML = `
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="auth-email" placeholder="seu@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Senha</label>
+                        <div class="password-field">
+                            <input type="password" id="auth-password" placeholder="Digite sua senha">
+                            <button class="toggle-password" onclick="togglePasswordVisibility('auth-password')">👁️</button>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 12px; margin-top: 20px;">
+                        <button class="btn btn-primary" style="flex: 1;" onclick="signup()">Cadastrar</button>
+                        <button class="btn btn-secondary" style="flex: 1;" onclick="toggleAuthMode()">Voltar</button>
+                    </div>
+                    <div id="auth-message" style="margin-top: 12px; padding: 12px; border-radius: 8px; display: none;"></div>
+                `;
+            } else {
+                authForm.innerHTML = `
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="auth-email" placeholder="seu@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Senha</label>
+                        <div class="password-field">
+                            <input type="password" id="auth-password" placeholder="Digite sua senha">
+                            <button class="toggle-password" onclick="togglePasswordVisibility('auth-password')">👁️</button>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 12px; margin-top: 20px;">
+                        <button class="btn btn-primary" style="flex: 1;" onclick="login()">Entrar</button>
+                        <button class="btn btn-secondary" style="flex: 1;" onclick="toggleAuthMode()">Cadastro</button>
+                    </div>
+                    <div id="auth-message" style="margin-top: 12px; padding: 12px; border-radius: 8px; display: none;"></div>
+                `;
+            }
+        }
+
+        function showAuthMessage(message, type) {
+            const messageEl = document.getElementById('auth-message');
+            if (!messageEl) return;
+
+            messageEl.textContent = message;
+            messageEl.style.background = type === 'danger' ? '#ffd1d1' : '#d1f4d1';
+            messageEl.style.color = type === 'danger' ? '#ff3b30' : '#00a000';
+            messageEl.style.display = 'block';
+        }
+
+        function setupEventListeners() {
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    const category = btn.dataset.category;
+                    switchCategory(category);
+                });
+            });
+
+            document.getElementById('search-input').addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase();
+                filterItems(query);
+            });
+        }
+
+        async function switchCategory(category) {
+            currentCategory = category;
+
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(category).classList.add('active');
+
+            const titles = {
+                dashboard: '📊 Dashboard',
+                senhas: '🔑 Senhas',
+                documentos: '📄 Documentos',
+                contatos: '👥 Contatos',
+                cartoes: '💳 Cartões',
+                notas: '📝 Notas',
+                contas: '🏦 Contas'
+            };
+
+            document.getElementById('page-title').textContent = titles[category];
+
+            if (category === 'dashboard') {
+                await loadDashboard();
+            } else {
+                await loadItems(category);
+            }
+        }
+
+        async function loadDashboard() {
+            if (!currentUser) return;
+
+            const categories = ['senhas', 'documentos', 'cartoes', 'contatos', 'notas', 'contas'];
+
+            for (const category of categories) {
+                try {
+                    const { data, error } = await supabaseClient
+                        .from(category)
+                        .select('*')
+                        .eq('user_id', currentUser.id)
+                        .order('created_at', { ascending: false });
+
+                    const countEl = document.getElementById(`count-${category}`);
+                    if (countEl && !error && data) {
+                        countEl.textContent = data.length;
+                    }
+                } catch (error) {
+                    console.log(`Erro ao contar ${category}:`, error);
+                }
+            }
+
+            let recentItems = [];
+
+            for (const category of categories) {
+                try {
+                    const { data, error } = await supabaseClient
+                        .from(category)
+                        .select('*')
+                        .eq('user_id', currentUser.id)
+                        .order('created_at', { ascending: false })
+                        .limit(2);
+
+                    if (!error && data) {
+                        recentItems = [...recentItems, ...data.map(item => ({ ...item, type: category }))];
+                    }
+                } catch (error) {
+                    console.log(`Erro ao carregar recentes de ${category}:`, error);
+                }
+            }
+
+            recentItems = recentItems
+                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                .slice(0, 5);
+
+            const recentContainer = document.getElementById('recent-items');
+
+            if (recentItems.length === 0) {
+                recentContainer.innerHTML = '<div class="empty-state"><p>Nenhum item adicionado ainda</p></div>';
+            } else {
+                recentContainer.innerHTML = recentItems.map(item => `
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">${escapeHTML(item.titulo || item.nome || item.banco || item.tipo || 'Sem título')}</div>
+                                <div class="card-subtitle">${escapeHTML(item.type.charAt(0).toUpperCase() + item.type.slice(1))}</div>
+                            </div>
+                            <div class="card-actions">
+                                <button class="btn-icon" onclick="editItem('${item.type}', '${item.id}')">✏️</button>
+                                <button class="btn-icon danger" onclick="deleteItem('${item.type}', '${item.id}')">🗑️</button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        async function loadItems(category) {
+            if (!currentUser) return;
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from(category)
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                const container = document.getElementById(`${category}-list`);
+
+                if (!data || data.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📭</div>
+                            <h3>Nenhum item</h3>
+                            <p>Comece adicionando seu primeiro ${category}</p>
+                            <button class="btn btn-primary" onclick="openAddModal()">+ Adicionar</button>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = data.map(item => renderItem(item, category)).join('');
+                }
+            } catch (error) {
+                console.error(error);
+                document.getElementById(`${category}-list`).innerHTML = '<div class="empty-state"><p>Erro ao carregar itens</p></div>';
+            }
+        }
+
+        function renderItem(item, category) {
+            if (category === 'senhas') {
+                return `
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">${escapeHTML(item.titulo || '')}</div>
+                                <div class="card-subtitle">${escapeHTML(item.usuario || item.email || '')}</div>
+                            </div>
+                            <div class="card-actions">
+                                <button class="btn-icon" onclick="copyToClipboard(${JSON.stringify(item.senha || '')})">📋</button>
+                                <button class="btn-icon" onclick="editItem('${category}', '${item.id}')">✏️</button>
+                                <button class="btn-icon danger" onclick="deleteItem('${category}', '${item.id}')">🗑️</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (category === 'documentos') {
+                return `
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">${escapeHTML(item.tipo || '')}: ${escapeHTML(item.numero || '')}</div>
+                                <div class="card-subtitle">${escapeHTML(item.titular || '')}</div>
+                            </div>
+                            <div class="card-actions">
+                                <button class="btn-icon" onclick="copyToClipboard(${JSON.stringify(item.numero || '')})">📋</button>
+                                <button class="btn-icon" onclick="editItem('${category}', '${item.id}')">✏️</button>
+                                <button class="btn-icon danger" onclick="deleteItem('${category}', '${item.id}')">🗑️</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (category === 'cartoes') {
+                const numero = item.numero || '';
+                return `
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">${escapeHTML(item.nome || '')}</div>
+                                <div class="card-subtitle">•••• •••• •••• ${escapeHTML(numero.slice(-4))}</div>
+                            </div>
+                            <div class="card-actions">
+                                <button class="btn-icon" onclick="copyToClipboard(${JSON.stringify(numero)})">📋</button>
+                                <button class="btn-icon" onclick="editItem('${category}', '${item.id}')">✏️</button>
+                                <button class="btn-icon danger" onclick="deleteItem('${category}', '${item.id}')">🗑️</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (category === 'contatos') {
+                const contato = item.telefone || item.email || '';
+                return `
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">${escapeHTML(item.nome || '')}</div>
+                                <div class="card-subtitle">${escapeHTML(contato)}</div>
+                            </div>
+                            <div class="card-actions">
+                                <button class="btn-icon" onclick="copyToClipboard(${JSON.stringify(contato)})">📋</button>
+                                <button class="btn-icon" onclick="editItem('${category}', '${item.id}')">✏️</button>
+                                <button class="btn-icon danger" onclick="deleteItem('${category}', '${item.id}')">🗑️</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (category === 'notas') {
+                const conteudo = item.conteudo || '';
+                return `
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">${escapeHTML(item.titulo || '')}</div>
+                            </div>
+                            <div class="card-actions">
+                                <button class="btn-icon" onclick="editItem('${category}', '${item.id}')">✏️</button>
+                                <button class="btn-icon danger" onclick="deleteItem('${category}', '${item.id}')">🗑️</button>
+                            </div>
+                        </div>
+                        <p style="color: #86868b; font-size: 14px; margin-top: 8px;">${escapeHTML(conteudo.substring(0, 100))}${conteudo.length > 100 ? '...' : ''}</p>
+                    </div>
+                `;
+            }
+
+            if (category === 'contas') {
+                return `
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">${escapeHTML(item.banco || '')}</div>
+                                <div class="card-subtitle">${escapeHTML(item.tipo_conta || '')} - ${escapeHTML(item.agencia || '')}/${escapeHTML(item.numero || '')}</div>
+                            </div>
+                            <div class="card-actions">
+                                <button class="btn-icon" onclick="copyToClipboard(${JSON.stringify(item.numero || '')})">📋</button>
+                                <button class="btn-icon" onclick="editItem('${category}', '${item.id}')">✏️</button>
+                                <button class="btn-icon danger" onclick="deleteItem('${category}', '${item.id}')">🗑️</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            return '';
+        }
+
+        function openAddModal() {
+            if (!currentUser) {
+                document.getElementById('auth-modal').classList.add('active');
+                showCopyFeedback('Faça login primeiro');
+                return;
+            }
+
+            const forms = {
+                senhas: `
+                    <div class="form-group">
+                        <label>Título</label>
+                        <input type="text" id="add-titulo" placeholder="Ex: Gmail">
+                    </div>
+                    <div class="form-group">
+                        <label>Usuário/Email</label>
+                        <input type="text" id="add-usuario" placeholder="seu@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Senha</label>
+                        <div class="password-field">
+                            <input type="password" id="add-senha" placeholder="Digite a senha">
+                            <button class="toggle-password" onclick="togglePasswordVisibility('add-senha')">👁️</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Notas</label>
+                        <textarea id="add-notas" placeholder="Observações..."></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button class="btn btn-primary" onclick="addItem('senhas')">Salvar</button>
+                        <button class="btn btn-secondary" onclick="closeAddModal()">Cancelar</button>
+                    </div>
+                `,
+                documentos: `
+                    <div class="form-group">
+                        <label>Tipo</label>
+                        <select id="add-tipo">
+                            <option>CPF</option>
+                            <option>RG</option>
+                            <option>CNH</option>
+                            <option>Passaporte</option>
+                            <option>Outro</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Número</label>
+                        <input type="text" id="add-numero" placeholder="000.000.000-00">
+                    </div>
+                    <div class="form-group">
+                        <label>Titular</label>
+                        <input type="text" id="add-titular" placeholder="Seu nome completo">
+                    </div>
+                    <div class="form-group">
+                        <label>Data de Emissão</label>
+                        <input type="date" id="add-emissao">
+                    </div>
+                    <div class="form-group">
+                        <label>Data de Validade</label>
+                        <input type="date" id="add-validade">
+                    </div>
+                    <div class="form-actions">
+                        <button class="btn btn-primary" onclick="addItem('documentos')">Salvar</button>
+                        <button class="btn btn-secondary" onclick="closeAddModal()">Cancelar</button>
+                    </div>
+                `,
+                cartoes: `
+                    <div class="form-group">
+                        <label>Nome do Cartão</label>
+                        <input type="text" id="add-nome" placeholder="Ex: Crédito Itaú">
+                    </div>
+                    <div class="form-group">
+                        <label>Número</label>
+                        <input type="text" id="add-numero" placeholder="0000 0000 0000 0000">
+                    </div>
+                    <div class="form-group">
+                        <label>Titular</label>
+                        <input type="text" id="add-titular" placeholder="Nome no cartão">
+                    </div>
+                    <div class="form-group">
+                        <label>CVV</label>
+                        <input type="password" id="add-cvv" placeholder="000">
+                    </div>
+                    <div class="form-group">
+                        <label>Data de Validade</label>
+                        <input type="text" id="add-validade" placeholder="MM/AA">
+                    </div>
+                    <div class="form-actions">
+                        <button class="btn btn-primary" onclick="addItem('cartoes')">Salvar</button>
+                        <button class="btn btn-secondary" onclick="closeAddModal()">Cancelar</button>
+                    </div>
+                `,
+                contatos: `
+                    <div class="form-group">
+                        <label>Nome</label>
+                        <input type="text" id="add-nome" placeholder="Nome completo">
+                    </div>
+                    <div class="form-group">
+                        <label>Telefone</label>
+                        <input type="tel" id="add-telefone" placeholder="(11) 99999-9999">
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="add-email" placeholder="email@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Endereço</label>
+                        <input type="text" id="add-endereco" placeholder="Rua, número, cidade">
+                    </div>
+                    <div class="form-actions">
+                        <button class="btn btn-primary" onclick="addItem('contatos')">Salvar</button>
+                        <button class="btn btn-secondary" onclick="closeAddModal()">Cancelar</button>
+                    </div>
+                `,
+                notas: `
+                    <div class="form-group">
+                        <label>Título</label>
+                        <input type="text" id="add-titulo" placeholder="Título da nota">
+                    </div>
+                    <div class="form-group">
+                        <label>Conteúdo</label>
+                        <textarea id="add-conteudo" placeholder="Escreva sua nota aqui..."></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button class="btn btn-primary" onclick="addItem('notas')">Salvar</button>
+                        <button class="btn btn-secondary" onclick="closeAddModal()">Cancelar</button>
+                    </div>
+                `,
+                contas: `
+                    <div class="form-group">
+                        <label>Banco</label>
+                        <input type="text" id="add-banco" placeholder="Ex: Itaú">
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo de Conta</label>
+                        <select id="add-tipo_conta">
+                            <option>Corrente</option>
+                            <option>Poupança</option>
+                            <option>Investimento</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Agência</label>
+                        <input type="text" id="add-agencia" placeholder="0000">
+                    </div>
+                    <div class="form-group">
+                        <label>Número da Conta</label>
+                        <input type="text" id="add-numero" placeholder="00000-0">
+                    </div>
+                    <div class="form-group">
+                        <label>Titular</label>
+                        <input type="text" id="add-titular" placeholder="Seu nome">
+                    </div>
+                    <div class="form-actions">
+                        <button class="btn btn-primary" onclick="addItem('contas')">Salvar</button>
+                        <button class="btn btn-secondary" onclick="closeAddModal()">Cancelar</button>
+                    </div>
+                `
+            };
+
+            document.getElementById('add-form').innerHTML = forms[currentCategory] || forms.notas;
+            document.getElementById('add-modal').classList.add('active');
+        }
+
+        function closeAddModal() {
+            document.getElementById('add-modal').classList.remove('active');
+        }
+
+        async function addItem(category) {
+            if (!currentUser) return;
+
+            const data = {};
+
+            if (category === 'senhas') {
+                data.titulo = document.getElementById('add-titulo').value;
+                data.usuario = document.getElementById('add-usuario').value;
+                data.senha = document.getElementById('add-senha').value;
+                data.notas = document.getElementById('add-notas').value;
+            } else if (category === 'documentos') {
+                data.tipo = document.getElementById('add-tipo').value;
+                data.numero = document.getElementById('add-numero').value;
+                data.titular = document.getElementById('add-titular').value;
+                data.data_emissao = document.getElementById('add-emissao').value;
+                data.data_validade = document.getElementById('add-validade').value;
+            } else if (category === 'cartoes') {
+                data.nome = document.getElementById('add-nome').value;
+                data.numero = document.getElementById('add-numero').value;
+                data.titular = document.getElementById('add-titular').value;
+                data.cvv = document.getElementById('add-cvv').value;
+                data.validade = document.getElementById('add-validade').value;
+            } else if (category === 'contatos') {
+                data.nome = document.getElementById('add-nome').value;
+                data.telefone = document.getElementById('add-telefone').value;
+                data.email = document.getElementById('add-email').value;
+                data.endereco = document.getElementById('add-endereco').value;
+            } else if (category === 'notas') {
+                data.titulo = document.getElementById('add-titulo').value;
+                data.conteudo = document.getElementById('add-conteudo').value;
+            } else if (category === 'contas') {
+                data.banco = document.getElementById('add-banco').value;
+                data.tipo_conta = document.getElementById('add-tipo_conta').value;
+                data.agencia = document.getElementById('add-agencia').value;
+                data.numero = document.getElementById('add-numero').value;
+                data.titular = document.getElementById('add-titular').value;
+            }
+
+            data.user_id = currentUser.id;
+            data.created_at = new Date().toISOString();
+
+            try {
+                const { error } = await supabaseClient.from(category).insert([data]);
+                if (error) throw error;
+
+                closeAddModal();
+                await loadItems(category);
+                await loadDashboard();
+                showCopyFeedback('Item adicionado com sucesso!');
+            } catch (error) {
+                alert('Erro ao adicionar item: ' + error.message);
+            }
+        }
+
+        async function editItem(category, id) {
+            if (!currentUser) return;
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from(category)
+                    .select('*')
+                    .eq('id', id)
+                    .eq('user_id', currentUser.id)
+                    .single();
+
+                if (error) throw error;
+
+                editingItemId = id;
+                editingCategory = category;
+
+                const forms = {
+                    senhas: `
+                        <div class="form-group">
+                            <label>Título</label>
+                            <input type="text" id="edit-titulo" value="${escapeAttr(data.titulo || '')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Usuário/Email</label>
+                            <input type="text" id="edit-usuario" value="${escapeAttr(data.usuario || '')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Senha</label>
+                            <div class="password-field">
+                                <input type="password" id="edit-senha" value="${escapeAttr(data.senha || '')}">
+                                <button class="toggle-password" onclick="togglePasswordVisibility('edit-senha')">👁️</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Notas</label>
+                            <textarea id="edit-notas">${escapeHTML(data.notas || '')}</textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button class="btn btn-primary" onclick="updateItem('${category}')">Atualizar</button>
+                            <button class="btn btn-secondary" onclick="closeEditModal()">Cancelar</button>
+                        </div>
+                    `,
+                    documentos: `
+                        <div class="form-group">
+                            <label>Tipo</label>
+                            <select id="edit-tipo">
+                                <option ${data.tipo === 'CPF' ? 'selected' : ''}>CPF</option>
+                                <option ${data.tipo === 'RG' ? 'selected' : ''}>RG</option>
+                                <option ${data.tipo === 'CNH' ? 'selected' : ''}>CNH</option>
+                                <option ${data.tipo === 'Passaporte' ? 'selected' : ''}>Passaporte</option>
+                                <option ${data.tipo === 'Outro' ? 'selected' : ''}>Outro</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Número</label>
+                            <input type="text" id="edit-numero" value="${escapeAttr(data.numero || '')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Titular</label>
+                            <input type="text" id="edit-titular" value="${escapeAttr(data.titular || '')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Data de Emissão</label>
+                            <input type="date" id="edit-emissao" value="${escapeAttr(data.data_emissao || '')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Data de Validade</label>
+                            <input type="date" id="edit-validade" value="${escapeAttr(data.data_validade || '')}">
+                        </div>
+                        <div class="form-actions">
+                            <button class="btn btn-primary" onclick="updateItem('${category}')">Atualizar</button>
+                            <button class="btn btn-secondary" onclick="closeEditModal()">Cancelar</button>
+                        </div>
+                    `,
+                    cartoes: `
+                        <div class="form-group">
+                            <label>Nome do Cartão</label>
+                            <input type="text" id="edit-nome" value="${escapeAttr(data.nome || '')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Número</label>
+                            <input type="text" id="edit-numero" value="${escapeAttr(data.numero || '')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Titular</label>
+                            <input type="text" id="edit-titular" value="${escapeAttr(data.titular || '')}">
+                        </div>
+                        <div class="form-group">
+                            <label>CVV</label>
+                            <input type="password" id="edit-cvv" value="${escapeAttr(data.cvv || '')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Data de Validade</label>
+                            <input type="text" id="edit-validade" value="${escapeAttr(data.validade || '')}">
+                        </div>
+                        <div class="form-actions">
+                            <button class="btn btn-primary" onclick="updateItem('${category}')">Atualizar</button>
+                            <button class="btn btn-secondary" onclick="closeEditModal()">Cancelar</button>
+                        </div>
+                    `,
+                    contatos: `
+                        <div class="form-group">
+                            <label>Nome</label>
+                            <input type="text" id="edit-nome" value="${escapeAttr(data.nome || '')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Telefone</label>
+                            <input type="tel" id="edit-telefone" value="${escapeAttr(data.telefone || '')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="edit-email" value="${escapeAttr(data.email || '')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Endereço</label>
+                            <input type="text" id="edit-endereco" value="${escapeAttr(data.endereco || '')}">
+                        </div>
+                        <div class="form-actions">
+                            <button class="btn btn-primary" onclick="updateItem('${category}')">Atualizar</button>
+                            <button class="btn btn-secondary" onclick="closeEditModal()">Cancelar</button>
+                        </div>
+                    `,
+                    notas: `
+                        <div class="form-group">
+                            <label>Título</label>
+                            <input type="text" id="edit-titulo" value="${escapeAttr(data.titulo || '')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Conteúdo</label>
+                            <textarea id="edit-conteudo">${escapeHTML(data.conteudo || '')}</textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button class="btn btn-primary" onclick="updateItem('${category}')">Atualizar</button>
+                            <button class="btn btn-secondary" onclick="closeEditModal()">Cancelar</button>
+                        </div>
+                    `,
+                    contas: `
+                        <div class="form-group">
+                            <label>Banco</label>
+                            <input type="text" id="edit-banco" value="${escapeAttr(data.banco || '')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo de Conta</label>
+                            <select id="edit-tipo_conta">
+                                <option ${data.tipo_conta === 'Corrente' ? 'selected' : ''}>Corrente</option>
+                                <option ${data.tipo_conta === 'Poupança' ? 'selected' : ''}>Poupança</option>
+                                <option ${data.tipo_conta === 'Investimento' ? 'selected' : ''}>Investimento</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Agência</label>
+                            <input type="text" id="edit-agencia" value="${escapeAttr(data.agencia || '')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Número da Conta</label>
+                            <input type="text" id="edit-numero" value="${escapeAttr(data.numero || '')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Titular</label>
+                            <input type="text" id="edit-titular" value="${escapeAttr(data.titular || '')}">
+                        </div>
+                        <div class="form-actions">
+                            <button class="btn btn-primary" onclick="updateItem('${category}')">Atualizar</button>
+                            <button class="btn btn-secondary" onclick="closeEditModal()">Cancelar</button>
+                        </div>
+                    `
+                };
+
+                document.getElementById('edit-form').innerHTML = forms[category] || forms.notas;
+                document.getElementById('edit-modal').classList.add('active');
+            } catch (error) {
+                alert('Erro ao carregar item: ' + error.message);
+            }
+        }
+
+        function closeEditModal() {
+            document.getElementById('edit-modal').classList.remove('active');
+            editingItemId = null;
+            editingCategory = null;
+        }
+
+        async function updateItem(category) {
+            if (!currentUser || !editingItemId) return;
+
+            const data = {};
+
+            if (category === 'senhas') {
+                data.titulo = document.getElementById('edit-titulo').value;
+                data.usuario = document.getElementById('edit-usuario').value;
+                data.senha = document.getElementById('edit-senha').value;
+                data.notas = document.getElementById('edit-notas').value;
+            } else if (category === 'documentos') {
+                data.tipo = document.getElementById('edit-tipo').value;
+                data.numero = document.getElementById('edit-numero').value;
+                data.titular = document.getElementById('edit-titular').value;
+                data.data_emissao = document.getElementById('edit-emissao').value;
+                data.data_validade = document.getElementById('edit-validade').value;
+            } else if (category === 'cartoes') {
+                data.nome = document.getElementById('edit-nome').value;
+                data.numero = document.getElementById('edit-numero').value;
+                data.titular = document.getElementById('edit-titular').value;
+                data.cvv = document.getElementById('edit-cvv').value;
+                data.validade = document.getElementById('edit-validade').value;
+            } else if (category === 'contatos') {
+                data.nome = document.getElementById('edit-nome').value;
+                data.telefone = document.getElementById('edit-telefone').value;
+                data.email = document.getElementById('edit-email').value;
+                data.endereco = document.getElementById('edit-endereco').value;
+            } else if (category === 'notas') {
+                data.titulo = document.getElementById('edit-titulo').value;
+                data.conteudo = document.getElementById('edit-conteudo').value;
+            } else if (category === 'contas') {
+                data.banco = document.getElementById('edit-banco').value;
+                data.tipo_conta = document.getElementById('edit-tipo_conta').value;
+                data.agencia = document.getElementById('edit-agencia').value;
+                data.numero = document.getElementById('edit-numero').value;
+                data.titular = document.getElementById('edit-titular').value;
+            }
+
+            try {
+                const { error } = await supabaseClient
+                    .from(category)
+                    .update(data)
+                    .eq('id', editingItemId)
+                    .eq('user_id', currentUser.id);
+
+                if (error) throw error;
+
+                closeEditModal();
+                await loadItems(category);
+                await loadDashboard();
+                showCopyFeedback('Item atualizado com sucesso!');
+            } catch (error) {
+                alert('Erro ao atualizar item: ' + error.message);
+            }
+        }
+
+        async function deleteItem(category, id) {
+            if (!currentUser) return;
+            if (!confirm('Tem certeza que deseja deletar este item?')) return;
+
+            try {
+                const { error } = await supabaseClient
+                    .from(category)
+                    .delete()
+                    .eq('id', id)
+                    .eq('user_id', currentUser.id);
+
+                if (error) throw error;
+
+                await loadItems(category);
+                await loadDashboard();
+                showCopyFeedback('Item deletado com sucesso!');
+            } catch (error) {
+                alert('Erro ao deletar item: ' + error.message);
+            }
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text || '').then(() => {
+                showCopyFeedback('Copiado!');
+            });
+        }
+
+        function showCopyFeedback(message) {
+            const feedback = document.createElement('div');
+            feedback.className = 'copy-feedback';
+            feedback.textContent = message;
+            document.body.appendChild(feedback);
+            setTimeout(() => feedback.remove(), 2000);
+        }
+
+        function togglePasswordVisibility(inputId) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+
+        function filterItems(query) {
+            if (!query) {
+                if (currentCategory === 'dashboard') {
+                    loadDashboard();
+                } else {
+                    loadItems(currentCategory);
+                }
+                return;
+            }
+
+            const activeSection = document.querySelector('.content-section.active');
+            const cards = activeSection ? activeSection.querySelectorAll('.card') : [];
+
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                card.style.display = text.includes(query) ? 'block' : 'none';
+            });
+        }
+
+        function showSettings() {
+            document.getElementById('settings-modal').classList.add('active');
+        }
+
+        function closeSettings() {
+            document.getElementById('settings-modal').classList.remove('active');
+        }
+
+        async function updatePassword() {
+            const newPassword = document.getElementById('settings-password').value;
+
+            if (!newPassword) {
+                alert('Digite uma nova senha');
+                return;
+            }
+
+            try {
+                const { error } = await supabaseClient.auth.updateUser({
+                    password: newPassword
+                });
+
+                if (error) throw error;
+
+                showCopyFeedback('Senha atualizada com sucesso!');
+                document.getElementById('settings-password').value = '';
+                closeSettings();
+            } catch (error) {
+                alert('Erro ao atualizar senha: ' + error.message);
+            }
+        }
+
+        function escapeHTML(value) {
+            return String(value ?? '')
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#039;');
+        }
+
+        function escapeAttr(value) {
+            return escapeHTML(value);
+        }
+    </script>
+</body>
+</html>
