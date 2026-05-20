@@ -3,173 +3,127 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>editor neon</title>
-
+  <title>editor</title>
   <style>
     :root {
-      --bg: #07070b;
-      --panel: rgba(18, 18, 26, .78);
-      --panel-2: rgba(28, 28, 42, .88);
-      --text: #f5f7ff;
-      --muted: #9a9bad;
-      --line: rgba(255, 255, 255, .10);
-      --soft: rgba(255, 255, 255, .07);
-      --accent: #00e5ff;
-      --accent-2: #8b5cf6;
-      --accent-3: #22c55e;
-      --danger: #ff4d6d;
-      --shadow: 0 24px 80px rgba(0, 0, 0, .48);
-      --radius: 24px;
+      --bg: #000000;
+      --panel: #1c1c1e;
+      --panel-2: #2c2c2e;
+      --panel-3: #3a3a3c;
+      --text: #f5f5f7;
+      --muted: #98989d;
+      --line: rgba(255, 255, 255, .08);
+      --soft: rgba(255, 255, 255, .06);
+      --accent: #0a84ff;
+      --accent-2: #5e5ce6;
+      --accent-3: #30d158;
+      --danger: #ff453a;
+      --shadow: 0 8px 20px rgba(0, 0, 0, .24);
+      --radius: 16px;
       --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", Inter, system-ui, sans-serif;
       --mono: "SF Mono", "Cascadia Code", "Consolas", monospace;
     }
 
-    * {
-      box-sizing: border-box;
-    }
-
-    html,
-    body {
-      height: 100%;
-    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
 
     body {
       margin: 0;
       color: var(--text);
       font-family: var(--font);
-      background:
-        radial-gradient(circle at 15% 10%, rgba(0, 229, 255, .20), transparent 32%),
-        radial-gradient(circle at 84% 4%, rgba(139, 92, 246, .22), transparent 30%),
-        radial-gradient(circle at 72% 92%, rgba(34, 197, 94, .13), transparent 34%),
-        linear-gradient(135deg, #050509, #090914 42%, #050509);
+      background: #000000;
       overflow: hidden;
     }
 
-    button,
-    input,
-    textarea {
-      font: inherit;
-    }
+    button, input, textarea { font: inherit; }
 
     button {
       border: 0;
       background: transparent;
       color: inherit;
       cursor: pointer;
-      transition: .18s ease;
+      transition: all .12s ease;
     }
 
-    button:active {
-      transform: scale(.97);
-    }
+    button:active { transform: scale(.96); }
+    button:disabled { opacity: .4; cursor: default; transform: none; }
 
     .app {
-      width: min(1760px, calc(100vw - 18px));
-      height: calc(100vh - 18px);
-      margin: 9px auto;
+      width: min(1760px, calc(100vw - 16px));
+      height: calc(100vh - 16px);
+      margin: 8px auto;
       display: grid;
-      grid-template-rows: auto 1fr auto;
-      gap: 9px;
+      grid-template-rows: auto 1fr;
+      gap: 8px;
     }
 
     .glass {
       border: 1px solid var(--line);
       background: var(--panel);
-      backdrop-filter: blur(28px) saturate(180%);
-      -webkit-backdrop-filter: blur(28px) saturate(180%);
-      box-shadow: var(--shadow);
     }
 
     .topbar {
-      min-height: 58px;
-      padding: 9px 10px;
+      min-height: 56px;
+      padding: 8px 12px;
       border-radius: var(--radius);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
+      gap: 10px;
+      position: relative;
     }
 
-    .brand {
-      display: flex;
+    .top-status {
+      height: 34px;
+      padding: 0 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--soft);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 500;
+      display: inline-flex;
       align-items: center;
-      gap: 11px;
-      min-width: 0;
-    }
-
-    .logo {
-      width: 38px;
-      height: 38px;
-      border-radius: 15px;
-      display: grid;
-      place-items: center;
-      color: #001018;
-      font-weight: 900;
-      letter-spacing: -.08em;
-      background:
-        linear-gradient(135deg, var(--accent), #ffffff 48%, var(--accent-2));
-      box-shadow:
-        0 0 28px rgba(0, 229, 255, .42),
-        inset 0 1px 1px rgba(255, 255, 255, .75);
+      gap: 8px;
+      white-space: nowrap;
       flex: 0 0 auto;
     }
 
-    .brand h1 {
-      margin: 0;
-      font-size: 15px;
-      line-height: 1.05;
-      letter-spacing: -.02em;
-    }
-
-    .brand p {
-      margin: 3px 0 0;
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .actions {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 7px;
-      flex-wrap: wrap;
-    }
+    .actions { display: flex; align-items: center; justify-content: flex-end; gap: 6px; flex-wrap: wrap; min-width: 0; }
 
     .pill {
-      height: 36px;
-      padding: 0 13px;
+      height: 34px;
+      padding: 0 12px;
       border-radius: 999px;
       border: 1px solid var(--line);
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.04));
+      background: transparent;
       color: var(--text);
       font-size: 13px;
+      font-weight: 500;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 7px;
+      gap: 6px;
       white-space: nowrap;
+      position: relative;
+      overflow: hidden;
     }
 
+    .pill svg { width: 16px; height: 16px; opacity: 0.9; }
+
     .pill:hover {
-      border-color: rgba(0, 229, 255, .45);
-      background: rgba(0, 229, 255, .10);
-      color: var(--accent);
-      box-shadow: 0 0 24px rgba(0, 229, 255, .16);
+      background: var(--soft);
+      border-color: rgba(255, 255, 255, .12);
     }
 
     .pill.primary {
       border-color: transparent;
-      color: #001018;
-      font-weight: 750;
-      background: linear-gradient(135deg, var(--accent), #b9f7ff);
-      box-shadow: 0 0 30px rgba(0, 229, 255, .26);
+      color: white;
+      font-weight: 600;
+      background: var(--accent);
     }
 
-    .pill.primary:hover {
-      color: #001018;
-      filter: brightness(1.05);
-    }
+    .pill.primary:hover { background: #1b8cff; }
 
     .workspace {
       min-height: 0;
@@ -178,58 +132,46 @@
       gap: 0;
     }
 
-    .workspace.editor-big {
-      grid-template-columns: minmax(560px, 1.16fr) 8px minmax(340px, .84fr);
-    }
-
-    .workspace.preview-only {
-      grid-template-columns: 0 0 1fr;
-    }
-
-    .workspace.preview-only .left,
-    .workspace.preview-only .resizer {
-      display: none;
-    }
+    .workspace.editor-big { grid-template-columns: minmax(560px, 1.16fr) 8px minmax(340px, .84fr); }
+    .workspace.preview-only { grid-template-columns: 0 0 1fr; }
+    .workspace.preview-only .left, .workspace.preview-only .resizer { display: none; }
 
     .panel {
-      min-width: 0;
-      min-height: 0;
+      min-width: 0; min-height: 0;
       overflow: hidden;
       display: grid;
       grid-template-rows: auto 1fr;
+      position: relative;
+      transition: border-color .12s ease;
     }
 
-    .panel.left {
-      border-radius: var(--radius) 10px 10px var(--radius);
-    }
-
-    .panel.right {
-      border-radius: 10px var(--radius) var(--radius) 10px;
-    }
+    .panel.left { border-radius: var(--radius) 8px 8px var(--radius); }
+    .panel.right { border-radius: 8px var(--radius) var(--radius) 8px; }
 
     .resizer {
       cursor: col-resize;
       display: grid;
       place-items: center;
+      position: relative;
     }
 
     .resizer::before {
       content: "";
       width: 4px;
-      height: 58px;
+      height: 48px;
       border-radius: 999px;
-      background: rgba(255, 255, 255, .14);
-      transition: .18s ease;
+      background: rgba(255, 255, 255, .12);
+      transition: .12s ease;
     }
 
     .resizer:hover::before {
-      height: 80px;
+      width: 5px;
+      height: 64px;
       background: var(--accent);
-      box-shadow: 0 0 20px rgba(0, 229, 255, .55);
     }
 
     .panel-head {
-      min-height: 52px;
+      min-height: 48px;
       padding: 8px;
       border-bottom: 1px solid var(--line);
       display: flex;
@@ -238,401 +180,494 @@
       gap: 8px;
     }
 
-    .tabs {
-      display: flex;
-      gap: 5px;
-      min-width: 0;
-      overflow-x: auto;
-      scrollbar-width: none;
-    }
-
-    .tabs::-webkit-scrollbar {
-      display: none;
-    }
+    .tabs { display: flex; gap: 4px; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+    .tabs::-webkit-scrollbar { display: none; }
 
     .tab {
-      height: 34px;
-      padding: 0 12px;
+      height: 32px;
+      padding: 0 11px;
       border-radius: 999px;
       color: var(--muted);
       font-size: 13px;
-      font-weight: 650;
+      font-weight: 500;
       flex: 0 0 auto;
+      border: 1px solid transparent;
+      transition: all .12s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .tab svg { width: 14px; height: 14px; }
+
+    .tab:hover {
+      color: var(--text);
+      background: var(--soft);
     }
 
     .tab.active {
-      color: #001018;
-      background: linear-gradient(135deg, var(--accent), #d7fbff);
-      box-shadow: 0 0 24px rgba(0, 229, 255, .22);
+      color: white;
+      background: var(--accent);
+      border-color: transparent;
     }
 
-    .status {
-      color: var(--muted);
-      font-size: 12px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 240px;
-    }
+    .status { color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 240px; }
 
     .editor-wrap {
       position: relative;
       min-height: 0;
       overflow: hidden;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.015)),
-        rgba(0, 0, 0, .18);
+      background: #111113;
     }
 
-    .editor {
-      width: 100%;
-      height: 100%;
-      resize: none;
+    .highlight-layer {
+      position: absolute;
+      inset: 0;
+      margin: 0;
+      padding: 18px 20px 44px;
       border: 0;
-      outline: 0;
-      padding: 20px 22px 48px;
-      color: #eff6ff;
+      color: #d1d1d6;
       background: transparent;
       font-family: var(--mono);
       font-size: 14px;
-      line-height: 1.65;
+      line-height: 1.6;
+      tab-size: 2;
+      white-space: pre;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .tok-tag { color: #ff9f0a; }
+    .tok-attr { color: #64d2ff; }
+    .tok-keyword { color: #bf5af2; }
+    .tok-string { color: #30d158; }
+    .tok-number { color: #ffd60a; }
+    .tok-comment { color: #6e6e73; font-style: italic; }
+    .tok-color { color: #ff6b8a; }
+    .tok-punc { color: #8e8e93; }
+    .tok-selector { color: #5e9eff; }
+    .tok-property { color: #64d2ff; }
+
+    .color-popover {
+      position: absolute;
+      z-index: 5;
+      display: none;
+      align-items: center;
+      gap: 9px;
+      min-width: 156px;
+      padding: 8px 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: #1c1c1e;
+      box-shadow: 0 18px 46px rgba(0,0,0,.38);
+    }
+
+    .color-popover.show { display: flex; }
+
+    .color-popover input[type="color"] {
+      width: 34px;
+      height: 34px;
+      padding: 0;
+      border: 0;
+      border-radius: 10px;
+      background: transparent;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .color-popover input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+    .color-popover input[type="color"]::-webkit-color-swatch { border: 0; border-radius: 9px; }
+
+    .color-value {
+      color: var(--text);
+      font: 12px/1 var(--mono);
+      letter-spacing: .01em;
+    }
+
+    .editor {
+      width: 100%; height: 100%; resize: none; border: 0; outline: 0;
+      padding: 18px 20px 44px;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+      background: transparent;
+      position: relative;
+      z-index: 2;
+      font-family: var(--mono);
+      font-size: 14px;
+      line-height: 1.6;
       tab-size: 2;
       caret-color: var(--accent);
       white-space: pre;
       overflow: auto;
-      scrollbar-gutter: stable;
+      scrollbar-gutter: stable both-edges;
     }
 
-    .editor::selection {
-      background: rgba(0, 229, 255, .30);
-      color: white;
-    }
+    .editor::selection { background: rgba(10, 132, 255, .28); color: transparent; -webkit-text-fill-color: transparent; }
 
-    .editor-tools {
-      position: absolute;
-      left: 12px;
-      right: 12px;
-      bottom: 10px;
-      display: flex;
-      justify-content: space-between;
-      gap: 8px;
-      pointer-events: none;
-    }
+    .editor-tools { position: absolute; left: 12px; right: 12px; bottom: 8px; display: flex; justify-content: space-between; gap: 8px; pointer-events: none; }
 
     .mini-info {
-      height: 26px;
-      padding: 0 10px;
+      height: 24px;
+      padding: 0 9px;
       border: 1px solid var(--line);
       border-radius: 999px;
-      background: rgba(10, 10, 18, .70);
+      background: rgba(10, 10, 18, .5);
       color: var(--muted);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
       display: inline-flex;
       align-items: center;
-      font-size: 12px;
+      font-size: 11px;
     }
 
-    .preview-tools {
-      display: flex;
-      gap: 7px;
-      align-items: center;
-    }
-
-    .preview-frame-wrap {
-      position: relative;
-      min-height: 0;
-      background: white;
-    }
-
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: 0;
-      background: white;
-    }
+    .preview-tools { display: flex; gap: 6px; align-items: center; }
+    .preview-frame-wrap { position: relative; min-height: 0; background: white; }
+    iframe { width: 100%; height: 100%; border: 0; background: white; }
 
     .preview-error {
-      position: absolute;
-      left: 14px;
-      right: 14px;
-      bottom: 14px;
-      display: none;
-      padding: 12px 14px;
-      border-radius: 18px;
-      background: rgba(255, 77, 109, .12);
-      border: 1px solid rgba(255, 77, 109, .26);
-      color: #ff8fa3;
-      font: 12px/1.45 var(--mono);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      max-height: 140px;
-      overflow: auto;
+      position: absolute; left: 12px; right: 12px; bottom: 12px; display: none;
+      padding: 10px 12px; border-radius: 12px;
+      background: rgba(255, 69, 58, .12); border: 1px solid rgba(255, 69, 58, .24);
+      color: #ff8fa3; font: 11px/1.4 var(--mono);
+      max-height: 120px; overflow: auto;
     }
-
-    .preview-error.show {
-      display: block;
-    }
+    .preview-error.show { display: block; }
 
     .bottombar {
-      min-height: 38px;
+      min-height: 36px;
       border-radius: 999px;
-      padding: 5px 10px;
+      padding: 4px 10px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 10px;
       color: var(--muted);
-      font-size: 12px;
+      font-size: 11px;
     }
 
-    .bottom-group {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      min-width: 0;
-    }
-
-    .dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 99px;
-      background: var(--accent-3);
-      box-shadow: 0 0 14px rgba(34, 197, 94, .8);
-      flex: 0 0 auto;
-    }
-
-    .dot.dirty {
-      background: #ffcc00;
-      box-shadow: 0 0 14px rgba(255, 204, 0, .8);
-    }
+    .bottom-group { display: flex; align-items: center; gap: 6px; min-width: 0; }
+    .dot { width: 6px; height: 6px; border-radius: 99px; background: var(--accent-3); flex: 0 0 auto; }
+    .dot.dirty { background: #ffcc00; }
 
     .searchbar {
       position: fixed;
       left: 50%;
-      top: 78px;
+      top: 72px;
       transform: translateX(-50%) translateY(-10px);
-      width: min(820px, calc(100vw - 30px));
+      width: min(880px, calc(100vw - 28px));
       padding: 8px;
-      border-radius: 23px;
+      border-radius: 20px;
       display: none;
-      grid-template-columns: minmax(170px, 1fr) minmax(145px, .75fr) auto auto auto;
-      gap: 7px;
+      grid-template-columns: minmax(160px, 1fr) minmax(140px, .7fr) auto auto auto auto;
+      gap: 6px;
       z-index: 20;
       opacity: 0;
-      transition: .18s ease;
+      transition: .12s ease;
+      overflow: hidden;
     }
 
-    .searchbar.show {
-      display: grid;
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
+    .searchbar.show { display: grid; opacity: 1; transform: translateX(-50%) translateY(0); }
 
     .field {
-      height: 38px;
+      height: 36px;
       border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: 0 13px;
+      border-radius: 12px;
+      padding: 0 12px;
       color: var(--text);
-      background: rgba(255, 255, 255, .07);
+      background: var(--panel-2);
       outline: 0;
       min-width: 0;
+      transition: .12s ease;
+      font-size: 13px;
     }
 
-    .field:focus {
-      border-color: rgba(0, 229, 255, .52);
-      box-shadow: 0 0 0 4px rgba(0, 229, 255, .12);
-      background: rgba(255, 255, 255, .10);
-    }
+    .field:hover { border-color: rgba(255, 255, 255, .12); }
+    .field:focus { border-color: var(--accent); background: var(--panel-3); box-shadow: 0 0 0 3px rgba(10, 132, 255, .15); }
 
     .search-nav {
-      height: 38px;
-      padding: 3px;
+      height: 36px;
+      padding: 2px;
       border: 1px solid var(--line);
       border-radius: 999px;
-      background: rgba(255,255,255,.06);
+      background: var(--panel-2);
       display: flex;
-      gap: 4px;
+      gap: 3px;
       align-items: center;
     }
 
-    .round {
-      width: 30px;
-      height: 30px;
-      border-radius: 999px;
-      display: grid;
-      place-items: center;
-      color: var(--muted);
-      font-size: 15px;
+    .round, .close-search {
+      width: 28px; height: 28px; border-radius: 999px;
+      display: grid; place-items: center;
+      color: var(--muted); font-size: 14px;
+      transition: all .12s ease;
+    }
+    .round svg { width: 14px; height: 14px; }
+
+    .round:hover, .close-search:hover {
+      background: var(--soft);
+      color: var(--text);
     }
 
-    .round:hover {
-      background: rgba(0, 229, 255, .12);
-      color: var(--accent);
+    .close-search {
+      width: 36px; height: 36px;
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      font-size: 18px;
+    }
+
+    .close-search:hover {
+      border-color: rgba(255, 69, 58, .4);
+      background: rgba(255, 69, 58, .1);
+      color: #ff8fa3;
     }
 
     .search-count {
-      height: 38px;
-      min-width: 72px;
-      padding: 0 10px;
+      height: 36px;
+      min-width: 68px;
+      padding: 0 9px;
       border-radius: 999px;
       display: grid;
       place-items: center;
       color: var(--muted);
-      background: rgba(255,255,255,.06);
+      background: var(--panel-2);
       border: 1px solid var(--line);
-      font-size: 12px;
+      font-size: 11px;
       white-space: nowrap;
     }
 
     .menu {
       position: fixed;
-      right: 16px;
-      top: 76px;
-      width: 230px;
-      padding: 8px;
-      border-radius: 22px;
+      width: 228px;
+      padding: 6px;
+      border-radius: 16px;
       z-index: 21;
       display: none;
+      overflow: hidden;
+      transform-origin: top right;
+      box-shadow: var(--shadow);
     }
-
     .menu.show {
       display: block;
+      animation: menuPop .12s ease both;
     }
 
-    .menu button {
-      width: 100%;
-      height: 39px;
-      border-radius: 14px;
-      padding: 0 10px;
-      text-align: left;
+    @keyframes menuPop {
+      from { opacity: 0; transform: translateY(-4px) scale(.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .menu button { width: 100%; height: 36px; border-radius: 10px; padding: 0 10px; text-align: left; display: flex; align-items: center; justify-content: space-between; color: var(--text); font-size: 13px; transition: all .12s ease; }
+    .menu button:hover { background: var(--soft); color: var(--text); }
+    .menu button span:first-child { display: flex; align-items: center; gap: 8px; }
+    .menu button svg { width: 16px; height: 16px; opacity: 0.8; }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 28;
+      display: none;
+      place-items: center;
+      padding: 18px;
+      background: rgba(0, 0, 0, .42);
+    }
+
+    .modal-backdrop.show { display: grid; }
+
+    .modal-card {
+      width: min(420px, 100%);
+      border-radius: 24px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      animation: modalPop .14s ease both;
+    }
+
+    @keyframes modalPop {
+      from { opacity: 0; transform: translateY(10px) scale(.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .modal-head {
+      min-height: 54px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 10px;
+    }
+
+    .modal-title {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -.01em;
+    }
+
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      background: var(--soft);
+      font-size: 18px;
+    }
+
+    .modal-close:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, .1);
+    }
+
+    .shortcut-list {
+      padding: 10px;
+      display: grid;
+      gap: 6px;
+    }
+
+    .shortcut-row {
+      min-height: 40px;
+      padding: 8px 10px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: rgba(255, 255, 255, .035);
+      border: 1px solid transparent;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .shortcut-row:hover {
+      border-color: rgba(255, 255, 255, .08);
+      background: rgba(255, 255, 255, .055);
       color: var(--text);
     }
 
-    .menu button:hover {
-      background: rgba(0, 229, 255, .10);
-      color: var(--accent);
+    .kbd {
+      min-width: 92px;
+      height: 26px;
+      padding: 0 9px;
+      border-radius: 9px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      color: var(--text);
+      font: 11px/1 var(--mono);
+      white-space: nowrap;
     }
 
     .toast {
-      position: fixed;
-      left: 50%;
-      bottom: 22px;
-      transform: translateX(-50%) translateY(18px);
-      opacity: 0;
-      pointer-events: none;
-      padding: 11px 15px;
+      position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%) translateY(16px);
+      opacity: 0; pointer-events: none; padding: 10px 14px; border-radius: 999px;
+      border: 1px solid var(--line); background: var(--panel);
+      color: var(--text); font-size: 12px; transition: .12s ease; z-index: 30;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .hidden { display: none; }
+
+    /* Scrollbars */
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: #636366 transparent;
+    }
+
+    .editor::-webkit-scrollbar,
+    .preview-error::-webkit-scrollbar,
+    .tabs::-webkit-scrollbar,
+    .actions::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    .editor::-webkit-scrollbar-track,
+    .preview-error::-webkit-scrollbar-track,
+    .tabs::-webkit-scrollbar-track,
+    .actions::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .editor::-webkit-scrollbar-thumb,
+    .preview-error::-webkit-scrollbar-thumb,
+    .tabs::-webkit-scrollbar-thumb,
+    .actions::-webkit-scrollbar-thumb {
       border-radius: 999px;
-      border: 1px solid var(--line);
-      background: var(--panel);
-      backdrop-filter: blur(24px) saturate(180%);
-      -webkit-backdrop-filter: blur(24px) saturate(180%);
-      box-shadow: var(--shadow);
-      color: var(--text);
-      font-size: 13px;
-      transition: .2s ease;
-      z-index: 30;
+      background: rgba(255, 255, 255, .2);
+      transition: background .12s ease;
     }
 
-    .toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-
-    .hidden {
-      display: none;
+    .editor::-webkit-scrollbar-thumb:hover,
+    .preview-error::-webkit-scrollbar-thumb:hover,
+    .tabs::-webkit-scrollbar-thumb:hover,
+    .actions::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, .35);
     }
 
     @media (max-width: 960px) {
-      body {
-        overflow: auto;
-      }
-
-      .app {
-        height: auto;
-        min-height: calc(100vh - 18px);
-      }
-
-      .topbar {
-        align-items: flex-start;
-        flex-direction: column;
-      }
-
-      .actions {
-        width: 100%;
-        justify-content: flex-start;
-        overflow-x: auto;
-        flex-wrap: nowrap;
-        scrollbar-width: none;
-      }
-
-      .actions::-webkit-scrollbar {
-        display: none;
-      }
-
-      .workspace,
-      .workspace.editor-big,
-      .workspace.preview-only {
-        min-height: 1040px;
-        grid-template-columns: 1fr;
-        grid-template-rows: 460px 1fr;
-        gap: 9px;
-      }
-
-      .workspace.preview-only {
-        grid-template-rows: 1fr;
-      }
-
-      .resizer {
-        display: none;
-      }
-
-      .panel.left,
-      .panel.right {
-        border-radius: var(--radius);
-      }
-
-      .searchbar {
-        top: 92px;
-        grid-template-columns: 1fr;
-      }
-
-      .search-nav,
-      .search-count,
-      .searchbar .pill {
-        width: 100%;
-      }
-
-      .bottombar {
-        border-radius: 20px;
-        align-items: flex-start;
-        flex-direction: column;
-      }
+      .topbar { gap: 8px; padding: 8px 10px; }
+      .actions { width: 100%; justify-content: flex-start; overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; }
+      .actions::-webkit-scrollbar { display: none; }
+      .pill { height: 36px; padding: 0 10px; font-size: 12px; }
+      .workspace, .workspace.editor-big, .workspace.preview-only { min-height: calc(100dvh - 88px); height: calc(100dvh - 88px); grid-template-columns: 1fr; grid-template-rows: 1fr; gap: 0; }
+      .workspace.mobile-preview .left { display: none; }
+      .workspace.mobile-preview .right { display: grid; }
+      .workspace:not(.mobile-preview) .right { display: none; }
+      .workspace:not(.mobile-preview) .left { display: grid; }
+      .panel.left, .panel.right { border-radius: var(--radius); }
+      .panel-head { min-height: 46px; }
+      .editor { font-size: 13px; line-height: 1.55; padding: 16px 14px 48px; }
+      .editor-tools { left: 10px; right: 10px; bottom: 6px; }
+      .mini-info { font-size: 10px; height: 22px; }
+      .tabs { width: 100%; }
+      .tab { flex: 1; padding: 0 8px; }
+      .searchbar { top: auto; bottom: 8px; width: calc(100vw - 16px); transform: translateX(-50%) translateY(12px); border-radius: 18px; grid-template-columns: 1fr; padding: 8px; }
+      .searchbar.show { transform: translateX(-50%) translateY(0); }
+      .search-nav { justify-content: center; }
+      .round { width: 50%; }
+      .menu { width: min(320px, calc(100vw - 16px)); border-radius: 18px; }
+      .bottombar { min-height: 40px; padding: 6px 10px; }
+      .bottom-group:last-child { display: none; }
+      body { overflow: auto; }
+      .app { height: auto; min-height: calc(100vh - 16px); }
+      .topbar { align-items: stretch; flex-direction: column; }
+      .top-status { width: fit-content; }
+      .workspace, .workspace.editor-big, .workspace.preview-only { min-height: 1000px; grid-template-columns: 1fr; grid-template-rows: 440px 1fr; gap: 8px; }
+      .workspace.preview-only { grid-template-rows: 1fr; }
+      .resizer { display: none; }
+      .panel.left, .panel.right { border-radius: var(--radius); }
+      .searchbar { top: 88px; grid-template-columns: 1fr; }
+      .search-nav, .search-count, .searchbar .pill, .close-search { width: 100%; }
+      .bottombar { border-radius: 18px; align-items: flex-start; flex-direction: column; }
     }
   </style>
 </head>
-
 <body>
   <div class="app">
     <header class="topbar glass">
-      <div class="brand">
-        <div class="logo">&lt;/&gt;</div>
-        <div>
-          <h1>editor neon</h1>
-          <p>html, css, js e preview local</p>
-        </div>
-      </div>
-
+      <div class="top-status"><span class="dot" id="saveDot"></span><span id="saveState">salvo localmente</span></div>
       <div class="actions">
-        <button class="pill" id="openSearch">buscar</button>
-        <button class="pill" id="importBtn">importar</button>
-        <button class="pill" id="saveBtn">salvar</button>
-        <button class="pill primary" id="runBtn">visualizar</button>
-        <button class="pill" id="menuBtn">mais</button>
+        <button class="pill" id="openSearch">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <span>buscar</span>
+        </button>
+        <button class="pill" id="importBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+          <span>importar</span>
+        </button>
+        <button class="pill" id="saveBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+          <span>salvar</span>
+        </button>
+        <button class="pill primary" id="refreshBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+          <span>atualizar</span>
+        </button>
+        <button class="pill" id="menuBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+          <span>mais</span>
+        </button>
       </div>
     </header>
 
@@ -640,16 +675,32 @@
       <section class="panel left glass">
         <div class="panel-head">
           <div class="tabs">
-            <button class="tab active" data-tab="html">html</button>
-            <button class="tab" data-tab="css">css</button>
-            <button class="tab" data-tab="js">js</button>
-            <button class="tab" data-tab="final">final</button>
+            <button class="tab active" data-tab="html">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+              html
+            </button>
+            <button class="tab" data-tab="css">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+              css
+            </button>
+            <button class="tab" data-tab="js">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
+              js
+            </button>
+            <button class="tab" data-tab="final">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              final
+            </button>
           </div>
           <div class="status" id="tabStatus">html</div>
         </div>
-
-        <div class="editor-wrap">
-          <textarea class="editor" id="editor" spellcheck="false"></textarea>
+        <div class="editor-wrap" id="editorWrap">
+          <pre class="highlight-layer" id="highlightLayer" aria-hidden="true"></pre>
+          <textarea class="editor" id="editor" spellcheck="false" wrap="off"></textarea>
+          <div class="color-popover" id="colorPopover" aria-hidden="true">
+            <input type="color" id="colorInput" />
+            <span class="color-value" id="colorValue">#000000</span>
+          </div>
           <div class="editor-tools">
             <span class="mini-info" id="cursorInfo">linha 1, col 1</span>
             <span class="mini-info" id="sizeInfo">0 caracteres</span>
@@ -663,11 +714,12 @@
         <div class="panel-head">
           <div class="status" id="previewStatus">preview pronto</div>
           <div class="preview-tools">
-            <button class="pill" id="openPreviewBtn">abrir</button>
-            <button class="pill" id="refreshBtn">atualizar</button>
+            <button class="pill" id="openPreviewBtn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+              <span>abrir</span>
+            </button>
           </div>
         </div>
-
         <div class="preview-frame-wrap">
           <iframe id="preview" sandbox="allow-scripts allow-forms allow-modals allow-popups allow-downloads"></iframe>
           <div class="preview-error" id="previewError"></div>
@@ -675,34 +727,79 @@
       </section>
     </main>
 
-    <footer class="bottombar glass">
-      <div class="bottom-group">
-        <span class="dot" id="saveDot"></span>
-        <span id="saveState">salvo localmente</span>
-      </div>
-      <div class="bottom-group">
-        <span>ctrl+s salvar · ctrl+f buscar · ctrl+enter visualizar</span>
-      </div>
-    </footer>
   </div>
 
   <div class="searchbar glass" id="searchbar">
     <input class="field" id="findInput" placeholder="buscar no código atual" />
     <input class="field" id="replaceInput" placeholder="substituir por" />
     <div class="search-nav">
-      <button class="round" id="prevMatch">↑</button>
-      <button class="round" id="nextMatch">↓</button>
+      <button class="round" id="prevMatch" title="anterior">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+      </button>
+      <button class="round" id="nextMatch" title="próximo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </button>
     </div>
     <div class="search-count" id="searchCount">0/0</div>
-    <button class="pill primary" id="replaceBtn">trocar tudo</button>
+    <button class="pill primary" id="replaceBtn"><span>trocar tudo</span></button>
+    <button class="close-search" id="closeSearch" title="fechar busca">×</button>
   </div>
 
   <div class="menu glass" id="menu">
-    <button id="exportBtn"><span>exportar html</span><span>⌘</span></button>
-    <button id="layoutBtn"><span>layout</span><span id="layoutLabel">preview maior</span></button>
-    <button id="previewOnlyBtn"><span>modo preview</span><span>⌁</span></button>
-    <button id="copyBtn"><span>copiar final</span><span>⧉</span></button>
-    <button id="resetBtn"><span>limpar projeto</span><span>↺</span></button>
+    <button id="exportBtn">
+      <span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+        exportar html
+      </span>
+    </button>
+    <button id="layoutBtn">
+      <span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="3" x2="12" y2="21"></line></svg>
+        layout
+      </span>
+      <span id="layoutLabel">preview maior</span>
+    </button>
+    <button id="previewOnlyBtn">
+      <span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+        modo preview
+      </span>
+    </button>
+    <button id="copyBtn">
+      <span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+        copiar final
+      </span>
+    </button>
+    <button id="shortcutsBtn">
+      <span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M8 12h8M7 16h10"></path></svg>
+        atalhos
+      </span>
+    </button>
+    <button id="resetBtn">
+      <span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+        limpar projeto
+      </span>
+    </button>
+  </div>
+
+  <div class="modal-backdrop" id="shortcutsModal" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="shortcutsTitle">
+      <div class="modal-head">
+        <h2 class="modal-title" id="shortcutsTitle">atalhos do editor</h2>
+        <button class="modal-close" id="closeShortcuts" title="fechar">×</button>
+      </div>
+      <div class="shortcut-list">
+        <div class="shortcut-row"><span>salvar localmente</span><span class="kbd">ctrl+s</span></div>
+        <div class="shortcut-row"><span>buscar no código</span><span class="kbd">ctrl+f</span></div>
+        <div class="shortcut-row"><span>atualizar preview</span><span class="kbd">ctrl+enter</span></div>
+        <div class="shortcut-row"><span>desfazer troca de cor</span><span class="kbd">ctrl+z</span></div>
+        <div class="shortcut-row"><span>refazer troca de cor</span><span class="kbd">ctrl+shift+z</span></div>
+        <div class="shortcut-row"><span>fechar busca/menu</span><span class="kbd">esc</span></div>
+      </div>
+    </div>
   </div>
 
   <input class="hidden" type="file" id="fileInput" accept=".html,.htm,.css,.js,.txt" />
@@ -711,41 +808,38 @@
   <script>
     const $ = (q) => document.querySelector(q);
     const $$ = (q) => [...document.querySelectorAll(q)];
-
-    const STORAGE = "editor-neon-final-v1";
+    const STORAGE = "editor-neon-final-v2";
 
     const starter = {
       name: "meu-site",
-      html:
-`<main class="card">
+      html: `<main class="card">
   <p class="eyebrow">teste local</p>
   <h1>seu site aqui</h1>
   <p>edite html, css e js. o preview atualiza sozinho.</p>
   <button onclick="sayHi()">clicar</button>
 </main>`,
-      css:
-`body {
+      css: `body {
   margin: 0;
   min-height: 100vh;
   display: grid;
   place-items: center;
   font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  background: #09090f;
-  color: #f5f7ff;
+  background: #000;
+  color: #f5f5f7;
 }
 
 .card {
   width: min(440px, calc(100vw - 40px));
   padding: 34px;
   border-radius: 30px;
-  background: rgba(255,255,255,.08);
-  border: 1px solid rgba(255,255,255,.14);
-  box-shadow: 0 24px 80px rgba(0,0,0,.35);
-  backdrop-filter: blur(22px);
+  background: #1c1c1e;
+  border: 1px solid rgba(255,255,255,.10);
+  box-shadow: 0 18px 44px rgba(0,0,0,.32);
+  
 }
 
 .eyebrow {
-  color: #00e5ff;
+  color: #0a84ff;
   font-size: 13px;
   font-weight: 800;
   text-transform: uppercase;
@@ -759,7 +853,7 @@ h1 {
 }
 
 p {
-  color: #b8bad0;
+  color: #a1a1a6;
   line-height: 1.5;
 }
 
@@ -768,14 +862,13 @@ button {
   padding: 0 18px;
   border: 0;
   border-radius: 999px;
-  background: linear-gradient(135deg, #00e5ff, #8b5cf6);
+  background: linear-gradient(135deg, #0a84ff, #5e5ce6);
   color: white;
   font-weight: 750;
   cursor: pointer;
-  box-shadow: 0 0 28px rgba(0,229,255,.28);
+  box-shadow: none;
 }`,
-      js:
-`function sayHi() {
+      js: `function sayHi() {
   alert("funcionando");
 }`
     };
@@ -790,60 +883,25 @@ button {
     const editor = $("#editor");
     const preview = $("#preview");
     const workspace = $("#workspace");
+    const highlightLayer = $("#highlightLayer");
+    const colorPopover = $("#colorPopover");
+    const colorInput = $("#colorInput");
+    const colorValue = $("#colorValue");
+    let activeColorRange = null;
+    let colorPickSession = null;
+    const colorUndoStack = [];
+    const colorRedoStack = [];
 
-    function defaultState() {
-      return {
-        ...starter,
-        layout: "preview",
-        previewOnly: false,
-        finalDraft: "",
-        lastSaved: Date.now()
-      };
-    }
-
-    function loadState() {
-      try {
-        const saved = JSON.parse(localStorage.getItem(STORAGE));
-        if (saved && typeof saved === "object") {
-          return { ...defaultState(), ...saved };
-        }
-      } catch {}
-      return defaultState();
-    }
-
-    function saveState(silent = false) {
-      state.lastSaved = Date.now();
-      localStorage.setItem(STORAGE, JSON.stringify(state));
-      dirty = false;
-      updateSavedUI();
-      if (!silent) toast("salvo no navegador");
-    }
-
-    function setDirty(value = true) {
-      dirty = value;
-      updateSavedUI();
-    }
-
-    function updateSavedUI() {
-      $("#saveDot").classList.toggle("dirty", dirty);
-      $("#saveState").textContent = dirty ? "alterações não salvas" : "salvo localmente";
-    }
-
-    function toast(text) {
-      const el = $("#toast");
-      el.textContent = text;
-      el.classList.add("show");
-      clearTimeout(toast.t);
-      toast.t = setTimeout(() => el.classList.remove("show"), 1600);
-    }
-
-    function safeTitle(text) {
-      return String(text || "site exportado").replace(/[<>&"]/g, "");
-    }
+    function defaultState() { return { ...starter, layout: "preview", previewOnly: false, finalDraft: "", lastSaved: Date.now() }; }
+    function loadState() { try { const saved = JSON.parse(localStorage.getItem(STORAGE)); if (saved && typeof saved === "object") return { ...defaultState(), ...saved }; } catch {} return defaultState(); }
+    function saveState(silent = false) { state.lastSaved = Date.now(); localStorage.setItem(STORAGE, JSON.stringify(state)); dirty = false; updateSavedUI(); if (!silent) toast("salvo no navegador"); }
+    function setDirty(value = true) { dirty = value; updateSavedUI(); }
+    function updateSavedUI() { $("#saveDot").classList.toggle("dirty", dirty); $("#saveState").textContent = dirty ? "alterações não salvas" : "salvo localmente"; }
+    function toast(text) { const el = $("#toast"); el.textContent = text; el.classList.add("show"); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove("show"), 1600); }
+    function safeTitle(text) { return String(text || "site exportado").replace(/[<>&"]/g, ""); }
 
     function templateFinal() {
       const title = safeTitle(state.name || "site exportado");
-
       return `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -864,506 +922,364 @@ ${state.js || ""}
 </html>`;
     }
 
-    function finalCode() {
-      return state.finalDraft || templateFinal();
-    }
-
-    function rebuildFinalDraft() {
-      state.finalDraft = templateFinal();
-    }
+    function finalCode() { return state.finalDraft || templateFinal(); }
+    function rebuildFinalDraft() { state.finalDraft = templateFinal(); }
 
     function parseHTML(text) {
       const source = String(text || "");
-
-      const styles = [...source.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/gi)]
-        .map(m => m[1].trim())
-        .join("\\n\\n");
-
-      const scripts = [...source.matchAll(/<script(?![^>]*src=)[^>]*>([\s\S]*?)<\/script>/gi)]
-        .map(m => m[1].trim())
-        .join("\\n\\n");
-
-      let bodyText = source
-        .replace(/<!DOCTYPE[\s\S]*?>/i, "")
-        .replace(/<html[^>]*>/gi, "")
-        .replace(/<\/html>/gi, "")
-        .replace(/<head[\s\S]*?<\/head>/gi, "")
-        .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
-        .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "");
-
+      const styles = [...source.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/gi)].map(m => m[1].trim()).join("\n\n");
+      const scripts = [...source.matchAll(/<script(?![^>]*src=)[^>]*>([\s\S]*?)<\/script>/gi)].map(m => m[1].trim()).join("\n\n");
+      let bodyText = source.replace(/<!DOCTYPE[\s\S]*?>/i, "").replace(/<html[^>]*>/gi, "").replace(/<\/html>/gi, "").replace(/<head[\s\S]*?<\/head>/gi, "").replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "").replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "");
       const body = bodyText.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
       if (body) bodyText = body[1];
-
       const title = source.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+      return { html: bodyText.trim(), css: styles, js: scripts, title: title ? title[1].trim() : "" };
+    }
 
+    function escapeHTML(text) {
+      return String(text || "").replace(/[&<>]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[char]));
+    }
+
+    function tokenClass(token, mode) {
+      if (/^(\/\*|\/\/|<!--)/.test(token)) return "tok-comment";
+      if (/^(["'`])/.test(token)) return "tok-string";
+      if (/^#[0-9a-fA-F]{3,8}\b/.test(token)) return "tok-color";
+      if (/^\d/.test(token)) return "tok-number";
+      if (/^<\/?[a-zA-Z]/.test(token)) return "tok-tag";
+      if (/^[a-zA-Z-]+(?=\s*=)/.test(token)) return "tok-attr";
+      if (mode === "css" && /^[.#]?[a-zA-Z_][\w-]*(?=\s*[{,])/.test(token)) return "tok-selector";
+      if (mode === "css" && /^[-a-zA-Z]+(?=\s*:)/.test(token)) return "tok-property";
+      if (/\b(function|const|let|var|return|if|else|for|while|class|new|try|catch|async|await|true|false|null|undefined|import|export|from|document|window|querySelector|addEventListener)\b/.test(token)) return "tok-keyword";
+      if (/^[{}()[\];,.<>\/=:+*\-]$/.test(token)) return "tok-punc";
+      return "";
+    }
+
+    function highlightCode(code, mode) {
+      const re = /(<!--[\s\S]*?-->|\/\*[\s\S]*?\*\/|\/\/[^\n]*|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`|#[0-9a-fA-F]{3,8}\b|\b\d+(?:\.\d+)?(?:px|rem|em|vh|vw|%|s|ms)?\b|<\/?[a-zA-Z][\w:-]*|[a-zA-Z-]+(?=\s*=)|\b(?:function|const|let|var|return|if|else|for|while|class|new|try|catch|async|await|true|false|null|undefined|import|export|from|document|window|querySelector|addEventListener)\b|[{}()[\];,.<>\/=:+*\-])/g;
+      let out = "";
+      let last = 0;
+      let match;
+      while ((match = re.exec(code)) !== null) {
+        out += escapeHTML(code.slice(last, match.index));
+        const token = match[0];
+        const cls = tokenClass(token, mode);
+        out += cls ? `<span class="${cls}">${escapeHTML(token)}</span>` : escapeHTML(token);
+        last = match.index + token.length;
+      }
+      out += escapeHTML(code.slice(last));
+      return out + (code.endsWith("\n") ? " " : "");
+    }
+
+    function renderHighlight() {
+      const mode = currentTab === "final" ? "html" : currentTab;
+      highlightLayer.innerHTML = highlightCode(editor.value, mode);
+      syncHighlightScroll();
+    }
+
+    function syncHighlightScroll() {
+      highlightLayer.scrollTop = editor.scrollTop;
+      highlightLayer.scrollLeft = editor.scrollLeft;
+    }
+
+    function normalizeHexForInput(hex) {
+      const clean = String(hex || "").replace("#", "");
+      if (clean.length === 3) return "#" + clean.split("").map(ch => ch + ch).join("");
+      if (clean.length >= 6) return "#" + clean.slice(0, 6);
+      return "#000000";
+    }
+
+    function findHexAt(pos) {
+      const re = /#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})\b/g;
+      let match;
+      while ((match = re.exec(editor.value)) !== null) {
+        const start = match.index;
+        const end = start + match[0].length;
+        if (pos >= start && pos <= end) return { start, end, value: match[0] };
+      }
+      return null;
+    }
+
+    function showColorPicker(range) {
+      activeColorRange = range;
+      const value = normalizeHexForInput(range.value);
+      colorInput.value = value;
+      colorValue.textContent = value;
+      const before = editor.value.slice(0, range.start);
+      const lines = before.split("\n");
+      const line = lines.length - 1;
+      const col = lines[lines.length - 1].length;
+      const cs = getComputedStyle(editor);
+      const canvas = showColorPicker.canvas || (showColorPicker.canvas = document.createElement("canvas"));
+      const ctx = canvas.getContext("2d");
+      ctx.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+      const charW = ctx.measureText("M").width || 8.4;
+      const lineH = parseFloat(cs.lineHeight) || 22.4;
+      const padLeft = parseFloat(cs.paddingLeft) || 20;
+      const padTop = parseFloat(cs.paddingTop) || 18;
+      const x = Math.max(10, Math.min(editor.clientWidth - 170, padLeft + col * charW - editor.scrollLeft));
+      const y = Math.max(10, Math.min(editor.clientHeight - 56, padTop + line * lineH - editor.scrollTop + 24));
+      colorPopover.style.left = `${x}px`;
+      colorPopover.style.top = `${y}px`;
+      colorPopover.classList.add("show");
+      colorPopover.setAttribute("aria-hidden", "false");
+    }
+
+    function closeColorPicker() {
+      activeColorRange = null;
+      colorPickSession = null;
+      colorPopover.classList.remove("show");
+      colorPopover.setAttribute("aria-hidden", "true");
+    }
+
+    function maybeOpenColorPicker() {
+      const range = findHexAt(editor.selectionStart || 0);
+      if (range) showColorPicker(range);
+      else closeColorPicker();
+    }
+
+    function snapshotEditor() {
       return {
-        html: bodyText.trim(),
-        css: styles,
-        js: scripts,
-        title: title ? title[1].trim() : ""
+        tab: currentTab,
+        value: editor.value,
+        start: editor.selectionStart || 0,
+        end: editor.selectionEnd || 0
       };
     }
 
-    function applyLayout() {
-      workspace.classList.toggle("editor-big", state.layout === "editor");
-      workspace.classList.toggle("preview-only", Boolean(state.previewOnly));
-      $("#layoutLabel").textContent = state.layout === "editor" ? "editor maior" : "preview maior";
-    }
-
-    function syncEditor() {
-      editor.value = currentTab === "final" ? finalCode() : (state[currentTab] || "");
-      $("#tabStatus").textContent = currentTab;
+    function restoreEditorSnapshot(snapshot) {
+      if (!snapshot) return;
+      if (snapshot.tab !== currentTab) {
+        currentTab = snapshot.tab;
+        $$(".tab").forEach(btn => btn.classList.toggle("active", btn.dataset.tab === currentTab));
+      }
+      editor.value = snapshot.value;
+      applyEditorValue(editor.value);
+      editor.setSelectionRange(snapshot.start, snapshot.end);
+      setDirty(true);
       updateEditorMeta();
       updateSearch(true, false);
+      renderHighlight();
+      updatePreview();
+      saveState(true);
     }
 
-    function switchTab(tab) {
-      if (currentTab !== "final" && tab === "final") rebuildFinalDraft();
-
-      currentTab = tab;
-
-      $$(".tab").forEach(btn => {
-        btn.classList.toggle("active", btn.dataset.tab === tab);
-      });
-
-      syncEditor();
-      editor.focus();
+    function rememberColorUndo() {
+      if (colorPickSession) return;
+      colorPickSession = snapshotEditor();
+      colorUndoStack.push(colorPickSession);
+      if (colorUndoStack.length > 80) colorUndoStack.shift();
+      colorRedoStack.length = 0;
     }
+
+    function undoColorChange() {
+      const previous = colorUndoStack.pop();
+      if (!previous) return false;
+      colorRedoStack.push(snapshotEditor());
+      closeColorPicker();
+      restoreEditorSnapshot(previous);
+      toast("cor desfeita");
+      return true;
+    }
+
+    function redoColorChange() {
+      const next = colorRedoStack.pop();
+      if (!next) return false;
+      colorUndoStack.push(snapshotEditor());
+      closeColorPicker();
+      restoreEditorSnapshot(next);
+      toast("cor refeita");
+      return true;
+    }
+
+    function applyPickedColor(value) {
+      if (!activeColorRange) return;
+      rememberColorUndo();
+      const before = editor.value.slice(0, activeColorRange.start);
+      const after = editor.value.slice(activeColorRange.end);
+      editor.value = before + value + after;
+      const end = activeColorRange.start + value.length;
+      editor.setSelectionRange(activeColorRange.start, end);
+      activeColorRange = { start: activeColorRange.start, end, value };
+      colorValue.textContent = value;
+      handleEditorInput();
+    }
+
+
+    function applyLayout() { workspace.classList.toggle("editor-big", state.layout === "editor"); workspace.classList.toggle("preview-only", Boolean(state.previewOnly)); $("#layoutLabel").textContent = state.layout === "editor" ? "editor maior" : "preview maior"; }
+    function syncEditor() { editor.value = currentTab === "final" ? finalCode() : (state[currentTab] || ""); $("#tabStatus").textContent = currentTab; updateEditorMeta(); updateSearch(true, false); renderHighlight(); closeColorPicker(); }
+    function switchTab(tab) { if (currentTab !== "final" && tab === "final") rebuildFinalDraft(); currentTab = tab; $$(".tab").forEach(btn => btn.classList.toggle("active", btn.dataset.tab === tab)); syncEditor(); editor.focus(); }
 
     function applyEditorValue(value) {
       if (currentTab === "final") {
         state.finalDraft = value;
-
         const parsed = parseHTML(value);
-        state.html = parsed.html;
-        state.css = parsed.css;
-        state.js = parsed.js;
-
+        state.html = parsed.html; state.css = parsed.css; state.js = parsed.js;
         if (parsed.title) state.name = parsed.title;
-      } else {
-        state[currentTab] = value;
-        rebuildFinalDraft();
-      }
+      } else { state[currentTab] = value; rebuildFinalDraft(); }
     }
 
-    function handleEditorInput() {
-      applyEditorValue(editor.value);
-      setDirty(true);
-      updateEditorMeta();
-      updateSearch(false, false);
+    function handleEditorInput() { applyEditorValue(editor.value); setDirty(true); updateEditorMeta(); updateSearch(false, false); renderHighlight(); clearTimeout(handleEditorInput.previewT); handleEditorInput.previewT = setTimeout(updatePreview, 360); clearTimeout(handleEditorInput.saveT); handleEditorInput.saveT = setTimeout(() => saveState(true), 1000); }
 
-      clearTimeout(handleEditorInput.previewT);
-      handleEditorInput.previewT = setTimeout(updatePreview, 360);
-
-      clearTimeout(handleEditorInput.saveT);
-      handleEditorInput.saveT = setTimeout(() => saveState(true), 1000);
-    }
-
-    function updateEditorMeta() {
-      const pos = editor.selectionStart || 0;
-      const before = editor.value.slice(0, pos);
-      const line = before.split("\\n").length;
-      const col = before.length - before.lastIndexOf("\\n");
-
-      $("#cursorInfo").textContent = `linha ${line}, col ${col}`;
-      $("#sizeInfo").textContent = `${editor.value.length.toLocaleString("pt-BR")} caracteres`;
-    }
+    function updateEditorMeta() { const pos = editor.selectionStart || 0; const before = editor.value.slice(0, pos); const line = before.split("\n").length; const col = before.length - before.lastIndexOf("\n"); $("#cursorInfo").textContent = `linha ${line}, col ${col}`; $("#sizeInfo").textContent = `${editor.value.length.toLocaleString("pt-BR")} caracteres`; }
 
     function updatePreview() {
-      $("#previewError").classList.remove("show");
-      $("#previewError").textContent = "";
-
-      const errorHook = `
-<script>
-window.addEventListener("error", function(e) {
-  parent.postMessage({
-    type: "preview-error",
-    message: e.message,
-    line: e.lineno,
-    col: e.colno
-  }, "*");
-});
-
-window.addEventListener("unhandledrejection", function(e) {
-  parent.postMessage({
-    type: "preview-error",
-    message: String(e.reason || "erro em promise")
-  }, "*");
-});
-<\/script>`;
-
-      const code = finalCode().includes("</body>")
-        ? finalCode().replace("</body>", errorHook + "\\n</body>")
-        : finalCode() + errorHook;
-
-      preview.srcdoc = code;
-
+      $("#previewError").classList.remove("show"); $("#previewError").textContent = "";
+      const errorHook = `\n<script>\nwindow.addEventListener("error",function(e){parent.postMessage({type:"preview-error",message:e.message,line:e.lineno,col:e.colno},"*")});\nwindow.addEventListener("unhandledrejection",function(e){parent.postMessage({type:"preview-error",message:String(e.reason||"erro em promise")},"*")});\n<\/script>`;
+      const base = finalCode();
+      preview.srcdoc = base.includes("</body>") ? base.replace("</body>", errorHook + "\n</body>") : base + errorHook;
       $("#previewStatus").textContent = "preview atualizado";
-      clearTimeout(updatePreview.t);
-      updatePreview.t = setTimeout(() => {
-        $("#previewStatus").textContent = "preview pronto";
-      }, 1100);
+      clearTimeout(updatePreview.t); updatePreview.t = setTimeout(() => $("#previewStatus").textContent = "preview pronto", 1100);
     }
 
-    window.addEventListener("message", (event) => {
-      if (!event.data || event.data.type !== "preview-error") return;
+    window.addEventListener("message", (event) => { if (!event.data || event.data.type !== "preview-error") return; const msg = event.data.line ? `${event.data.message} — linha ${event.data.line}:${event.data.col || 0}` : event.data.message; $("#previewError").textContent = msg; $("#previewError").classList.add("show"); $("#previewStatus").textContent = "erro no preview"; });
 
-      const msg = event.data.line
-        ? `${event.data.message} — linha ${event.data.line}:${event.data.col || 0}`
-        : event.data.message;
-
-      $("#previewError").textContent = msg;
-      $("#previewError").classList.add("show");
-      $("#previewStatus").textContent = "erro no preview";
-    });
-
-    function openSearch() {
-      $("#searchbar").classList.add("show");
-      $("#findInput").focus();
-      $("#findInput").select();
-      updateSearch(true, false);
-    }
-
-    function closeSearch() {
-      $("#searchbar").classList.remove("show");
-      $("#findInput").value = "";
-      $("#replaceInput").value = "";
-      currentMatch = -1;
-      updateSearch(true, false);
-      editor.focus();
-    }
-
-    function getTerm() {
-      return $("#findInput").value || "";
-    }
+    function openSearch() { $("#searchbar").classList.add("show"); $("#findInput").focus(); $("#findInput").select(); updateSearch(true, false); }
+    function closeSearch() { $("#searchbar").classList.remove("show"); $("#findInput").value = ""; $("#replaceInput").value = ""; currentMatch = -1; updateSearch(true, false); editor.focus(); }
+    function getTerm() { return $("#findInput").value || ""; }
 
     function collectMatches(text, term) {
       if (!term) return [];
-
-      const found = [];
-      const lower = text.toLowerCase();
-      const needle = term.toLowerCase();
-
-      let index = 0;
-
-      while (true) {
-        index = lower.indexOf(needle, index);
-        if (index === -1) break;
-
-        found.push({
-          start: index,
-          end: index + term.length
-        });
-
-        index += Math.max(term.length, 1);
-      }
-
+      const found = []; const lower = text.toLowerCase(); const needle = term.toLowerCase(); let index = 0;
+      while (true) { index = lower.indexOf(needle, index); if (index === -1) break; found.push({ start: index, end: index + term.length }); index += Math.max(term.length, 1); }
       return found;
     }
 
     function updateSearch(reset = false, select = true) {
-      const term = getTerm();
-      matches = collectMatches(editor.value, term);
-
-      if (!matches.length) currentMatch = -1;
-      else if (reset || currentMatch < 0) currentMatch = 0;
-      else if (currentMatch >= matches.length) currentMatch = matches.length - 1;
-
-      $("#searchCount").textContent = matches.length
-        ? `${currentMatch + 1}/${matches.length}`
-        : "0/0";
-
-      $("#prevMatch").disabled = !matches.length;
-      $("#nextMatch").disabled = !matches.length;
-
+      matches = collectMatches(editor.value, getTerm());
+      if (!matches.length) currentMatch = -1; else if (reset || currentMatch < 0) currentMatch = 0; else if (currentMatch >= matches.length) currentMatch = matches.length - 1;
+      $("#searchCount").textContent = matches.length ? `${currentMatch + 1}/${matches.length}` : "0/0";
+      $("#prevMatch").disabled = !matches.length; $("#nextMatch").disabled = !matches.length;
       if (select && matches.length) selectMatch(currentMatch, false);
     }
 
     function selectMatch(index, center = true) {
       if (!matches[index]) return;
-
-      const match = matches[index];
-
-      editor.focus({ preventScroll: true });
-      editor.setSelectionRange(match.start, match.end);
-
-      if (center) {
-        const before = editor.value.slice(0, match.start);
-        const line = before.split("\\n").length - 1;
-        const lineHeight = parseFloat(getComputedStyle(editor).lineHeight) || 23;
-
-        editor.scrollTop = Math.max(0, line * lineHeight - editor.clientHeight * .42);
-      }
-
-      $("#searchCount").textContent = `${index + 1}/${matches.length}`;
-      updateEditorMeta();
+      const match = matches[index]; editor.focus({ preventScroll: true }); editor.setSelectionRange(match.start, match.end);
+      if (center) { const before = editor.value.slice(0, match.start); const line = before.split("\n").length - 1; const lineHeight = parseFloat(getComputedStyle(editor).lineHeight) || 23; editor.scrollTop = Math.max(0, line * lineHeight - editor.clientHeight * .42); }
+      $("#searchCount").textContent = `${index + 1}/${matches.length}`; updateEditorMeta();
     }
 
-    function goToMatch(step) {
-      updateSearch(false, false);
-      if (!matches.length) return;
-
-      currentMatch = (currentMatch + step + matches.length) % matches.length;
-      selectMatch(currentMatch);
-    }
+    function goToMatch(step) { updateSearch(false, false); if (!matches.length) return; currentMatch = (currentMatch + step + matches.length) % matches.length; selectMatch(currentMatch); }
 
     function replaceAllMatches() {
-      const find = getTerm();
-      if (!find) return;
-
-      const before = editor.value;
-      const escaped = find.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      const next = before.replace(new RegExp(escaped, "gi"), $("#replaceInput").value);
-
-      if (before === next) {
-        toast("nada encontrado");
-        return;
-      }
-
-      editor.value = next;
-      applyEditorValue(next);
-      setDirty(true);
-      updateEditorMeta();
-      updatePreview();
-      updateSearch(true, false);
-      saveState(true);
-      toast("substituído");
+      const find = getTerm(); if (!find) return;
+      const before = editor.value; const escaped = find.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); const next = before.replace(new RegExp(escaped, "gi"), $("#replaceInput").value);
+      if (before === next) { toast("nada encontrado"); return; }
+      editor.value = next; applyEditorValue(next); setDirty(true); updateEditorMeta(); updatePreview(); updateSearch(true, false); saveState(true); toast("substituído");
     }
 
-    function downloadFile() {
-      const blob = new Blob([finalCode()], { type: "text/html;charset=utf-8" });
-      const a = document.createElement("a");
-
-      const safeName = (state.name || "meu-site")
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\\u0300-\\u036f]/g, "")
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, "") || "meu-site";
-
-      a.href = URL.createObjectURL(blob);
-      a.download = `${safeName}.html`;
-      a.click();
-
-      URL.revokeObjectURL(a.href);
-      toast("arquivo exportado");
-    }
-
-    async function copyFinal() {
-      try {
-        await navigator.clipboard.writeText(finalCode());
-        toast("código final copiado");
-      } catch {
-        toast("não deu para copiar");
-      }
-    }
-
-    function openPreview() {
-      if (previewBlobUrl) URL.revokeObjectURL(previewBlobUrl);
-
-      previewBlobUrl = URL.createObjectURL(
-        new Blob([finalCode()], { type: "text/html" })
-      );
-
-      window.open(previewBlobUrl, "_blank");
-    }
+    function downloadFile() { const blob = new Blob([finalCode()], { type: "text/html;charset=utf-8" }); const a = document.createElement("a"); const safeName = (state.name || "meu-site").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "meu-site"; a.href = URL.createObjectURL(blob); a.download = `${safeName}.html`; a.click(); URL.revokeObjectURL(a.href); toast("arquivo exportado"); }
+    async function copyFinal() { try { await navigator.clipboard.writeText(finalCode()); toast("código final copiado"); } catch { toast("não deu para copiar"); } }
+    function openPreview() { if (previewBlobUrl) URL.revokeObjectURL(previewBlobUrl); previewBlobUrl = URL.createObjectURL(new Blob([finalCode()], { type: "text/html" })); window.open(previewBlobUrl, "_blank"); }
 
     async function importFile(file) {
-      const text = await file.text();
-      const name = file.name.toLowerCase();
-
-      if (name.endsWith(".css")) {
-        state.css = text;
-        rebuildFinalDraft();
-        switchTab("css");
-      } else if (name.endsWith(".js")) {
-        state.js = text;
-        rebuildFinalDraft();
-        switchTab("js");
-      } else {
-        const parsed = parseHTML(text);
-
-        state.html = parsed.html || text;
-        state.css = parsed.css || state.css || "";
-        state.js = parsed.js || state.js || "";
-        state.finalDraft = text;
-
-        if (parsed.title) state.name = parsed.title;
-
-        switchTab("html");
-      }
-
-      setDirty(true);
-      syncEditor();
-      updatePreview();
-      saveState(true);
-      toast("arquivo importado");
+      const text = await file.text(); const name = file.name.toLowerCase();
+      if (name.endsWith(".css")) { state.css = text; rebuildFinalDraft(); switchTab("css"); }
+      else if (name.endsWith(".js")) { state.js = text; rebuildFinalDraft(); switchTab("js"); }
+      else { const parsed = parseHTML(text); state.html = parsed.html || text; state.css = parsed.css || state.css || ""; state.js = parsed.js || state.js || ""; state.finalDraft = text; if (parsed.title) state.name = parsed.title; switchTab("html"); }
+      setDirty(true); syncEditor(); updatePreview(); saveState(true); toast("arquivo importado");
     }
 
-    function resetProject() {
-      state = defaultState();
-      currentTab = "html";
-
-      $$(".tab").forEach(btn => {
-        btn.classList.toggle("active", btn.dataset.tab === "html");
-      });
-
-      applyLayout();
-      syncEditor();
-      updatePreview();
-      saveState(true);
-      toast("projeto limpo");
-    }
+    function resetProject() { state = defaultState(); currentTab = "html"; $$(".tab").forEach(btn => btn.classList.toggle("active", btn.dataset.tab === "html")); applyLayout(); syncEditor(); updatePreview(); saveState(true); toast("projeto limpo"); }
 
     editor.addEventListener("input", handleEditorInput);
-    editor.addEventListener("keyup", updateEditorMeta);
-    editor.addEventListener("click", updateEditorMeta);
-    editor.addEventListener("scroll", updateEditorMeta);
+    editor.addEventListener("keyup", () => { updateEditorMeta(); renderHighlight(); });
+    editor.addEventListener("click", () => { updateEditorMeta(); setTimeout(maybeOpenColorPicker, 0); });
+    editor.addEventListener("scroll", () => { updateEditorMeta(); syncHighlightScroll(); if (colorPopover.classList.contains("show")) maybeOpenColorPicker(); });
+    colorInput.addEventListener("input", (e) => applyPickedColor(e.target.value));
+    colorPopover.addEventListener("mousedown", (e) => e.stopPropagation());
+    editor.addEventListener("keydown", (e) => { if (e.key === "Tab") { e.preventDefault(); const start = editor.selectionStart; const end = editor.selectionEnd; const insert = "  "; editor.value = editor.value.slice(0, start) + insert + editor.value.slice(end); editor.selectionStart = editor.selectionEnd = start + insert.length; handleEditorInput(); } });
 
-    editor.addEventListener("keydown", (e) => {
-      if (e.key === "Tab") {
-        e.preventDefault();
+    $$(".tab").forEach(btn => btn.addEventListener("click", () => switchTab(btn.dataset.tab)));
 
-        const start = editor.selectionStart;
-        const end = editor.selectionEnd;
-        const insert = "  ";
-
-        editor.value = editor.value.slice(0, start) + insert + editor.value.slice(end);
-        editor.selectionStart = editor.selectionEnd = start + insert.length;
-
-        handleEditorInput();
-      }
+    $("#refreshBtn").addEventListener("click", updatePreview); $("#saveBtn").addEventListener("click", () => saveState()); $("#importBtn").addEventListener("click", () => $("#fileInput").click()); $("#openPreviewBtn").addEventListener("click", openPreview);
+    $("#openSearch").addEventListener("click", openSearch); $("#closeSearch").addEventListener("click", closeSearch); $("#prevMatch").addEventListener("click", () => goToMatch(-1)); $("#nextMatch").addEventListener("click", () => goToMatch(1)); $("#replaceBtn").addEventListener("click", replaceAllMatches);
+    $("#findInput").addEventListener("input", () => {
+      updateSearch(true, false);
     });
+    $("#findInput").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); goToMatch(e.shiftKey ? -1 : 1); } if (e.key === "Escape") closeSearch(); });
+    $("#replaceInput").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); replaceAllMatches(); } if (e.key === "Escape") closeSearch(); });
+    $("#fileInput").addEventListener("change", async (e) => { const file = e.target.files[0]; if (file) await importFile(file); e.target.value = ""; });
 
-    $$(".tab").forEach(btn => {
-      btn.addEventListener("click", () => switchTab(btn.dataset.tab));
-    });
+    function positionMenu() {
+      const btn = $("#menuBtn");
+      const menu = $("#menu");
+      const rect = btn.getBoundingClientRect();
+      const gap = 8;
+      const width = Math.min(320, Math.max(228, menu.offsetWidth || 228));
+      const left = Math.max(8, Math.min(window.innerWidth - width - 8, rect.right - width));
+      menu.style.left = `${left}px`;
+      menu.style.top = `${Math.min(window.innerHeight - 8, rect.bottom + gap)}px`;
+    }
 
-    $("#runBtn").addEventListener("click", updatePreview);
-    $("#refreshBtn").addEventListener("click", updatePreview);
-    $("#saveBtn").addEventListener("click", () => saveState());
-    $("#importBtn").addEventListener("click", () => $("#fileInput").click());
-    $("#openPreviewBtn").addEventListener("click", openPreview);
-    $("#openSearch").addEventListener("click", openSearch);
-    $("#prevMatch").addEventListener("click", () => goToMatch(-1));
-    $("#nextMatch").addEventListener("click", () => goToMatch(1));
-    $("#replaceBtn").addEventListener("click", replaceAllMatches);
+    function toggleMenu() {
+      const menu = $("#menu");
+      const willOpen = !menu.classList.contains("show");
+      menu.classList.toggle("show", willOpen);
+      if (willOpen) requestAnimationFrame(positionMenu);
+    }
 
-    $("#findInput").addEventListener("input", () => updateSearch(true, true));
+    function closeMenu() { $("#menu").classList.remove("show"); }
 
-    $("#findInput").addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        goToMatch(e.shiftKey ? -1 : 1);
-      }
+    function openShortcuts() {
+      closeMenu();
+      $("#shortcutsModal").classList.add("show");
+      $("#shortcutsModal").setAttribute("aria-hidden", "false");
+    }
 
-      if (e.key === "Escape") closeSearch();
-    });
+    function closeShortcuts() {
+      $("#shortcutsModal").classList.remove("show");
+      $("#shortcutsModal").setAttribute("aria-hidden", "true");
+    }
 
-    $("#replaceInput").addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        replaceAllMatches();
-      }
-
-      if (e.key === "Escape") closeSearch();
-    });
-
-    $("#fileInput").addEventListener("change", async (e) => {
-      const file = e.target.files[0];
-      if (file) await importFile(file);
-      e.target.value = "";
-    });
-
-    $("#menuBtn").addEventListener("click", () => {
-      $("#menu").classList.toggle("show");
-    });
-
+    $("#menuBtn").addEventListener("click", (e) => { e.stopPropagation(); toggleMenu(); });
+    window.addEventListener("resize", () => { if ($("#menu").classList.contains("show")) positionMenu(); });
+    window.addEventListener("scroll", () => { if ($("#menu").classList.contains("show")) positionMenu(); }, true);
     document.addEventListener("click", (e) => {
-      if (!$("#menu").contains(e.target) && !$("#menuBtn").contains(e.target)) {
-        $("#menu").classList.remove("show");
-      }
+      if (!$("#menu").contains(e.target) && !$("#menuBtn").contains(e.target)) closeMenu();
+      if (!$("#editorWrap").contains(e.target)) closeColorPicker();
     });
-
-    $("#exportBtn").addEventListener("click", downloadFile);
-    $("#copyBtn").addEventListener("click", copyFinal);
-    $("#resetBtn").addEventListener("click", resetProject);
-
-    $("#layoutBtn").addEventListener("click", () => {
-      state.previewOnly = false;
-      state.layout = state.layout === "preview" ? "editor" : "preview";
-      workspace.style.gridTemplateColumns = "";
-      applyLayout();
-      saveState(true);
-    });
-
-    $("#previewOnlyBtn").addEventListener("click", () => {
-      state.previewOnly = !state.previewOnly;
-      workspace.style.gridTemplateColumns = "";
-      applyLayout();
-      saveState(true);
-    });
+    $("#shortcutsBtn").addEventListener("click", openShortcuts);
+    $("#closeShortcuts").addEventListener("click", closeShortcuts);
+    $("#shortcutsModal").addEventListener("click", (e) => { if (e.target === $("#shortcutsModal")) closeShortcuts(); });
+    $("#exportBtn").addEventListener("click", downloadFile); $("#copyBtn").addEventListener("click", copyFinal); $("#resetBtn").addEventListener("click", resetProject);
+    $("#layoutBtn").addEventListener("click", () => { state.previewOnly = false; state.layout = state.layout === "preview" ? "editor" : "preview"; workspace.style.gridTemplateColumns = ""; applyLayout(); saveState(true); });
+    $("#previewOnlyBtn").addEventListener("click", () => { state.previewOnly = !state.previewOnly; workspace.style.gridTemplateColumns = ""; applyLayout(); saveState(true); });
 
     window.addEventListener("keydown", (e) => {
       const key = e.key.toLowerCase();
-
-      if ((e.ctrlKey || e.metaKey) && key === "s") {
-        e.preventDefault();
-        saveState();
+      if ((e.ctrlKey || e.metaKey) && key === "z") {
+        if (e.shiftKey ? redoColorChange() : undoColorChange()) {
+          e.preventDefault();
+          return;
+        }
       }
-
-      if ((e.ctrlKey || e.metaKey) && key === "enter") {
-        e.preventDefault();
-        updatePreview();
-      }
-
-      if ((e.ctrlKey || e.metaKey) && key === "f") {
-        e.preventDefault();
-        openSearch();
-      }
-
-      if (e.key === "Escape") {
-        if ($("#searchbar").classList.contains("show")) closeSearch();
-        $("#menu").classList.remove("show");
-      }
+      if ((e.ctrlKey || e.metaKey) && key === "s") { e.preventDefault(); saveState(); }
+      if ((e.ctrlKey || e.metaKey) && key === "enter") { e.preventDefault(); updatePreview(); }
+      if ((e.ctrlKey || e.metaKey) && key === "f") { e.preventDefault(); openSearch(); }
+      if (e.key === "Escape") { if ($("#searchbar").classList.contains("show")) closeSearch(); closeMenu(); closeShortcuts(); closeColorPicker(); }
     });
 
-    const resizer = $("#resizer");
-    let resizing = false;
+    const resizer = $("#resizer"); let resizing = false;
+    resizer.addEventListener("mousedown", () => { resizing = true; state.previewOnly = false; workspace.classList.remove("preview-only"); document.body.style.userSelect = "none"; });
+    window.addEventListener("mousemove", (e) => { if (!resizing || window.innerWidth < 960) return; const rect = workspace.getBoundingClientRect(); const x = e.clientX - rect.left; const pct = Math.max(22, Math.min(78, (x / rect.width) * 100)); workspace.style.gridTemplateColumns = `${pct}% 8px ${100 - pct}%`; });
+    window.addEventListener("mouseup", () => { if (resizing) saveState(true); resizing = false; document.body.style.userSelect = ""; });
+    window.addEventListener("beforeunload", (e) => { if (!dirty) return; e.preventDefault(); e.returnValue = ""; });
 
-    resizer.addEventListener("mousedown", () => {
-      resizing = true;
-      state.previewOnly = false;
-      workspace.classList.remove("preview-only");
-      document.body.style.userSelect = "none";
+    function setMobileView(view) {
+      const isPreview = view === "preview";
+      workspace.classList.toggle("mobile-preview", isPreview);
+      $$(".mobile-tab").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.mobileView === view);
+      });
+      if (isPreview) updatePreview();
+    }
+
+    $$(".mobile-tab").forEach(btn => {
+      btn.addEventListener("click", () => setMobileView(btn.dataset.mobileView));
     });
 
-    window.addEventListener("mousemove", (e) => {
-      if (!resizing || window.innerWidth < 960) return;
-
-      const rect = workspace.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const pct = Math.max(22, Math.min(78, (x / rect.width) * 100));
-
-      workspace.style.gridTemplateColumns = `${pct}% 8px ${100 - pct}%`;
-    });
-
-    window.addEventListener("mouseup", () => {
-      if (resizing) saveState(true);
-      resizing = false;
-      document.body.style.userSelect = "";
-    });
-
-    window.addEventListener("beforeunload", (e) => {
-      if (!dirty) return;
-      e.preventDefault();
-      e.returnValue = "";
-    });
-
-    applyLayout();
-    syncEditor();
-    updateSavedUI();
-    updatePreview();
+    applyLayout(); syncEditor(); updateSavedUI(); updatePreview();
   </script>
 </body>
 </html>
