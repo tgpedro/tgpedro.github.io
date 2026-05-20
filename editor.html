@@ -6,6 +6,8 @@
   <title>editor</title>
   <style>
     :root {
+      --editor-font-size: 14px;
+      --editor-line-height: 22.4px;
       --bg: #000000;
       --panel: #1c1c1e;
       --panel-2: #2c2c2e;
@@ -219,6 +221,21 @@
       background: #111113;
     }
 
+    .active-line-bg {
+      position: absolute;
+      left: 54px;
+      right: 0;
+      top: 18px;
+      height: var(--editor-line-height);
+      background: rgba(255, 255, 255, .055);
+      border-top: 1px solid rgba(255,255,255,.035);
+      border-bottom: 1px solid rgba(0,0,0,.18);
+      pointer-events: none;
+      z-index: 0;
+      transform: translate3d(0, 0, 0);
+      will-change: transform;
+    }
+
     .highlight-layer {
       position: absolute;
       inset: 0;
@@ -228,8 +245,8 @@
       color: #d1d1d6;
       background: transparent;
       font-family: var(--mono);
-      font-size: 14px;
-      line-height: 1.6;
+      font-size: var(--editor-font-size);
+      line-height: var(--editor-line-height);
       tab-size: 2;
       white-space: pre;
       overflow: hidden;
@@ -256,8 +273,8 @@
       background: #111113;
       color: #6e6e73;
       font-family: var(--mono);
-      font-size: 14px;
-      line-height: 1.6;
+      font-size: var(--editor-font-size);
+      line-height: var(--editor-line-height);
       text-align: right;
       overflow: hidden;
       pointer-events: none;
@@ -273,12 +290,14 @@
 
     .line-number {
       display: block;
-      height: 1.6em;
+      height: var(--editor-line-height);
       padding-right: 10px;
     }
 
     .line-number.active {
       color: #f5f5f7;
+      background: rgba(255, 255, 255, .055);
+      border-radius: 8px 0 0 8px;
     }
 
     .tok-tag { color: #ff9f0a; }
@@ -337,8 +356,8 @@
       position: relative;
       z-index: 2;
       font-family: var(--mono);
-      font-size: 14px;
-      line-height: 1.6;
+      font-size: var(--editor-font-size);
+      line-height: var(--editor-line-height);
       tab-size: 2;
       caret-color: var(--accent);
       white-space: pre;
@@ -348,7 +367,7 @@
 
     .editor::selection { background: rgba(10, 132, 255, .28); color: transparent; -webkit-text-fill-color: transparent; }
 
-    .editor-tools { position: absolute; left: 12px; right: 12px; bottom: 8px; display: flex; justify-content: space-between; gap: 8px; pointer-events: none; }
+    .editor-tools { display: none; }
 
     .mini-info {
       height: 24px;
@@ -1003,6 +1022,7 @@
         </div>
         <div class="editor-wrap" id="editorWrap">
           <div class="line-numbers" id="lineNumbers" aria-hidden="true"><span class="line-number-list" id="lineNumberList">1</span></div>
+          <div class="active-line-bg" id="activeLineBg" aria-hidden="true"></div>
           <pre class="highlight-layer" id="highlightLayer" aria-hidden="true"><code class="highlight-code" id="highlightCode"></code></pre>
           <textarea class="editor" id="editor" spellcheck="false" wrap="off"></textarea>
           <div class="color-popover" id="colorPopover" aria-hidden="true">
@@ -1074,12 +1094,6 @@
         layout
       </span>
       <span id="layoutLabel">preview maior</span>
-    </button>
-    <button id="previewOnlyBtn">
-      <span>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-        modo preview
-      </span>
     </button>
     <button id="copyBtn">
       <span>
@@ -1203,6 +1217,7 @@ button {
     const highlightCodeEl = $("#highlightCode");
     const lineNumbers = $("#lineNumbers");
     const lineNumberList = $("#lineNumberList");
+    const activeLineBg = $("#activeLineBg");
     const colorPopover = $("#colorPopover");
     const colorInput = $("#colorInput");
     const colorValue = $("#colorValue");
@@ -1211,8 +1226,8 @@ button {
     const colorUndoStack = [];
     const colorRedoStack = [];
 
-    function defaultState() { return { ...starter, layout: "preview", previewOnly: false, finalDraft: "", lastSaved: Date.now() }; }
-    function loadState() { try { const saved = JSON.parse(localStorage.getItem(STORAGE)); if (saved && typeof saved === "object") return { ...defaultState(), ...saved }; } catch {} return defaultState(); }
+    function defaultState() { return { ...starter, layout: "preview", finalDraft: "", lastSaved: Date.now() }; }
+    function loadState() { try { const saved = JSON.parse(localStorage.getItem(STORAGE)); if (saved && typeof saved === "object") { const merged = { ...defaultState(), ...saved }; delete merged.previewOnly; return merged; } } catch {} return defaultState(); }
     function saveState(silent = false) { state.lastSaved = Date.now(); localStorage.setItem(STORAGE, JSON.stringify(state)); dirty = false; updateSavedUI(); if (!silent) toast("salvo no navegador"); }
     function setDirty(value = true) { dirty = value; updateSavedUI(); }
     function updateSavedUI() { $("#saveDot").classList.toggle("dirty", dirty); $("#saveState").textContent = dirty ? "alterações não salvas" : "salvo localmente"; }
@@ -1263,6 +1278,7 @@ ${state.js || ""}
       if (/^(\/\*|\/\/|<!--)/.test(token)) return "tok-comment";
       if (/^(["'`])/.test(token)) return "tok-string";
       if (/^#[0-9a-fA-F]{3,8}\b/.test(token)) return "tok-color";
+      if (/^rgba?\(/i.test(token)) return "tok-color";
       if (/^\d/.test(token)) return "tok-number";
       if (/^<\/?[a-zA-Z]/.test(token)) return "tok-tag";
       if (/^[a-zA-Z-]+(?=\s*=)/.test(token)) return "tok-attr";
@@ -1274,7 +1290,7 @@ ${state.js || ""}
     }
 
     function highlightCode(code, mode) {
-      const re = /(<!--[\s\S]*?-->|\/\*[\s\S]*?\*\/|\/\/[^\n]*|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`|#[0-9a-fA-F]{3,8}\b|\b\d+(?:\.\d+)?(?:px|rem|em|vh|vw|%|s|ms)?\b|<\/?[a-zA-Z][\w:-]*|[a-zA-Z-]+(?=\s*=)|\b(?:function|const|let|var|return|if|else|for|while|class|new|try|catch|async|await|true|false|null|undefined|import|export|from|document|window|querySelector|addEventListener)\b|[{}()[\];,.<>\/=:+*\-])/g;
+      const re = /(<!--[\s\S]*?-->|\/\*[\s\S]*?\*\/|\/\/[^\n]*|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`|rgba?\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}(?:\s*,\s*(?:0|1|0?\.\d+|\d+%))?\s*\)|#[0-9a-fA-F]{3,8}\b|\b\d+(?:\.\d+)?(?:px|rem|em|vh|vw|%|s|ms)?\b|<\/?[a-zA-Z][\w:-]*|[a-zA-Z-]+(?=\s*=)|\b(?:function|const|let|var|return|if|else|for|while|class|new|try|catch|async|await|true|false|null|undefined|import|export|from|document|window|querySelector|addEventListener)\b|[{}()[\];,.<>\/=:+*\-])/g;
       let out = "";
       let last = 0;
       let match;
@@ -1309,11 +1325,24 @@ ${state.js || ""}
         html += `<span class="line-number${i === active ? " active" : ""}">${i}</span>`;
       }
       lineNumberList.innerHTML = html;
+      updateActiveLineBg();
+    }
+
+    function updateActiveLineBg() {
+      const cs = getComputedStyle(editor);
+      const lineH = parseFloat(cs.lineHeight) || 22.4;
+      const padTop = parseFloat(cs.paddingTop) || 18;
+      const activeIndex = currentLineNumber() - 1;
+      const y = padTop + activeIndex * lineH - editor.scrollTop;
+      activeLineBg.style.height = `${lineH}px`;
+      activeLineBg.style.transform = `translate3d(${-editor.scrollLeft}px, ${y - padTop}px, 0)`;
+      activeLineBg.style.width = `calc(100% + ${editor.scrollLeft}px)`;
     }
 
     function syncHighlightScroll() {
       highlightCodeEl.style.transform = `translate3d(${-editor.scrollLeft}px, ${-editor.scrollTop}px, 0)`;
       lineNumberList.style.transform = `translate3d(0, ${-editor.scrollTop}px, 0)`;
+      updateActiveLineBg();
     }
 
     function normalizeHexForInput(hex) {
@@ -1338,7 +1367,7 @@ ${state.js || ""}
       activeColorRange = range;
       const value = normalizeHexForInput(range.value);
       colorInput.value = value;
-      colorValue.textContent = value;
+      colorValue.textContent = range.value;
       const before = editor.value.slice(0, range.start);
       const lines = before.split("\n");
       const line = lines.length - 1;
@@ -1367,7 +1396,7 @@ ${state.js || ""}
     }
 
     function maybeOpenColorPicker() {
-      const range = findHexAt(editor.selectionStart || 0);
+      const range = findColorAt(editor.selectionStart || 0);
       if (range) showColorPicker(range);
       else closeColorPicker();
     }
@@ -1429,18 +1458,19 @@ ${state.js || ""}
     function applyPickedColor(value) {
       if (!activeColorRange) return;
       rememberColorUndo();
+      const replacement = formatPickedColor(value, activeColorRange);
       const before = editor.value.slice(0, activeColorRange.start);
       const after = editor.value.slice(activeColorRange.end);
-      editor.value = before + value + after;
-      const end = activeColorRange.start + value.length;
+      editor.value = before + replacement + after;
+      const end = activeColorRange.start + replacement.length;
       editor.setSelectionRange(activeColorRange.start, end);
-      activeColorRange = { start: activeColorRange.start, end, value };
-      colorValue.textContent = value;
+      activeColorRange = { ...activeColorRange, end, value: replacement };
+      colorValue.textContent = replacement;
       handleEditorInput();
     }
 
 
-    function applyLayout() { workspace.classList.toggle("editor-big", state.layout === "editor"); workspace.classList.toggle("preview-only", Boolean(state.previewOnly)); $("#layoutLabel").textContent = state.layout === "editor" ? "editor maior" : "preview maior"; }
+    function applyLayout() { workspace.classList.toggle("editor-big", state.layout === "editor"); workspace.classList.remove("preview-only"); $("#layoutLabel").textContent = state.layout === "editor" ? "editor maior" : "preview maior"; }
     function syncEditor() { editor.value = currentTab === "final" ? finalCode() : (state[currentTab] || ""); $("#tabStatus").textContent = currentTab; updateEditorMeta(); updateSearch(true, false); renderHighlight(); closeColorPicker(); }
     function switchTab(tab) { if (currentTab !== "final" && tab === "final") rebuildFinalDraft(); currentTab = tab; $$(".tab").forEach(btn => btn.classList.toggle("active", btn.dataset.tab === tab)); syncEditor(); editor.focus(); }
 
@@ -1517,9 +1547,19 @@ ${state.js || ""}
 
     function resetProject() { state = defaultState(); currentTab = "html"; $$(".tab").forEach(btn => btn.classList.toggle("active", btn.dataset.tab === "html")); applyLayout(); syncEditor(); updatePreview(); saveState(true); toast("projeto limpo"); }
 
+    function updateCursorVisuals() {
+      updateEditorMeta();
+      renderLineNumbers();
+      updateActiveLineBg();
+    }
+
     editor.addEventListener("input", handleEditorInput);
-    editor.addEventListener("keyup", () => { updateEditorMeta(); renderHighlight(); });
-    editor.addEventListener("click", () => { updateEditorMeta(); setTimeout(maybeOpenColorPicker, 0); });
+    editor.addEventListener("keyup", updateCursorVisuals);
+    editor.addEventListener("mouseup", () => { updateCursorVisuals(); maybeOpenColorPicker(); });
+    editor.addEventListener("touchend", () => { updateCursorVisuals(); maybeOpenColorPicker(); }, { passive: true });
+    editor.addEventListener("click", () => { updateCursorVisuals(); maybeOpenColorPicker(); });
+    editor.addEventListener("select", updateCursorVisuals);
+    document.addEventListener("selectionchange", () => { if (document.activeElement === editor) updateCursorVisuals(); });
     editor.addEventListener("scroll", () => { updateEditorMeta(); syncHighlightScroll(); if (colorPopover.classList.contains("show")) maybeOpenColorPicker(); });
     colorInput.addEventListener("input", (e) => applyPickedColor(e.target.value));
     colorPopover.addEventListener("mousedown", (e) => e.stopPropagation());
@@ -1604,8 +1644,7 @@ ${state.js || ""}
     $("#closeShortcuts").addEventListener("click", closeShortcuts);
     $("#shortcutsModal").addEventListener("click", (e) => { if (e.target === $("#shortcutsModal")) closeShortcuts(); });
     $("#exportBtn").addEventListener("click", downloadFile); $("#copyBtn").addEventListener("click", copyFinal); $("#resetBtn").addEventListener("click", resetProject);
-    $("#layoutBtn").addEventListener("click", () => { state.previewOnly = false; state.layout = state.layout === "preview" ? "editor" : "preview"; workspace.style.gridTemplateColumns = ""; applyLayout(); saveState(true); });
-    $("#previewOnlyBtn").addEventListener("click", () => { state.previewOnly = !state.previewOnly; workspace.style.gridTemplateColumns = ""; applyLayout(); saveState(true); });
+    $("#layoutBtn").addEventListener("click", () => { state.layout = state.layout === "preview" ? "editor" : "preview"; workspace.style.gridTemplateColumns = ""; applyLayout(); saveState(true); });
 
     window.addEventListener("keydown", (e) => {
       const key = e.key.toLowerCase();
@@ -1622,7 +1661,7 @@ ${state.js || ""}
     });
 
     const resizer = $("#resizer"); let resizing = false;
-    resizer.addEventListener("mousedown", () => { resizing = true; state.previewOnly = false; workspace.classList.remove("preview-only"); document.body.style.userSelect = "none"; });
+    resizer.addEventListener("mousedown", () => { resizing = true; workspace.classList.remove("preview-only"); document.body.style.userSelect = "none"; });
     window.addEventListener("mousemove", (e) => { if (!resizing || window.innerWidth < 960) return; const rect = workspace.getBoundingClientRect(); const x = e.clientX - rect.left; const pct = Math.max(22, Math.min(78, (x / rect.width) * 100)); workspace.style.gridTemplateColumns = `${pct}% 8px ${100 - pct}%`; });
     window.addEventListener("mouseup", () => { if (resizing) saveState(true); resizing = false; document.body.style.userSelect = ""; });
     window.addEventListener("beforeunload", (e) => { if (!dirty) return; e.preventDefault(); e.returnValue = ""; });
