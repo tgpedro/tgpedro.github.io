@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>pedro hub | launcher</title>
+
+    <!-- supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
         :root {
             --bg-color: #000000;
@@ -14,6 +18,9 @@
             --glass-border: rgba(255, 255, 255, 0.1);
             --card-bg: rgba(44, 44, 46, 0.4);
             --ios-radius: 22px;
+            --danger: #ff453a;
+            --success: #30d158;
+            --warning: #ffcc00;
         }
 
         body.theme-tinted { --accent-color: #d1d1d6; }
@@ -28,7 +35,6 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* Scrollbar Customizada */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb {
@@ -37,7 +43,10 @@
             border: 2px solid transparent;
             background-clip: content-box;
         }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.3); background-clip: content-box; }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+            background-clip: content-box;
+        }
 
         body {
             background-color: var(--bg-color);
@@ -57,7 +66,7 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
-            margin-bottom: 40px;
+            margin-bottom: 24px;
             animation: ios-slide-up 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
@@ -71,16 +80,62 @@
             font-weight: 700;
             letter-spacing: -1px;
             margin-bottom: 4px;
+            text-transform: lowercase;
         }
 
         .greeting p {
             color: var(--text-dim);
             font-size: 1rem;
             font-weight: 500;
+            text-transform: lowercase;
         }
 
-        .header-right { text-align: right; }
-        .time-display { font-size: 1.2rem; font-weight: 600; margin-bottom: 4px; }
+        .header-right {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+        }
+
+        .time-display {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0;
+        }
+
+        .sync-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            max-width: 180px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: rgba(255,255,255,.08);
+            color: var(--text-dim);
+            font-size: .72rem;
+            font-weight: 700;
+            white-space: nowrap;
+            border: .5px solid rgba(255,255,255,.08);
+        }
+
+        .sync-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 99px;
+            background: var(--warning);
+            box-shadow: 0 0 0 3px rgba(255,204,0,.12);
+        }
+
+        .sync-pill.online .sync-dot {
+            background: var(--success);
+            box-shadow: 0 0 0 3px rgba(48,209,88,.12);
+        }
+
+        .sync-pill.error .sync-dot {
+            background: var(--danger);
+            box-shadow: 0 0 0 3px rgba(255,69,58,.12);
+        }
 
         .search-wrapper {
             margin-bottom: 40px;
@@ -111,7 +166,6 @@
             height: 18px;
         }
 
-        /* Widgets Menores */
         .widgets-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -147,9 +201,20 @@
         }
 
         .widget-icon svg { width: 16px; height: 16px; fill: #fff; }
-        .widget-title { font-size: 0.75rem; font-weight: 600; color: var(--text-dim); margin-top: 8px; }
+        .widget-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-dim);
+            margin-top: 8px;
+            text-transform: uppercase;
+        }
         .widget-value { font-size: 1.5rem; font-weight: 700; margin-top: 2px; }
-        .widget-unit { font-size: 0.8rem; color: var(--text-dim); font-weight: 500; }
+        .widget-unit {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            font-weight: 500;
+            text-transform: lowercase;
+        }
 
         .section-label {
             font-size: 0.85rem;
@@ -165,10 +230,7 @@
         }
 
         .section-label svg { width: 14px; height: 14px; fill: currentColor; }
-
-        .category-section {
-            margin-bottom: 32px;
-        }
+        .category-section { margin-bottom: 32px; }
 
         .app-grid {
             display: grid;
@@ -185,6 +247,7 @@
             transition: transform 0.2s ease;
             animation: ios-app-in 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
             cursor: pointer;
+            position: relative;
         }
 
         @keyframes ios-app-in {
@@ -209,7 +272,14 @@
         }
 
         .app-icon svg { width: 32px; height: 32px; fill: #fff; }
-        .app-name { font-size: 0.7rem; font-weight: 500; text-align: center; width: 100%; color: var(--text-dim); }
+        .app-name {
+            font-size: 0.7rem;
+            font-weight: 500;
+            text-align: center;
+            width: 100%;
+            color: var(--text-dim);
+            text-transform: lowercase;
+        }
         .app-item:hover .app-icon { transform: scale(1.05); }
         .app-item:hover .app-name { color: #fff; }
 
@@ -230,11 +300,15 @@
         }
 
         .dock-item {
-            width: 54px; height: 54px;
+            width: 54px;
+            height: 54px;
             background: rgba(0,0,0,0.3);
             border-radius: 14px;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: transform 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s ease;
         }
 
         .dock-item:hover { transform: translateY(-10px) scale(1.1); }
@@ -242,7 +316,10 @@
 
         .modal-overlay {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background: rgba(0,0,0,0.6);
             backdrop-filter: blur(10px);
             display: none;
@@ -263,6 +340,8 @@
             overflow-y: auto;
         }
 
+        .modal h3, .modal h4 { text-transform: lowercase; }
+
         @keyframes modal-pop {
             from { opacity: 0; transform: scale(0.8); }
             to { opacity: 1; transform: scale(1); }
@@ -279,55 +358,146 @@
             outline: none;
         }
 
-        .modal-btns { display: flex; gap: 12px; margin-top: 12px; }
-        .btn { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 600; cursor: pointer; }
+        .modal-btns {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            text-transform: lowercase;
+        }
+
         .btn-primary { background: var(--accent-color); color: #fff; }
         .btn-secondary { background: #3a3a3c; color: #fff; }
 
-        /* Calendário */
-        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
-        .calendar-day-label { font-size: 0.65rem; font-weight: 700; color: var(--text-dim); }
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            text-align: center;
+        }
+
+        .calendar-day-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--text-dim);
+        }
+
         .calendar-day {
             aspect-ratio: 1;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            font-size: 0.85rem; border-radius: 12px; cursor: pointer; position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            border-radius: 12px;
+            cursor: pointer;
+            position: relative;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .calendar-day:hover { background: rgba(255, 255, 255, 0.15); transform: scale(1.05); }
-        .calendar-day.today { background: var(--accent-color); color: #fff; font-weight: 700; }
-        .calendar-day.other-month { color: #3a3a3c; }
-        .calendar-day.selected-start, .calendar-day.selected-end { background: var(--accent-color) !important; color: #fff !important; }
-        .calendar-day.in-range { background: rgba(0, 122, 255, 0.3); border-radius: 0; }
-        .calendar-day.has-event::after {
-            content: ''; position: absolute; bottom: 4px; width: 4px; height: 4px;
-            background: #ff3b30; border-radius: 50%;
+
+        .calendar-day:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(1.05);
         }
-        .calendar-nav { display: flex; gap: 8px; }
+
+        .calendar-day.today {
+            background: var(--accent-color);
+            color: #fff;
+            font-weight: 700;
+        }
+
+        .calendar-day.other-month { color: #3a3a3c; }
+        .calendar-day.selected-start, .calendar-day.selected-end {
+            background: var(--accent-color) !important;
+            color: #fff !important;
+        }
+
+        .calendar-day.in-range {
+            background: rgba(0, 122, 255, 0.3);
+            border-radius: 0;
+        }
+
+        .calendar-day.has-event::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            width: 4px;
+            height: 4px;
+            background: #ff3b30;
+            border-radius: 50%;
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 8px;
+        }
+
         .calendar-nav-btn {
             background: rgba(255, 255, 255, 0.1);
             border: none;
             color: var(--accent-color);
-            width: 32px; height: 32px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: background 0.2s;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s;
         }
-        .calendar-nav-btn svg { width: 16px; height: 16px; fill: var(--accent-color); }
+
+        .calendar-nav-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: var(--accent-color);
+        }
 
         .range-info {
             background: rgba(0, 122, 255, 0.1);
-            padding: 12px; border-radius: 12px; margin-bottom: 16px;
-            display: none; text-align: center; font-weight: 600; color: var(--accent-color);
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            display: none;
+            text-align: center;
+            font-weight: 600;
+            color: var(--accent-color);
         }
 
-        .event-editor { margin-top: 20px; padding-top: 20px; border-top: 0.5px solid var(--glass-border); display: none; }
+        .event-editor {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 0.5px solid var(--glass-border);
+            display: none;
+        }
+
         .notes-area {
-            width: 100%; min-height: 100px; background: #2c2c2e; border: none;
-            border-radius: 10px; padding: 12px; color: #fff; outline: none; resize: none;
-            font-size: 0.9rem; margin-bottom: 12px;
+            width: 100%;
+            min-height: 100px;
+            background: #2c2c2e;
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            color: #fff;
+            outline: none;
+            resize: none;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
         }
-
-
 
         .category-title-row {
             display: flex;
@@ -338,7 +508,10 @@
             padding-left: 4px;
         }
 
-        .category-title-row .section-label { margin-bottom: 0; padding-left: 0; }
+        .category-title-row .section-label {
+            margin-bottom: 0;
+            padding-left: 0;
+        }
 
         .category-edit-btn, .app-edit-btn {
             border: none;
@@ -353,6 +526,7 @@
             padding: 7px 10px;
             font-size: .72rem;
             font-weight: 700;
+            text-transform: lowercase;
         }
 
         .category-edit-btn:hover, .app-edit-btn:hover {
@@ -360,8 +534,6 @@
             color: #fff;
             transform: scale(1.03);
         }
-
-        .app-item { position: relative; }
 
         .app-edit-btn {
             position: absolute;
@@ -378,8 +550,16 @@
             -webkit-backdrop-filter: blur(18px);
         }
 
-        .app-edit-btn svg { width: 13px; height: 13px; fill: currentColor; }
-        .app-item:hover .app-edit-btn { opacity: 1; pointer-events: auto; }
+        .app-edit-btn svg {
+            width: 13px;
+            height: 13px;
+            fill: currentColor;
+        }
+
+        .app-item:hover .app-edit-btn {
+            opacity: 1;
+            pointer-events: auto;
+        }
 
         .hint-text {
             color: var(--text-dim);
@@ -388,8 +568,17 @@
             margin: -2px 0 14px;
         }
 
-        .danger-zone { margin-top: 16px; padding-top: 16px; border-top: .5px solid var(--glass-border); }
-        .btn-danger { background: rgba(255, 59, 48, .18); color: #ff453a; }
+        .danger-zone {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: .5px solid var(--glass-border);
+        }
+
+        .btn-danger {
+            background: rgba(255, 59, 48, .18);
+            color: #ff453a;
+        }
+
         .btn-danger:hover { background: rgba(255, 59, 48, .28); }
 
         .color-field {
@@ -409,10 +598,62 @@
             cursor: pointer;
         }
 
+        .empty-state {
+            color: var(--text-dim);
+            font-size: .9rem;
+            padding: 18px;
+            border: .5px solid rgba(255,255,255,.08);
+            border-radius: 18px;
+            background: rgba(255,255,255,.04);
+        }
+
         @media (max-width: 600px) {
-            .app-grid { grid-template-columns: repeat(4, 1fr); gap: 16px 8px; }
-            .app-icon { width: 56px; height: 56px; }
-            .widgets-grid { grid-template-columns: 1fr 1fr; }
+            .container {
+                padding: 28px 16px 110px;
+            }
+
+            header {
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .greeting h2 {
+                font-size: 1.7rem;
+            }
+
+            .header-right {
+                min-width: 88px;
+            }
+
+            .sync-pill {
+                max-width: 110px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .app-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 16px 8px;
+            }
+
+            .app-icon {
+                width: 56px;
+                height: 56px;
+            }
+
+            .widgets-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .dock-container {
+                bottom: 16px;
+                padding: 10px;
+            }
+
+            .dock-item {
+                width: 50px;
+                height: 50px;
+            }
         }
     </style>
 </head>
@@ -426,6 +667,10 @@
             </div>
             <div class="header-right">
                 <div class="time-display" id="clock-display">00:00</div>
+                <div class="sync-pill" id="sync-pill">
+                    <span class="sync-dot"></span>
+                    <span id="sync-text">conectando</span>
+                </div>
             </div>
         </header>
 
@@ -437,52 +682,139 @@
         <div class="section-label">eventos próximos</div>
         <div class="widgets-grid">
             <div class="widget-card">
-                <div class="widget-header"><div class="widget-icon" style="background: #ff9500;"><svg viewBox="0 0 24 24"><path d="M12 3L1 9l11 6l9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg></div></div>
-                <div><div class="widget-title">ENEM 2026</div><div class="widget-value" id="enem-countdown">--</div><div class="widget-unit">dias restantes</div></div>
+                <div class="widget-header">
+                    <div class="widget-icon" style="background: #ff9500;">
+                        <svg viewBox="0 0 24 24"><path d="M12 3L1 9l11 6l9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>
+                    </div>
+                </div>
+                <div>
+                    <div class="widget-title">ENEM 2026</div>
+                    <div class="widget-value" id="enem-countdown">--</div>
+                    <div class="widget-unit">dias restantes</div>
+                </div>
             </div>
             <div class="widget-card">
-                <div class="widget-header"><div class="widget-icon" style="background: #af52de;"><svg viewBox="0 0 24 24"><path d="M12 6c1.11 0 2-.9 2-2 0-.38-.1-.73-.29-1.03L12 0l-1.71 2.97c-.19.3-.29.65-.29 1.03 0 1.1.89 2 2 2zm4.6 9.99l-1.07-1.07-1.08 1.07c-1.3 1.3-3.58 1.31-4.89 0l-1.07-1.07-1.09 1.07C6.13 17.25 4 16.39 4 14.5V13c0-1.1.9-2 2-2h12c1.1 0 2 .9 2 2v1.5c0 1.89-2.13 2.75-3.4 1.49zM18 19H6c-1.1 0-2 .9-2 2v1h16v-1c0-1.1-.9-2-2-2z"/></svg></div></div>
-                <div><div class="widget-title">18 ANOS</div><div class="widget-value" id="bday-countdown">--</div><div class="widget-unit">dias restantes</div></div>
+                <div class="widget-header">
+                    <div class="widget-icon" style="background: #af52de;">
+                        <svg viewBox="0 0 24 24"><path d="M12 6c1.11 0 2-.9 2-2 0-.38-.1-.73-.29-1.03L12 0l-1.71 2.97c-.19.3-.29.65-.29 1.03 0 1.1.89 2 2 2zm4.6 9.99l-1.07-1.07-1.08 1.07c-1.3 1.3-3.58 1.31-4.89 0l-1.07-1.07-1.09 1.07C6.13 17.25 4 16.39 4 14.5V13c0-1.1.9-2 2-2h12c1.1 0 2 .9 2 2v1.5c0 1.89-2.13 2.75-3.4 1.49zM18 19H6c-1.1 0-2 .9-2 2v1h16v-1c0-1.1-.9-2-2-2z"/></svg>
+                    </div>
+                </div>
+                <div>
+                    <div class="widget-title">18 ANOS</div>
+                    <div class="widget-value" id="bday-countdown">--</div>
+                    <div class="widget-unit">dias restantes</div>
+                </div>
             </div>
         </div>
 
-        <div id="fav-section" style="display:none"><div class="section-label">favoritos</div><div class="app-grid" id="fav-grid" style="margin-bottom: 40px;"></div></div>
-        
-        <div id="apps-container">
-            <!-- Categorias serão inseridas aqui -->
+        <div id="fav-section" style="display:none">
+            <div class="section-label">favoritos</div>
+            <div class="app-grid" id="fav-grid" style="margin-bottom: 40px;"></div>
         </div>
+
+        <div id="apps-container"></div>
     </div>
 
     <div class="dock-container">
-        <div class="dock-item" onclick="openModal('modal-shortcut')"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></div>
-        <div class="dock-item" onclick="openModal('modal-settings')"><svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94c0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6s3.6 1.62 3.6 3.6s-1.62 3.6-3.6 3.6z"/></svg></div>
-        <div class="dock-item" onclick="logout()"><svg viewBox="0 0 24 24"><path d="M10.09 15.59L11.5 17l5-5l-5-5l-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5a2 2 0 0 0-2 2v4h2V5h14v14H5v-4H3v4a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z"/></svg></div>
+        <div class="dock-item" onclick="openModal('modal-shortcut')" title="novo atalho">
+            <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+        </div>
+        <div class="dock-item" onclick="openModal('modal-settings')" title="ajustes">
+            <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94c0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6s3.6 1.62 3.6 3.6s-1.62 3.6-3.6 3.6z"/></svg>
+        </div>
+        <div class="dock-item" onclick="forceSync()" title="sincronizar">
+            <svg viewBox="0 0 24 24"><path d="M12 6V3L8 7l4 4V8c2.21 0 4 1.79 4 4c0 .73-.2 1.41-.54 2l1.46 1.46A5.93 5.93 0 0 0 18 12c0-3.31-2.69-6-6-6zm-4.92 2.54A5.93 5.93 0 0 0 6 12c0 3.31 2.69 6 6 6v3l4-4l-4-4v3c-2.21 0-4-1.79-4-4c0-.73.2-1.41.54-2L7.08 8.54z"/></svg>
+        </div>
+        <div class="dock-item" onclick="logout()" title="sair">
+            <svg viewBox="0 0 24 24"><path d="M10.09 15.59L11.5 17l5-5l-5-5l-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5a2 2 0 0 0-2 2v4h2V5h14v14H5v-4H3v4a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z"/></svg>
+        </div>
     </div>
 
-    <!-- Modais -->
-    <div class="modal-overlay" id="modal-shortcut"><div class="modal"><h3>novo atalho</h3><input type="text" id="new-name" class="input-field" placeholder="nome"><input type="text" id="new-url" class="input-field" placeholder="url"><input type="text" id="new-category" class="input-field" placeholder="categoria (ex: lazer)"><div class="modal-btns"><button class="btn btn-secondary" onclick="closeModal('modal-shortcut')">cancelar</button><button class="btn btn-primary" onclick="addShortcut()">adicionar</button></div></div></div>
+    <div class="modal-overlay" id="modal-shortcut">
+        <div class="modal">
+            <h3>novo atalho</h3>
+            <input type="text" id="new-name" class="input-field" placeholder="nome">
+            <input type="text" id="new-url" class="input-field" placeholder="url">
+            <input type="text" id="new-category" class="input-field" placeholder="categoria">
+            <div class="color-field">
+                <input type="text" id="new-color-text" class="input-field" placeholder="#007aff" value="#007aff" oninput="syncNewColorText()">
+                <input type="color" id="new-color" value="#007aff" oninput="syncNewColorPicker()">
+            </div>
+            <div class="modal-btns">
+                <button class="btn btn-secondary" onclick="closeModal('modal-shortcut')">cancelar</button>
+                <button class="btn btn-primary" onclick="addShortcut()">adicionar</button>
+            </div>
+        </div>
+    </div>
 
-    <div class="modal-overlay" id="modal-edit-shortcut"><div class="modal"><h3>editar atalho</h3><p class="hint-text">altere nome, link, categoria e cor. nos atalhos do sistema, isso fica salvo como personalização.</p><input type="hidden" id="edit-id"><input type="text" id="edit-name" class="input-field" placeholder="nome"><input type="text" id="edit-url" class="input-field" placeholder="url"><input type="text" id="edit-category" class="input-field" placeholder="categoria"><div class="color-field"><input type="text" id="edit-color-text" class="input-field" placeholder="#007aff" oninput="syncEditColorText()"><input type="color" id="edit-color" value="#007aff" oninput="syncEditColorPicker()"></div><div class="modal-btns"><button class="btn btn-secondary" onclick="closeModal('modal-edit-shortcut')">cancelar</button><button class="btn btn-primary" onclick="saveShortcutEdit()">salvar</button></div><div class="danger-zone"><button class="btn btn-danger" style="width:100%;" onclick="deleteEditingShortcut()">apagar atalho</button></div></div></div>
+    <div class="modal-overlay" id="modal-edit-shortcut">
+        <div class="modal">
+            <h3>editar atalho</h3>
+            <p class="hint-text">altere nome, link, categoria e cor. a mudança sincroniza nos outros dispositivos.</p>
+            <input type="hidden" id="edit-id">
+            <input type="text" id="edit-name" class="input-field" placeholder="nome">
+            <input type="text" id="edit-url" class="input-field" placeholder="url">
+            <input type="text" id="edit-category" class="input-field" placeholder="categoria">
+            <div class="color-field">
+                <input type="text" id="edit-color-text" class="input-field" placeholder="#007aff" oninput="syncEditColorText()">
+                <input type="color" id="edit-color" value="#007aff" oninput="syncEditColorPicker()">
+            </div>
+            <div class="modal-btns">
+                <button class="btn btn-secondary" onclick="closeModal('modal-edit-shortcut')">cancelar</button>
+                <button class="btn btn-primary" onclick="saveShortcutEdit()">salvar</button>
+            </div>
+            <div class="danger-zone">
+                <button class="btn btn-danger" style="width:100%;" onclick="deleteEditingShortcut()">apagar atalho</button>
+            </div>
+        </div>
+    </div>
 
-    <div class="modal-overlay" id="modal-edit-category"><div class="modal"><h3>editar categoria</h3><p class="hint-text">renomeia a categoria em todos os atalhos que estão nela.</p><input type="hidden" id="edit-category-old"><input type="text" id="edit-category-new" class="input-field" placeholder="novo nome"><div class="modal-btns"><button class="btn btn-secondary" onclick="closeModal('modal-edit-category')">cancelar</button><button class="btn btn-primary" onclick="saveCategoryEdit()">salvar</button></div></div></div>
+    <div class="modal-overlay" id="modal-edit-category">
+        <div class="modal">
+            <h3>editar categoria</h3>
+            <p class="hint-text">renomeia a categoria em todos os atalhos que estão nela.</p>
+            <input type="hidden" id="edit-category-old">
+            <input type="text" id="edit-category-new" class="input-field" placeholder="novo nome">
+            <div class="modal-btns">
+                <button class="btn btn-secondary" onclick="closeModal('modal-edit-category')">cancelar</button>
+                <button class="btn btn-primary" onclick="saveCategoryEdit()">salvar</button>
+            </div>
+        </div>
+    </div>
 
-    <div class="modal-overlay" id="modal-settings"><div class="modal"><h3>ajustes</h3><input type="text" id="set-name" class="input-field" placeholder="seu nome"><select id="set-theme" class="input-field"><option value="default">escuro padrão</option><option value="tinted">tinted (ios 18)</option><option value="neon">vibrante</option></select><div class="modal-btns"><button class="btn btn-secondary" onclick="closeModal('modal-settings')">fechar</button><button class="btn btn-primary" onclick="saveSettings()">salvar</button></div></div></div>
+    <div class="modal-overlay" id="modal-settings">
+        <div class="modal">
+            <h3>ajustes</h3>
+            <input type="text" id="set-name" class="input-field" placeholder="seu nome">
+            <select id="set-theme" class="input-field">
+                <option value="default">escuro padrão</option>
+                <option value="tinted">tinted</option>
+                <option value="neon">vibrante</option>
+                <option value="black">preto</option>
+            </select>
+            <p class="hint-text">os ajustes ficam no supabase e atualizam em tempo real no celular e no pc.</p>
+            <div class="modal-btns">
+                <button class="btn btn-secondary" onclick="closeModal('modal-settings')">fechar</button>
+                <button class="btn btn-primary" onclick="saveSettings()">salvar</button>
+            </div>
+        </div>
+    </div>
 
     <div class="modal-overlay" id="modal-calendar">
         <div class="modal">
             <div class="calendar-header">
-                <h3 id="calendar-month-year" style="margin-bottom: 0;">Maio 2024</h3>
+                <h3 id="calendar-month-year" style="margin-bottom: 0;">maio 2026</h3>
                 <div class="calendar-nav">
-                    <button class="calendar-nav-btn" onclick="changeMonth(-1)"><svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg></button>
+                    <button class="calendar-nav-btn" onclick="changeMonth(-1)"><svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6l6 6l1.41-1.41L10.83 12z"/></svg></button>
                     <button class="calendar-nav-btn" onclick="changeMonth(1)"><svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></button>
                 </div>
             </div>
             <div class="range-info" id="range-info"></div>
             <div class="calendar-grid" id="calendar-grid"></div>
             <div class="event-editor" id="event-editor">
-                <h4 id="selected-date-label">Dia 19</h4>
-                <input type="text" id="event-title" class="input-field" placeholder="Título do evento">
-                <textarea id="event-notes" class="notes-area" placeholder="Anote algo aqui..."></textarea>
+                <h4 id="selected-date-label">dia 19</h4>
+                <input type="text" id="event-title" class="input-field" placeholder="título do evento">
+                <textarea id="event-notes" class="notes-area" placeholder="anote algo aqui..."></textarea>
                 <div class="modal-btns">
                     <button class="btn btn-secondary" onclick="hideEditor()">cancelar</button>
                     <button class="btn btn-primary" onclick="saveEvent()">salvar</button>
@@ -495,6 +827,13 @@
     </div>
 
     <script>
+        const SUPABASE_URL = "https://aelsvgfmijreuhpoccmt.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFlbHN2Z2ZtaWpyZXVocG9jY210Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyNTM4NTksImV4cCI6MjA5MjgyOTg1OX0.exKQufYKsAW-Nh85BHG-3W7V4gli7oK1XYO2igmZ1_g";
+
+        const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            realtime: { params: { eventsPerSecond: 10 } }
+        });
+
         const ICONS = {
             estudos: '<path d="M12 3L1 9l11 6l9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/>',
             foco: '<path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8s8 3.58 8 8s-3.58 8-8 8zm.5-13H11v6l5.25 3.15l.75-1.23l-4.5-2.67z"/>',
@@ -506,7 +845,7 @@
             ideias: '<path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74c0-3.86-3.14-7-7-7zm2.85 11.1l-.85.6V16h-4v-2.3l-.85-.6A4.997 4.997 0 0 1 7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.63-.8 3.06-2.15 3.9z"/>',
             config: '<path d="M19.14 12.94c.04-.3.06-.61.06-.94c0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6s3.6 1.62 3.6 3.6s-1.62 3.6-3.6 3.6z"/>',
             calendario: '<path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2zM7 12h5v5H7z"/>',
-            lazer: '<path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-3c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>',
+            lazer: '<path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-3c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5s1.5.67 1.5 1.5s-.67 1.5-1.5 1.5z"/>',
             default: '<path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" />'
         };
 
@@ -527,33 +866,221 @@
             'produtividade': '<path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1s-1-.45-1-1s.45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>',
             'estudos': '<path d="M12 3L1 9l11 6l9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/>',
             'utilitários': '<path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/>',
-            'lazer': '<path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-3c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>'
+            'lazer': '<path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-3c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5s1.5.67 1.5 1.5s-.67 1.5-1.5 1.5z"/>'
         };
 
-        let customApps = JSON.parse(localStorage.getItem('pedro_hub_custom')) || [];
-        let appOverrides = JSON.parse(localStorage.getItem('pedro_hub_overrides')) || {};
-        let favorites = JSON.parse(localStorage.getItem('pedro_hub_favs')) || [];
-        let userPrefs = JSON.parse(localStorage.getItem('pedro_hub_prefs')) || { name: 'Pedro', theme: 'default' };
-        let events = JSON.parse(localStorage.getItem('pedro_hub_events')) || {};
+        const DEFAULT_STATE = {
+            customApps: [],
+            appOverrides: {},
+            favorites: [],
+            userPrefs: { name: 'Pedro', theme: 'default' },
+            events: {}
+        };
+
+        let customApps = [];
+        let appOverrides = {};
+        let favorites = [];
+        let userPrefs = { name: 'Pedro', theme: 'default' };
+        let events = {};
         let currentCalendarDate = new Date();
         let rangeStart = null;
         let rangeEnd = null;
+        let selectedDateKey = null;
+        let saveTimer = null;
+        let isApplyingRemote = false;
+        let lastRemoteUpdatedAt = null;
+        let channel = null;
+
+        function getState() {
+            return {
+                customApps,
+                appOverrides,
+                favorites,
+                userPrefs,
+                events
+            };
+        }
+
+        function applyState(state, source = 'remote') {
+            const safe = { ...DEFAULT_STATE, ...(state || {}) };
+
+            customApps = Array.isArray(safe.customApps) ? safe.customApps : [];
+            appOverrides = safe.appOverrides && typeof safe.appOverrides === 'object' ? safe.appOverrides : {};
+            favorites = Array.isArray(safe.favorites) ? safe.favorites : [];
+            userPrefs = { ...DEFAULT_STATE.userPrefs, ...(safe.userPrefs || {}) };
+            events = safe.events && typeof safe.events === 'object' ? safe.events : {};
+
+            localStorage.setItem('pedro_hub_cache', JSON.stringify(getState()));
+
+            isApplyingRemote = source === 'remote';
+            applyPrefs();
+            updateClock();
+            renderApps(document.getElementById('search-input')?.value || '');
+            renderCalendar();
+            isApplyingRemote = false;
+        }
+
+        function loadLocalCache() {
+            try {
+                const cached = JSON.parse(localStorage.getItem('pedro_hub_cache'));
+                if (cached) applyState(cached, 'cache');
+            } catch (_) {}
+
+            try {
+                const oldData = {
+                    customApps: JSON.parse(localStorage.getItem('pedro_hub_custom')) || [],
+                    appOverrides: JSON.parse(localStorage.getItem('pedro_hub_overrides')) || {},
+                    favorites: JSON.parse(localStorage.getItem('pedro_hub_favs')) || [],
+                    userPrefs: JSON.parse(localStorage.getItem('pedro_hub_prefs')) || DEFAULT_STATE.userPrefs,
+                    events: JSON.parse(localStorage.getItem('pedro_hub_events')) || {}
+                };
+
+                const hasOldData =
+                    oldData.customApps.length ||
+                    Object.keys(oldData.appOverrides).length ||
+                    oldData.favorites.length ||
+                    Object.keys(oldData.events).length ||
+                    oldData.userPrefs.name !== DEFAULT_STATE.userPrefs.name ||
+                    oldData.userPrefs.theme !== DEFAULT_STATE.userPrefs.theme;
+
+                const hasCache = !!localStorage.getItem('pedro_hub_cache');
+                if (hasOldData && !hasCache) applyState(oldData, 'cache');
+            } catch (_) {}
+        }
+
+        function setSyncStatus(status, text) {
+            const pill = document.getElementById('sync-pill');
+            const label = document.getElementById('sync-text');
+            if (!pill || !label) return;
+
+            pill.classList.remove('online', 'error');
+            if (status === 'online') pill.classList.add('online');
+            if (status === 'error') pill.classList.add('error');
+            label.textContent = text;
+        }
+
+        async function loadFromSupabase() {
+            setSyncStatus('pending', 'conectando');
+
+            const { data, error } = await sb
+                .from('hub_state')
+                .select('*')
+                .eq('id', HUB_ID)
+                .maybeSingle();
+
+            if (error) {
+                console.error('erro ao carregar supabase:', error);
+                setSyncStatus('error', 'offline');
+                return;
+            }
+
+            if (data) {
+                lastRemoteUpdatedAt = data.updated_at;
+                applyState(data.state, 'remote');
+                setSyncStatus('online', 'sincronizado');
+                return;
+            }
+
+            await saveToSupabase(true);
+        }
+
+        async function saveToSupabase(immediate = false) {
+            if (isApplyingRemote) return;
+
+            clearTimeout(saveTimer);
+
+            const run = async () => {
+                setSyncStatus('pending', 'salvando');
+
+                const payload = {
+                    id: HUB_ID,
+                    state: getState(),
+                    updated_at: new Date().toISOString()
+                };
+
+                localStorage.setItem('pedro_hub_cache', JSON.stringify(payload.state));
+
+                const { data, error } = await sb
+                    .from('hub_state')
+                    .upsert(payload, { onConflict: 'id' })
+                    .select()
+                    .single();
+
+                if (error) {
+                    console.error('erro ao salvar supabase:', error);
+                    setSyncStatus('error', 'erro');
+                    return;
+                }
+
+                lastRemoteUpdatedAt = data?.updated_at || payload.updated_at;
+                setSyncStatus('online', 'sincronizado');
+            };
+
+            if (immediate) await run();
+            else saveTimer = setTimeout(run, 350);
+        }
+
+        function subscribeRealtime() {
+            if (channel) sb.removeChannel(channel);
+
+            channel = sb
+                .channel('hub-state-live')
+                .on(
+                    'postgres_changes',
+                    {
+                        event: '*',
+                        schema: 'public',
+                        table: 'hub_state',
+                        filter: `id=eq.${HUB_ID}`
+                    },
+                    (payload) => {
+                        if (!payload.new || !payload.new.state) return;
+                        if (payload.new.updated_at && payload.new.updated_at === lastRemoteUpdatedAt) return;
+
+                        lastRemoteUpdatedAt = payload.new.updated_at;
+                        applyState(payload.new.state, 'remote');
+                        setSyncStatus('online', 'ao vivo');
+                        setTimeout(() => setSyncStatus('online', 'sincronizado'), 1200);
+                    }
+                )
+                .subscribe((status) => {
+                    if (status === 'SUBSCRIBED') setSyncStatus('online', 'ao vivo');
+                    if (status === 'CHANNEL_ERROR') setSyncStatus('error', 'sem realtime');
+                    if (status === 'TIMED_OUT') setSyncStatus('error', 'timeout');
+                    if (status === 'CLOSED') setSyncStatus('error', 'fechado');
+                });
+        }
+
+        async function forceSync() {
+            await loadFromSupabase();
+        }
 
         function init() {
-            updateClock(); setInterval(updateClock, 1000);
-            updateCountdowns(); setInterval(updateCountdowns, 3600000);
-            renderApps(); applyPrefs(); renderCalendar();
+            loadLocalCache();
+            updateClock();
+            setInterval(updateClock, 1000);
+            updateCountdowns();
+            setInterval(updateCountdowns, 3600000);
+            renderApps();
+            applyPrefs();
+            renderCalendar();
+
             document.getElementById('search-input').addEventListener('input', (e) => renderApps(e.target.value));
+
+            loadFromSupabase();
+            subscribeRealtime();
         }
 
         function updateClock() {
             const now = new Date();
             document.getElementById('clock-display').textContent = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
             const hour = now.getHours();
             let greet = 'boa noite';
             if (hour >= 5 && hour < 12) greet = 'bom dia';
             else if (hour >= 12 && hour < 18) greet = 'boa tarde';
-            document.getElementById('greeting-text').textContent = `${greet}, ${userPrefs.name.toLowerCase()}`;
+
+            document.getElementById('greeting-text').textContent = `${greet}, ${String(userPrefs.name || 'Pedro').toLowerCase()}`;
             document.getElementById('date-text').textContent = now.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
         }
 
@@ -562,25 +1089,18 @@
             const enemDate = new Date('2026-11-08T00:00:00');
             const diffEnem = enemDate - now;
             const daysEnem = Math.ceil(diffEnem / (1000 * 60 * 60 * 24));
-            document.getElementById('enem-countdown').textContent = daysEnem > 0 ? daysEnem : 'HOJE!';
+            document.getElementById('enem-countdown').textContent = daysEnem > 0 ? daysEnem : 'hoje';
+
             const bdayDate = new Date('2027-02-04T00:00:00');
             const diffBday = bdayDate - now;
             const daysBday = Math.ceil(diffBday / (1000 * 60 * 60 * 24));
-            document.getElementById('bday-countdown').textContent = daysBday > 0 ? daysBday : 'PARABÉNS!';
+            document.getElementById('bday-countdown').textContent = daysBday > 0 ? daysBday : 'parabéns';
         }
 
         function getAllApps() {
             return [...DEFAULT_APPS, ...customApps]
                 .map(app => ({ ...app, ...(appOverrides[app.id] || {}) }))
                 .filter(app => !app.hidden);
-        }
-
-        function saveCustomApps() {
-            localStorage.setItem('pedro_hub_custom', JSON.stringify(customApps));
-        }
-
-        function saveOverrides() {
-            localStorage.setItem('pedro_hub_overrides', JSON.stringify(appOverrides));
         }
 
         function renderApps(search = '') {
@@ -613,7 +1133,14 @@
                 categories[cat].push(app);
             });
 
-            container.innerHTML = Object.keys(categories).map(catName => {
+            const keys = Object.keys(categories);
+
+            if (!keys.length) {
+                container.innerHTML = '<div class="empty-state">nenhum atalho encontrado.</div>';
+                return;
+            }
+
+            container.innerHTML = keys.map(catName => {
                 const apps = categories[catName];
                 const catIcon = CATEGORY_ICONS[catName.toLowerCase()] || ICONS.default;
                 return `
@@ -621,7 +1148,7 @@
                         <div class="category-title-row">
                             <div class="section-label">
                                 <svg viewBox="0 0 24 24">${catIcon}</svg>
-                                ${catName}
+                                ${escapeHtml(catName)}
                             </div>
                             <button class="category-edit-btn" onclick="openCategoryEditor('${escapeAttr(catName)}')">editar</button>
                         </div>
@@ -634,23 +1161,23 @@
         }
 
         function renderAppItem(app) {
-            const iconColor = app.color || 'var(--accent-color)';
+            const iconColor = normalizeColor(app.color || '#007aff');
             const iconSvg = ICONS[app.icon] || ICONS.default;
             const isAction = app.action === 'calendar';
-            const appTarget = isAction
+            const target = isAction
                 ? `<div onclick="openModal('modal-calendar')" class="app-icon" style="background: ${iconColor}20; border-color: ${iconColor}40;">`
                 : `<a href="${escapeAttr(app.link || '#')}" class="app-icon" style="background: ${iconColor}20; border-color: ${iconColor}40;">`;
-            const appClose = isAction ? '</div>' : '</a>';
+            const close = isAction ? '</div>' : '</a>';
             const favMark = favorites.includes(app.id) ? '★ ' : '';
 
             return `
-                <div class="app-item" oncontextmenu="toggleFav(event, '${app.id}')">
-                    <button class="app-edit-btn" onclick="openShortcutEditor(event, '${app.id}')" title="editar atalho">
+                <div class="app-item" oncontextmenu="toggleFav(event, '${escapeAttr(app.id)}')" ondblclick="toggleFav(event, '${escapeAttr(app.id)}')">
+                    <button class="app-edit-btn" onclick="openShortcutEditor(event, '${escapeAttr(app.id)}')" title="editar atalho">
                         <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm2.92 2.33h-.5v-.5l8.64-8.64l.5.5l-8.64 8.64zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83l3.75 3.75l1.83-1.83z"/></svg>
                     </button>
-                    ${appTarget}
+                    ${target}
                         <svg viewBox="0 0 24 24" style="fill: ${iconColor}">${iconSvg}</svg>
-                    ${appClose}
+                    ${close}
                     <span class="app-name">${favMark}${escapeHtml(app.name)}</span>
                 </div>
             `;
@@ -659,13 +1186,18 @@
         function renderCalendar() {
             const grid = document.getElementById('calendar-grid');
             const monthYearLabel = document.getElementById('calendar-month-year');
+            if (!grid || !monthYearLabel) return;
+
             grid.innerHTML = '';
             const year = currentCalendarDate.getFullYear();
             const month = currentCalendarDate.getMonth();
             monthYearLabel.textContent = currentCalendarDate.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
 
             ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'].forEach(l => {
-                const el = document.createElement('div'); el.className = 'calendar-day-label'; el.textContent = l; grid.appendChild(el);
+                const el = document.createElement('div');
+                el.className = 'calendar-day-label';
+                el.textContent = l;
+                grid.appendChild(el);
             });
 
             const firstDay = new Date(year, month, 1).getDay();
@@ -673,40 +1205,63 @@
             const prevMonthDays = new Date(year, month, 0).getDate();
 
             for (let i = firstDay - 1; i >= 0; i--) {
-                const el = document.createElement('div'); el.className = 'calendar-day other-month'; el.textContent = prevMonthDays - i; grid.appendChild(el);
+                const el = document.createElement('div');
+                el.className = 'calendar-day other-month';
+                el.textContent = prevMonthDays - i;
+                grid.appendChild(el);
             }
 
             const today = new Date();
+
             for (let i = 1; i <= daysInMonth; i++) {
-                const el = document.createElement('div'); el.className = 'calendar-day';
-                const dateKey = `${year}-${month+1}-${i}`;
+                const el = document.createElement('div');
+                el.className = 'calendar-day';
+
+                const dateKey = makeDateKey(year, month, i);
                 const currentDate = new Date(year, month, i);
+
                 if (i === today.getDate() && month === today.getMonth() && year === today.getFullYear()) el.classList.add('today');
                 if (rangeStart && currentDate.getTime() === rangeStart.getTime()) el.classList.add('selected-start');
                 if (rangeEnd && currentDate.getTime() === rangeEnd.getTime()) el.classList.add('selected-end');
+
                 if (rangeStart && rangeEnd) {
                     const start = Math.min(rangeStart.getTime(), rangeEnd.getTime());
                     const end = Math.max(rangeStart.getTime(), rangeEnd.getTime());
                     if (currentDate.getTime() > start && currentDate.getTime() < end) el.classList.add('in-range');
                 }
+
                 if (events[dateKey]) el.classList.add('has-event');
+
                 el.textContent = i;
                 el.onclick = (e) => handleDayClick(e, dateKey, i);
                 grid.appendChild(el);
             }
+
             updateRangeInfo();
+        }
+
+        function makeDateKey(year, month, day) {
+            const mm = String(month + 1).padStart(2, '0');
+            const dd = String(day).padStart(2, '0');
+            return `${year}-${mm}-${dd}`;
         }
 
         function handleDayClick(e, dateKey, day) {
             const year = currentCalendarDate.getFullYear();
             const month = currentCalendarDate.getMonth();
             const clickedDate = new Date(year, month, day);
+
             if (e.shiftKey) {
-                if (!rangeStart || (rangeStart && rangeEnd)) { rangeStart = clickedDate; rangeEnd = null; }
-                else { rangeEnd = clickedDate; }
+                if (!rangeStart || (rangeStart && rangeEnd)) {
+                    rangeStart = clickedDate;
+                    rangeEnd = null;
+                } else {
+                    rangeEnd = clickedDate;
+                }
                 renderCalendar();
             } else {
-                rangeStart = null; rangeEnd = null;
+                rangeStart = null;
+                rangeEnd = null;
                 showEditor(dateKey, day);
                 renderCalendar();
             }
@@ -714,24 +1269,33 @@
 
         function updateRangeInfo() {
             const info = document.getElementById('range-info');
+            if (!info) return;
+
             if (rangeStart && rangeEnd) {
                 const days = Math.ceil(Math.abs(rangeEnd - rangeStart) / (1000 * 60 * 60 * 24));
-                info.textContent = `Intervalo: ${days} dias`;
+                info.textContent = `intervalo: ${days} dias`;
                 info.style.display = 'block';
             } else if (rangeStart) {
-                info.textContent = "Selecione a segunda data com Shift";
+                info.textContent = "selecione a segunda data com shift";
                 info.style.display = 'block';
-            } else { info.style.display = 'none'; }
+            } else {
+                info.style.display = 'none';
+            }
         }
 
-        function changeMonth(offset) { currentCalendarDate.setMonth(currentCalendarDate.getMonth() + offset); renderCalendar(); }
+        function changeMonth(offset) {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + offset);
+            renderCalendar();
+        }
 
         function showEditor(dateKey, day) {
             selectedDateKey = dateKey;
-            document.getElementById('selected-date-label').textContent = `Dia ${day} de ${currentCalendarDate.toLocaleDateString('pt-BR', { month: 'long' })}`;
+
+            document.getElementById('selected-date-label').textContent = `dia ${day} de ${currentCalendarDate.toLocaleDateString('pt-BR', { month: 'long' })}`;
+
             const event = events[dateKey] || { title: '', notes: '' };
-            document.getElementById('event-title').value = event.title;
-            document.getElementById('event-notes').value = event.notes;
+            document.getElementById('event-title').value = event.title || '';
+            document.getElementById('event-notes').value = event.notes || '';
             document.getElementById('event-editor').style.display = 'block';
             document.getElementById('calendar-main-btns').style.display = 'none';
         }
@@ -742,47 +1306,73 @@
         }
 
         function saveEvent() {
-            const title = document.getElementById('event-title').value;
-            const notes = document.getElementById('event-notes').value;
-            if (!title && !notes) { delete events[selectedDateKey]; }
-            else { events[selectedDateKey] = { title, notes }; }
-            localStorage.setItem('pedro_hub_events', JSON.stringify(events));
-            renderCalendar(); hideEditor();
+            const title = document.getElementById('event-title').value.trim();
+            const notes = document.getElementById('event-notes').value.trim();
+
+            if (!selectedDateKey) return;
+
+            if (!title && !notes) delete events[selectedDateKey];
+            else events[selectedDateKey] = { title, notes };
+
+            renderCalendar();
+            hideEditor();
+            saveToSupabase();
         }
 
         function toggleFav(e, id) {
             e.preventDefault();
+
             if (favorites.includes(id)) favorites = favorites.filter(f => f !== id);
             else favorites.push(id);
-            localStorage.setItem('pedro_hub_favs', JSON.stringify(favorites));
+
             renderApps(document.getElementById('search-input').value);
+            saveToSupabase();
         }
 
         function addShortcut() {
             const name = document.getElementById('new-name').value.trim();
             let url = document.getElementById('new-url').value.trim();
             const category = document.getElementById('new-category').value.trim() || 'outros';
+            const color = normalizeColor(document.getElementById('new-color-text').value.trim() || '#007aff');
+
             if (!name || !url) return;
+
             if (!url.startsWith('http') && !url.startsWith('/') && !url.startsWith('#')) url = 'https://' + url;
-            customApps.push({ id: 'c-'+Date.now(), name, link: url, icon: 'default', color: '#007aff', category });
-            saveCustomApps();
+
+            customApps.push({
+                id: 'c-' + Date.now(),
+                name,
+                link: url,
+                icon: 'default',
+                color,
+                category
+            });
+
             document.getElementById('new-name').value = '';
             document.getElementById('new-url').value = '';
             document.getElementById('new-category').value = '';
-            renderApps(); closeModal('modal-shortcut');
+            document.getElementById('new-color-text').value = '#007aff';
+            document.getElementById('new-color').value = '#007aff';
+
+            renderApps();
+            closeModal('modal-shortcut');
+            saveToSupabase();
         }
 
         function openShortcutEditor(event, id) {
             event.preventDefault();
             event.stopPropagation();
+
             const app = getAllApps().find(a => a.id === id);
             if (!app) return;
+
             document.getElementById('edit-id').value = id;
             document.getElementById('edit-name').value = app.name || '';
             document.getElementById('edit-url').value = app.link || '';
             document.getElementById('edit-category').value = app.category || 'outros';
-            document.getElementById('edit-color-text').value = app.color || '#007aff';
+            document.getElementById('edit-color-text').value = normalizeColor(app.color || '#007aff');
             document.getElementById('edit-color').value = normalizeColor(app.color || '#007aff');
+
             openModal('modal-edit-shortcut');
         }
 
@@ -792,36 +1382,54 @@
             let link = document.getElementById('edit-url').value.trim();
             const category = document.getElementById('edit-category').value.trim() || 'outros';
             const color = normalizeColor(document.getElementById('edit-color-text').value.trim() || '#007aff');
+
             if (!id || !name) return;
             if (link && !link.startsWith('http') && !link.startsWith('/') && !link.startsWith('#')) link = 'https://' + link;
 
             const customIndex = customApps.findIndex(app => app.id === id);
+
             if (customIndex >= 0) {
-                customApps[customIndex] = { ...customApps[customIndex], name, link, category, color };
-                saveCustomApps();
+                customApps[customIndex] = {
+                    ...customApps[customIndex],
+                    name,
+                    link,
+                    category,
+                    color
+                };
             } else {
-                appOverrides[id] = { ...(appOverrides[id] || {}), name, link, category, color };
-                saveOverrides();
+                appOverrides[id] = {
+                    ...(appOverrides[id] || {}),
+                    name,
+                    link,
+                    category,
+                    color
+                };
             }
+
             renderApps(document.getElementById('search-input').value);
             closeModal('modal-edit-shortcut');
+            saveToSupabase();
         }
 
         function deleteEditingShortcut() {
             const id = document.getElementById('edit-id').value;
             if (!id) return;
             if (!confirm('apagar este atalho?')) return;
+
             if (id.startsWith('c-')) {
                 customApps = customApps.filter(app => app.id !== id);
-                saveCustomApps();
             } else {
-                appOverrides[id] = { ...(appOverrides[id] || {}), hidden: true };
-                saveOverrides();
+                appOverrides[id] = {
+                    ...(appOverrides[id] || {}),
+                    hidden: true
+                };
             }
+
             favorites = favorites.filter(f => f !== id);
-            localStorage.setItem('pedro_hub_favs', JSON.stringify(favorites));
+
             renderApps(document.getElementById('search-input').value);
             closeModal('modal-edit-shortcut');
+            saveToSupabase();
         }
 
         function openCategoryEditor(category) {
@@ -833,19 +1441,24 @@
         function saveCategoryEdit() {
             const oldName = document.getElementById('edit-category-old').value;
             const newName = document.getElementById('edit-category-new').value.trim();
+
             if (!oldName || !newName) return;
 
             customApps = customApps.map(app => app.category === oldName ? { ...app, category: newName } : app);
+
             DEFAULT_APPS.forEach(app => {
                 const current = { ...app, ...(appOverrides[app.id] || {}) };
                 if ((current.category || 'outros') === oldName) {
-                    appOverrides[app.id] = { ...(appOverrides[app.id] || {}), category: newName };
+                    appOverrides[app.id] = {
+                        ...(appOverrides[app.id] || {}),
+                        category: newName
+                    };
                 }
             });
-            saveCustomApps();
-            saveOverrides();
+
             renderApps(document.getElementById('search-input').value);
             closeModal('modal-edit-category');
+            saveToSupabase();
         }
 
         function syncEditColorPicker() {
@@ -858,6 +1471,16 @@
             document.getElementById('edit-color').value = value;
         }
 
+        function syncNewColorPicker() {
+            const value = document.getElementById('new-color').value;
+            document.getElementById('new-color-text').value = value;
+        }
+
+        function syncNewColorText() {
+            const value = normalizeColor(document.getElementById('new-color-text').value);
+            document.getElementById('new-color').value = value;
+        }
+
         function normalizeColor(value) {
             if (/^#[0-9a-fA-F]{6}$/.test(value)) return value;
             if (/^#[0-9a-fA-F]{3}$/.test(value)) return '#' + value.slice(1).split('').map(c => c + c).join('');
@@ -865,27 +1488,64 @@
         }
 
         function escapeHtml(value = '') {
-            return String(value).replace(/[&<>"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[char]));
+            return String(value).replace(/[&<>"]/g, char => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;'
+            }[char]));
         }
 
-        function escapeAttr(value = '') { return escapeHtml(value).replace(/'/g, '&#39;'); }
+        function escapeAttr(value = '') {
+            return escapeHtml(value).replace(/'/g, '&#39;');
+        }
 
         function saveSettings() {
-            userPrefs.name = document.getElementById('set-name').value || 'Pedro';
+            userPrefs.name = document.getElementById('set-name').value.trim() || 'Pedro';
             userPrefs.theme = document.getElementById('set-theme').value;
-            localStorage.setItem('pedro_hub_prefs', JSON.stringify(userPrefs));
-            applyPrefs(); updateClock(); closeModal('modal-settings');
+
+            applyPrefs();
+            updateClock();
+            closeModal('modal-settings');
+            saveToSupabase();
         }
 
         function applyPrefs() {
             document.body.className = userPrefs.theme !== 'default' ? 'theme-' + userPrefs.theme : '';
-            document.getElementById('set-name').value = userPrefs.name;
-            document.getElementById('set-theme').value = userPrefs.theme;
+
+            const nameInput = document.getElementById('set-name');
+            const themeInput = document.getElementById('set-theme');
+
+            if (nameInput) nameInput.value = userPrefs.name || 'Pedro';
+            if (themeInput) themeInput.value = userPrefs.theme || 'default';
         }
 
-        function logout() { localStorage.removeItem('pedro_hub_auth'); window.location.href = 'password.html'; }
-        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; hideEditor(); rangeStart = null; rangeEnd = null; renderCalendar(); }
+        function logout() {
+            localStorage.removeItem('pedro_hub_auth');
+            window.location.href = 'password.html';
+        }
+
+        function openModal(id) {
+            document.getElementById(id).style.display = 'flex';
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+            hideEditor();
+            rangeStart = null;
+            rangeEnd = null;
+            renderCalendar();
+        }
+
+        window.addEventListener('online', () => {
+            setSyncStatus('pending', 'reconectando');
+            loadFromSupabase();
+            subscribeRealtime();
+        });
+
+        window.addEventListener('offline', () => {
+            setSyncStatus('error', 'sem internet');
+        });
 
         init();
     </script>
