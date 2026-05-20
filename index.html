@@ -370,7 +370,7 @@
         let favorites = JSON.parse(localStorage.getItem('pedro_hub_favs')) || [];
         let userPrefs = JSON.parse(localStorage.getItem('pedro_hub_prefs')) || { name: 'Pedro', theme: 'default' };
 
-        if (localStorage.getItem('pedro_hub_auth') !== 'true') window.location.href = 'password/';
+        if (localStorage.getItem('pedro_hub_auth') !== 'true') window.location.href = 'password.html/';
 
         function init() {
             updateClock();
@@ -457,7 +457,7 @@
             document.getElementById('set-theme').value = userPrefs.theme;
         }
 
-        function logout() { localStorage.removeItem('pedro_hub_auth'); window.location.href = 'password/'; }
+        function logout() { localStorage.removeItem('pedro_hub_auth'); window.location.href = 'password.html/'; }
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
