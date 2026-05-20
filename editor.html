@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>editor</title>
   <style>
     :root {
@@ -223,7 +223,7 @@
       position: absolute;
       inset: 0;
       margin: 0;
-      padding: 18px 20px 44px;
+      padding: 0;
       border: 0;
       color: #d1d1d6;
       background: transparent;
@@ -235,6 +235,50 @@
       overflow: hidden;
       pointer-events: none;
       z-index: 1;
+    }
+
+    .highlight-code {
+      display: block;
+      min-width: max-content;
+      padding: 18px 20px 44px 72px;
+      transform: translate3d(0, 0, 0);
+      will-change: transform;
+    }
+
+    .line-numbers {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 54px;
+      padding: 18px 8px 44px 0;
+      border-right: 1px solid rgba(255,255,255,.06);
+      background: #111113;
+      color: #6e6e73;
+      font-family: var(--mono);
+      font-size: 14px;
+      line-height: 1.6;
+      text-align: right;
+      overflow: hidden;
+      pointer-events: none;
+      user-select: none;
+      z-index: 3;
+    }
+
+    .line-number-list {
+      display: block;
+      transform: translate3d(0, 0, 0);
+      will-change: transform;
+    }
+
+    .line-number {
+      display: block;
+      height: 1.6em;
+      padding-right: 10px;
+    }
+
+    .line-number.active {
+      color: #f5f5f7;
     }
 
     .tok-tag { color: #ff9f0a; }
@@ -286,7 +330,7 @@
 
     .editor {
       width: 100%; height: 100%; resize: none; border: 0; outline: 0;
-      padding: 18px 20px 44px;
+      padding: 18px 20px 44px 72px;
       color: transparent;
       -webkit-text-fill-color: transparent;
       background: transparent;
@@ -605,41 +649,300 @@
       background: rgba(255, 255, 255, .35);
     }
 
+
+
+    .mobile-switch {
+      display: none;
+      gap: 4px;
+      padding: 3px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      flex: 0 0 auto;
+    }
+
+    .mobile-tab {
+      height: 32px;
+      min-width: 82px;
+      padding: 0 12px;
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 650;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .mobile-tab.active {
+      color: #fff;
+      background: var(--accent);
+    }
+
+    .touch-bar {
+      display: none;
+      gap: 6px;
+      padding: 8px;
+      border-top: 1px solid var(--line);
+      background: #111113;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .touch-bar::-webkit-scrollbar { display: none; }
+
+    .touch-btn {
+      height: 34px;
+      padding: 0 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      color: var(--text);
+      font: 12px/1 var(--mono);
+      flex: 0 0 auto;
+    }
+
+    .touch-btn:hover { background: var(--panel-3); }
+
     @media (max-width: 960px) {
-      .topbar { gap: 8px; padding: 8px 10px; }
-      .actions { width: 100%; justify-content: flex-start; overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; }
+      html, body {
+        height: 100dvh;
+        overflow: hidden;
+      }
+
+      body {
+        padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+      }
+
+      .app {
+        width: calc(100vw - 12px);
+        height: calc(100dvh - 12px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+        min-height: 0;
+        margin: 6px auto;
+        gap: 6px;
+        grid-template-rows: auto 1fr;
+      }
+
+      .topbar {
+        min-height: 0;
+        padding: 8px;
+        border-radius: 18px;
+        align-items: stretch;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .top-status {
+        height: 30px;
+        width: fit-content;
+        max-width: 100%;
+        padding: 0 10px;
+        font-size: 11px;
+      }
+
+      .mobile-switch {
+        display: flex;
+        width: 100%;
+      }
+
+      .mobile-tab {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .actions {
+        width: 100%;
+        justify-content: flex-start;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        scrollbar-width: none;
+        padding-bottom: 1px;
+        -webkit-overflow-scrolling: touch;
+      }
+
       .actions::-webkit-scrollbar { display: none; }
-      .pill { height: 36px; padding: 0 10px; font-size: 12px; }
-      .workspace, .workspace.editor-big, .workspace.preview-only { min-height: calc(100dvh - 88px); height: calc(100dvh - 88px); grid-template-columns: 1fr; grid-template-rows: 1fr; gap: 0; }
+
+      .pill {
+        height: 38px;
+        min-width: 44px;
+        padding: 0 12px;
+        font-size: 12px;
+      }
+
+      .workspace,
+      .workspace.editor-big,
+      .workspace.preview-only {
+        height: auto;
+        min-height: 0;
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr;
+        gap: 0;
+      }
+
       .workspace.mobile-preview .left { display: none; }
       .workspace.mobile-preview .right { display: grid; }
       .workspace:not(.mobile-preview) .right { display: none; }
       .workspace:not(.mobile-preview) .left { display: grid; }
-      .panel.left, .panel.right { border-radius: var(--radius); }
-      .panel-head { min-height: 46px; }
-      .editor { font-size: 13px; line-height: 1.55; padding: 16px 14px 48px; }
-      .editor-tools { left: 10px; right: 10px; bottom: 6px; }
-      .mini-info { font-size: 10px; height: 22px; }
-      .tabs { width: 100%; }
-      .tab { flex: 1; padding: 0 8px; }
-      .searchbar { top: auto; bottom: 8px; width: calc(100vw - 16px); transform: translateX(-50%) translateY(12px); border-radius: 18px; grid-template-columns: 1fr; padding: 8px; }
-      .searchbar.show { transform: translateX(-50%) translateY(0); }
-      .search-nav { justify-content: center; }
-      .round { width: 50%; }
-      .menu { width: min(320px, calc(100vw - 16px)); border-radius: 18px; }
-      .bottombar { min-height: 40px; padding: 6px 10px; }
-      .bottom-group:last-child { display: none; }
-      body { overflow: auto; }
-      .app { height: auto; min-height: calc(100vh - 16px); }
-      .topbar { align-items: stretch; flex-direction: column; }
-      .top-status { width: fit-content; }
-      .workspace, .workspace.editor-big, .workspace.preview-only { min-height: 1000px; grid-template-columns: 1fr; grid-template-rows: 440px 1fr; gap: 8px; }
-      .workspace.preview-only { grid-template-rows: 1fr; }
+
+      .workspace.preview-only .left,
+      .workspace.preview-only .resizer { display: none; }
+
       .resizer { display: none; }
-      .panel.left, .panel.right { border-radius: var(--radius); }
-      .searchbar { top: 88px; grid-template-columns: 1fr; }
-      .search-nav, .search-count, .searchbar .pill, .close-search { width: 100%; }
-      .bottombar { border-radius: 18px; align-items: flex-start; flex-direction: column; }
+
+      .panel.left,
+      .panel.right {
+        border-radius: 18px;
+      }
+
+      .panel-head {
+        min-height: 46px;
+        padding: 7px;
+      }
+
+      .tabs {
+        width: 100%;
+        gap: 3px;
+      }
+
+      .tab {
+        flex: 1;
+        min-width: 64px;
+        height: 34px;
+        padding: 0 8px;
+        font-size: 12px;
+        justify-content: center;
+      }
+
+      .tab svg { display: none; }
+      .status { max-width: 120px; font-size: 11px; }
+
+      .editor-wrap {
+        display: grid;
+        grid-template-rows: 1fr auto;
+      }
+
+      .highlight-layer,
+      .editor {
+        padding: 14px 12px 52px;
+        font-size: 12.5px;
+        line-height: 1.55;
+        grid-area: 1 / 1;
+      }
+
+      .editor {
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .touch-bar {
+        display: flex;
+        grid-area: 2 / 1;
+      }
+
+      .editor-tools {
+        left: 8px;
+        right: 8px;
+        bottom: 48px;
+      }
+
+      .mini-info {
+        height: 22px;
+        max-width: 48%;
+        font-size: 10px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        background: rgba(28,28,30,.86);
+      }
+
+      .preview-frame-wrap {
+        border-radius: 0 0 18px 18px;
+        overflow: hidden;
+      }
+
+      .searchbar {
+        left: 8px;
+        right: 8px;
+        top: auto;
+        bottom: calc(8px + env(safe-area-inset-bottom));
+        width: auto;
+        transform: translateY(14px);
+        border-radius: 22px;
+        grid-template-columns: 1fr;
+        padding: 8px;
+        box-shadow: 0 18px 60px rgba(0,0,0,.55);
+      }
+
+      .searchbar.show {
+        transform: translateY(0);
+      }
+
+      .field,
+      .search-nav,
+      .search-count,
+      .searchbar .pill,
+      .close-search {
+        width: 100%;
+        height: 40px;
+      }
+
+      .search-nav { justify-content: center; }
+      .round { width: 50%; height: 32px; }
+
+      .menu {
+        left: 8px !important;
+        right: 8px !important;
+        top: auto !important;
+        bottom: calc(8px + env(safe-area-inset-bottom)) !important;
+        width: auto;
+        padding: 8px;
+        border-radius: 22px;
+        box-shadow: 0 18px 70px rgba(0,0,0,.58);
+      }
+
+      .menu button {
+        height: 44px;
+        border-radius: 14px;
+        font-size: 14px;
+      }
+
+      .color-popover.show {
+        position: fixed;
+        left: 8px !important;
+        right: 8px !important;
+        top: auto !important;
+        bottom: calc(8px + env(safe-area-inset-bottom)) !important;
+        width: auto;
+        min-width: 0;
+        justify-content: space-between;
+        padding: 10px 12px;
+        border-radius: 22px;
+        box-shadow: 0 18px 70px rgba(0,0,0,.58);
+      }
+
+      .color-popover input[type="color"] {
+        width: 48px;
+        height: 38px;
+        border-radius: 12px;
+      }
+
+      .color-value {
+        font-size: 13px;
+      }
+
+      .modal-backdrop {
+        padding: 12px;
+        align-items: flex-end;
+      }
+
+      .modal-card {
+        width: 100%;
+        border-radius: 24px;
+      }
+
+      .toast {
+        bottom: calc(14px + env(safe-area-inset-bottom));
+        max-width: calc(100vw - 24px);
+      }
     }
   </style>
 </head>
@@ -647,6 +950,10 @@
   <div class="app">
     <header class="topbar glass">
       <div class="top-status"><span class="dot" id="saveDot"></span><span id="saveState">salvo localmente</span></div>
+      <div class="mobile-switch" aria-label="alternar visualização">
+        <button class="mobile-tab active" data-mobile-view="editor">editor</button>
+        <button class="mobile-tab" data-mobile-view="preview">preview</button>
+      </div>
       <div class="actions">
         <button class="pill" id="openSearch">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
@@ -695,11 +1002,20 @@
           <div class="status" id="tabStatus">html</div>
         </div>
         <div class="editor-wrap" id="editorWrap">
-          <pre class="highlight-layer" id="highlightLayer" aria-hidden="true"></pre>
+          <div class="line-numbers" id="lineNumbers" aria-hidden="true"><span class="line-number-list" id="lineNumberList">1</span></div>
+          <pre class="highlight-layer" id="highlightLayer" aria-hidden="true"><code class="highlight-code" id="highlightCode"></code></pre>
           <textarea class="editor" id="editor" spellcheck="false" wrap="off"></textarea>
           <div class="color-popover" id="colorPopover" aria-hidden="true">
             <input type="color" id="colorInput" />
             <span class="color-value" id="colorValue">#000000</span>
+          </div>
+          <div class="touch-bar" aria-label="atalhos rápidos do editor">
+            <button class="touch-btn" data-insert="  ">tab</button>
+            <button class="touch-btn" data-insert="{">{</button>
+            <button class="touch-btn" data-insert="}">}</button>
+            <button class="touch-btn" data-insert="( )">( )</button>
+            <button class="touch-btn" data-insert=";">;</button>
+            <button class="touch-btn" data-insert="#000000">cor</button>
           </div>
           <div class="editor-tools">
             <span class="mini-info" id="cursorInfo">linha 1, col 1</span>
@@ -884,6 +1200,9 @@ button {
     const preview = $("#preview");
     const workspace = $("#workspace");
     const highlightLayer = $("#highlightLayer");
+    const highlightCodeEl = $("#highlightCode");
+    const lineNumbers = $("#lineNumbers");
+    const lineNumberList = $("#lineNumberList");
     const colorPopover = $("#colorPopover");
     const colorInput = $("#colorInput");
     const colorValue = $("#colorValue");
@@ -906,7 +1225,7 @@ button {
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>${title}</title>
   <style>
 ${state.css || ""}
@@ -972,13 +1291,29 @@ ${state.js || ""}
 
     function renderHighlight() {
       const mode = currentTab === "final" ? "html" : currentTab;
-      highlightLayer.innerHTML = highlightCode(editor.value, mode);
+      highlightCodeEl.innerHTML = highlightCode(editor.value, mode);
+      renderLineNumbers();
       syncHighlightScroll();
     }
 
+    function currentLineNumber() {
+      const pos = editor.selectionStart || 0;
+      return editor.value.slice(0, pos).split("\n").length;
+    }
+
+    function renderLineNumbers() {
+      const count = Math.max(1, editor.value.split("\n").length);
+      const active = currentLineNumber();
+      let html = "";
+      for (let i = 1; i <= count; i++) {
+        html += `<span class="line-number${i === active ? " active" : ""}">${i}</span>`;
+      }
+      lineNumberList.innerHTML = html;
+    }
+
     function syncHighlightScroll() {
-      highlightLayer.scrollTop = editor.scrollTop;
-      highlightLayer.scrollLeft = editor.scrollLeft;
+      highlightCodeEl.style.transform = `translate3d(${-editor.scrollLeft}px, ${-editor.scrollTop}px, 0)`;
+      lineNumberList.style.transform = `translate3d(0, ${-editor.scrollTop}px, 0)`;
     }
 
     function normalizeHexForInput(hex) {
@@ -1192,6 +1527,23 @@ ${state.js || ""}
 
     $$(".tab").forEach(btn => btn.addEventListener("click", () => switchTab(btn.dataset.tab)));
 
+
+    $$(".touch-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const value = btn.dataset.insert || "";
+        const start = editor.selectionStart;
+        const end = editor.selectionEnd;
+        let insert = value;
+        let caretOffset = insert.length;
+        if (value === "( )") { insert = "()"; caretOffset = 1; }
+        editor.value = editor.value.slice(0, start) + insert + editor.value.slice(end);
+        editor.selectionStart = editor.selectionEnd = start + caretOffset;
+        handleEditorInput();
+        editor.focus({ preventScroll: true });
+      });
+    });
+
+
     $("#refreshBtn").addEventListener("click", updatePreview); $("#saveBtn").addEventListener("click", () => saveState()); $("#importBtn").addEventListener("click", () => $("#fileInput").click()); $("#openPreviewBtn").addEventListener("click", openPreview);
     $("#openSearch").addEventListener("click", openSearch); $("#closeSearch").addEventListener("click", closeSearch); $("#prevMatch").addEventListener("click", () => goToMatch(-1)); $("#nextMatch").addEventListener("click", () => goToMatch(1)); $("#replaceBtn").addEventListener("click", replaceAllMatches);
     $("#findInput").addEventListener("input", () => {
@@ -1204,6 +1556,15 @@ ${state.js || ""}
     function positionMenu() {
       const btn = $("#menuBtn");
       const menu = $("#menu");
+      if (window.innerWidth <= 960) {
+        menu.style.left = "8px";
+        menu.style.right = "8px";
+        menu.style.top = "auto";
+        menu.style.bottom = "calc(8px + env(safe-area-inset-bottom))";
+        return;
+      }
+      menu.style.right = "auto";
+      menu.style.bottom = "auto";
       const rect = btn.getBoundingClientRect();
       const gap = 8;
       const width = Math.min(320, Math.max(228, menu.offsetWidth || 228));
@@ -1279,7 +1640,7 @@ ${state.js || ""}
       btn.addEventListener("click", () => setMobileView(btn.dataset.mobileView));
     });
 
-    applyLayout(); syncEditor(); updateSavedUI(); updatePreview();
+    applyLayout(); syncEditor(); updateSavedUI(); setMobileView("editor"); updatePreview();
   </script>
 </body>
 </html>
