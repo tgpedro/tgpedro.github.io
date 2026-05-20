@@ -14,10 +14,8 @@
             --glass-border: rgba(255, 255, 255, 0.1);
             --card-bg: rgba(44, 44, 46, 0.4);
             --ios-radius: 22px;
-            --squircle: polygon(50% 0%, 85% 2%, 98% 15%, 100% 50%, 98% 85%, 85% 98%, 50% 100%, 15% 98%, 2% 85%, 0% 50%, 2% 15%, 15% 2%);
         }
 
-        /* Temas iOS 18 */
         body.theme-tinted { --accent-color: #d1d1d6; }
         body.theme-neon { --accent-color: #30d158; }
         body.theme-black { --bg-color: #000000; --card-bg: rgba(28, 28, 30, 0.8); }
@@ -30,6 +28,17 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        /* Scrollbar Customizada (Estilo iOS da imagem) */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            border: 2px solid transparent;
+            background-clip: content-box;
+        }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.3); background-clip: content-box; }
+
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
@@ -38,7 +47,6 @@
             background-image: radial-gradient(circle at 50% -20%, #1c1c1e 0%, #000 80%);
         }
 
-        /* Layout */
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -71,20 +79,13 @@
             font-weight: 500;
         }
 
-        .header-right {
-            text-align: right;
-        }
+        .header-right { text-align: right; }
+        .time-display { font-size: 1.2rem; font-weight: 600; margin-bottom: 4px; }
 
-        .time-display {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        /* Search */
         .search-wrapper {
             margin-bottom: 40px;
             animation: ios-slide-up 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s both;
+            position: relative;
         }
 
         .search-bar {
@@ -100,7 +101,6 @@
             -webkit-backdrop-filter: blur(20px);
         }
 
-        .search-wrapper { position: relative; }
         .search-icon {
             position: absolute;
             left: 12px;
@@ -111,7 +111,45 @@
             height: 18px;
         }
 
-        /* Grid */
+        .widgets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px;
+            margin-bottom: 40px;
+            animation: ios-slide-up 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) 0.2s both;
+        }
+
+        .widget-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 20px;
+            border: 0.5px solid var(--glass-border);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 160px;
+            transition: transform 0.3s ease;
+        }
+
+        .widget-card:hover { transform: scale(1.02); }
+
+        .widget-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--accent-color);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .widget-icon svg { width: 20px; height: 20px; fill: #fff; }
+        .widget-title { font-size: 0.85rem; font-weight: 600; color: var(--text-dim); margin-top: 12px; }
+        .widget-value { font-size: 1.8rem; font-weight: 700; margin-top: 4px; }
+        .widget-unit { font-size: 0.9rem; color: var(--text-dim); font-weight: 500; }
+
         .section-label {
             font-size: 0.85rem;
             font-weight: 600;
@@ -129,7 +167,6 @@
             margin-bottom: 48px;
         }
 
-        /* App Icon Style */
         .app-item {
             display: flex;
             flex-direction: column;
@@ -138,6 +175,7 @@
             color: inherit;
             transition: transform 0.2s ease;
             animation: ios-app-in 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+            cursor: pointer;
         }
 
         @keyframes ios-app-in {
@@ -145,15 +183,11 @@
             to { opacity: 1; transform: scale(1); }
         }
 
-        .app-item:active {
-            transform: scale(0.9);
-        }
-
         .app-icon {
             width: 72px;
             height: 72px;
             background: var(--card-bg);
-            border-radius: 16px; /* iOS Squircle approximation */
+            border-radius: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -164,24 +198,9 @@
             overflow: hidden;
         }
 
-        .app-icon svg {
-            width: 36px;
-            height: 36px;
-            fill: var(--accent-color);
-            transition: all 0.3s ease;
-        }
+        .app-icon svg { width: 36px; height: 36px; fill: var(--accent-color); }
+        .app-name { font-size: 0.75rem; font-weight: 500; text-align: center; width: 100%; }
 
-        .app-name {
-            font-size: 0.75rem;
-            font-weight: 500;
-            text-align: center;
-            width: 100%;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        /* Dock */
         .dock-container {
             position: fixed;
             bottom: 24px;
@@ -196,26 +215,19 @@
             gap: 12px;
             border: 0.5px solid rgba(255,255,255,0.1);
             z-index: 1000;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
         }
 
         .dock-item {
-            width: 54px;
-            height: 54px;
+            width: 54px; height: 54px;
             background: rgba(0,0,0,0.3);
             border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: transform 0.2s ease;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: transform 0.2s ease;
         }
 
         .dock-item:hover { transform: translateY(-10px) scale(1.1); }
-        .dock-item:active { transform: scale(0.9); }
         .dock-item svg { width: 28px; height: 28px; fill: #fff; }
 
-        /* Modais */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -229,12 +241,14 @@
 
         .modal {
             background: #1c1c1e;
-            width: 90%;
-            max-width: 400px;
+            width: 95%;
+            max-width: 500px;
             border-radius: 24px;
             padding: 24px;
             border: 0.5px solid var(--glass-border);
             animation: modal-pop 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         @keyframes modal-pop {
@@ -242,7 +256,6 @@
             to { opacity: 1; transform: scale(1); }
         }
 
-        .modal h3 { margin-bottom: 20px; font-size: 1.3rem; }
         .input-field {
             width: 100%;
             background: #2c2c2e;
@@ -255,18 +268,73 @@
         }
 
         .modal-btns { display: flex; gap: 12px; margin-top: 12px; }
-        .btn {
-            flex: 1; padding: 12px; border-radius: 10px; border: none;
-            font-weight: 600; cursor: pointer;
-        }
+        .btn { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 600; cursor: pointer; }
         .btn-primary { background: var(--accent-color); color: #fff; }
         .btn-secondary { background: #3a3a3c; color: #fff; }
 
-        /* Mobile */
+        /* Calendário Avançado */
+        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
+        .calendar-day-label { font-size: 0.65rem; font-weight: 700; color: var(--text-dim); }
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            font-size: 0.85rem; border-radius: 12px; cursor: pointer; position: relative;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* Hover Estilo iOS */
+        .calendar-day:hover { background: rgba(255, 255, 255, 0.15); transform: scale(1.05); }
+        .calendar-day.today { background: var(--accent-color); color: #fff; font-weight: 700; }
+        .calendar-day.other-month { color: #3a3a3c; }
+        
+        /* Seleção de Intervalo */
+        .calendar-day.selected-start, .calendar-day.selected-end { background: var(--accent-color) !important; color: #fff !important; }
+        .calendar-day.in-range { background: rgba(0, 122, 255, 0.3); border-radius: 0; }
+        .calendar-day.selected-start { border-top-right-radius: 0; border-bottom-right-radius: 0; }
+        .calendar-day.selected-end { border-top-left-radius: 0; border-bottom-left-radius: 0; }
+
+        .calendar-day.has-event::after {
+            content: ''; position: absolute; bottom: 4px; width: 4px; height: 4px;
+            background: #ff3b30; border-radius: 50%;
+        }
+        
+        .calendar-nav { display: flex; gap: 8px; }
+        .calendar-nav-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: var(--accent-color);
+            width: 32px; height: 32px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: background 0.2s;
+        }
+        .calendar-nav-btn:hover { background: rgba(255, 255, 255, 0.2); }
+        .calendar-nav-btn svg { width: 16px; height: 16px; fill: var(--accent-color); }
+
+        /* Contador de Dias */
+        .range-info {
+            background: rgba(0, 122, 255, 0.1);
+            padding: 12px; border-radius: 12px; margin-bottom: 16px;
+            display: none; text-align: center; font-weight: 600; color: var(--accent-color);
+            animation: ios-slide-up 0.4s ease;
+        }
+
+        .event-editor { margin-top: 20px; padding-top: 20px; border-top: 0.5px solid var(--glass-border); display: none; }
+        .event-editor h4 { margin-bottom: 12px; font-size: 1rem; color: var(--accent-color); }
+        .color-picker { display: flex; gap: 8px; margin-bottom: 12px; }
+        .color-opt { width: 24px; height: 24px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
+        .color-opt.selected { border-color: #fff; }
+        
+        .notes-area {
+            width: 100%; min-height: 100px; background: #2c2c2e; border: none;
+            border-radius: 10px; padding: 12px; color: #fff; outline: none; resize: none;
+            font-size: 0.9rem; margin-bottom: 12px;
+        }
+
         @media (max-width: 600px) {
             .app-grid { grid-template-columns: repeat(4, 1fr); gap: 20px 10px; }
             .app-icon { width: 64px; height: 64px; }
-            .greeting h2 { font-size: 1.8rem; }
+            .widgets-grid { grid-template-columns: 1fr 1fr; }
         }
     </style>
 </head>
@@ -289,58 +357,70 @@
             <input type="text" class="search-bar" id="search-input" placeholder="buscar">
         </div>
 
-        <div id="fav-section" style="display:none">
-            <div class="section-label">favoritos</div>
-            <div class="app-grid" id="fav-grid"></div>
+        <div class="section-label">eventos próximos</div>
+        <div class="widgets-grid">
+            <div class="widget-card">
+                <div class="widget-header"><div class="widget-icon" style="background: #ff9500;"><svg viewBox="0 0 24 24"><path d="M12 3L1 9l11 6l9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg></div></div>
+                <div><div class="widget-title">ENEM 2026</div><div class="widget-value" id="enem-countdown">--</div><div class="widget-unit">dias restantes</div></div>
+            </div>
+            <div class="widget-card">
+                <div class="widget-header"><div class="widget-icon" style="background: #af52de;"><svg viewBox="0 0 24 24"><path d="M12 6c1.11 0 2-.9 2-2 0-.38-.1-.73-.29-1.03L12 0l-1.71 2.97c-.19.3-.29.65-.29 1.03 0 1.1.89 2 2 2zm4.6 9.99l-1.07-1.07-1.08 1.07c-1.3 1.3-3.58 1.31-4.89 0l-1.07-1.07-1.09 1.07C6.13 17.25 4 16.39 4 14.5V13c0-1.1.9-2 2-2h12c1.1 0 2 .9 2 2v1.5c0 1.89-2.13 2.75-3.4 1.49zM18 19H6c-1.1 0-2 .9-2 2v1h16v-1c0-1.1-.9-2-2-2z"/></svg></div></div>
+                <div><div class="widget-title">18 ANOS</div><div class="widget-value" id="bday-countdown">--</div><div class="widget-unit">dias para a liberdade</div></div>
+            </div>
         </div>
 
-        <div class="section-label">biblioteca de apps</div>
-        <div class="app-grid" id="main-grid"></div>
+        <div id="fav-section" style="display:none"><div class="section-label">favoritos</div><div class="app-grid" id="fav-grid"></div></div>
+        <div class="section-label">biblioteca de apps</div><div class="app-grid" id="main-grid"></div>
     </div>
 
     <div class="dock-container">
-        <div class="dock-item" onclick="openModal('modal-shortcut')" title="Adicionar">
-            <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-        </div>
-        <div class="dock-item" onclick="openModal('modal-settings')" title="Ajustes">
-            <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94c0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6s3.6 1.62 3.6 3.6s-1.62 3.6-3.6 3.6z"/></svg>
-        </div>
-        <div class="dock-item" onclick="logout()" title="Sair">
-            <svg viewBox="0 0 24 24"><path d="M10.09 15.59L11.5 17l5-5l-5-5l-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5a2 2 0 0 0-2 2v4h2V5h14v14H5v-4H3v4a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z"/></svg>
-        </div>
+        <div class="dock-item" onclick="openModal('modal-shortcut')"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></div>
+        <div class="dock-item" onclick="openModal('modal-settings')"><svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94c0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6s3.6 1.62 3.6 3.6s-1.62 3.6-3.6 3.6z"/></svg></div>
+        <div class="dock-item" onclick="logout()"><svg viewBox="0 0 24 24"><path d="M10.09 15.59L11.5 17l5-5l-5-5l-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5a2 2 0 0 0-2 2v4h2V5h14v14H5v-4H3v4a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z"/></svg></div>
     </div>
 
     <!-- Modais -->
-    <div class="modal-overlay" id="modal-shortcut">
-        <div class="modal">
-            <h3>novo atalho</h3>
-            <input type="text" id="new-name" class="input-field" placeholder="nome">
-            <input type="text" id="new-url" class="input-field" placeholder="url">
-            <div class="modal-btns">
-                <button class="btn btn-secondary" onclick="closeModal('modal-shortcut')">cancelar</button>
-                <button class="btn btn-primary" onclick="addShortcut()">adicionar</button>
-            </div>
-        </div>
-    </div>
+    <div class="modal-overlay" id="modal-shortcut"><div class="modal"><h3>novo atalho</h3><input type="text" id="new-name" class="input-field" placeholder="nome"><input type="text" id="new-url" class="input-field" placeholder="url"><div class="modal-btns"><button class="btn btn-secondary" onclick="closeModal('modal-shortcut')">cancelar</button><button class="btn btn-primary" onclick="addShortcut()">adicionar</button></div></div></div>
+    <div class="modal-overlay" id="modal-settings"><div class="modal"><h3>ajustes</h3><input type="text" id="set-name" class="input-field" placeholder="seu nome"><select id="set-theme" class="input-field"><option value="default">escuro padrão</option><option value="tinted">tinted (ios 18)</option><option value="neon">vibrante</option></select><div class="modal-btns"><button class="btn btn-secondary" onclick="closeModal('modal-settings')">fechar</button><button class="btn btn-primary" onclick="saveSettings()">salvar</button></div></div></div>
 
-    <div class="modal-overlay" id="modal-settings">
+    <div class="modal-overlay" id="modal-calendar">
         <div class="modal">
-            <h3>ajustes</h3>
-            <input type="text" id="set-name" class="input-field" placeholder="seu nome">
-            <select id="set-theme" class="input-field">
-                <option value="default">escuro padrão</option>
-                <option value="tinted">tinted (ios 18)</option>
-                <option value="neon">vibrante</option>
-            </select>
-            <div class="modal-btns">
-                <button class="btn btn-secondary" onclick="closeModal('modal-settings')">fechar</button>
-                <button class="btn btn-primary" onclick="saveSettings()">salvar</button>
+            <div class="calendar-header">
+                <h3 id="calendar-month-year" style="margin-bottom: 0;">Maio 2024</h3>
+                <div class="calendar-nav">
+                    <button class="calendar-nav-btn" onclick="changeMonth(-1)"><svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg></button>
+                    <button class="calendar-nav-btn" onclick="changeMonth(1)"><svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></button>
+                </div>
+            </div>
+            
+            <div class="range-info" id="range-info"></div>
+            
+            <div class="calendar-grid" id="calendar-grid"></div>
+            
+            <div class="event-editor" id="event-editor">
+                <h4 id="selected-date-label">Dia 19</h4>
+                <input type="text" id="event-title" class="input-field" placeholder="Título do evento">
+                <textarea id="event-notes" class="notes-area" placeholder="Anote algo aqui..."></textarea>
+                <div class="color-picker" id="color-picker">
+                    <div class="color-opt" style="background: #ff3b30;" data-color="#ff3b30"></div>
+                    <div class="color-opt" style="background: #ff9500;" data-color="#ff9500"></div>
+                    <div class="color-opt" style="background: #34c759;" data-color="#34c759"></div>
+                    <div class="color-opt" style="background: #007aff;" data-color="#007aff"></div>
+                    <div class="color-opt" style="background: #af52de;" data-color="#af52de"></div>
+                </div>
+                <div class="modal-btns">
+                    <button class="btn btn-secondary" onclick="hideEditor()">cancelar</button>
+                    <button class="btn btn-primary" onclick="saveEvent()">salvar</button>
+                </div>
+            </div>
+            
+            <div class="modal-btns" id="calendar-main-btns">
+                <button class="btn btn-secondary" onclick="closeModal('modal-calendar')">fechar</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Ícones SVG para cada sistema
         const ICONS = {
             estudos: '<path d="M12 3L1 9l11 6l9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/>',
             foco: '<path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8s8 3.58 8 8s-3.58 8-8 8zm.5-13H11v6l5.25 3.15l.75-1.23l-4.5-2.67z"/>',
@@ -351,10 +431,12 @@
             financeiro: '<path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15c0-1.09 1.01-1.85 2.7-1.85c1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61c0 2.31 1.91 3.46 4.7 4.13c2.5.6 3 1.48 3 2.41c0 .69-.49 1.79-2.7 1.79c-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55c0-2.84-2.43-3.81-4.7-4.4z"/>',
             ideias: '<path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74c0-3.86-3.14-7-7-7zm2.85 11.1l-.85.6V16h-4v-2.3l-.85-.6A4.997 4.997 0 0 1 7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.63-.8 3.06-2.15 3.9z"/>',
             config: '<path d="M19.14 12.94c.04-.3.06-.61.06-.94c0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6s3.6 1.62 3.6 3.6s-1.62 3.6-3.6 3.6z"/>',
+            calendario: '<path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2zM7 12h5v5H7z"/>',
             default: '<path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" />'
         };
 
         const DEFAULT_APPS = [
+            { id: 'calendario', name: 'calendário', action: () => openModal('modal-calendar'), icon: 'calendario' },
             { id: 'estudos', name: 'estudos', link: '/estudos', icon: 'estudos' },
             { id: 'foco', name: 'foco', link: '/foco', icon: 'foco' },
             { id: 'notas', name: 'notas', link: '/notas', icon: 'notas' },
@@ -369,15 +451,28 @@
         let customApps = JSON.parse(localStorage.getItem('pedro_hub_custom')) || [];
         let favorites = JSON.parse(localStorage.getItem('pedro_hub_favs')) || [];
         let userPrefs = JSON.parse(localStorage.getItem('pedro_hub_prefs')) || { name: 'Pedro', theme: 'default' };
-
-        if (localStorage.getItem('pedro_hub_auth') !== 'true') window.location.href = 'password.html/';
+        let events = JSON.parse(localStorage.getItem('pedro_hub_events')) || {};
+        let currentCalendarDate = new Date();
+        let selectedDateKey = null;
+        let selectedColor = '#007aff';
+        
+        // Range Selection
+        let rangeStart = null;
+        let rangeEnd = null;
 
         function init() {
-            updateClock();
-            setInterval(updateClock, 1000);
-            renderApps();
-            applyPrefs();
+            updateClock(); setInterval(updateClock, 1000);
+            updateCountdowns(); setInterval(updateCountdowns, 3600000);
+            renderApps(); applyPrefs(); renderCalendar();
             document.getElementById('search-input').addEventListener('input', (e) => renderApps(e.target.value));
+            
+            document.querySelectorAll('.color-opt').forEach(opt => {
+                opt.addEventListener('click', () => {
+                    document.querySelectorAll('.color-opt').forEach(o => o.classList.remove('selected'));
+                    opt.classList.add('selected');
+                    selectedColor = opt.dataset.color;
+                });
+            });
         }
 
         function updateClock() {
@@ -391,37 +486,154 @@
             document.getElementById('date-text').textContent = now.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
         }
 
+        function updateCountdowns() {
+            const now = new Date();
+            const enemDate = new Date('2026-11-08T00:00:00');
+            const diffEnem = enemDate - now;
+            const daysEnem = Math.ceil(diffEnem / (1000 * 60 * 60 * 24));
+            document.getElementById('enem-countdown').textContent = daysEnem > 0 ? daysEnem : 'HOJE!';
+            const bdayDate = new Date('2027-02-04T00:00:00');
+            const diffBday = bdayDate - now;
+            const daysBday = Math.ceil(diffBday / (1000 * 60 * 60 * 24));
+            document.getElementById('bday-countdown').textContent = daysBday > 0 ? daysBday : 'PARABÉNS!';
+        }
+
         function renderApps(search = '') {
             const mainGrid = document.getElementById('main-grid');
             const favGrid = document.getElementById('fav-grid');
             const favSection = document.getElementById('fav-section');
-            
             let all = [...DEFAULT_APPS, ...customApps];
             if (search) all = all.filter(a => a.name.toLowerCase().includes(search.toLowerCase()));
 
-            const html = all.map((app, idx) => `
-                <div class="app-item" style="animation-delay: ${idx * 0.05}s" oncontextmenu="toggleFav(event, '${app.id}')">
-                    <a href="${app.link}" class="app-icon">
-                        <svg viewBox="0 0 24 24">${ICONS[app.icon] || ICONS.default}</svg>
-                    </a>
-                    <span class="app-name">${app.name}</span>
-                </div>
-            `).join('');
-
+            const html = all.map((app, idx) => {
+                const clickAction = app.action ? `onclick="openModal('modal-calendar')"` : `href="${app.link}"`;
+                return `<div class="app-item" style="animation-delay: ${idx * 0.05}s" oncontextmenu="toggleFav(event, '${app.id}')"><${app.action ? 'div' : 'a'} ${clickAction} class="app-icon"><svg viewBox="0 0 24 24">${ICONS[app.icon] || ICONS.default}</svg></${app.action ? 'div' : 'a'}><span class="app-name">${app.name}</span></div>`;
+            }).join('');
             mainGrid.innerHTML = html;
 
             const favs = all.filter(a => favorites.includes(a.id));
             if (favs.length > 0 && !search) {
                 favSection.style.display = 'block';
-                favGrid.innerHTML = favs.map(app => `
-                    <a href="${app.link}" class="app-item">
-                        <div class="app-icon" style="background: var(--accent-color);"><svg viewBox="0 0 24 24" style="fill:#fff">${ICONS[app.icon] || ICONS.default}</svg></div>
-                        <span class="app-name">${app.name}</span>
-                    </a>
-                `).join('');
-            } else {
-                favSection.style.display = 'none';
+                favGrid.innerHTML = favs.map(app => {
+                    const clickAction = app.action ? `onclick="openModal('modal-calendar')"` : `href="${app.link}"`;
+                    return `<div class="app-item" ${app.action ? clickAction : ''}><${app.action ? 'div' : 'a'} ${app.action ? '' : 'href="'+app.link+'"'} class="app-icon" style="background: var(--accent-color);"><svg viewBox="0 0 24 24" style="fill:#fff">${ICONS[app.icon] || ICONS.default}</svg></${app.action ? 'div' : 'a'}><span class="app-name">${app.name}</span></div>`;
+                }).join('');
+            } else { favSection.style.display = 'none'; }
+        }
+
+        function renderCalendar() {
+            const grid = document.getElementById('calendar-grid');
+            const monthYearLabel = document.getElementById('calendar-month-year');
+            grid.innerHTML = '';
+            const year = currentCalendarDate.getFullYear();
+            const month = currentCalendarDate.getMonth();
+            monthYearLabel.textContent = currentCalendarDate.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+
+            ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'].forEach(l => {
+                const el = document.createElement('div'); el.className = 'calendar-day-label'; el.textContent = l; grid.appendChild(el);
+            });
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const prevMonthDays = new Date(year, month, 0).getDate();
+
+            for (let i = firstDay - 1; i >= 0; i--) {
+                const el = document.createElement('div'); el.className = 'calendar-day other-month'; el.textContent = prevMonthDays - i; grid.appendChild(el);
             }
+
+            const today = new Date();
+            for (let i = 1; i <= daysInMonth; i++) {
+                const el = document.createElement('div'); el.className = 'calendar-day';
+                const dateKey = `${year}-${month+1}-${i}`;
+                const currentDate = new Date(year, month, i);
+                
+                if (i === today.getDate() && month === today.getMonth() && year === today.getFullYear()) el.classList.add('today');
+                
+                // Range Classes
+                if (rangeStart && currentDate.getTime() === rangeStart.getTime()) el.classList.add('selected-start');
+                if (rangeEnd && currentDate.getTime() === rangeEnd.getTime()) el.classList.add('selected-end');
+                if (rangeStart && rangeEnd) {
+                    const start = Math.min(rangeStart.getTime(), rangeEnd.getTime());
+                    const end = Math.max(rangeStart.getTime(), rangeEnd.getTime());
+                    if (currentDate.getTime() > start && currentDate.getTime() < end) el.classList.add('in-range');
+                }
+
+                if (events[dateKey]) {
+                    el.classList.add('has-event');
+                    el.style.boxShadow = `inset 0 0 0 2px ${events[dateKey].color}`;
+                }
+                el.textContent = i;
+                el.onclick = (e) => handleDayClick(e, dateKey, i);
+                grid.appendChild(el);
+            }
+            updateRangeInfo();
+        }
+
+        function handleDayClick(e, dateKey, day) {
+            const year = currentCalendarDate.getFullYear();
+            const month = currentCalendarDate.getMonth();
+            const clickedDate = new Date(year, month, day);
+
+            if (e.shiftKey) {
+                if (!rangeStart || (rangeStart && rangeEnd)) {
+                    rangeStart = clickedDate;
+                    rangeEnd = null;
+                } else {
+                    rangeEnd = clickedDate;
+                }
+                renderCalendar();
+            } else {
+                rangeStart = null;
+                rangeEnd = null;
+                showEditor(dateKey, day);
+                renderCalendar();
+            }
+        }
+
+        function updateRangeInfo() {
+            const info = document.getElementById('range-info');
+            if (rangeStart && rangeEnd) {
+                const diff = Math.abs(rangeEnd - rangeStart);
+                const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+                info.textContent = `Intervalo selecionado: ${days} dias`;
+                info.style.display = 'block';
+            } else if (rangeStart) {
+                info.textContent = "Selecione a segunda data com Shift";
+                info.style.display = 'block';
+            } else {
+                info.style.display = 'none';
+            }
+        }
+
+        function changeMonth(offset) { currentCalendarDate.setMonth(currentCalendarDate.getMonth() + offset); renderCalendar(); }
+
+        function showEditor(dateKey, day) {
+            selectedDateKey = dateKey;
+            document.getElementById('selected-date-label').textContent = `Dia ${day} de ${currentCalendarDate.toLocaleDateString('pt-BR', { month: 'long' })}`;
+            const event = events[dateKey] || { title: '', notes: '', color: '#007aff' };
+            document.getElementById('event-title').value = event.title;
+            document.getElementById('event-notes').value = event.notes;
+            selectedColor = event.color;
+            document.querySelectorAll('.color-opt').forEach(opt => {
+                opt.classList.toggle('selected', opt.dataset.color === selectedColor);
+            });
+            document.getElementById('event-editor').style.display = 'block';
+            document.getElementById('calendar-main-btns').style.display = 'none';
+        }
+
+        function hideEditor() {
+            document.getElementById('event-editor').style.display = 'none';
+            document.getElementById('calendar-main-btns').style.display = 'flex';
+        }
+
+        function saveEvent() {
+            const title = document.getElementById('event-title').value;
+            const notes = document.getElementById('event-notes').value;
+            if (!title && !notes) { delete events[selectedDateKey]; }
+            else { events[selectedDateKey] = { title, notes, color: selectedColor }; }
+            localStorage.setItem('pedro_hub_events', JSON.stringify(events));
+            renderCalendar();
+            hideEditor();
         }
 
         function toggleFav(e, id) {
@@ -438,17 +650,14 @@
             if (!name || !url) return;
             customApps.push({ id: 'c-'+Date.now(), name, link: url, icon: 'default' });
             localStorage.setItem('pedro_hub_custom', JSON.stringify(customApps));
-            renderApps();
-            closeModal('modal-shortcut');
+            renderApps(); closeModal('modal-shortcut');
         }
 
         function saveSettings() {
             userPrefs.name = document.getElementById('set-name').value || 'Pedro';
             userPrefs.theme = document.getElementById('set-theme').value;
             localStorage.setItem('pedro_hub_prefs', JSON.stringify(userPrefs));
-            applyPrefs();
-            updateClock();
-            closeModal('modal-settings');
+            applyPrefs(); updateClock(); closeModal('modal-settings');
         }
 
         function applyPrefs() {
@@ -459,7 +668,7 @@
 
         function logout() { localStorage.removeItem('pedro_hub_auth'); window.location.href = 'password.html/'; }
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; hideEditor(); rangeStart = null; rangeEnd = null; renderCalendar(); }
 
         init();
     </script>
