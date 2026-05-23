@@ -75,6 +75,28 @@
       position: relative;
     }
 
+
+
+    .top-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+      flex: 0 0 auto;
+    }
+
+    .back-home {
+      width: 38px;
+      height: 34px;
+      padding: 0;
+      flex: 0 0 auto;
+    }
+
+    .back-home svg {
+      width: 17px;
+      height: 17px;
+    }
+
     .top-status {
       height: 34px;
       padding: 0 12px;
@@ -751,6 +773,16 @@
         gap: 8px;
       }
 
+      .top-left {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .back-home {
+        width: 40px;
+        height: 30px;
+      }
+
       .top-status {
         height: 30px;
         width: fit-content;
@@ -968,7 +1000,12 @@
 <body>
   <div class="app">
     <header class="topbar glass">
-      <div class="top-status"><span class="dot" id="saveDot"></span><span id="saveState">salvo localmente</span></div>
+      <div class="top-left">
+        <button class="pill back-home" id="backHomeBtn" title="voltar para o início" aria-label="voltar para o início">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
+        </button>
+        <div class="top-status"><span class="dot" id="saveDot"></span><span id="saveState">salvo localmente</span></div>
+      </div>
       <div class="mobile-switch" aria-label="alternar visualização">
         <button class="mobile-tab active" data-mobile-view="editor">editor</button>
         <button class="mobile-tab" data-mobile-view="preview">preview</button>
@@ -1584,7 +1621,10 @@ ${state.js || ""}
     });
 
 
-    $("#refreshBtn").addEventListener("click", updatePreview); $("#saveBtn").addEventListener("click", () => saveState()); $("#importBtn").addEventListener("click", () => $("#fileInput").click()); $("#openPreviewBtn").addEventListener("click", openPreview);
+    $("#backHomeBtn").addEventListener("click", () => {
+      window.location.href = "index.html";
+    });
+        $("#refreshBtn").addEventListener("click", updatePreview); $("#saveBtn").addEventListener("click", () => saveState()); $("#importBtn").addEventListener("click", () => $("#fileInput").click()); $("#openPreviewBtn").addEventListener("click", openPreview);
     $("#openSearch").addEventListener("click", openSearch); $("#closeSearch").addEventListener("click", closeSearch); $("#prevMatch").addEventListener("click", () => goToMatch(-1)); $("#nextMatch").addEventListener("click", () => goToMatch(1)); $("#replaceBtn").addEventListener("click", replaceAllMatches);
     $("#findInput").addEventListener("input", () => {
       updateSearch(true, false);
