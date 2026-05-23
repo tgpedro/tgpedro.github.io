@@ -78,6 +78,46 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
       box-shadow: var(--shadow);
     }
 
+    .back-btn {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+      transition: transform .2s, background .2s, border .2s;
+    }
+
+    .back-btn:hover {
+      transform: translateY(-1px);
+      background: rgba(255,255,255,0.13);
+      border-color: rgba(255,255,255,0.22);
+    }
+
+    .back-btn svg {
+      width: 19px;
+      height: 19px;
+    }
+
+    @media (max-width: 860px) {
+      .back-btn {
+        width: 38px;
+        height: 38px;
+      }
+
+      .topbar .back-btn {
+        order: -2;
+      }
+
+      .topbar .brand {
+        flex: 1;
+      }
+    }
+
     .brand {
       display: flex;
       align-items: center;
@@ -2368,6 +2408,11 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
 <body>
   <div class="app">
     <header class="topbar">
+      <button class="back-btn" type="button" onclick="window.location.href='index.html'" title="voltar para o início" aria-label="voltar para o início">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M15 18l-6-6 6-6"></path>
+        </svg>
+      </button>
       <div class="brand brand-text-only">
         <div>
           <h1>estudos</h1>
