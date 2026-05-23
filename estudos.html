@@ -3341,6 +3341,94 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
       }
     }
 
+
+    /* ajuste extra: no pc o título fica ao lado do botão voltar,
+       e alguns ícones ficam melhor alinhados com os textos */
+    @media (min-width: 861px) {
+      .topbar {
+        display: grid !important;
+        grid-template-columns: 44px minmax(0, auto) minmax(0, 1fr) !important;
+        align-items: center !important;
+        justify-content: start !important;
+        gap: 12px !important;
+      }
+
+      .topbar .back-btn {
+        grid-column: 1 !important;
+        justify-self: start !important;
+      }
+
+      .topbar .brand {
+        grid-column: 2 !important;
+        justify-self: start !important;
+        justify-content: flex-start !important;
+        text-align: left !important;
+        min-width: 0 !important;
+      }
+
+      .topbar .header-actions {
+        grid-column: 3 !important;
+        justify-self: end !important;
+        min-width: 0 !important;
+      }
+    }
+
+    .lucide {
+      vertical-align: middle;
+    }
+
+    .brand h1,
+    .brand p,
+    .calm-drawer > summary span,
+    .pomodoro-launch span,
+    .focus-action span,
+    .now-label > span,
+    .legend-item,
+    .section-title h2,
+    .mini-stat > span,
+    .small-card > span,
+    .shortcut-help-item,
+    .task .task-text,
+    .tool-card b {
+      line-height: 1.2;
+    }
+
+    .calm-drawer > summary span,
+    .pomodoro-launch span,
+    .focus-action span,
+    .now-label > span,
+    .legend-item,
+    .shortcut-help-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .calm-drawer > summary span .lucide,
+    .pomodoro-launch span .lucide,
+    .focus-action span .lucide,
+    .now-label > span .lucide,
+    .legend-item .lucide,
+    .mini-stat > span .lucide,
+    .small-card > span .lucide,
+    .section-title h2 .lucide {
+      width: 16px;
+      height: 16px;
+      position: relative;
+      top: -0.5px;
+      flex: 0 0 auto;
+    }
+
+    .brand .lucide,
+    .back-btn .lucide,
+    .icon-btn .lucide,
+    .mobile-bottom-nav .lucide,
+    .tool-icon .lucide,
+    .card-icon .lucide,
+    .modal-icon .lucide {
+      top: 0;
+    }
+
   </style>
 </head>
 <body>
