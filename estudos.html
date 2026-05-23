@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Estudos</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
   <style>
     :root {
       --bg: #050509;
@@ -3208,15 +3209,145 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
       .shortcut-link { width: 32px !important; height: 32px !important; flex-basis: 32px !important; }
     }
 
+  
+
+    .lucide {
+      width: 1em;
+      height: 1em;
+      stroke-width: 2.15;
+      flex: 0 0 auto;
+      pointer-events: none;
+    }
+
+    .icon-btn .lucide,
+    .back-btn .lucide,
+    .mobile-bottom-nav .lucide {
+      width: 20px;
+      height: 20px;
+    }
+
+    .pill,
+    .primary-btn,
+    .tiny-btn,
+    .delete,
+    .focus-action,
+    .pomodoro-launch,
+    .tool-card,
+    .modal-title-with-icon,
+    .section-title h2,
+    .mini-stat > span,
+    .small-card > span,
+    .now-label,
+    .shortcut-help-item span {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .primary-btn,
+    .pill,
+    .tiny-btn,
+    .delete {
+      justify-content: center;
+    }
+
+    .tool-card {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .tool-icon,
+    .card-icon,
+    .modal-icon {
+      width: 28px;
+      height: 28px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 12px;
+      color: white;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 12px 28px var(--day-soft);
+    }
+
+    .tool-icon .lucide,
+    .card-icon .lucide,
+    .modal-icon .lucide {
+      width: 17px;
+      height: 17px;
+    }
+
+    .focus-action .lucide {
+      width: 18px;
+      height: 18px;
+    }
+
+    .pomodoro-launch .lucide {
+      width: 20px;
+      height: 20px;
+      color: var(--accent-2);
+    }
+
+    .check .lucide {
+      width: 14px;
+      height: 14px;
+    }
+
+    .delete .lucide,
+    .tiny-btn .lucide {
+      width: 15px;
+      height: 15px;
+    }
+
+    .drag-handle .lucide {
+      width: 15px;
+      height: 15px;
+      color: var(--muted);
+    }
+
+    .mobile-bottom-nav span {
+      display: grid;
+      place-items: center;
+    }
+
+    .mobile-bottom-nav button:nth-child(2) {
+      background: transparent;
+      color: rgba(247,247,251,.72);
+    }
+
+    .mobile-bottom-nav button.is-active {
+      background: var(--day-soft);
+      color: white;
+    }
+
+    .legend-item .lucide {
+      width: 14px;
+      height: 14px;
+      opacity: .82;
+    }
+
+    .time,
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    @media (max-width: 860px) {
+      .pill,
+      .primary-btn,
+      .tiny-btn,
+      .delete {
+        gap: 6px;
+      }
+    }
+
   </style>
 </head>
 <body>
   <div class="app">
     <header class="topbar">
       <button class="back-btn" type="button" onclick="window.location.href='index.html'" title="voltar para o início" aria-label="voltar para o início">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M15 18l-6-6 6-6"></path>
-        </svg>
+        <i data-lucide="chevron-left"></i>
       </button>
       <div class="brand brand-text-only">
         <div>
@@ -3225,13 +3356,13 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
         </div>
       </div>
       <div class="header-actions">
-        <button class="pill" id="todayBtn">Hoje</button>
+        <button class="pill" id="todayBtn"><i data-lucide="calendar-days"></i>Hoje</button>
         <span class="sync-status" id="syncStatus"><span class="sync-dot"></span><span id="syncText">conectando</span></span>
-        <button class="icon-btn" data-modal="shortcutModal" title="adicionar atalho">+</button>
+        <button class="icon-btn" data-modal="shortcutModal" title="adicionar atalho" aria-label="adicionar atalho"><i data-lucide="plus"></i></button>
         <div class="header-divider"></div>
         <div class="shortcuts-bar" id="shortcutsBar"></div>
-        <button class="icon-btn native-icon" data-modal="toolsModal" title="menu">☰</button>
-        <button class="primary-btn" data-modal="taskModal">adicionar item</button>
+        <button class="icon-btn native-icon" data-modal="toolsModal" title="menu" aria-label="menu"><i data-lucide="menu"></i></button>
+        <button class="primary-btn" data-modal="taskModal"><i data-lucide="plus-circle"></i>adicionar item</button>
       </div>
     </header>
 
@@ -3244,7 +3375,7 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
           </div>
           <div class="countdowns">
             <div class="mini-stat">
-              <span>Contagem ENEM</span>
+              <span><i data-lucide="hourglass"></i>Contagem ENEM</span>
               <strong id="enemCountdown">-- dias</strong>
               <div class="enem-progress-card">
                 <div class="enem-progress-track"><div class="enem-progress-fill" id="enemProgressFill"></div></div>
@@ -3255,32 +3386,32 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
         </div>
 
         <div class="cards-row compact-status" aria-hidden="true">
-          <div class="small-card"><span>Foco</span><strong id="focusSuggestion">Pomodoro 25/5</strong></div>
-          <div class="small-card"><span>Blocos</span><strong id="studyBlocks">--</strong></div>
-          <div class="small-card"><span>Dia</span><strong id="selectedDateLabel">--</strong></div>
+          <div class="small-card"><span><i data-lucide="timer"></i>Foco</span><strong id="focusSuggestion">Pomodoro 25/5</strong></div>
+          <div class="small-card"><span><i data-lucide="blocks"></i>Blocos</span><strong id="studyBlocks">--</strong></div>
+          <div class="small-card"><span><i data-lucide="calendar"></i>Dia</span><strong id="selectedDateLabel">--</strong></div>
         </div>
 
         <div class="now-flow" id="nowFlow">
           <div class="now-card active">
-            <div class="now-label">agora <span class="now-badge" id="nowTimeLeft">--</span></div>
+            <div class="now-label"><span><i data-lucide="activity"></i>agora</span><span class="now-badge" id="nowTimeLeft">--</span></div>
             <div class="now-title" id="currentRoutineTitle">Carregando...</div>
             <p class="now-desc" id="currentRoutineDesc">Vou mostrar o que está acontecendo de acordo com o horário.</p>
           </div>
           <div class="now-card">
-            <div class="now-label">próxima <span class="now-badge" id="nextTimeLeft">--</span></div>
+            <div class="now-label"><span><i data-lucide="corner-down-right"></i>próxima</span><span class="now-badge" id="nextTimeLeft">--</span></div>
             <div class="now-title" id="nextRoutineTitle">Carregando...</div>
             <p class="now-desc" id="nextRoutineDesc">Também mostro quanto falta para a próxima parte da rotina.</p>
           </div>
         </div>
 
         <div class="focus-actions" aria-label="ações principais de estudo">
-          <button class="focus-action is-primary" type="button" onclick="openFocusMode()" data-open-focus><span>modo foco</span></button>
-          <button class="focus-action" type="button" data-modal="calendarModal"><span>calendário</span></button>
+          <button class="focus-action is-primary" type="button" onclick="openFocusMode()" data-open-focus><span><i data-lucide="timer"></i>modo foco</span></button>
+          <button class="focus-action" type="button" data-modal="calendarModal"><span><i data-lucide="calendar-days"></i>calendário</span></button>
         </div>
 
         <details class="calm-drawer routine-drawer">
           <summary>
-            <span>rotina</span>
+            <span><i data-lucide="list-checks"></i>rotina</span>
 
           </summary>
           <div class="drawer-content">
@@ -3293,15 +3424,15 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
       <aside class="panel panel-pad">
         <div class="section-title">
           <div>
-            <h2>Cronograma de estudos</h2>
+            <h2><i data-lucide="calendar-check"></i>Cronograma de estudos</h2>
             <small>gerado pelas prioridades das matérias</small>
           </div>
-          <button class="primary-btn" onclick="generateDailyStudySchedule()">Gerar</button>
+          <button class="primary-btn" onclick="generateDailyStudySchedule()"><i data-lucide="sparkles"></i>Gerar</button>
         </div>
         <div class="tasks" id="tasks"></div>
         <div class="subject-box">
           <button class="pomodoro-launch" type="button" data-modal="subjectsModal">
-            <span>matérias e prioridades</span>
+            <span><i data-lucide="book-open"></i>matérias e prioridades</span>
             <b id="subjectPriorityMini">editar</b>
             <small>adicionar, apagar ou mudar prioridade</small>
           </button>
@@ -3310,29 +3441,29 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
     </main>
 
     <nav class="mobile-bottom-nav" aria-label="atalhos principais">
-      <button type="button" data-modal="calendarModal" data-nav="calendar"><span>⌗</span><b>calendário</b></button>
-      <button type="button" data-open-focus data-nav="focus"><span>◉</span><b>foco</b></button>
-      <button type="button" data-modal="toolsModal" data-nav="menu"><span>☰</span><b>menu</b></button>
+      <button type="button" data-modal="calendarModal" data-nav="calendar"><span><i data-lucide="calendar-days"></i></span><b>calendário</b></button>
+      <button type="button" data-open-focus data-nav="focus"><span><i data-lucide="timer"></i></span><b>foco</b></button>
+      <button type="button" data-modal="toolsModal" data-nav="menu"><span><i data-lucide="menu"></i></span><b>menu</b></button>
     </nav>
   </div>
 
   <div class="modal-backdrop" id="calendarModal">
     <div class="modal calendar-modal">
       <div class="modal-head">
-        <h2 class="modal-title-with-icon"><span class="native-tool-img" style="--tool-image: url('https://i.imgur.com/NheLhAp.png')">cal</span>Calendário</h2>
-        <button class="icon-btn close-modal">✕</button>
+        <h2 class="modal-title-with-icon"><span class="modal-icon"><i data-lucide="calendar-days"></i></span>Calendário</h2>
+        <button class="icon-btn close-modal" aria-label="fechar"><i data-lucide="x"></i></button>
       </div>
       <div class="calendar-head">
-        <button class="pill" id="prevMonth">←</button>
+        <button class="pill" id="prevMonth" aria-label="mês anterior"><i data-lucide="chevron-left"></i></button>
         <h2 id="monthLabel">Mês</h2>
-        <button class="pill" id="nextMonth">→</button>
+        <button class="pill" id="nextMonth" aria-label="próximo mês"><i data-lucide="chevron-right"></i></button>
       </div>
       <div class="calendar-range-info" id="calendarRangeInfo">comparar datas</div>
       <div class="calendar-grid" id="calendarGrid"></div>
       <div class="calendar-legend">
-        <div class="legend-item"><span class="legend-dot study"></span>rotina de estudo</div>
-        <div class="legend-item"><span class="legend-dot task"></span>tarefa comum</div>
-        <div class="legend-item"><span class="legend-dot holiday"></span>feriado</div>
+        <div class="legend-item"><span class="legend-dot study"></span><i data-lucide="book-open"></i>rotina de estudo</div>
+        <div class="legend-item"><span class="legend-dot task"></span><i data-lucide="check-square"></i>tarefa comum</div>
+        <div class="legend-item"><span class="legend-dot holiday"></span><i data-lucide="party-popper"></i>feriado</div>
       </div>
 
       <div class="holiday-list" id="holidayList"></div>
@@ -3342,15 +3473,15 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
   <div class="modal-backdrop" id="toolsModal">
     <div class="modal">
       <div class="modal-head">
-        <h2>menu</h2>
-        <button class="icon-btn close-modal">✕</button>
+        <h2 class="modal-title-with-icon"><span class="modal-icon"><i data-lucide="menu"></i></span>menu</h2>
+        <button class="icon-btn close-modal" aria-label="fechar"><i data-lucide="x"></i></button>
       </div>
       <div class="tool-section">
         <div class="tool-section-title">Ações</div>
         <div class="tools-grid">
-          <button class="tool-card" onclick="closeModals(); openModal('keyboardModal')"><span>⌨️</span><b>atalhos</b></button>
-          <button class="tool-card" onclick="openFocusMode()" data-open-focus><span><span class="native-tool-img" style="--tool-image: url('https://i.imgur.com/230PgM1.png')">fer</span></span><b>modo foco</b></button>
-          <button class="tool-card" onclick="clearDoneTasks()"><span><span class="native-tool-img" style="--tool-image: url('https://i.imgur.com/230PgM1.png')">fer</span></span><b>limpar concluídas</b></button>
+          <button class="tool-card" onclick="closeModals(); openModal('keyboardModal')"><span class="tool-icon"><i data-lucide="keyboard"></i></span><b>atalhos</b></button>
+          <button class="tool-card" onclick="openFocusMode()" data-open-focus><span class="tool-icon"><i data-lucide="timer"></i></span><b>modo foco</b></button>
+          <button class="tool-card" onclick="clearDoneTasks()"><span class="tool-icon"><i data-lucide="trash-2"></i></span><b>limpar concluídas</b></button>
         </div>
       </div>
     </div>
@@ -3359,15 +3490,15 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
     <div class="modal-backdrop" id="shortcutModal">
     <div class="modal">
       <div class="modal-head">
-        <h2>adicionar atalho</h2>
-        <button class="icon-btn close-modal">✕</button>
+        <h2 class="modal-title-with-icon"><span class="modal-icon"><i data-lucide="link"></i></span>adicionar atalho</h2>
+        <button class="icon-btn close-modal" aria-label="fechar"><i data-lucide="x"></i></button>
       </div>
       <div class="form-row">
         <input id="shortcutName" placeholder="nome do atalho" />
       </div>
       <div class="form-row">
         <input id="shortcutUrl" placeholder="link" />
-<button class="primary-btn" id="addShortcut">adicionar</button>
+<button class="primary-btn" id="addShortcut"><i data-lucide="plus"></i>adicionar</button>
       </div>
 
       <p class="shortcut-reorder-hint">arraste pelos pontinhos ou use ↑/↓ para escolher a ordem dos atalhos.</p>
@@ -3378,8 +3509,8 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
   <div class="modal-backdrop" id="subjectsModal">
     <div class="modal">
       <div class="modal-head">
-        <h2 class="modal-title-with-icon"><span class="native-tool-img" style="--tool-image: url('https://i.imgur.com/aUMsQqP.png')">mat</span>Matérias e prioridades</h2>
-        <button class="icon-btn close-modal">✕</button>
+        <h2 class="modal-title-with-icon"><span class="modal-icon"><i data-lucide="book-open"></i></span>Matérias e prioridades</h2>
+        <button class="icon-btn close-modal" aria-label="fechar"><i data-lucide="x"></i></button>
       </div>
 
       <div class="form-row">
@@ -3399,7 +3530,7 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
             <button class="mac-select-option" type="button" data-value="lazer">lazer / tempo livre</button>
           </div>
         </div>
-        <button class="primary-btn" id="addSubject">Adicionar</button>
+        <button class="primary-btn" id="addSubject"><i data-lucide="plus"></i>Adicionar</button>
       </div>
       <div class="subjects-grid" id="subjectsGrid"></div>
     </div>
@@ -3408,8 +3539,8 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
   <div class="modal-backdrop" id="taskModal">
     <div class="modal">
       <div class="modal-head">
-        <h2>Adicionar item ao cronograma</h2>
-        <button class="icon-btn close-modal">✕</button>
+        <h2 class="modal-title-with-icon"><span class="modal-icon"><i data-lucide="list-plus"></i></span>Adicionar item ao cronograma</h2>
+        <button class="icon-btn close-modal" aria-label="fechar"><i data-lucide="x"></i></button>
       </div>
       <div class="form-row">
         <input id="modalTaskText" placeholder="" />
@@ -3425,7 +3556,7 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
             <button class="mac-select-option" type="button" data-value="rest">descanso</button>
           </div>
         </div>
-        <button class="primary-btn" id="modalAddTask">Adicionar</button>
+        <button class="primary-btn" id="modalAddTask"><i data-lucide="plus"></i>Adicionar</button>
       </div>
     </div>
   </div>
@@ -3434,22 +3565,22 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
   <div class="modal-backdrop" id="keyboardModal">
     <div class="modal">
       <div class="modal-head">
-        <h2>Atalhos de teclado</h2>
-        <button class="icon-btn close-modal">✕</button>
+        <h2 class="modal-title-with-icon"><span class="modal-icon"><i data-lucide="keyboard"></i></span>Atalhos de teclado</h2>
+        <button class="icon-btn close-modal" aria-label="fechar"><i data-lucide="x"></i></button>
       </div>
 
       <div class="shortcut-help-grid">
-        <div class="shortcut-help-item"><span>voltar para hoje</span><b class="kbd">T</b></div>
-        <div class="shortcut-help-item"><span>abrir calendário</span><b class="kbd">C</b></div>
-        <div class="shortcut-help-item"><span>adicionar tarefa</span><b class="kbd">A</b></div>
-        <div class="shortcut-help-item"><span>adicionar atalho</span><b class="kbd">L</b></div>
-        <div class="shortcut-help-item"><span>abrir FP</span><b class="kbd">F</b></div>
-        <div class="shortcut-help-item"><span>modo foco</span><b class="kbd">M</b></div>
-        <div class="shortcut-help-item"><span>Começar / pausar foco</span><b class="kbd">Espaço</b></div>
-        <div class="shortcut-help-item"><span>resetar foco</span><b class="kbd">R</b></div>
-        <div class="shortcut-help-item"><span>pular etapa</span><b class="kbd">K</b></div>
-        <div class="shortcut-help-item"><span>fechar janela</span><b class="kbd">Ctrl</b></div>
-        <div class="shortcut-help-item"><span>ver esta ajuda</span><b class="kbd">?</b></div>
+        <div class="shortcut-help-item"><span><i data-lucide="calendar-days"></i>voltar para hoje</span><b class="kbd">T</b></div>
+        <div class="shortcut-help-item"><span><i data-lucide="calendar"></i>abrir calendário</span><b class="kbd">C</b></div>
+        <div class="shortcut-help-item"><span><i data-lucide="list-plus"></i>adicionar tarefa</span><b class="kbd">A</b></div>
+        <div class="shortcut-help-item"><span><i data-lucide="link"></i>adicionar atalho</span><b class="kbd">L</b></div>
+        <div class="shortcut-help-item"><span><i data-lucide="external-link"></i>abrir FP</span><b class="kbd">F</b></div>
+        <div class="shortcut-help-item"><span><i data-lucide="timer"></i>modo foco</span><b class="kbd">M</b></div>
+        <div class="shortcut-help-item"><span><i data-lucide="play-pause"></i>Começar / pausar foco</span><b class="kbd">Espaço</b></div>
+        <div class="shortcut-help-item"><span><i data-lucide="rotate-ccw"></i>resetar foco</span><b class="kbd">R</b></div>
+        <div class="shortcut-help-item"><span><i data-lucide="skip-forward"></i>pular etapa</span><b class="kbd">K</b></div>
+        <div class="shortcut-help-item"><span><i data-lucide="x"></i>fechar janela</span><b class="kbd">Ctrl</b></div>
+        <div class="shortcut-help-item"><span><i data-lucide="circle-help"></i>ver esta ajuda</span><b class="kbd">?</b></div>
       </div>
     </div>
   </div>
@@ -3457,19 +3588,19 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
   <div class="modal-backdrop" id="focusModal">
     <div class="modal focus-modal">
       <div class="modal-head">
-        <h2>modo foco</h2>
-        <button class="icon-btn close-modal">✕</button>
+        <h2 class="modal-title-with-icon"><span class="modal-icon"><i data-lucide="timer"></i></span>modo foco</h2>
+        <button class="icon-btn close-modal" aria-label="fechar"><i data-lucide="x"></i></button>
       </div>
       <div class="focus-timer" id="focusTimerMirror">25:00</div>
       <div class="timer-label" id="focusTimerLabel">Foco</div>
       <div class="timer-buttons focus-presets">
-        <button class="pill" type="button" onclick="setPomodoro(25,5)">Pomodoro 25/5</button>
-        <button class="pill" type="button" onclick="setPomodoro(50,10)">Foco longo 50/10</button>
+        <button class="pill" type="button" onclick="setPomodoro(25,5)"><i data-lucide="timer"></i>Pomodoro 25/5</button>
+        <button class="pill" type="button" onclick="setPomodoro(50,10)"><i data-lucide="clock"></i>Foco longo 50/10</button>
       </div>
       <div class="timer-buttons">
-        <button class="primary-btn" id="focusStartPause">Começar</button>
-        <button class="pill" id="focusReset">Resetar</button>
-        <button class="pill" id="focusSkip">Pular</button>
+        <button class="primary-btn" id="focusStartPause"><i data-lucide="play"></i>Começar</button>
+        <button class="pill" id="focusReset"><i data-lucide="rotate-ccw"></i>Resetar</button>
+        <button class="pill" id="focusSkip"><i data-lucide="skip-forward"></i>Pular</button>
       </div>
     </div>
   </div>
@@ -3478,14 +3609,14 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
   <div class="modal-backdrop" id="planModal">
     <div class="modal">
       <div class="modal-head">
-        <h2>Prévia da semana</h2>
-        <button class="icon-btn close-modal">✕</button>
+        <h2 class="modal-title-with-icon"><span class="modal-icon"><i data-lucide="calendar-check"></i></span>Prévia da semana</h2>
+        <button class="icon-btn close-modal" aria-label="fechar"><i data-lucide="x"></i></button>
       </div>
       <div class="plan-helper"><b>Isso ainda não adicionou nada.</b><br>Confira a sugestão abaixo. Para colocar nos dias da semana, clique em <b>Aplicar como plano</b>. A rotina fixa continua igual.</div>
       <div class="plan-preview" id="planPreview"></div>
       <div class="plan-actions">
-        <button class="primary-btn" id="applyWeeklyPlan">Aplicar como plano</button>
-        <button class="pill close-modal">Cancelar</button>
+        <button class="primary-btn" id="applyWeeklyPlan"><i data-lucide="check-circle-2"></i>Aplicar como plano</button>
+        <button class="pill close-modal"><i data-lucide="x"></i>Cancelar</button>
       </div>
     </div>
   </div>
@@ -3566,6 +3697,11 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
     try { alarmEnabled = localStorage.getItem('pomodoroAlarmEnabled') !== 'false'; } catch (e) { alarmEnabled = true; }
 
     function $(id) { return document.getElementById(id); }
+    function renderLucide() {
+      if (window.lucide && typeof window.lucide.createIcons === 'function') {
+        window.lucide.createIcons();
+      }
+    }
     const dateKey = (date) => date.toISOString().slice(0, 10);
 
     const SUPABASE_URL = 'https://aelsvgfmijreuhpoccmt.supabase.co';
@@ -3704,6 +3840,7 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
       applyPomodoroStateFromApp();
       applyPomodoroVisibility();
       renderAll();
+    renderLucide();
       renderNotes();
       renderSubjects();
       renderShortcuts();
@@ -4078,12 +4215,13 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
         if (index === position.currentIndex) div.classList.add('current');
         if (index === position.nextIndex) div.classList.add('next');
         div.innerHTML = `
-          <div class="time">${item[0]}</div>
+          <div class="time"><i data-lucide="clock-3"></i>${item[0]}</div>
           <div><h3>${item[1]}</h3><p>${item[2]}</p></div>
-          <div class="tag">${index === position.currentIndex ? 'agora' : index === position.nextIndex ? 'próxima' : item[3]}</div>
+          <div class="tag"><i data-lucide="${index === position.currentIndex ? 'activity' : index === position.nextIndex ? 'corner-down-right' : 'tag'}"></i>${index === position.currentIndex ? 'agora' : index === position.nextIndex ? 'próxima' : item[3]}</div>
         `;
         list.appendChild(div);
       });
+      renderLucide();
     }
 
     function renderTasks() {
@@ -4100,14 +4238,15 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
         const div = document.createElement('div');
         div.className = 'task' + (task.done ? ' done' : '');
         div.innerHTML = `
-          <button class="check">${task.done ? '✓' : ''}</button>
+          <button class="check" aria-label="${task.done ? 'marcar como pendente' : 'marcar como concluída'}">${task.done ? '<i data-lucide="check"></i>' : ''}</button>
           <div><div class="task-text">${task.text}</div><small style="color: var(--muted)">${task.type || 'tarefa'}</small></div>
-          <button class="delete">apagar</button>
+          <button class="delete"><i data-lucide="trash-2"></i>apagar</button>
         `;
         div.querySelector('.check').onclick = () => toggleTask(index);
         div.querySelector('.delete').onclick = () => deleteTask(index);
         box.appendChild(div);
       });
+      renderLucide();
     }
 
     function addTask(text, type = 'tarefa') {
@@ -4169,7 +4308,7 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
       const holidayList = $('holidayList');
       if (holidayList) {
         const monthHolidays = Object.entries(holidays).filter(([key]) => Number(key.slice(5,7)) === month + 1).sort(([a],[b]) => a.localeCompare(b));
-        holidayList.innerHTML = monthHolidays.length ? monthHolidays.map(([key, name]) => '<div class="holiday-item"><span>' + name + '</span><strong>' + key.slice(8,10) + '/' + key.slice(5,7) + '</strong></div>').join('') : '<div class="holiday-item"><span>Sem feriados nacionais neste mês</span><strong>—</strong></div>';
+        holidayList.innerHTML = monthHolidays.length ? monthHolidays.map(([key, name]) => '<div class="holiday-item"><span><i data-lucide="party-popper"></i>' + name + '</span><strong>' + key.slice(8,10) + '/' + key.slice(5,7) + '</strong></div>').join('') : '<div class="holiday-item"><span><i data-lucide="calendar-x"></i>Sem feriados nacionais neste mês</span><strong>—</strong></div>';
       }
 
       for (let i = 0; i < 42; i++) {
@@ -4204,6 +4343,7 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
         };
         grid.appendChild(div);
       }
+      renderLucide();
     }
 
 
@@ -4387,8 +4527,9 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
       if ($('pomodoroLaunchText')) $('pomodoroLaunchText').textContent = isRunning ? (mode === 'focus' ? 'foco em andamento' : 'pausa em andamento') : 'abrir cronômetro';
       if ($('focusTimerMirror')) $('focusTimerMirror').textContent = `${m}:${s}`;
       if ($('focusTimerLabel')) $('focusTimerLabel').textContent = mode === 'focus' ? 'Foco' : 'Pausa';
-      if ($('focusStartPause')) $('focusStartPause').textContent = isRunning ? 'Pausar' : 'Começar';
+      if ($('focusStartPause')) $('focusStartPause').innerHTML = isRunning ? '<i data-lucide="pause"></i>Pausar' : '<i data-lucide="play"></i>Começar';
       applyPomodoroVisibility();
+      renderLucide();
     }
 
     function startTimer() {
@@ -4585,27 +4726,27 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
         if (isFixed) {
           const badge = document.createElement('span');
           badge.className = 'tag';
-          badge.textContent = 'fixo';
+          badge.innerHTML = '<i data-lucide="pin"></i>fixo';
           actions.appendChild(badge);
         } else {
           const handle = document.createElement('span');
           handle.className = 'drag-handle';
-          handle.textContent = '⋮⋮';
+          handle.innerHTML = '<i data-lucide="grip-vertical"></i>';
           handle.title = 'arrastar para reorganizar';
 
           const upButton = document.createElement('button');
           upButton.className = 'tiny-btn';
-          upButton.textContent = '↑';
+          upButton.innerHTML = '<i data-lucide="arrow-up"></i>';
           upButton.onclick = () => moveShortcut(savedIndex, -1);
 
           const downButton = document.createElement('button');
           downButton.className = 'tiny-btn';
-          downButton.textContent = '↓';
+          downButton.innerHTML = '<i data-lucide="arrow-down"></i>';
           downButton.onclick = () => moveShortcut(savedIndex, 1);
 
           const deleteButton = document.createElement('button');
           deleteButton.className = 'delete';
-          deleteButton.textContent = 'apagar';
+          deleteButton.innerHTML = '<i data-lucide="trash-2"></i>apagar';
           deleteButton.onclick = () => {
             const all = sortedShortcuts(getShortcuts());
             all.splice(savedIndex, 1);
@@ -4625,6 +4766,7 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
         item.appendChild(actions);
         list.appendChild(item);
       });
+      renderLucide();
     }
 
     function renderNotes() {
@@ -4846,9 +4988,9 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
             <div class="subject-priority-slot"></div>
           </div>
           <div class="subject-actions">
-            <button class="tiny-btn add-study">estudar hoje</button>
-            <button class="tiny-btn add-sunday">colocar domingo</button>
-            <button class="tiny-btn delete-subject">apagar</button>
+            <button class="tiny-btn add-study"><i data-lucide="plus-circle"></i>estudar hoje</button>
+            <button class="tiny-btn add-sunday"><i data-lucide="calendar-plus"></i>colocar domingo</button>
+            <button class="tiny-btn delete-subject"><i data-lucide="trash-2"></i>apagar</button>
           </div>
         `;
 
@@ -4900,6 +5042,7 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
         };
         grid.appendChild(card);
       });
+      renderLucide();
     }
 
     function getSubjectPool() {
@@ -5037,10 +5180,11 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
       const applyBtn = $('applyWeeklyPlan');
       if (applyBtn) {
         applyBtn.style.display = applied ? 'none' : 'inline-flex';
-        applyBtn.textContent = applied ? 'Aplicado' : 'Aplicar como plano';
+        applyBtn.innerHTML = applied ? '<i data-lucide="check-circle-2"></i>Aplicado' : '<i data-lucide="check-circle-2"></i>Aplicar como plano';
       }
       const helper = document.querySelector('#planModal .plan-helper');
       if (helper && applied) helper.innerHTML = '<b>Plano aplicado.</b><br>Agora as sugestões aparecem dentro das tarefas de cada dia. A rotina fixa não foi alterada.';
+      renderLucide();
     }
 
     function getCurrentFocusTask() {
@@ -5076,6 +5220,7 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
       if (id === 'subjectsModal') renderSubjects();
       if (id === 'shortcutModal') renderShortcuts();
       if (id === 'focusModal') renderFocusMode();
+      renderLucide();
     }
 
     function closeModals() {
@@ -5136,6 +5281,7 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
       renderCalendar();
       renderShortcuts();
       renderSubjectPriorityMini();
+      renderLucide();
     }
 
     document.addEventListener('click', () => closeCustomSelects());
