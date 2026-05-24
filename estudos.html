@@ -5378,7 +5378,6 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
 
     document.querySelectorAll('[data-modal]').forEach(btn => btn.addEventListener('click', () => openModal(btn.dataset.modal)));
     document.querySelectorAll('.close-modal').forEach(btn => btn.addEventListener('click', closeModals));
-    document.querySelectorAll('.modal-backdrop').forEach(bg => bg.addEventListener('click', (e) => { if (e.target === bg) closeModals(); }));
 
     $('todayBtn').onclick = () => { selectedDate = new Date(); calendarDate = new Date(); renderAll(); };
     $('prevMonth').onclick = () => { calendarDate.setMonth(calendarDate.getMonth() - 1); renderCalendar(); };
@@ -5451,11 +5450,6 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
 
       const key = e.key.toLowerCase();
 
-      if (key === 'alt') {
-        e.preventDefault();
-        closeModals();
-        return;
-      }
 
       if (key === '?' || (e.shiftKey && key === '/')) {
         e.preventDefault();
@@ -5577,16 +5571,8 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
       return;
     }
 
-    if (event.target && event.target.id === 'focusModal') {
-      closeFocusModeHard();
-    }
   }, true);
 
-  document.addEventListener('keydown', function (event) {
-    if (event.key === 'Escape' || event.key === 'Control') {
-      closeFocusModeHard();
-    }
-  }, true);
 })();
 </script>
 
@@ -5610,7 +5596,7 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
       var navButton = event.target.closest('.mobile-bottom-nav [data-nav]');
       if (navButton) setMobileNavActive(navButton.dataset.nav);
 
-      if (event.target.closest('.close-modal') || event.target.classList?.contains('modal-backdrop')) {
+      if (event.target.closest('.close-modal')) {
         setTimeout(updateMobileNavActive, 260);
       }
     }, true);
@@ -5622,9 +5608,6 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
     });
 
     window.addEventListener('load', updateMobileNavActive);
-    document.addEventListener('keydown', function (event) {
-      if (event.key === 'Escape' || event.key === 'Control') setTimeout(updateMobileNavActive, 260);
-    });
   })();
 </script>
 </body>
