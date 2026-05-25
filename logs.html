@@ -2644,7 +2644,7 @@
               <i data-lucide="square-pen"></i>
             </div>
             <h2>${dateFilter ? "filtro ativo" : "novo log"}</h2>
-            <p>${dateFilter ? "escolha um registro na lista ou limpe o filtro do calendário." : "escolha um log na lista ou crie um novo registro."}</p>
+            <p>${dateFilter ? "" : ""}</p>
             ${dateFilter ? `<button class="primary" onclick="clearDateFilter()">limpar filtro</button>` : `<button class="primary" onclick="createLog()">criar log</button>`}
           </div>
         </section>
