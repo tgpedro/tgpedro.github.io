@@ -1519,6 +1519,32 @@
       }
     }
 
+
+    /* botões de navegação: início + estudos */
+    #homeBtn svg,
+    #studyBtn svg {
+      width: 17px;
+      height: 17px;
+    }
+
+    @media (max-width: 430px) {
+      .top-actions {
+        gap: 4px;
+      }
+
+      #homeBtn,
+      #studyBtn {
+        width: 34px;
+        height: 34px;
+      }
+
+      #homeBtn svg,
+      #studyBtn svg {
+        width: 15px;
+        height: 15px;
+      }
+    }
+
   </style>
 </head>
 
@@ -1532,8 +1558,12 @@
         </div>
 
         <div class="top-actions">
-          <button class="icon-btn" id="backBtn" title="voltar">
-            <i data-lucide="chevron-left"></i>
+          <button class="icon-btn" id="homeBtn" title="tela inicial">
+            <i data-lucide="house"></i>
+          </button>
+
+          <button class="icon-btn" id="studyBtn" title="estudos">
+            <i data-lucide="book-open-check"></i>
           </button>
 
           <button class="icon-btn" id="calendarBtn" title="calendário">
@@ -2761,8 +2791,12 @@
     }
 
     function bind() {
-      $("#backBtn").addEventListener("click", () => {
+      $("#homeBtn").addEventListener("click", () => {
         window.location.href = "index.html";
+      });
+
+      $("#studyBtn").addEventListener("click", () => {
+        window.location.href = "estudos.html";
       });
 
       $("#newBtn").addEventListener("click", createLog);
