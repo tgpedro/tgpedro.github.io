@@ -1750,6 +1750,7 @@
     let dateFilter = null;
     let calendarCursor = new Date();
     let pendingDeleteId = null;
+    let draftLog = null;
 
     function todayISO() {
       const now = new Date();
@@ -1907,7 +1908,7 @@
     }
 
     async function saveLogsToSupabase(silent = true) {
-      logs = sortLogsForSupabase(logs);
+      logs = sortLogsForSupabase(logs.filter(log => !log.isDraft));
       saveLocal();
       localStorage.setItem(STORAGE_KEY + ".updated", String(Date.now()));
 
@@ -2019,10 +2020,15 @@
     }
 
     function selectedLog() {
+      if (draftLog && selectedId === draftLog.id) return draftLog;
       return logs.find(log => log.id === selectedId) || null;
     }
 
     function setSelected(id, nextMode = "read") {
+      if (draftLog && id !== draftLog.id) {
+        draftLog = null;
+      }
+
       selectedId = id;
       mode = nextMode;
 
@@ -2340,7 +2346,7 @@
     }
 
     function renderEditor(log) {
-      els.statusLine.textContent = "editando";
+      els.statusLine.textContent = log.isDraft ? "rascunho não salvo" : "editando";
       els.statusTitle.textContent = log.title || "novo log";
       els.editBtn.style.display = "none";
       els.saveBtn.style.display = "inline-flex";
@@ -2413,8 +2419,8 @@
           <textarea class="notes-area" id="notesInput" placeholder="escreva suas anotações...">${escapeHTML(log.notes || "")}</textarea>
 
           <div class="editor-actions">
-            <button type="button" class="pill ghost" onclick="setSelected('${log.id}', 'read')">cancelar</button>
-            <button type="button" class="pill danger" onclick="askDelete('${log.id}')">apagar</button>
+            <button type="button" class="pill ghost" onclick="${log.isDraft ? "discardDraft()" : `setSelected('${log.id}', 'read')`}">cancelar</button>
+            ${log.isDraft ? "" : `<button type="button" class="pill danger" onclick="askDelete('${log.id}')">apagar</button>`}
             <button type="submit" class="primary">salvar</button>
           </div>
         </form>
@@ -2488,8 +2494,8 @@
     }
 
     function createLog() {
-      const newLog = {
-        id: crypto.randomUUID(),
+      draftLog = {
+        id: "draft-" + crypto.randomUUID(),
         date: todayISO(),
         type: "aula",
         subject: subjects[0]?.name || "",
@@ -2502,19 +2508,33 @@
         reviewDate: "",
         reviewedAt: "",
         createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
+        isDraft: true
       };
 
-      logs.unshift(newLog);
-      selectedId = newLog.id;
+      selectedId = draftLog.id;
       mode = "edit";
       currentView = "logs";
-      saveLogsToSupabase();
 
       if (window.innerWidth <= 760) document.body.classList.add("mobile-editor-open");
 
       render();
       setTimeout(() => $("#titleInput")?.focus(), 80);
+    }
+
+    function discardDraft() {
+      if (!draftLog) return;
+
+      draftLog = null;
+      selectedId = logs[0]?.id || null;
+      mode = "read";
+
+      if (!selectedId && window.innerWidth <= 760) {
+        document.body.classList.remove("mobile-editor-open");
+      }
+
+      render();
+      showToast("rascunho descartado");
     }
 
     function saveEditor() {
@@ -2553,7 +2573,15 @@
         updatedAt: new Date().toISOString()
       };
 
-      logs = logs.map(item => item.id === log.id ? updated : item);
+      if (draftLog && log.id === draftLog.id) {
+        updated.id = crypto.randomUUID();
+        updated.isDraft = false;
+        logs.unshift(updated);
+        draftLog = null;
+      } else {
+        logs = logs.map(item => item.id === log.id ? updated : item);
+      }
+
       selectedId = updated.id;
       mode = "read";
 
@@ -2581,6 +2609,11 @@
     }
 
     function askDelete(id) {
+      if (draftLog && id === draftLog.id) {
+        discardDraft();
+        return;
+      }
+
       pendingDeleteId = id;
       openModal(els.deleteModal);
     }
