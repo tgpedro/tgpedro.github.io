@@ -1433,6 +1433,19 @@
       }
     }
 
+
+    /* filtro por matéria */
+    .filter-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(104px, .82fr);
+    }
+
+    @media (max-width: 430px) {
+      .filter-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
   </style>
 </head>
 
@@ -1490,6 +1503,17 @@
               <button class="select-option" data-value="simulado"><span class="checkmark">✓</span><span>simulado</span></button>
               <button class="select-option" data-value="leitura"><span class="checkmark">✓</span><span>leitura</span></button>
               <button class="select-option" data-value="outro"><span class="checkmark">✓</span><span>outro</span></button>
+            </div>
+          </div>
+
+          <div class="mac-select" data-select="subject">
+            <button class="menu-trigger" type="button">
+              <b id="subjectFilterLabel">matéria</b>
+              <i data-lucide="chevron-down"></i>
+            </button>
+
+            <div class="select-menu" id="subjectFilterMenu">
+              <button class="select-option active" data-value="todas"><span class="checkmark">✓</span><span>todas</span></button>
             </div>
           </div>
 
@@ -1626,6 +1650,8 @@
       editorBody: $("#editorBody"),
       searchInput: $("#searchInput"),
       typeLabel: $("#typeLabel"),
+      subjectFilterLabel: $("#subjectFilterLabel"),
+      subjectFilterMenu: $("#subjectFilterMenu"),
       sortLabel: $("#sortLabel"),
       statusLine: $("#statusLine"),
       statusTitle: $("#statusTitle"),
@@ -1646,6 +1672,7 @@
     let mode = "read";
     let currentView = "logs";
     let typeFilter = "todos";
+    let subjectFilter = "todas";
     let sortMode = "recentes";
     let dateFilter = null;
     let calendarCursor = new Date();
@@ -1958,6 +1985,36 @@
       return "";
     }
 
+
+    function renderSubjectFilterMenu() {
+      if (!els.subjectFilterMenu) return;
+
+      const allSubjects = subjects.length ? subjects : defaultSubjects;
+      const options = [
+        `<button class="select-option ${subjectFilter === "todas" ? "active" : ""}" data-value="todas"><span class="checkmark">✓</span><span>todas</span></button>`,
+        ...allSubjects.map(subject => {
+          const value = subject.name;
+          const active = normalize(value) === normalize(subjectFilter);
+          return `
+            <button class="select-option ${active ? "active" : ""}" data-value="${escapeAttr(value)}">
+              <span class="checkmark">✓</span>
+              <span>${escapeHTML(value)}</span>
+              <small>${escapeHTML(subject.priority || "")}</small>
+            </button>
+          `;
+        })
+      ];
+
+      els.subjectFilterMenu.innerHTML = options.join("");
+
+      els.subjectFilterMenu.querySelectorAll(".select-option").forEach(option => {
+        option.addEventListener("click", event => {
+          event.stopPropagation();
+          setSelect("subject", option.dataset.value || "todas");
+        });
+      });
+    }
+
     function filteredLogs() {
       const query = normalize(els.searchInput.value);
 
@@ -1965,13 +2022,14 @@
         const text = normalize(`${log.title} ${log.subject} ${log.type} ${log.notes}`);
         const matchesSearch = !query || text.includes(query);
         const matchesType = typeFilter === "todos" || log.type === typeFilter;
+        const matchesSubject = subjectFilter === "todas" || normalize(log.subject) === normalize(subjectFilter);
         const matchesDate = !dateFilter || log.date === dateFilter;
 
         if (currentView === "reviews") {
-          return hasReview(log) && matchesSearch && matchesDate;
+          return hasReview(log) && matchesSearch && matchesSubject && matchesDate;
         }
 
-        return matchesSearch && matchesType && matchesDate;
+        return matchesSearch && matchesType && matchesSubject && matchesDate;
       });
 
       items.sort((a, b) => {
@@ -2431,12 +2489,13 @@
         option.classList.toggle("active", option.dataset.value === value);
       });
 
-      const label = name === "type" ? els.typeLabel : els.sortLabel;
-      label.textContent = value;
+      const label = name === "type" ? els.typeLabel : name === "subject" ? els.subjectFilterLabel : els.sortLabel;
+      if (label) label.textContent = value === "todas" ? "matéria" : value;
     }
 
     function setSelect(name, value) {
       if (name === "type") typeFilter = value;
+      if (name === "subject") subjectFilter = value;
       if (name === "sort") sortMode = value;
 
       setSelectVisual(name, value);
@@ -2528,6 +2587,7 @@
 
 
     function render() {
+      renderSubjectFilterMenu();
       renderList();
       renderContent();
       renderCalendar();
