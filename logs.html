@@ -1446,6 +1446,79 @@
       }
     }
 
+
+    .list-empty {
+      margin: 16px 8px;
+      padding: 24px 20px;
+      border-radius: 24px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.045);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+      display: grid;
+      justify-items: center;
+      align-content: center;
+      text-align: center;
+      min-height: 220px;
+      gap: 10px;
+    }
+
+    .list-empty .empty-icon {
+      width: 52px;
+      height: 52px;
+      margin: 0;
+      border-radius: 18px;
+    }
+
+    .list-empty h2 {
+      margin: 4px 0 0;
+      font-size: 1.15rem;
+      line-height: 1.05;
+      letter-spacing: -.04em;
+      text-transform: lowercase;
+    }
+
+    .list-empty p {
+      margin: 0;
+      max-width: 240px;
+      color: var(--muted);
+      font-size: .88rem;
+      line-height: 1.42;
+    }
+
+    .list-empty .primary {
+      margin-top: 4px;
+    }
+
+    @media (max-width: 760px) {
+      .list-empty {
+        margin: 12px 4px 16px;
+        min-height: 200px;
+        padding: 22px 16px;
+        border-radius: 22px;
+      }
+
+      .list-empty p {
+        max-width: 220px;
+      }
+    }
+
+    @media (max-width: 430px) {
+      .list-empty {
+        margin-inline: 2px;
+        padding: 20px 14px;
+        min-height: 190px;
+      }
+
+      .list-empty h2 {
+        font-size: 1.08rem;
+      }
+
+      .list-empty p {
+        font-size: .84rem;
+        max-width: 200px;
+      }
+    }
+
   </style>
 </head>
 
@@ -1526,7 +1599,7 @@
             <div class="select-menu">
               <button class="select-option active" data-value="recentes"><span class="checkmark">✓</span><span>recentes</span></button>
               <button class="select-option" data-value="antigos"><span class="checkmark">✓</span><span>antigos</span></button>
-              <button class="select-option" data-value="matéria"><span class="checkmark">✓</span><span>matéria</span></button>
+              <button class="select-option" data-value="matéria"><span class="checkmark">✓</span><span>prioridade</span></button>
             </div>
           </div>
         </div>
@@ -1799,8 +1872,8 @@
           const remoteUpdated = data?.data?.updatedAt ? new Date(data.data.updatedAt).getTime() : 0;
 
           if (!logs.length || remoteUpdated >= localUpdated) {
-            logs = remoteLogs;
-            saveLogsToSupabase();
+            logs = sortLogsForSupabase(remoteLogs);
+            saveLocal();
             localStorage.setItem(STORAGE_KEY + ".updated", String(remoteUpdated || Date.now()));
           }
 
@@ -1820,7 +1893,21 @@
       }
     }
 
+
+    function sortLogsForSupabase(items) {
+      return [...items].sort((a, b) => {
+        const priorityDiff = subjectPriorityValue(a.subject) - subjectPriorityValue(b.subject);
+        if (priorityDiff !== 0) return priorityDiff;
+
+        const subjectDiff = normalize(a.subject).localeCompare(normalize(b.subject));
+        if (subjectDiff !== 0) return subjectDiff;
+
+        return String(b.date || "").localeCompare(String(a.date || ""));
+      });
+    }
+
     async function saveLogsToSupabase(silent = true) {
+      logs = sortLogsForSupabase(logs);
       saveLocal();
       localStorage.setItem(STORAGE_KEY + ".updated", String(Date.now()));
 
@@ -1833,7 +1920,9 @@
         const payload = {
           id: LOGS_DATA_ID,
           data: {
-            logs,
+            logs: sortLogsForSupabase(logs),
+            orderBy: "subject_priority",
+            orderRule: ["alta", "media", "baixa", "lazer", "sem prioridade"],
             updatedAt: new Date().toISOString()
           }
         };
@@ -2015,6 +2104,27 @@
       });
     }
 
+
+    function subjectPriorityValue(subjectName) {
+      const subject = subjects.find(item => normalize(item.name) === normalize(subjectName));
+      const priority = normalize(subject?.priority || "");
+
+      const order = {
+        "alta": 0,
+        "media": 1,
+        "média": 1,
+        "baixa": 2,
+        "lazer": 3
+      };
+
+      return Object.prototype.hasOwnProperty.call(order, priority) ? order[priority] : 9;
+    }
+
+    function subjectPriorityLabel(subjectName) {
+      const subject = subjects.find(item => normalize(item.name) === normalize(subjectName));
+      return subject?.priority || "";
+    }
+
     function filteredLogs() {
       const query = normalize(els.searchInput.value);
 
@@ -2039,7 +2149,15 @@
         }
 
         if (sortMode === "antigos") return String(a.date).localeCompare(String(b.date));
-        if (sortMode === "matéria") return normalize(a.subject).localeCompare(normalize(b.subject));
+        if (sortMode === "matéria") {
+          const priorityDiff = subjectPriorityValue(a.subject) - subjectPriorityValue(b.subject);
+          if (priorityDiff !== 0) return priorityDiff;
+
+          const subjectDiff = normalize(a.subject).localeCompare(normalize(b.subject));
+          if (subjectDiff !== 0) return subjectDiff;
+
+          return String(b.date).localeCompare(String(a.date));
+        }
         return String(b.date).localeCompare(String(a.date));
       });
 
@@ -2056,6 +2174,11 @@
         if (state === "done") return "revisadas";
       }
 
+      if (sortMode === "matéria") {
+        const priority = subjectPriorityLabel(log.subject);
+        return `${priority ? priority + " • " : ""}${log.subject || "sem matéria"}`;
+      }
+
       return log.date || todayISO();
     }
 
@@ -2068,11 +2191,11 @@
 
       if (!items.length) {
         els.listWrap.innerHTML = `
-          <div class="empty-card" style="margin:16px 8px;padding:24px;border-radius:24px">
-            <div class="empty-icon" style="width:48px;height:48px;border-radius:18px">
+          <div class="list-empty">
+            <div class="empty-icon">
               <i data-lucide="${currentView === "reviews" ? "rotate-ccw" : "search-x"}"></i>
             </div>
-            <h2 style="font-size:1.35rem">${currentView === "reviews" ? "sem revisões" : "nada aqui"}</h2>
+            <h2>${currentView === "reviews" ? "sem revisões" : "nada aqui"}</h2>
             <p>${currentView === "reviews" ? "adicione prazo de revisão em algum log." : "mude o filtro ou crie um log novo."}</p>
             <button class="primary" onclick="createLog()">novo log</button>
           </div>
@@ -2100,7 +2223,7 @@
       }
 
       els.listWrap.innerHTML = orderedKeys.map(key => `
-        <div class="day-group">${currentView === "reviews" ? key : formatDate(key)}</div>
+        <div class="day-group">${currentView === "reviews" || sortMode === "matéria" ? key : formatDate(key)}</div>
         ${groups[key].map((log, index) => renderListItem(log, index)).join("")}
       `).join("");
     }
@@ -2122,7 +2245,7 @@
           <p>${escapeHTML(summary)}</p>
           <div class="note-meta">
             ${reviewPill}
-            <span>${escapeHTML(log.subject || "sem matéria")}${countInfo}</span>
+            <span>${escapeHTML(log.subject || "sem matéria")}${subjectPriorityLabel(log.subject) ? ` • ${escapeHTML(subjectPriorityLabel(log.subject))}` : ""}${countInfo}</span>
           </div>
         </article>
       `;
@@ -2490,7 +2613,10 @@
       });
 
       const label = name === "type" ? els.typeLabel : name === "subject" ? els.subjectFilterLabel : els.sortLabel;
-      if (label) label.textContent = value === "todas" ? "matéria" : value;
+      if (label) {
+        if (name === "subject") label.textContent = value === "todas" ? "matéria" : value;
+        else label.textContent = value === "matéria" ? "prioridade" : value;
+      }
     }
 
     function setSelect(name, value) {
