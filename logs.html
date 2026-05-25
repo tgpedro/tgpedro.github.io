@@ -20,10 +20,10 @@
       --text: #f7f7fb;
       --muted: rgba(247,247,251,.58);
       --muted-2: rgba(247,247,251,.38);
-      --accent: #f7b731;
-      --accent-2: #ffd166;
-      --accent-soft: rgba(247,183,49,.16);
-      --accent-glow: rgba(247,183,49,.24);
+      --accent: #60a5fa;
+      --accent-2: #67e8f9;
+      --accent-soft: rgba(96,165,250,.16);
+      --accent-glow: rgba(96,165,250,.24);
       --danger: #ff6b81;
       --danger-soft: rgba(255,107,129,.13);
       --success: #7bed9f;
@@ -32,6 +32,14 @@
       --shadow: 0 26px 90px rgba(0,0,0,.42);
       --sidebar: 390px;
     }
+
+    body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --accent-soft: rgba(52,211,153,.16); --accent-glow: rgba(103,232,249,.20); }
+    body.day-1 { --accent: #60a5fa; --accent-2: #93c5fd; --accent-soft: rgba(96,165,250,.16); --accent-glow: rgba(96,165,250,.28); }
+    body.day-2 { --accent: #a78bfa; --accent-2: #c4b5fd; --accent-soft: rgba(167,139,250,.16); --accent-glow: rgba(167,139,250,.28); }
+    body.day-3 { --accent: #22c55e; --accent-2: #86efac; --accent-soft: rgba(34,197,94,.15); --accent-glow: rgba(34,197,94,.24); }
+    body.day-4 { --accent: #f59e0b; --accent-2: #fde68a; --accent-soft: rgba(245,158,11,.15); --accent-glow: rgba(245,158,11,.24); }
+    body.day-5 { --accent: #f472b6; --accent-2: #f0abfc; --accent-soft: rgba(244,114,182,.15); --accent-glow: rgba(244,114,182,.24); }
+    body.day-6 { --accent: #fb7185; --accent-2: #fdba74; --accent-soft: rgba(251,113,133,.14); --accent-glow: rgba(253,186,116,.22); }
 
     * { box-sizing: border-box; }
 
@@ -42,9 +50,9 @@
       overflow: hidden;
       color: var(--text);
       background:
-        radial-gradient(circle at 16% 10%, rgba(247,183,49,.18), transparent 28%),
+        radial-gradient(circle at 16% 10%, var(--accent-glow), transparent 28%),
         radial-gradient(circle at 88% 4%, rgba(255,255,255,.075), transparent 24%),
-        radial-gradient(circle at 65% 108%, rgba(247,183,49,.12), transparent 32%),
+        radial-gradient(circle at 65% 108%, var(--accent-soft), transparent 32%),
         linear-gradient(180deg, #0b0b10, #050509 58%, #030305);
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
     }
@@ -249,9 +257,9 @@
 
     input:focus,
     textarea:focus {
-      border-color: rgba(247,183,49,.52);
+      border-color: var(--accent);
       background: rgba(255,255,255,.095);
-      box-shadow: 0 0 0 4px rgba(247,183,49,.08);
+      box-shadow: 0 0 0 4px var(--accent-soft);
     }
 
     .search-box input {
@@ -467,8 +475,8 @@
       max-width: 112px;
       padding: 4px 7px;
       border-radius: 999px;
-      background: rgba(247,183,49,.13);
-      color: rgba(255,222,143,.95);
+      background: var(--accent-soft);
+      color: var(--accent-2);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -679,8 +687,8 @@
 
     .reader-chip.accent {
       background: var(--accent-soft);
-      color: #ffdf95;
-      border-color: rgba(247,183,49,.24);
+      color: var(--accent-2);
+      border-color: var(--accent-glow);
     }
 
     .reader-chip.success {
@@ -710,7 +718,7 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      color: #ffdf95;
+      color: var(--accent-2);
       font-weight: 800;
       font-size: .92rem;
     }
@@ -783,9 +791,9 @@
     }
 
     .type-option input:checked + span {
-      color: #ffdf95;
+      color: var(--accent-2);
       background: var(--accent-soft);
-      border-color: rgba(247,183,49,.24);
+      border-color: var(--accent-glow);
     }
 
     .type-option span:hover {
@@ -941,13 +949,13 @@
     .day.muted { opacity: .30; }
 
     .day.today {
-      border-color: rgba(247,183,49,.36);
-      box-shadow: inset 0 0 0 1px rgba(247,183,49,.08);
+      border-color: var(--accent-glow);
+      box-shadow: inset 0 0 0 1px var(--accent-soft);
     }
 
     .day.selected {
       background: radial-gradient(circle at top right, var(--accent-glow), transparent 55%), rgba(255,255,255,.075);
-      border-color: rgba(247,183,49,.44);
+      border-color: var(--accent);
     }
 
     .day-number {
@@ -1274,6 +1282,12 @@
   <div class="toast" id="toast">salvo</div>
 
   <script>
+
+    function applyDayTheme() {
+      document.body.classList.remove("day-0", "day-1", "day-2", "day-3", "day-4", "day-5", "day-6");
+      document.body.classList.add(`day-${new Date().getDay()}`);
+    }
+
     const STORAGE_KEY = "tgpedro.logs.notes.reviews.v1";
 
     const SUPABASE_URL = "https://aelsvgfmijreuhpoccmt.supabase.co";
@@ -2387,6 +2401,7 @@
       });
     }
 
+    applyDayTheme();
     loadLocal();
     loadSubjectsFromLocalBackup();
     bind();
