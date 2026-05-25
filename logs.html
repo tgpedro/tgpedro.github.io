@@ -1735,6 +1735,123 @@
       }
     }
 
+
+    /* refinamento de tipografia: menos peso em textos pequenos, mais cara de iOS */
+    :root {
+      --font-ui: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+    }
+
+    html,
+    body,
+    button,
+    input,
+    textarea,
+    select {
+      font-family: var(--font-ui);
+      font-synthesis-weight: none;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: geometricPrecision;
+    }
+
+    body {
+      font-weight: 400;
+    }
+
+    .title-wrap h1 {
+      font-weight: 720;
+      letter-spacing: -.065em;
+    }
+
+    .title-wrap p,
+    .content-status span,
+    .reader-date {
+      font-weight: 470;
+      letter-spacing: -.005em;
+    }
+
+    .icon-btn,
+    .pill,
+    .primary,
+    .chip,
+    .menu-trigger,
+    .tabbar button,
+    .select-option,
+    .reader-chip,
+    .type-option span,
+    .toast,
+    label {
+      font-weight: 560;
+      letter-spacing: -.01em;
+    }
+
+    .tabbar button.active,
+    .primary,
+    .note-card h3,
+    .content-status b,
+    .reader-link {
+      font-weight: 650;
+    }
+
+    .menu-trigger b,
+    .select-option small,
+    .note-meta,
+    .note-pill,
+    .day-group,
+    .day-number,
+    .weekday {
+      font-weight: 520;
+      letter-spacing: 0;
+    }
+
+    .note-card h3 {
+      letter-spacing: -.018em;
+      line-height: 1.22;
+    }
+
+    .note-card p,
+    .reader-sub,
+    .empty-card p,
+    .list-empty p,
+    .modal-head p {
+      font-weight: 400;
+      letter-spacing: -.006em;
+    }
+
+    .reader h2,
+    .edit-title {
+      font-weight: 710;
+      letter-spacing: -.072em;
+    }
+
+    .empty-card h2,
+    .list-empty h2,
+    .modal-head h2,
+    .calendar-head h3 {
+      font-weight: 650;
+    }
+
+    input,
+    textarea {
+      font-weight: 430;
+      letter-spacing: -.006em;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      font-weight: 400;
+      color: rgba(247,247,251,.42);
+    }
+
+    .reader-note,
+    .notes-area {
+      font-weight: 410;
+      letter-spacing: -.006em;
+    }
+
+    .sync-dot {
+      font-weight: initial;
+    }
+
   </style>
 </head>
 
