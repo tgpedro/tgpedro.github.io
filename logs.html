@@ -1597,6 +1597,112 @@
       }
     }
 
+
+    /* estabilidade visual quando filtra por data */
+    .sidebar {
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .list-wrap {
+      width: 100%;
+      min-width: 0;
+      overflow-x: hidden;
+      padding: 0 14px 14px;
+    }
+
+    .day-group {
+      width: 100%;
+      min-width: 0;
+      padding: 12px 4px 7px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .note-card {
+      width: 100%;
+      min-width: 0;
+      max-width: 100%;
+      margin: 0 0 8px;
+      overflow: hidden;
+      border-radius: 20px;
+    }
+
+    .note-card h3,
+    .note-card p,
+    .note-meta {
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    .note-meta {
+      overflow: hidden;
+    }
+
+    .note-meta > span:not(.note-pill) {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .list-empty {
+      width: 100%;
+      max-width: 100%;
+      margin: 16px 0 0;
+      overflow: hidden;
+    }
+
+    .content {
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .content-top {
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .editor-body {
+      min-width: 0;
+      overflow-x: hidden;
+    }
+
+    .empty-state {
+      min-width: 0;
+      width: 100%;
+    }
+
+    .empty-card {
+      max-width: min(460px, calc(100% - 32px));
+      overflow: hidden;
+    }
+
+    @media (min-width: 761px) {
+      .app {
+        grid-template-columns: 390px minmax(0, 1fr);
+      }
+
+      .content {
+        border-left: 1px solid rgba(255,255,255,.075);
+      }
+    }
+
+    @media (max-width: 760px) {
+      .list-wrap {
+        padding: 0 12px 16px;
+      }
+
+      .list-empty {
+        margin-top: 12px;
+      }
+
+      .note-card {
+        border-radius: 18px;
+      }
+    }
+
   </style>
 </head>
 
@@ -2294,14 +2400,23 @@
       els.subtitle.textContent = dateFilter ? `${formatDate(dateFilter, true)} • ${totalText}` : totalText;
 
       if (!items.length) {
+        const emptyTitle = currentView === "reviews" ? "sem revisões" : "nada aqui";
+        const emptyText = dateFilter
+          ? (currentView === "reviews"
+              ? "nenhuma revisão marcada para essa data."
+              : "nenhum log registrado nessa data.")
+          : (currentView === "reviews"
+              ? "adicione prazo de revisão em algum log."
+              : "mude o filtro ou crie um log novo.");
+
         els.listWrap.innerHTML = `
           <div class="list-empty">
             <div class="empty-icon">
               <i data-lucide="${currentView === "reviews" ? "rotate-ccw" : "search-x"}"></i>
             </div>
-            <h2>${currentView === "reviews" ? "sem revisões" : "nada aqui"}</h2>
-            <p>${currentView === "reviews" ? "adicione prazo de revisão em algum log." : "mude o filtro ou crie um log novo."}</p>
-            <button class="primary" onclick="createLog()">novo log</button>
+            <h2>${emptyTitle}</h2>
+            <p>${emptyText}</p>
+            ${currentView === "logs" ? `<button class="primary" onclick="createLog()">novo log</button>` : ""}
           </div>
         `;
         return;
@@ -2368,8 +2483,8 @@
     }
 
     function renderEmpty() {
-      els.statusLine.textContent = "nenhum log selecionado";
-      els.statusTitle.textContent = "selecione um registro";
+      els.statusLine.textContent = dateFilter ? `filtro: ${formatDate(dateFilter, true)}` : "nenhum log selecionado";
+      els.statusTitle.textContent = dateFilter ? "sem registro selecionado" : "selecione um registro";
       els.editBtn.style.display = "none";
       els.saveBtn.style.display = "none";
 
@@ -2379,9 +2494,9 @@
             <div class="empty-icon">
               <i data-lucide="square-pen"></i>
             </div>
-            <h2>novo log</h2>
-            <p>escolha um log na lista ou crie um novo registro.</p>
-            <button class="primary" onclick="createLog()">criar log</button>
+            <h2>${dateFilter ? "filtro ativo" : "novo log"}</h2>
+            <p>${dateFilter ? "escolha um registro na lista ou limpe o filtro do calendário." : "escolha um log na lista ou crie um novo registro."}</p>
+            ${dateFilter ? `<button class="primary" onclick="clearDateFilter()">limpar filtro</button>` : `<button class="primary" onclick="createLog()">criar log</button>`}
           </div>
         </section>
       `;
