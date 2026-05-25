@@ -1971,7 +1971,7 @@
       <div class="modal-head">
         <div>
           <h2>calendário</h2>
-          <p id="calendarSubtitle">selecione uma data para filtrar</p>
+          <p id="calendarSubtitle"></p>
         </div>
 
         <button class="icon-btn" id="closeCalendar">
@@ -2680,7 +2680,7 @@
 
           ${hasLink ? `<a class="reader-link" href="${escapeAttr(log.link)}" target="_blank" rel="noopener noreferrer"><i data-lucide="external-link" width="17" height="17"></i>abrir aula ou lista</a>` : ""}
 
-          <div class="reader-note">${escapeHTML(log.notes || "sem anotações ainda.")}</div>
+          <div class="reader-note">${escapeHTML(log.notes || "sem anotações")}</div>
 
           <div class="editor-actions">
             ${hasReview(log) && !isReviewDone(log) ? `<button class="pill success" onclick="markReviewed('${log.id}')">marcar revisado</button>` : ""}
@@ -3049,7 +3049,7 @@
 
       els.calendarSubtitle.textContent = dateFilter
         ? `filtrando ${formatDate(dateFilter, true)}`
-        : "selecione uma data para filtrar";
+        : "";
 
       const weekdays = ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"];
       const cells = [];
