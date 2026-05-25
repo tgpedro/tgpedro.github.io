@@ -3700,7 +3700,7 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
         <div class="shortcut-help-item"><span><i data-lucide="link"></i>adicionar atalho</span><b class="kbd">L</b></div>
         <div class="shortcut-help-item"><span><i data-lucide="external-link"></i>abrir FP</span><b class="kbd">F</b></div>
         <div class="shortcut-help-item"><span><i data-lucide="timer"></i>modo foco</span><b class="kbd">M</b></div>
-        <div class="shortcut-help-item"><span><i data-lucide="play-pause"></i>Começar / pausar foco</span><b class="kbd">Espaço</b></div>
+        <div class="shortcut-help-item"><span><i data-lucide="circle-play"></i>Começar / pausar foco</span><b class="kbd">Espaço</b></div>
         <div class="shortcut-help-item"><span><i data-lucide="rotate-ccw"></i>resetar foco</span><b class="kbd">R</b></div>
         <div class="shortcut-help-item"><span><i data-lucide="skip-forward"></i>pular etapa</span><b class="kbd">K</b></div>
         <div class="shortcut-help-item"><span><i data-lucide="x"></i>fechar janela</span><b class="kbd">Ctrl</b></div>
@@ -4894,6 +4894,13 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
     }
 
     function renderNotes() {
+      const notesRoot =
+        document.getElementById("notesList") ||
+        document.getElementById("notes-list") ||
+        document.querySelector("[data-notes-list]") ||
+        document.querySelector(".notes-list");
+      if (!notesRoot) return;
+
       const notes = getNotes();
       const list = $('notesList');
       list.innerHTML = '';
