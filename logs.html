@@ -2552,8 +2552,8 @@
         const emptyTitle = currentView === "reviews" ? "sem revisões" : "nada aqui";
         const emptyText = dateFilter
           ? (currentView === "reviews"
-              ? "nenhuma revisão marcada para essa data."
-              : "nenhum log registrado nessa data.")
+              ? ""
+              : "")
           : (currentView === "reviews"
               ? "adicione prazo de revisão em algum log."
               : "mude o filtro ou crie um log novo.");
