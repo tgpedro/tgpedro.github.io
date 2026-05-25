@@ -1013,7 +1013,6 @@
       transform: translateX(-50%) translateY(0);
     }
 
-    .file-input { display: none; }
 
     @keyframes softFadeUp {
       from { opacity: 0; transform: translateY(10px); }
@@ -1206,15 +1205,7 @@
         </div>
 
         <div class="content-actions">
-          <button class="icon-btn" id="exportBtn" title="exportar">
-            <i data-lucide="download"></i>
-          </button>
-
-          <button class="icon-btn" id="importBtn" title="importar">
-            <i data-lucide="upload"></i>
-          </button>
-
-          <button class="pill" id="editBtn" style="display:none">editar</button>
+<button class="pill" id="editBtn" style="display:none">editar</button>
           <button class="primary" id="saveBtn" style="display:none">salvar</button>
         </div>
       </header>
@@ -1276,10 +1267,7 @@
       </div>
     </div>
   </section>
-
-  <input class="file-input" id="importFile" type="file" accept="application/json" />
-
-  <div class="toast" id="toast">salvo</div>
+<div class="toast" id="toast">salvo</div>
 
   <script>
 
@@ -1325,7 +1313,6 @@
       statusTitle: $("#statusTitle"),
       editBtn: $("#editBtn"),
       saveBtn: $("#saveBtn"),
-      importFile: $("#importFile"),
       toast: $("#toast"),
       calendarModal: $("#calendarModal"),
       calendarGrid: $("#calendarGrid"),
@@ -2221,66 +2208,6 @@
       showToast("filtro removido");
     }
 
-    function exportData() {
-      const blob = new Blob([JSON.stringify(logs, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const anchor = document.createElement("a");
-
-      anchor.href = url;
-      anchor.download = `logs-${todayISO()}.json`;
-      document.body.appendChild(anchor);
-      anchor.click();
-      anchor.remove();
-
-      URL.revokeObjectURL(url);
-      showToast("backup exportado");
-    }
-
-    function importData(file) {
-      const reader = new FileReader();
-
-      reader.onload = () => {
-        try {
-          const data = JSON.parse(reader.result);
-
-          if (!Array.isArray(data)) throw new Error("json inválido");
-
-          const clean = data
-            .filter(item => item && item.title)
-            .map(item => ({
-              id: item.id || crypto.randomUUID(),
-              date: item.date || todayISO(),
-              type: item.type || "aula",
-              subject: String(item.subject || "").trim(),
-              title: String(item.title || "").trim(),
-              link: String(item.link || "").trim(),
-              questions: Number(item.questions || 0),
-              correct: Number(item.correct || 0),
-              notes: String(item.notes || "").trim(),
-              reviewDays: item.reviewDays ?? "",
-              reviewDate: item.reviewDate || "",
-              reviewedAt: item.reviewedAt || "",
-              createdAt: item.createdAt || new Date().toISOString(),
-              updatedAt: new Date().toISOString()
-            }));
-
-          const existing = new Set(logs.map(log => log.id));
-          logs = [...clean.filter(log => !existing.has(log.id)), ...logs];
-
-          if (!selectedId && logs[0]) selectedId = logs[0].id;
-
-          saveLogsToSupabase();
-          render();
-          showToast("backup importado");
-        } catch {
-          showToast("arquivo inválido");
-        }
-
-        els.importFile.value = "";
-      };
-
-      reader.readAsText(file);
-    }
 
     function render() {
       renderList();
@@ -2371,16 +2298,7 @@
       });
 
       $("#clearDateFilter").addEventListener("click", clearDateFilter);
-
-      $("#exportBtn").addEventListener("click", exportData);
-      $("#importBtn").addEventListener("click", () => els.importFile.click());
-
-      els.importFile.addEventListener("change", event => {
-        const file = event.target.files && event.target.files[0];
-        if (file) importData(file);
-      });
-
-      $("#closeDelete").addEventListener("click", () => closeModal(els.deleteModal));
+$("#closeDelete").addEventListener("click", () => closeModal(els.deleteModal));
       $("#cancelDelete").addEventListener("click", () => closeModal(els.deleteModal));
       $("#confirmDelete").addEventListener("click", deleteLog);
 
