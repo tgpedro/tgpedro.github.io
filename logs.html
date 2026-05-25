@@ -1703,6 +1703,78 @@
       }
     }
 
+
+    /* correção definitiva do painel vazio no desktop */
+    .content {
+      min-width: 0;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .editor-body {
+      width: 100%;
+      min-width: 0;
+      overflow-x: hidden;
+    }
+
+    .empty-state {
+      width: 100%;
+      min-width: 0;
+      min-height: calc(100vh - 120px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 28px;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    .empty-state .empty-card {
+      width: min(430px, 100%);
+      max-width: 430px;
+      margin: 0 auto;
+      transform: none;
+      justify-self: center;
+      align-self: center;
+    }
+
+    .empty-state .empty-card h2,
+    .empty-state .empty-card p {
+      max-width: 100%;
+      overflow-wrap: anywhere;
+    }
+
+    @media (min-width: 761px) {
+      .app {
+        width: min(1320px, calc(100vw - 28px));
+        grid-template-columns: 390px minmax(0, 1fr);
+      }
+
+      .content {
+        max-width: 100%;
+      }
+
+      .editor-body {
+        max-width: 100%;
+      }
+
+      .empty-state {
+        min-height: calc(100vh - 126px);
+      }
+    }
+
+    @media (max-width: 760px) {
+      .empty-state {
+        min-height: calc(100vh - 80px);
+        padding: 20px;
+      }
+
+      .empty-state .empty-card {
+        width: min(420px, 100%);
+        max-width: 100%;
+      }
+    }
+
   </style>
 </head>
 
