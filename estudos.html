@@ -3757,6 +3757,53 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
       { name: 'Filme / lazer no domingo', priority: 'lazer', note: '' }
     ];
 
+
+    function subjectPriorityRank(priority) {
+      const key = String(priority || 'media')
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '');
+
+      const order = {
+        alta: 0,
+        media: 1,
+        baixa: 2,
+        lazer: 3
+      };
+
+      return Object.prototype.hasOwnProperty.call(order, key) ? order[key] : 9;
+    }
+
+    function normalizeSubjectItem(subject) {
+      if (typeof subject === 'string') {
+        return { name: subject.trim(), priority: 'media', note: '' };
+      }
+
+      return {
+        name: String(subject?.name || '').trim(),
+        priority: subject?.priority || 'media',
+        note: subject?.note || ''
+      };
+    }
+
+    function sortSubjectsByPriority(subjects) {
+      return (subjects || [])
+        .map(normalizeSubjectItem)
+        .filter(subject => subject.name)
+        .sort((a, b) => {
+          const priorityDiff = subjectPriorityRank(a.priority) - subjectPriorityRank(b.priority);
+          if (priorityDiff !== 0) return priorityDiff;
+
+          return a.name.localeCompare(b.name, 'pt-BR', { sensitivity: 'base' });
+        });
+    }
+
+    function normalizeAppSubjects() {
+      appState.subjects = sortSubjectsByPriority(appState.subjects || defaultSubjects);
+      return appState.subjects;
+    }
+
+
     const routines = {
       1: {
         label: 'Segunda', summary: '', studyBlocks: '6 pomodoros', items: [
@@ -4006,6 +4053,7 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
     }
 
     async function saveAppDataNow() {
+      normalizeAppSubjects();
       backupLocal();
 
       if (!supabaseClient) {
@@ -4019,7 +4067,12 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
         .from('app_data')
         .upsert({
           id: DATA_ID,
-          data: appState,
+          data: {
+            ...appState,
+            subjects: sortSubjectsByPriority(appState.subjects || defaultSubjects),
+            subjectsOrderBy: 'priority',
+            subjectsOrderRule: ['alta', 'media', 'baixa', 'lazer', 'sem prioridade']
+          },
           updated_at: new Date().toISOString()
         }, { onConflict: 'id' });
 
@@ -4035,6 +4088,7 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
     }
 
     function queueSave() {
+      normalizeAppSubjects();
       backupLocal();
       clearTimeout(saveTimer);
       saveTimer = setTimeout(saveAppDataNow, 450);
@@ -4042,6 +4096,7 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
 
     window.addEventListener('beforeunload', () => {
       syncPomodoroState(false);
+      normalizeAppSubjects();
       backupLocal();
     });
 
@@ -4097,11 +4152,12 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
     }
 
     function getSubjects() {
-      return appState.subjects || defaultSubjects;
+      appState.subjects = sortSubjectsByPriority(appState.subjects || defaultSubjects);
+      return appState.subjects;
     }
 
     function setSubjects(subjects) {
-      appState.subjects = subjects || defaultSubjects;
+      appState.subjects = sortSubjectsByPriority(subjects || defaultSubjects);
       queueSave();
     }
 
