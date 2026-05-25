@@ -1908,7 +1908,7 @@
     }
 
     async function saveLogsToSupabase(silent = true) {
-      logs = sortLogsForSupabase(logs.filter(log => !log.isDraft));
+      logs = sortLogsForSupabase(logs);
       saveLocal();
       localStorage.setItem(STORAGE_KEY + ".updated", String(Date.now()));
 
@@ -2020,15 +2020,11 @@
     }
 
     function selectedLog() {
-      if (draftLog && selectedId === draftLog.id) return draftLog;
+      if (draftLog && draftLog.id === selectedId) return draftLog;
       return logs.find(log => log.id === selectedId) || null;
     }
 
     function setSelected(id, nextMode = "read") {
-      if (draftLog && id !== draftLog.id) {
-        draftLog = null;
-      }
-
       selectedId = id;
       mode = nextMode;
 
@@ -2420,7 +2416,7 @@
 
           <div class="editor-actions">
             <button type="button" class="pill ghost" onclick="${log.isDraft ? "discardDraft()" : `setSelected('${log.id}', 'read')`}">cancelar</button>
-            ${log.isDraft ? "" : `<button type="button" class="pill danger" onclick="askDelete('${log.id}')">apagar</button>`}
+            <button type="button" class="pill danger" onclick="askDelete('${log.id}')">apagar</button>
             <button type="submit" class="primary">salvar</button>
           </div>
         </form>
@@ -2493,9 +2489,29 @@
       daysInput.value = Math.max(0, diffDays(date, reviewDate));
     }
 
+
+    function discardDraft() {
+      if (draftLog && selectedId === draftLog.id) {
+        draftLog = null;
+        selectedId = logs[0]?.id || null;
+        mode = "read";
+
+        if (window.innerWidth <= 760 && !selectedId) {
+          document.body.classList.remove("mobile-editor-open");
+        }
+
+        render();
+        showToast("rascunho descartado");
+        return;
+      }
+
+      if (selectedId) setSelected(selectedId, "read");
+    }
+
     function createLog() {
       draftLog = {
-        id: "draft-" + crypto.randomUUID(),
+        id: `draft-${crypto.randomUUID()}`,
+        isDraft: true,
         date: todayISO(),
         type: "aula",
         subject: subjects[0]?.name || "",
@@ -2508,8 +2524,7 @@
         reviewDate: "",
         reviewedAt: "",
         createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        isDraft: true
+        updatedAt: new Date().toISOString()
       };
 
       selectedId = draftLog.id;
@@ -2520,21 +2535,6 @@
 
       render();
       setTimeout(() => $("#titleInput")?.focus(), 80);
-    }
-
-    function discardDraft() {
-      if (!draftLog) return;
-
-      draftLog = null;
-      selectedId = logs[0]?.id || null;
-      mode = "read";
-
-      if (!selectedId && window.innerWidth <= 760) {
-        document.body.classList.remove("mobile-editor-open");
-      }
-
-      render();
-      showToast("rascunho descartado");
     }
 
     function saveEditor() {
@@ -2559,6 +2559,8 @@
 
       const updated = {
         ...log,
+        id: log.isDraft ? crypto.randomUUID() : log.id,
+        isDraft: false,
         title,
         subject,
         date: $("#dateInput").value || todayISO(),
@@ -2573,9 +2575,7 @@
         updatedAt: new Date().toISOString()
       };
 
-      if (draftLog && log.id === draftLog.id) {
-        updated.id = crypto.randomUUID();
-        updated.isDraft = false;
+      if (log.isDraft) {
         logs.unshift(updated);
         draftLog = null;
       } else {
@@ -2751,7 +2751,7 @@
       renderContent();
       renderCalendar();
 
-      if (!selectedId && logs[0]) {
+      if (!selectedId && !draftLog && logs[0]) {
         selectedId = logs[0].id;
         renderList();
         renderContent();
