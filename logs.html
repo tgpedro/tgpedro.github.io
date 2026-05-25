@@ -1545,6 +1545,58 @@
       }
     }
 
+
+    /* correção dos campos de data no iPhone/Safari */
+    input[type="date"] {
+      -webkit-appearance: none;
+      appearance: none;
+      min-height: 48px;
+      height: 48px;
+      line-height: 1.2;
+      text-align: left;
+      display: block;
+    }
+
+    input[type="date"]::-webkit-date-and-time-value {
+      text-align: left;
+      min-height: 1.2em;
+      line-height: 1.2;
+      padding: 0;
+      margin: 0;
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      opacity: .72;
+      filter: invert(1);
+      width: 18px;
+      height: 18px;
+      margin-left: 6px;
+    }
+
+    @media (max-width: 760px) {
+      input[type="date"] {
+        height: 46px;
+        min-height: 46px;
+        padding: 11px 13px;
+        font-size: 16px;
+        border-radius: 18px;
+      }
+
+      input[type="date"]::-webkit-date-and-time-value {
+        font-size: 16px;
+        text-align: left;
+      }
+    }
+
+    @media (max-width: 430px) {
+      input[type="date"] {
+        height: 44px;
+        min-height: 44px;
+        padding: 10px 12px;
+        border-radius: 17px;
+      }
+    }
+
   </style>
 </head>
 
