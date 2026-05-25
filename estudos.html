@@ -2332,7 +2332,7 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
 
       .mobile-bottom-nav {
         bottom: 8px !important;
-        width: min(390px, calc(100% - 14px)) !important;
+        width: min(430px, calc(100% - 14px)) !important;
       }
     }
 
@@ -3006,9 +3006,9 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
 
       .mobile-bottom-nav {
         display: grid !important;
-        grid-template-columns: repeat(3, 1fr) !important;
+        grid-template-columns: repeat(4, 1fr) !important;
         gap: 6px !important;
-        width: min(360px, calc(100% - 22px)) !important;
+        width: min(430px, calc(100% - 22px)) !important;
         min-height: 58px !important;
         padding: 6px !important;
         bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
@@ -3187,8 +3187,8 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
 
       .mobile-bottom-nav {
         display: grid !important;
-        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-        width: min(390px, calc(100% - 22px)) !important;
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+        width: min(430px, calc(100% - 22px)) !important;
         min-height: 58px !important;
         padding: 6px !important;
         gap: 6px !important;
@@ -3462,6 +3462,19 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
       top: 0;
     }
 
+
+    /* botão de logs na navegação inferior do celular */
+    @media (max-width: 860px) {
+      .mobile-bottom-nav {
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+        width: min(430px, calc(100% - 22px)) !important;
+      }
+
+      .mobile-bottom-nav button {
+        min-width: 0 !important;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -3567,6 +3580,7 @@ body.day-0 { --accent: #34d399; --accent-2: #67e8f9; --day-soft: rgba(52, 211, 1
     <nav class="mobile-bottom-nav" aria-label="atalhos principais">
       <button type="button" data-modal="calendarModal" data-nav="calendar"><span><i data-lucide="calendar-days"></i></span><b>calendário</b></button>
       <button type="button" data-open-focus data-nav="focus"><span><i data-lucide="timer"></i></span><b>foco</b></button>
+      <button type="button" data-nav="logs" onclick="window.location.href='logs.html'" aria-label="abrir logs"><span><i data-lucide="notebook-tabs"></i></span><b>logs</b></button>
       <button type="button" data-modal="toolsModal" data-nav="menu"><span><i data-lucide="menu"></i></span><b>menu</b></button>
     </nav>
   </div>
