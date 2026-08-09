@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AURA — Acervo & Lançamentos de Artistas</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkbg: '#08080a',
+                        cardbg: '#141416',
+                        accent: '#a855f7',
+                        accenthover: '#9333ea',
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .masonry-grid {
+            column-count: 1;
+            column-gap: 1.25rem;
+        }
+        @media (min-width: 640px) { .masonry-grid { column-count: 2; } }
+        @media (min-width: 768px) { .masonry-grid { column-count: 3; } }
+        @media (min-width: 1280px) { .masonry-grid { column-count: 4; } }
+        @media (min-width: 1536px) { .masonry-grid { column-count: 5; } }
+        
+        .masonry-item {
+            break-inside: avoid;
+            margin-bottom: 1.25rem;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #08080a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #27272a;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3f3f46;
+        }
+    </style>
+</head>
+<body class="bg-darkbg text-zinc-100 font-sans antialiased min-h-screen selection:bg-purple-500 selection:text-white">
+
+    <!-- HEADER / NAVIGATION -->
+    <header class="sticky top-0 z-50 backdrop-blur-xl bg-darkbg/85 border-b border-zinc-800/80 px-4 lg:px-8 py-3.5 transition-all">
+        <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+            <!-- Logo & Brand -->
+            <div class="flex items-center gap-6 cursor-pointer" onclick="switchView('feed')">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 via-indigo-600 to-zinc-950 flex items-center justify-center shadow-lg shadow-purple-900/30 border border-purple-500/30">
+                        <i data-lucide="radio" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <div>
+                        <span class="text-lg font-extrabold tracking-wider bg-gradient-to-r from-white via-zinc-200 to-purple-400 bg-clip-text text-transparent">AURA</span>
+                        <span class="block text-[9px] text-purple-400 font-bold uppercase tracking-widest -mt-1">Music Archive</span>
+                    </div>
+                </div>
+
+                <!-- Navigation Links -->
+                <nav class="hidden md:flex items-center gap-1 font-medium text-sm">
+                    <button onclick="switchView('feed')" id="nav-feed" class="px-4 py-2 rounded-full bg-zinc-800 text-white transition-all shadow-sm">Acervo Geral</button>
+                    <button onclick="switchView('releases')" id="nav-releases" class="px-4 py-2 rounded-full text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span> Top Lançamentos da Semana
+                    </button>
+                    <button onclick="switchView('artists')" id="nav-artists" class="px-4 py-2 rounded-full text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all">Artistas</button>
+                </nav>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="flex-1 max-w-lg relative hidden sm:block">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-zinc-400">
+                    <i data-lucide="search" class="w-4 h-4"></i>
+                </span>
+                <input type="text" id="searchInput" placeholder="Buscar artista, álbum, capa, GIF ou show..." 
+                    class="w-full pl-11 pr-4 py-2 bg-zinc-900/90 border border-zinc-800 rounded-full text-sm text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all shadow-inner">
+            </div>
+
+            <!-- Actions -->
+            <div class="flex items-center gap-3">
+                <button onclick="switchView('releases')" class="px-3.5 py-2 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold transition shadow-lg shadow-purple-900/30 flex items-center gap-2">
+                    <i data-lucide="zap" class="w-3.5 h-3.5"></i> Lançamentos
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 lg:px-8 py-6">
+
+        <!-- VIEW 1: FEED / ACERVO GERAL -->
+        <section id="view-feed" class="space-y-6">
+            <!-- Banner Destaque Lançamentos da Semana -->
+            <div onclick="switchView('releases')" class="relative rounded-3xl overflow-hidden bg-gradient-to-r from-purple-950 via-zinc-900 to-indigo-950 p-6 sm:p-8 border border-purple-500/30 cursor-pointer group shadow-2xl">
+                <div class="absolute right-0 top-0 bottom-0 w-1/2 opacity-30 bg-cover bg-center mix-blend-overlay pointer-events-none" style="background-image: url('https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&q=80&w=1200')"></div>
+                <div class="relative z-10 max-w-2xl space-y-3">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs font-bold">
+                        <i data-lucide="flame" class="w-3.5 h-3.5"></i> ATUALIZADO HOJE
+                    </div>
+                    <h2 class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight group-hover:text-purple-300 transition">Top Lançamentos da Semana</h2>
+                    <p class="text-zinc-300 text-sm sm:text-base leading-relaxed">Confira os singles, álbuns e videoclipes que estão dominando os charts globais e o acervo visual oficial dos artistas.</p>
+                    <div class="pt-2 flex items-center gap-2 text-xs font-bold text-purple-400 group-hover:translate-x-1 transition-transform">
+                        <span>Ver todos os lançamentos</span> <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter Pills por Tipo de Mídia & Gênero -->
+            <div class="flex items-center justify-between gap-4 flex-wrap pt-2">
+                <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+                    <button onclick="filterCategory('all')" class="category-btn px-4 py-2 rounded-full text-xs font-semibold bg-white text-black transition flex-shrink-0 shadow-md">Todo Acervo</button>
+                    <button onclick="filterCategory('foto')" class="category-btn px-4 py-2 rounded-full text-xs font-semibold bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white transition flex-shrink-0 border border-zinc-800">📸 Fotos Oficiais</button>
+                    <button onclick="filterCategory('capa')" class="category-btn px-4 py-2 rounded-full text-xs font-semibold bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white transition flex-shrink-0 border border-zinc-800">💿 Capas & Álbuns</button>
+                    <button onclick="filterCategory('gif')" class="category-btn px-4 py-2 rounded-full text-xs font-semibold bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white transition flex-shrink-0 border border-zinc-800">✨ GIFs & Shows</button>
+                    <button onclick="filterCategory('bastidores')" class="category-btn px-4 py-2 rounded-full text-xs font-semibold bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white transition flex-shrink-0 border border-zinc-800">🎬 Bastidores</button>
+                </div>
+                
+                <!-- Quick Artist Selector -->
+                <div class="flex items-center gap-2 text-xs text-zinc-400 font-semibold">
+                    <span>Artistas em Destaque:</span>
+                    <button onclick="openArtistPage('The Weeknd')" class="px-3 py-1 rounded-full bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-800 transition">The Weeknd</button>
+                    <button onclick="openArtistPage('Dua Lipa')" class="px-3 py-1 rounded-full bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-800 transition">Dua Lipa</button>
+                    <button onclick="openArtistPage('Travis Scott')" class="px-3 py-1 rounded-full bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-800 transition">Travis Scott</button>
+                </div>
+            </div>
+
+            <!-- Masonry Feed Container (Acervo) -->
+            <div id="masonryFeed" class="masonry-grid pt-2">
+                <!-- Items injected via JS -->
+            </div>
+        </section>
+
+        <!-- VIEW 2: TOP LANÇAMENTOS DA SEMANA -->
+        <section id="view-releases" class="hidden space-y-8 animate-fadeIn">
+            <div class="space-y-2">
+                <div class="inline-flex items-center gap-2 text-rose-400 text-xs font-bold uppercase tracking-wider">
+                    <i data-lucide="trending-up" class="w-4 h-4"></i> Charts & Drops
+                </div>
+                <h1 class="text-3xl sm:text-4xl font-extrabold text-white">Top Lançamentos da Semana</h1>
+                <p class="text-zinc-400 text-sm">Os álbuns mais ouvidos e singles fresquinhos catalogados com materiais visuais exclusivos.</p>
+            </div>
+
+            <!-- Releases Grid -->
+            <div id="releasesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Injected via JS -->
+            </div>
+        </section>
+
+        <!-- VIEW 3: PÁGINA DO ARTISTA (ACERVO DEDICADO) -->
+        <section id="view-artist" class="hidden space-y-8 animate-fadeIn">
+            <!-- Artist Header Banner -->
+            <div class="relative rounded-3xl overflow-hidden bg-zinc-955 border border-zinc-800">
+                <div class="h-64 sm:h-96 w-full relative">
+                    <img id="artistBanner" src="" alt="Banner" class="w-full h-full object-cover opacity-60">
+                    <div class="absolute inset-0 bg-gradient-to-t from-darkbg via-darkbg/50 to-transparent"></div>
+                </div>
+
+                <!-- Profile Info Overlay -->
+                <div class="px-6 sm:px-10 pb-8 pt-0 relative -mt-24 sm:-mt-32 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-end gap-6">
+                        <img id="artistAvatar" src="" alt="Avatar" class="w-32 h-32 sm:w-40 sm:h-40 rounded-2xl object-cover ring-4 ring-darkbg shadow-2xl">
+                        <div class="space-y-1.5">
+                            <div class="flex items-center gap-2.5">
+                                <h1 id="artistName" class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white"></h1>
+                                <span class="bg-purple-500/20 text-purple-400 p-1.5 rounded-full border border-purple-500/30" title="Artista Oficial Verificado"><i data-lucide="badge-check" class="w-5 h-5"></i></span>
+                            </div>
+                            <p id="artistGenre" class="text-purple-400 text-sm font-semibold"></p>
+                            <p id="artistBio" class="text-zinc-300 text-sm max-w-xl leading-relaxed pt-1"></p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-3 w-full sm:w-auto">
+                        <button onclick="switchView('feed')" class="px-6 py-2.5 rounded-full bg-zinc-800 hover:bg-zinc-700 text-white font-semibold text-sm transition border border-zinc-700 flex items-center gap-2">
+                            <i data-lucide="arrow-left" class="w-4 h-4"></i> Voltar ao Acervo
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Artist Section Tabs -->
+            <div class="flex items-center gap-6 border-b border-zinc-800 pb-3 text-sm font-semibold">
+                <button onclick="switchArtistTab('all')" id="art-tab-all" class="text-white pb-3 border-b-2 border-purple-500 -mb-3 transition">Todo Acervo do Artista</button>
+                <button onclick="switchArtistTab('capa')" id="art-tab-capa" class="text-zinc-400 hover:text-white pb-3 transition">Capas & Álbuns</button>
+                <button onclick="switchArtistTab('foto')" id="art-tab-foto" class="text-zinc-400 hover:text-white pb-3 transition">Fotos Oficiais & Presskit</button>
+                <button onclick="switchArtistTab('gif')" id="art-tab-gif" class="text-zinc-400 hover:text-white pb-3 transition">GIFs & Shows</button>
+            </div>
+
+            <!-- Artist Media Masonry Grid -->
+            <div id="artistMasonryGrid" class="masonry-grid">
+                <!-- Injected via JS -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL FOR MEDIA PREVIEW & DOWNLOAD -->
+    <div id="mediaModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden items-center justify-center p-4 sm:p-6">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col md:flex-row shadow-2xl relative animate-scaleUp">
+            
+            <!-- Close Button -->
+            <button onclick="closeModal()" class="absolute top-4 right-4 z-10 p-2 rounded-full bg-black/60 hover:bg-black text-white transition backdrop-blur-sm">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+
+            <!-- Modal Left: Media Preview -->
+            <div class="md:w-3/5 bg-black flex items-center justify-center relative overflow-hidden">
+                <img id="modalImage" src="" alt="Preview" class="w-full h-full object-cover max-h-[70vh] md:max-h-[85vh]">
+            </div>
+
+            <!-- Modal Right: Metadata -->
+            <div class="md:w-2/5 p-6 flex flex-col justify-between overflow-y-auto max-h-[85vh]">
+                <div class="space-y-6">
+                    <!-- Artist Ref -->
+                    <div class="flex items-center justify-between border-b border-zinc-800 pb-4">
+                        <div class="flex items-center gap-3 cursor-pointer" onclick="closeModal(); openArtistPage(currentMedia.artist)">
+                            <img id="modalAvatar" src="" alt="Artist" class="w-12 h-12 rounded-xl object-cover ring-2 ring-purple-500">
+                            <div>
+                                <h3 id="modalArtist" class="font-bold text-white hover:underline"></h3>
+                                <p id="modalCategory" class="text-xs text-purple-400 font-semibold uppercase tracking-wider"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Title & Description -->
+                    <div class="space-y-2">
+                        <h2 id="modalTitle" class="text-xl font-bold text-white"></h2>
+                        <p id="modalDesc" class="text-sm text-zinc-400 leading-relaxed"></p>
+                    </div>
+
+                    <!-- Resolution & Info -->
+                    <div class="bg-zinc-950 p-4 rounded-2xl border border-zinc-800/80 space-y-2 text-xs text-zinc-400">
+                        <div class="flex justify-between">
+                            <span>Formato:</span>
+                            <span class="text-white font-semibold" id="modalFormat">Alta Resolução (PNG / WebP)</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Dimensões:</span>
+                            <span class="text-white font-semibold">3840 x 2160 (4K Ultra HD)</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Licença de Acervo:</span>
+                            <span class="text-purple-400 font-semibold">Uso Editorial / Divulgação Oficial</span>
+                        </div>
+                    </div>
+
+                    <!-- Tags -->
+                    <div id="modalTags" class="flex flex-wrap gap-2"></div>
+                </div>
+
+                <!-- Modal Actions -->
+                <div class="pt-6 mt-6 border-t border-zinc-800 flex items-center justify-between">
+                    <button onclick="alert('Download do arquivo original iniciado em alta qualidade!')" class="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-sm transition shadow-lg shadow-purple-900/40 flex items-center justify-center gap-2">
+                        <i data-lucide="download" class="w-4 h-4"></i> Baixar Mídia Original (4K)
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Initialize Lucide Icons
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            renderFeed(mediaAcervo);
+            renderReleases();
+        });
+
+        // Mock Database: Acervo Oficial de Artistas (Fotos, Capas, GIFs, Bastidores)
+        const mediaAcervo = [
+            {
+                id: 1,
+                title: "After Hours - Álbum Official Cover & Photoshoot",
+                artist: "The Weeknd",
+                genre: "R&B / Synth-Pop",
+                type: "capa",
+                image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&q=80&w=1000",
+                avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200",
+                banner: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&q=80&w=1600",
+                bio: "Cantor, compositor e produtor canadense, conhecido por sua versatilidade sônica e estética cinematográfica sombria.",
+                desc: "Sessão fotográfica oficial para a era After Hours, destacando o terno vermelho icônico e iluminação neon dramática.",
+                tags: ["TheWeeknd", "AfterHours", "AlbumCover", "Neon"]
+            },
+            {
+                id: 2,
+                title: "Future Nostalgia Tour - Live Stage Performance GIF",
+                artist: "Dua Lipa",
+                genre: "Pop / Disco",
+                type: "gif",
+                image: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&q=80&w=1000",
+                avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&q=80&w=200",
+                banner: "https://images.unsplash.com/photo-1465847899084-d164df4dedc6?auto=format&fit=crop&q=80&w=1600",
+                bio: "Ícone pop global britânica-albanesa, referência em dance-pop futurista e visuais sofisticados.",
+                desc: "Momento dinâmico capturado durante a turnê mundial Future Nostalgia, misturando coreografia espacial e lasers.",
+                tags: ["DuaLipa", "LiveTour", "PopMusic", "StageDesign"]
+            },
+            {
+                id: 3,
+                title: "UTOPIA Stadium Tour - Pyro & Stage Production",
+                artist: "Travis Scott",
+                genre: "Hip-Hop / Trap",
+                type: "foto",
+                image: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&q=80&w=1000",
+                avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=200",
+                banner: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&q=80&w=1600",
+                bio: "Rapper, produtor e designer norte-americano, pioneiro em experiências imersivas de grande escala e concertos sísmicos.",
+                desc: "Produção de palco titânica para a turnê UTOPIA, incorporando estruturas rochosas e pirotecnia de alto impacto.",
+                tags: ["TravisScott", "Utopia", "StadiumTour", "HipHop"]
+            },
+            {
+                id: 4,
+                title: "Starboy Era - Studio Recording Session",
+                artist: "The Weeknd",
+                genre: "R&B / Synth-Pop",
+                type: "bastidores",
+                image: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&q=80&w=1000",
+                avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200",
+                banner: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&q=80&w=1600",
+                bio: "Cantor, compositor e produtor canadense, conhecido por sua versatilidade sônica e estética cinematográfica sombria.",
+                desc: "Bastidores de gravação no estúdio com console SSL e iluminação em LED ultravioleta.",
+                tags: ["StudioSession", "Recording", "TheWeeknd", "Gear"]
+            },
+            {
+                id: 5,
+                title: "Radical Optimism - Album Artwork & Typography",
+                artist: "Dua Lipa",
+                genre: "Pop / Disco",
+                type: "capa",
+                image: "https://images.unsplash.com/photo-1520523839896-5c6264906f36?auto=format&fit=crop&q=80&w=1000",
+                avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&q=80&w=200",
+                banner: "https://images.unsplash.com/photo-1465847899084-d164df4dedc6?auto=format&fit=crop&q=80&w=1600",
+                bio: "Ícone pop global britânica-albanesa, referência em dance-pop futurista e visuais sofisticados.",
+                desc: "Concepção visual psicodélica e aquática para o álbum Radical Optimism.",
+                tags: ["RadicalOptimism", "AlbumCover", "DuaLipa"]
+            },
+            {
+                id: 6,
+                title: "ASTROWORLD Festival - Crowd Control & Atmosphere",
+                artist: "Travis Scott",
+                genre: "Hip-Hop / Trap",
+                type: "gif",
+                image: "https://images.unsplash.com/photo-1563308121-36a468d9230c?auto=format&fit=crop&q=80&w=1000",
+                avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=200",
+                banner: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&q=80&w=1600",
+                bio: "Rapper, produtor e designer norte-americano, pioneiro em experiências imersivas de grande escala e concertos sísmicos.",
+                desc: "GIF animado mostrando a energia explosiva do público durante a abertura do show principal.",
+                tags: ["Astroworld", "Festival", "LiveGif", "TravisScott"]
+            },
+            {
+                id: 7,
+                title: "Dark Harmonic Soundscapes - Synth Rack Closeup",
+                artist: "The Weeknd",
+                genre: "R&B / Synth-Pop",
+                type: "bastidores",
+                image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&q=80&w=1000",
+                avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200",
+                banner: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&q=80&w=1600",
+                bio: "Cantor, compositor e produtor canadense, conhecido por sua versatilidade sônica e estética cinematográfica sombria.",
+                desc: "Equipamentos de sintetizadores analógicos utilizados na criação das atmosferas oitentistas.",
+                tags: ["Synthesizer", "Gear", "Analog", "Production"]
+            },
+            {
+                id: 8,
+                title: "Vogue Magazine Editorial Photoshoot",
+                artist: "Dua Lipa",
+                genre: "Pop / Disco",
+                type: "foto",
+                image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=1000",
+                avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&q=80&w=200",
+                banner: "https://images.unsplash.com/photo-1465847899084-d164df4dedc6?auto=format&fit=crop&q=80&w=1600",
+                bio: "Ícone pop global britânica-albanesa, referência em dance-pop futurista e visuais sofisticados.",
+                desc: "Ensaio fotográfico exclusivo para edição de moda internacional.",
+                tags: ["Vogue", "Fashion", "Editorial", "DuaLipa"]
+            }
+        ];
+
+        // Top Lançamentos da Semana Data
+        const releasesData = [
+            {
+                title: "Hurry Up Tomorrow (Album)",
+                artist: "The Weeknd",
+                type: "Álbum Completo • 14 Faixas",
+                date: "Lançado esta semana",
+                image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&q=80&w=800",
+                streams: "48.2M streams no dia de estreia",
+                linkText: "Ouvir no Spotify / Apple Music"
+            },
+            {
+                title: "Training Season (Remixes EP)",
+                artist: "Dua Lipa",
+                type: "EP / Club Mixes",
+                date: "Lançado há 3 dias",
+                image: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&q=80&w=800",
+                streams: "19.5M streams",
+                linkText: "Ouvir no Spotify / Apple Music"
+            },
+            {
+                title: "TO JACKSONVILLE (Single & Video)",
+                artist: "Travis Scott",
+                type: "Single Oficial + 4K MV",
+                date: "Lançado há 5 dias",
+                image: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&q=80&w=800",
+                streams: "31.0M streams",
+                linkText: "Assistir Videoclipe"
+            }
+        ];
+
+        let currentMedia = null;
+
+        // Render Feed (Acervo Geral)
+        function renderFeed(data, containerId = 'masonryFeed') {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            if (data.length === 0) {
+                container.innerHTML = `<div class="col-span-full py-16 text-center text-zinc-500">Nenhum item encontrado neste acervo.</div>`;
+                return;
+            }
+
+            data.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'masonry-item group cursor-pointer';
+                card.onclick = () => openModal(item);
+
+                card.innerHTML = `
+                    <div class="relative rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-800/80 transition-all duration-300 group-hover:border-purple-500/50 group-hover:shadow-xl group-hover:shadow-purple-950/30">
+                        <!-- Media Image -->
+                        <div class="relative overflow-hidden">
+                            <img src="${item.image}" alt="${item.title}" class="w-full object-cover transition-transform duration-500 group-hover:scale-105">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-4">
+                                <div class="flex justify-between items-center">
+                                    <span class="px-3 py-1 rounded-full bg-black/70 backdrop-blur-md text-[11px] font-bold text-purple-300 border border-purple-500/30 uppercase tracking-wider">
+                                        ${item.type}
+                                    </span>
+                                    <span class="p-2 rounded-full bg-purple-600 text-white shadow-lg">
+                                        <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i>
+                                    </span>
+                                </div>
+                                <div class="text-xs text-zinc-300 font-medium">
+                                    <span>Clique para ampliar & baixar</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer Info -->
+                        <div class="p-3.5 space-y-1.5">
+                            <h3 class="font-bold text-sm text-zinc-100 group-hover:text-purple-400 transition line-clamp-1">${item.title}</h3>
+                            <div class="flex items-center justify-between pt-1">
+                                <div class="flex items-center gap-2 cursor-pointer" onclick="event.stopPropagation(); openArtistPage('${item.artist}')">
+                                    <img src="${item.avatar}" alt="${item.artist}" class="w-5 h-5 rounded-full object-cover">
+                                    <span class="text-xs text-zinc-400 hover:text-white transition font-medium">${item.artist}</span>
+                                </div>
+                                <span class="text-[10px] text-zinc-500 font-semibold uppercase">${item.genre}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        // Render Top Lançamentos
+        function renderReleases() {
+            const container = document.getElementById('releasesGrid');
+            container.innerHTML = '';
+
+            releasesData.forEach(rel => {
+                const card = document.createElement('div');
+                card.className = 'bg-zinc-900 border border-zinc-800 rounded-3xl overflow-hidden flex flex-col justify-between group hover:border-purple-500/50 transition shadow-xl';
+                card.innerHTML = `
+                    <div class="relative h-64 overflow-hidden">
+                        <img src="${rel.image}" alt="${rel.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <div class="absolute top-4 left-4 bg-black/70 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-rose-400 border border-rose-500/30 flex items-center gap-1.5">
+                            <i data-lucide="flame" class="w-3.5 h-3.5"></i> ${rel.date}
+                        </div>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <div class="space-y-1">
+                            <span class="text-xs font-bold text-purple-400 uppercase tracking-widest">${rel.type}</span>
+                            <h3 class="text-xl font-bold text-white">${rel.title}</h3>
+                            <p class="text-sm text-zinc-400 font-semibold">por <span class="text-white hover:underline cursor-pointer" onclick="openArtistPage('${rel.artist}')">${rel.artist}</span></p>
+                        </div>
+                        <div class="flex items-center justify-between pt-2 border-t border-zinc-800 text-xs text-zinc-400">
+                            <span class="flex items-center gap-1 font-medium text-zinc-300"><i data-lucide="headphones" class="w-4 h-4 text-purple-400"></i> ${rel.streams}</span>
+                            <button onclick="alert('Redirecionando para a plataforma oficial de streaming.')" class="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold transition shadow-md">
+                                ${rel.linkText}
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        // Switch Views
+        function switchView(viewName) {
+            document.getElementById('view-feed').classList.add('hidden');
+            document.getElementById('view-releases').classList.add('hidden');
+            document.getElementById('view-artist').classList.add('hidden');
+
+            document.getElementById('nav-feed').className = 'px-4 py-2 rounded-full text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all';
+            document.getElementById('nav-releases').className = 'px-4 py-2 rounded-full text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all';
+            document.getElementById('nav-artists').className = 'px-4 py-2 rounded-full text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all';
+
+            if (viewName === 'feed') {
+                document.getElementById('view-feed').classList.remove('hidden');
+                document.getElementById('nav-feed').className = 'px-4 py-2 rounded-full bg-zinc-800 text-white transition-all shadow-sm';
+                renderFeed(mediaAcervo);
+            } else if (viewName === 'releases') {
+                document.getElementById('view-releases').classList.remove('hidden');
+                document.getElementById('nav-releases').className = 'px-4 py-2 rounded-full bg-zinc-800 text-white transition-all shadow-sm';
+            } else if (viewName === 'artists') {
+                openArtistPage('The Weeknd');
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Open Dedicated Artist Page (.html like view)
+        function openArtistPage(artistName) {
+            const item = mediaAcervo.find(m => m.artist === artistName) || mediaAcervo[0];
+
+            document.getElementById('artistBanner').src = item.banner;
+            document.getElementById('artistAvatar').src = item.avatar;
+            document.getElementById('artistName').innerText = item.artist;
+            document.getElementById('artistGenre').innerText = `Gênero: ${item.genre} • Acervo Oficial`;
+            document.getElementById('artistBio').innerText = item.bio;
+
+            const artistItems = mediaAcervo.filter(m => m.artist === item.artist);
+            renderFeed(artistItems, 'artistMasonryGrid');
+
+            document.getElementById('view-feed').classList.add('hidden');
+            document.getElementById('view-releases').classList.add('hidden');
+            document.getElementById('view-artist').classList.remove('hidden');
+
+            document.getElementById('nav-artists').className = 'px-4 py-2 rounded-full bg-zinc-800 text-white transition-all shadow-sm';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            lucide.createIcons();
+        }
+
+        // Filter Categories
+        function filterCategory(cat) {
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.className = 'category-btn px-4 py-2 rounded-full text-xs font-semibold bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white transition flex-shrink-0 border border-zinc-800';
+            });
+            event.target.className = 'category-btn px-4 py-2 rounded-full text-xs font-semibold bg-white text-black transition flex-shrink-0 shadow-md';
+
+            if (cat === 'all') {
+                renderFeed(mediaAcervo);
+            } else {
+                const filtered = mediaAcervo.filter(m => m.type === cat);
+                renderFeed(filtered);
+            }
+        }
+
+        // Artist Tab Filter
+        function switchArtistTab(tab) {
+            document.getElementById('art-tab-all').className = 'text-zinc-400 hover:text-white pb-3 transition';
+            document.getElementById('art-tab-capa').className = 'text-zinc-400 hover:text-white pb-3 transition';
+            document.getElementById('art-tab-foto').className = 'text-zinc-400 hover:text-white pb-3 transition';
+            document.getElementById('art-tab-gif').className = 'text-zinc-400 hover:text-white pb-3 transition';
+
+            document.getElementById(`art-tab-${tab}`).className = 'text-white pb-3 border-b-2 border-purple-500 -mb-3 transition';
+
+            const currentArtist = document.getElementById('artistName').innerText;
+            const artistItems = mediaAcervo.filter(m => m.artist === currentArtist);
+
+            if (tab === 'all') {
+                renderFeed(artistItems, 'artistMasonryGrid');
+            } else {
+                const filtered = artistItems.filter(m => m.type === tab);
+                renderFeed(filtered, 'artistMasonryGrid');
+            }
+        }
+
+        // Modal View
+        function openModal(item) {
+            currentMedia = item;
+            document.getElementById('modalImage').src = item.image;
+            document.getElementById('modalAvatar').src = item.avatar;
+            document.getElementById('modalArtist').innerText = item.artist;
+            document.getElementById('modalCategory').innerText = `Acervo • ${item.type.toUpperCase()}`;
+            document.getElementById('modalTitle').innerText = item.title;
+            document.getElementById('modalDesc').innerText = item.desc;
+
+            const tagsContainer = document.getElementById('modalTags');
+            tagsContainer.innerHTML = '';
+            item.tags.forEach(tag => {
+                const t = document.createElement('span');
+                t.className = 'px-3 py-1 bg-zinc-800/80 text-purple-300 text-xs rounded-full font-medium border border-zinc-700/60';
+                t.innerText = `#${tag}`;
+                tagsContainer.appendChild(t);
+            });
+
+            document.getElementById('mediaModal').classList.remove('hidden');
+            document.getElementById('mediaModal').classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('mediaModal').classList.add('hidden');
+            document.getElementById('mediaModal').classList.remove('flex');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Live Search
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const filtered = mediaAcervo.filter(m => 
+                m.title.toLowerCase().includes(query) || 
+                m.artist.toLowerCase().includes(query) || 
+                m.genre.toLowerCase().includes(query) ||
+                m.tags.some(t => t.toLowerCase().includes(query))
+            );
+            renderFeed(filtered);
+            switchView('feed');
+        });
+    </script>
+</body>
+</html>
