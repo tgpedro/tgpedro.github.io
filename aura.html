@@ -279,14 +279,70 @@
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-        // Initialize Lucide Icons
+        // ==========================================
+        // SPOTIFY API CONFIGURATION (PRONTO PARA USO)
+        // ==========================================
+        const SPOTIFY_CREDENTIALS = {
+            clientId: '866fce2636ee446c9563c5fd62a05d23',       // Cole seu Client ID do Spotify aqui
+            clientSecret: '38902d99ce4a4aaa9128d277b2eb12e4' // Cole seu Client Secret do Spotify aqui
+        };
+
+        async function getSpotifyAccessToken() {
+            if (SPOTIFY_CREDENTIALS.clientId === 'SEU_CLIENT_ID_AQUI') {
+                throw new Error("Por favor, insira suas credenciais do Spotify no objeto SPOTIFY_CREDENTIALS.");
+            }
+            
+            const response = await fetch('https://accounts.spotify.com/api/token', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Authorization': 'Basic ' + btoa(SPOTIFY_CREDENTIALS.clientId + ':' + SPOTIFY_CREDENTIALS.clientSecret)
+                },
+                body: 'grant_type=client_credentials'
+            });
+            
+            const data = await response.json();
+            return data.access_token;
+        }
+
+        async function fetchSpotifyWeeklyReleases() {
+            try {
+                const token = await getSpotifyAccessToken();
+                const response = await fetch('https://api.spotify.com/v1/browse/new-releases?limit=6&country=BR', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                const data = await response.json();
+                
+                // Mapeia para o formato do site
+                const apiReleases = data.albums.items.map(album => ({
+                    title: album.name,
+                    artist: album.artists.map(a => a.name).join(', '),
+                    type: album.album_type === 'single' ? 'Single Oficial' : 'Álbum Completo',
+                    date: 'Lançamento recente',
+                    image: album.images[0].url,
+                    streams: 'Disponível no Spotify',
+                    linkText: 'Ouvir no Spotify'
+                }));
+
+                renderDynamicReleases(apiReleases);
+            } catch (error) {
+                console.warn("Modo offline / API não configurada. Usando lançamentos padrão:", error.message);
+                renderReleases(); // Fallback para os dados mockados
+            }
+        }
+        // ==========================================
+
+        // Initialize Lucide Icons & Data
         document.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
             renderFeed(mediaAcervo);
-            renderReleases();
+            
+            // Tenta buscar da API do Spotify (caso as credenciais estejam configuradas, senão usa mock)
+            fetchSpotifyWeeklyReleases();
         });
 
-        // Mock Database: Acervo Oficial de Artistas (Fotos, Capas, GIFs, Bastidores)
+        // Mock Database: Acervo Oficial de Artistas
         const mediaAcervo = [
             {
                 id: 1,
@@ -394,7 +450,7 @@
             }
         ];
 
-        // Top Lançamentos da Semana Data
+        // Top Lançamentos da Semana Fallback Data
         const releasesData = [
             {
                 title: "Hurry Up Tomorrow (Album)",
@@ -403,7 +459,7 @@
                 date: "Lançado esta semana",
                 image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&q=80&w=800",
                 streams: "48.2M streams no dia de estreia",
-                linkText: "Ouvir no Spotify / Apple Music"
+                linkText: "Ouvir no Spotify"
             },
             {
                 title: "Training Season (Remixes EP)",
@@ -412,7 +468,7 @@
                 date: "Lançado há 3 dias",
                 image: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&q=80&w=800",
                 streams: "19.5M streams",
-                linkText: "Ouvir no Spotify / Apple Music"
+                linkText: "Ouvir no Spotify"
             },
             {
                 title: "TO JACKSONVILLE (Single & Video)",
@@ -470,7 +526,7 @@
                                     <img src="${item.avatar}" alt="${item.artist}" class="w-5 h-5 rounded-full object-cover">
                                     <span class="text-xs text-zinc-400 hover:text-white transition font-medium">${item.artist}</span>
                                 </div>
-                                <span class="text-[10px] text-zinc-500 font-semibold uppercase">${item.genre}</span>
+                                <span class="text-[10px] text-zinc-500 font-semibold uppercase">${item.genre || 'Music'}</span>
                             </div>
                         </div>
                     </div>
@@ -480,12 +536,16 @@
             lucide.createIcons();
         }
 
-        // Render Top Lançamentos
+        // Render Top Lançamentos (Fallback or Mock)
         function renderReleases() {
+            renderDynamicReleases(releasesData);
+        }
+
+        function renderDynamicReleases(releases) {
             const container = document.getElementById('releasesGrid');
             container.innerHTML = '';
 
-            releasesData.forEach(rel => {
+            releases.forEach(rel => {
                 const card = document.createElement('div');
                 card.className = 'bg-zinc-900 border border-zinc-800 rounded-3xl overflow-hidden flex flex-col justify-between group hover:border-purple-500/50 transition shadow-xl';
                 card.innerHTML = `
@@ -600,13 +660,13 @@
             document.getElementById('modalImage').src = item.image;
             document.getElementById('modalAvatar').src = item.avatar;
             document.getElementById('modalArtist').innerText = item.artist;
-            document.getElementById('modalCategory').innerText = `Acervo • ${item.type.toUpperCase()}`;
+            document.getElementById('modalCategory').innerText = `Acervo • ${(item.type || 'Media').toUpperCase()}`;
             document.getElementById('modalTitle').innerText = item.title;
-            document.getElementById('modalDesc').innerText = item.desc;
+            document.getElementById('modalDesc').innerText = item.desc || 'Material oficial de divulgação e acervo do artista.';
 
             const tagsContainer = document.getElementById('modalTags');
             tagsContainer.innerHTML = '';
-            item.tags.forEach(tag => {
+            (item.tags || ['Music', 'Artist']).forEach(tag => {
                 const t = document.createElement('span');
                 t.className = 'px-3 py-1 bg-zinc-800/80 text-purple-300 text-xs rounded-full font-medium border border-zinc-700/60';
                 t.innerText = `#${tag}`;
@@ -630,8 +690,8 @@
             const filtered = mediaAcervo.filter(m => 
                 m.title.toLowerCase().includes(query) || 
                 m.artist.toLowerCase().includes(query) || 
-                m.genre.toLowerCase().includes(query) ||
-                m.tags.some(t => t.toLowerCase().includes(query))
+                (m.genre && m.genre.toLowerCase().includes(query)) ||
+                (m.tags && m.tags.some(t => t.toLowerCase().includes(query)))
             );
             renderFeed(filtered);
             switchView('feed');
