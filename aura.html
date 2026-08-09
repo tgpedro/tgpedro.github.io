@@ -4,21 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VYNL — dê uma nota pra cada disco</title>
-<meta name="description" content="VYNL — avalie álbuns, monte suas crates e veja o que o mundo anda ouvindo.">
+<meta name="description" content="VYNL — avalie álbuns, escreva reviews, monte suas crates.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  /* ============================================================
-     DESIGN TOKENS
-     ink        — fundo principal, quase preto com leve azul
-     charcoal   — superfícies (cards, nav)
-     charcoal-2 — superfícies elevadas / bordas
-     bone       — texto principal, branco quente (cor de papel de encarte)
-     muted      — texto secundário
-     amber      — destaque primário (agulha / VU meter)
-     wine       — destaque secundário (avaliação / ações)
-  ============================================================ */
   :root{
     --ink:#0a0c11;
     --charcoal:#14161e;
@@ -49,26 +39,13 @@
   button{ font-family: inherit; cursor: pointer; }
 
   ::selection{ background: var(--amber); color: var(--ink); }
+  :focus-visible{ outline: 2px solid var(--amber); outline-offset: 3px; }
 
-  :focus-visible{
-    outline: 2px solid var(--amber);
-    outline-offset: 3px;
-  }
+  .wrap{ max-width: 1180px; margin: 0 auto; padding: 0 28px; }
 
-  .wrap{
-    max-width: 1180px;
-    margin: 0 auto;
-    padding: 0 28px;
-  }
-
-  /* ---------- background texture ---------- */
   body::before{
     content:"";
-    position: fixed;
-    inset:0;
-    pointer-events:none;
-    z-index:0;
-    opacity:0.5;
+    position: fixed; inset:0; pointer-events:none; z-index:0; opacity:0.5;
     background-image:
       radial-gradient(circle at 15% 8%, rgba(232,163,61,0.07), transparent 40%),
       radial-gradient(circle at 85% 30%, rgba(193,65,106,0.06), transparent 45%);
@@ -78,308 +55,152 @@
      NAV
   ============================================================ */
   .nav{
-    position: sticky;
-    top:0;
-    z-index: 60;
-    display:flex;
-    align-items:center;
-    justify-content: space-between;
-    gap: 24px;
+    position: sticky; top:0; z-index: 60;
+    display:flex; align-items:center; justify-content: space-between; gap: 24px;
     padding: 18px 28px;
     background: rgba(10,12,17,0.82);
     backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--line);
   }
   .logo{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    font-family: var(--font-display);
-    font-weight: 900;
-    font-size: 1.5rem;
-    letter-spacing: 0.02em;
-    color: var(--bone);
-    white-space: nowrap;
+    display:flex; align-items:center; gap:10px;
+    font-family: var(--font-display); font-weight: 900; font-size: 1.5rem;
+    letter-spacing: 0.02em; color: var(--bone); white-space: nowrap;
   }
   .logo .disc{
     width: 26px; height:26px; border-radius:50%;
     background: conic-gradient(from 90deg, var(--amber), var(--wine), var(--amber));
-    position: relative;
-    flex-shrink:0;
+    position: relative; flex-shrink:0;
   }
-  .logo .disc::after{
-    content:"";
-    position:absolute; inset:38%;
-    background: var(--ink);
-    border-radius:50%;
-  }
-  .nav-links{
-    display:flex;
-    gap: 28px;
-    font-size: 0.92rem;
-    font-weight: 600;
-    color: var(--muted);
-    flex:1;
-    justify-content:center;
-  }
+  .logo .disc::after{ content:""; position:absolute; inset:38%; background: var(--ink); border-radius:50%; }
+  .nav-links{ display:flex; gap: 26px; font-size: 0.92rem; font-weight: 600; color: var(--muted); flex:1; justify-content:center; }
   .nav-links a{ transition: color 0.2s; padding: 4px 0; border-bottom: 2px solid transparent; }
   .nav-links a:hover{ color: var(--bone); border-color: var(--amber); }
 
   .nav-actions{ display:flex; align-items:center; gap:14px; }
   .search-pill{
     display:flex; align-items:center; gap:8px;
-    background: var(--charcoal);
-    border: 1px solid var(--line);
-    border-radius: 100px;
-    padding: 8px 14px;
-    color: var(--muted);
-    font-size: 0.85rem;
+    background: var(--charcoal); border: 1px solid var(--line); border-radius: 100px;
+    padding: 8px 14px; color: var(--muted); font-size: 0.85rem;
   }
-  .search-pill svg{ width:14px; height:14px; opacity:0.7; }
-  .btn{
-    border:none;
-    border-radius: 100px;
-    padding: 9px 18px;
-    font-weight: 700;
-    font-size: 0.85rem;
-    transition: transform 0.15s ease, opacity 0.15s ease;
+  .search-pill svg{ width:14px; height:14px; opacity:0.7; flex-shrink:0; }
+  .search-pill input{
+    background:none; border:none; outline:none; color: var(--bone); font: inherit; font-size:0.85rem; width:150px;
   }
+  .search-pill input::placeholder{ color: var(--muted); }
+
+  .btn{ border:none; border-radius: 100px; padding: 9px 18px; font-weight: 700; font-size: 0.85rem; transition: transform 0.15s ease, opacity 0.15s ease; }
   .btn:hover{ transform: translateY(-1px); }
   .btn-ghost{ background: transparent; color: var(--bone); border: 1px solid var(--line); }
   .btn-ghost:hover{ border-color: var(--amber); }
   .btn-solid{ background: var(--amber); color: #241703; }
   .btn-solid:hover{ opacity:0.9; }
   .user-chip{
-    display:none;
-    align-items:center; gap:8px;
-    background: var(--charcoal-2);
-    border-radius: 100px;
-    padding: 6px 14px 6px 6px;
-    font-size:0.85rem;
-    font-weight:600;
+    display:none; align-items:center; gap:8px;
+    background: var(--charcoal-2); border-radius: 100px; padding: 6px 14px 6px 6px; font-size:0.85rem; font-weight:600;
+    cursor:pointer;
   }
   .user-chip .av{
     width:26px; height:26px; border-radius:50%;
     background: linear-gradient(135deg, var(--wine), var(--amber));
     display:flex; align-items:center; justify-content:center;
-    font-family: var(--font-mono); font-size:0.75rem; font-weight:700;
-    color: var(--ink);
+    font-family: var(--font-mono); font-size:0.75rem; font-weight:700; color: var(--ink);
   }
 
-  /* ---------- ticker ---------- */
-  .ticker-bar{
-    border-bottom: 1px solid var(--line);
-    background: var(--charcoal);
-    overflow:hidden;
-    white-space: nowrap;
-    padding: 7px 0;
-  }
+  .ticker-bar{ border-bottom: 1px solid var(--line); background: var(--charcoal); overflow:hidden; white-space: nowrap; padding: 7px 0; }
   .ticker-track{
-    display:inline-flex;
-    gap: 40px;
-    animation: scrollTicker 32s linear infinite;
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    color: var(--muted);
-    letter-spacing: 0.02em;
+    display:inline-flex; gap: 40px; animation: scrollTicker 32s linear infinite;
+    font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); letter-spacing: 0.02em;
   }
   .ticker-track span{ color: var(--amber-dim); }
-  @keyframes scrollTicker{
-    from{ transform: translateX(0); }
-    to{ transform: translateX(-50%); }
-  }
+  @keyframes scrollTicker{ from{ transform: translateX(0); } to{ transform: translateX(-50%); } }
 
   /* ============================================================
      HERO
   ============================================================ */
   .hero{
     position:relative; z-index:1;
-    display:grid;
-    grid-template-columns: 1.1fr 0.9fr;
-    gap: 56px;
-    align-items:center;
-    padding: 88px 28px 80px;
-    max-width: 1180px;
-    margin: 0 auto;
+    display:grid; grid-template-columns: 1.1fr 0.9fr; gap: 56px; align-items:center;
+    padding: 88px 28px 80px; max-width: 1180px; margin: 0 auto;
   }
-  .eyebrow{
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--amber);
-    margin: 0 0 18px;
-  }
-  .hero h1{
-    font-family: var(--font-display);
-    font-weight: 900;
-    font-size: clamp(2.4rem, 5vw, 3.9rem);
-    line-height: 1.05;
-    margin: 0 0 22px;
-    letter-spacing: -0.01em;
-  }
-  .hero h1 em{
-    font-style: italic;
-    font-weight: 500;
-    color: var(--wine);
-  }
-  .hero p{
-    font-size: 1.08rem;
-    color: var(--muted);
-    max-width: 46ch;
-    line-height: 1.6;
-    margin: 0 0 34px;
-  }
+  .eyebrow{ font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--amber); margin: 0 0 18px; }
+  .hero h1{ font-family: var(--font-display); font-weight: 900; font-size: clamp(2.4rem, 5vw, 3.9rem); line-height: 1.05; margin: 0 0 22px; letter-spacing: -0.01em; }
+  .hero h1 em{ font-style: italic; font-weight: 500; color: var(--wine); }
+  .hero p{ font-size: 1.08rem; color: var(--muted); max-width: 46ch; line-height: 1.6; margin: 0 0 34px; }
   .hero-ctas{ display:flex; gap:14px; flex-wrap:wrap; }
   .btn-lg{ padding: 14px 26px; font-size:0.95rem; }
 
-  /* ---------- spinning disc centerpiece ---------- */
-  .disc-stage{
-    position:relative;
-    display:flex; align-items:center; justify-content:center;
-    height: 420px;
-  }
+  .disc-stage{ position:relative; display:flex; align-items:center; justify-content:center; height: 420px; }
   .platter{
-    position:absolute;
-    width: 360px; height:360px;
-    border-radius:50%;
+    position:absolute; width: 360px; height:360px; border-radius:50%;
     background: repeating-radial-gradient(circle at center, #05060a 0 2px, #0d0f15 2px 4px);
     box-shadow: 0 30px 80px -20px rgba(0,0,0,0.7), inset 0 0 0 1px var(--line);
   }
-  .record{
-    position:relative;
-    width: 300px; height:300px;
-    border-radius:50%;
-    animation: spin 6s linear infinite;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-  }
+  .record{ position:relative; width: 300px; height:300px; border-radius:50%; animation: spin 6s linear infinite; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
   @media (prefers-reduced-motion: reduce){ .record{ animation: none; } }
   @keyframes spin{ to{ transform: rotate(360deg); } }
-  .record .sleeve-art{
-    position:absolute; inset:0; border-radius:50%; overflow:hidden;
-  }
-  .record .grooves{
-    position:absolute; inset:26px; border-radius:50%;
-    background: repeating-radial-gradient(circle at center, rgba(0,0,0,0.35) 0 1px, transparent 1px 5px);
-  }
-  .record .label{
-    position:absolute; inset:38%; border-radius:50%;
-    background: var(--ink);
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    text-align:center;
-    border: 2px solid rgba(243,239,228,0.12);
-  }
+  .record .sleeve-art{ position:absolute; inset:0; border-radius:50%; overflow:hidden; }
+  .record .grooves{ position:absolute; inset:26px; border-radius:50%; background: repeating-radial-gradient(circle at center, rgba(0,0,0,0.35) 0 1px, transparent 1px 5px); }
+  .record .label{ position:absolute; inset:38%; border-radius:50%; background: var(--ink); display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; border: 2px solid rgba(243,239,228,0.12); }
   .record .label .t{ font-family: var(--font-display); font-weight:700; font-size:0.72rem; }
   .record .label .a{ font-family: var(--font-mono); font-size:0.55rem; color: var(--muted); margin-top:2px; }
-  .record .hole{
-    position:absolute; inset:47%; border-radius:50%; background: var(--ink);
-    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.6);
-  }
-  .tonearm{
-    position:absolute;
-    top: 10px; right: -6px;
-    width: 130px; height: 130px;
-    transform-origin: 90% 10%;
-    transform: rotate(-18deg);
-    transition: transform 0.6s cubic-bezier(.4,1.4,.4,1);
-    z-index:5;
-  }
+  .record .hole{ position:absolute; inset:47%; border-radius:50%; background: var(--ink); box-shadow: inset 0 0 0 1px rgba(0,0,0,0.6); }
+  .tonearm{ position:absolute; top: 10px; right: -6px; width: 130px; height: 130px; transform-origin: 90% 10%; transform: rotate(-18deg); transition: transform 0.6s cubic-bezier(.4,1.4,.4,1); z-index:5; }
   .disc-stage:hover .tonearm{ transform: rotate(2deg); }
   .tonearm svg{ width:100%; height:100%; overflow:visible; }
   .now-spinning{
     position:absolute; bottom: -6px; left:50%; transform: translateX(-50%);
-    background: var(--charcoal);
-    border: 1px solid var(--line);
-    padding: 8px 18px;
-    border-radius: 100px;
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    color: var(--muted);
-    white-space:nowrap;
+    background: var(--charcoal); border: 1px solid var(--line); padding: 8px 18px; border-radius: 100px;
+    font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); white-space:nowrap;
   }
   .now-spinning b{ color: var(--bone); font-weight:600; }
 
   /* ============================================================
      SECTIONS shared
   ============================================================ */
+  [data-view]{ position:relative; z-index:1; }
   section{ position: relative; z-index:1; padding: 64px 0; }
-  .section-head{
-    display:flex; align-items:flex-end; justify-content:space-between;
-    gap: 20px;
-    margin-bottom: 32px;
-    flex-wrap:wrap;
-  }
-  .section-head h2{
-    font-family: var(--font-display);
-    font-size: clamp(1.6rem, 3vw, 2.2rem);
-    font-weight: 700;
-    margin:0;
-  }
+  .page-pad{ padding: 56px 0 96px; }
+  .section-head{ display:flex; align-items:flex-end; justify-content:space-between; gap: 20px; margin-bottom: 32px; flex-wrap:wrap; }
+  .section-head h2{ font-family: var(--font-display); font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 700; margin:0; }
   .section-head .sub{ color: var(--muted); font-size:0.92rem; margin-top:6px; }
-  .section-link{
-    font-size:0.82rem; font-weight:700; color: var(--amber);
-    display:flex; align-items:center; gap:6px;
-    border-bottom: 1px solid transparent;
-  }
+  .section-link{ font-size:0.82rem; font-weight:700; color: var(--amber); display:flex; align-items:center; gap:6px; border-bottom: 1px solid transparent; }
   .section-link:hover{ border-color: var(--amber); }
+  .reviews-title{ font-family: var(--font-display); font-size:1.4rem; font-weight:700; margin: 0 0 18px; }
+  .back-link{ display:inline-block; margin-bottom:26px; color: var(--muted); font-size:0.85rem; }
+  .back-link:hover{ color: var(--amber); }
+  .empty-state{ color: var(--muted); font-size:0.88rem; padding:18px 0; line-height:1.6; }
+  .empty-state a{ color: var(--amber); font-weight:600; }
 
   .reveal{ opacity:0; transform: translateY(22px); transition: opacity 0.7s ease, transform 0.7s ease; }
   .reveal.in{ opacity:1; transform:none; }
   @media (prefers-reduced-motion: reduce){ .reveal{ opacity:1; transform:none; transition:none; } }
 
-  /* ---------- shelf (new releases) ---------- */
-  .shelf{
-    display:flex; gap:20px;
-    overflow-x:auto;
-    padding: 6px 4px 26px;
-    scroll-snap-type: x proximity;
-  }
+  /* ---------- shelf / grid of cards ---------- */
+  .shelf{ display:flex; gap:20px; overflow-x:auto; padding: 6px 4px 26px; scroll-snap-type: x proximity; }
   .shelf::-webkit-scrollbar{ height:6px; }
   .shelf::-webkit-scrollbar-thumb{ background: var(--charcoal-2); border-radius:10px; }
+  .grid-cards{ display:grid; grid-template-columns: repeat(auto-fill, minmax(170px,1fr)); gap: 26px 20px; }
 
-  .card{
-    flex: 0 0 210px;
-    scroll-snap-align:start;
-  }
+  .card{ flex: 0 0 210px; scroll-snap-align:start; }
+  .card-link{ display:block; color:inherit; text-decoration:none; }
   .cover{
-    position:relative;
-    width:100%; aspect-ratio:1/1;
-    border-radius: 10px;
-    overflow:hidden;
-    margin-bottom:14px;
-    box-shadow: 0 14px 30px -14px rgba(0,0,0,0.7);
-    isolation:isolate;
+    position:relative; width:100%; aspect-ratio:1/1; border-radius: 10px; overflow:hidden; margin-bottom:14px;
+    box-shadow: 0 14px 30px -14px rgba(0,0,0,0.7); isolation:isolate;
   }
   .cover .grain{
     position:absolute; inset:0;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
-    mix-blend-mode: overlay;
-    opacity:0.5;
+    mix-blend-mode: overlay; opacity:0.5;
   }
-  .cover .mark{
-    position:absolute; inset:0;
-    display:flex; align-items:flex-end;
-    padding: 14px;
-  }
-  .cover .mark .glyph{
-    font-family: var(--font-display);
-    font-weight:900;
-    font-size: 3.4rem;
-    color: rgba(255,255,255,0.85);
-    line-height:1;
-  }
+  .cover .mark{ position:absolute; inset:0; display:flex; align-items:flex-end; padding: 14px; }
+  .cover .mark .glyph{ font-family: var(--font-display); font-weight:900; font-size: 3.4rem; color: rgba(255,255,255,0.85); line-height:1; }
   .card-title{ font-weight:700; font-size:0.94rem; margin: 0 0 2px; }
   .card-artist{ color: var(--muted); font-size: 0.82rem; margin:0 0 10px; }
 
-  /* ---------- star rating widget ---------- */
+  /* ---------- stars ---------- */
   .stars{ display:inline-flex; gap:2px; }
-  .stars button{
-    background:none; border:none; padding:0;
-    font-size: 1.05rem;
-    line-height:1;
-    color: var(--charcoal-2);
-    transition: color 0.12s, transform 0.12s;
-  }
+  .stars button{ background:none; border:none; padding:0; font-size: 1.05rem; line-height:1; color: var(--charcoal-2); transition: color 0.12s, transform 0.12s; }
   .stars button.on{ color: var(--amber); }
   .stars button:hover{ transform: scale(1.15); }
   .stars.readonly button{ pointer-events:none; }
@@ -388,148 +209,103 @@
 
   /* ---------- chart / ranking ---------- */
   .chart-list{ display:flex; flex-direction:column; border-top:1px solid var(--line); }
-  .chart-row{
-    display:grid;
-    grid-template-columns: 56px 52px 1fr auto auto;
-    align-items:center;
-    gap:18px;
-    padding: 16px 10px;
-    border-bottom: 1px solid var(--line);
-    transition: background 0.2s;
-  }
+  .chart-row{ display:grid; grid-template-columns: 56px 52px 1fr auto auto; align-items:center; gap:18px; padding: 16px 10px; border-bottom: 1px solid var(--line); transition: background 0.2s; }
   .chart-row:hover{ background: rgba(243,239,228,0.03); }
-  .matrix{
-    font-family: var(--font-mono);
-    font-weight:600;
-    font-size:0.85rem;
-    color: var(--amber-dim);
-    letter-spacing:0.02em;
-  }
-  .mini-cover{
-    width:52px; height:52px; border-radius:6px;
-    position:relative; overflow:hidden;
-    flex-shrink:0;
-  }
-  .mini-cover .glyph{
-    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-    font-family: var(--font-display); font-weight:900; font-size:1.3rem; color: rgba(255,255,255,0.85);
-  }
+  .row-link{ display:contents; color:inherit; text-decoration:none; }
+  .matrix{ font-family: var(--font-mono); font-weight:600; font-size:0.85rem; color: var(--amber-dim); letter-spacing:0.02em; }
+  .mini-cover{ width:52px; height:52px; border-radius:6px; position:relative; overflow:hidden; flex-shrink:0; }
+  .mini-cover .glyph{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family: var(--font-display); font-weight:900; font-size:1.3rem; color: rgba(255,255,255,0.85); }
   .row-meta .t{ font-weight:700; font-size:0.95rem; }
   .row-meta .a{ color: var(--muted); font-size:0.82rem; }
-  .tag{
-    font-family: var(--font-mono);
-    font-size:0.65rem;
-    color: var(--muted);
-    border: 1px solid var(--line);
-    padding: 2px 8px;
-    border-radius: 100px;
-    display:inline-block;
-    margin-top:4px;
-  }
-  .row-stat{
-    display:flex; flex-direction:column; align-items:flex-end; gap:4px;
-  }
+  .tag{ font-family: var(--font-mono); font-size:0.65rem; color: var(--muted); border: 1px solid var(--line); padding: 2px 8px; border-radius: 100px; display:inline-block; margin-top:4px; }
+  .row-stat{ display:flex; flex-direction:column; align-items:flex-end; gap:4px; }
   .avg-stars{ font-size:0.85rem; letter-spacing:1px; }
   .spins{ font-family: var(--font-mono); font-size:0.68rem; color: var(--muted); }
-
-  @media (max-width: 720px){
-    .chart-row{ grid-template-columns: 34px 42px 1fr; }
-    .row-stat:last-child{ display:none; }
-  }
+  @media (max-width: 720px){ .chart-row{ grid-template-columns: 34px 42px 1fr; } .row-stat:last-child{ display:none; } }
 
   /* ---------- crates ---------- */
-  .crates-grid{
-    display:grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 22px;
-  }
+  .crates-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
   @media (max-width: 900px){ .crates-grid{ grid-template-columns: 1fr; } }
-  .crate{
-    background: var(--charcoal);
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    padding: 20px;
-    transition: border-color 0.2s, transform 0.2s;
-  }
+  .crate{ background: var(--charcoal); border: 1px solid var(--line); border-radius: 14px; padding: 20px; transition: border-color 0.2s, transform 0.2s; position:relative; }
   .crate:hover{ border-color: var(--amber-dim); transform: translateY(-3px); }
-  .crate-collage{
-    display:grid; grid-template-columns: repeat(4,1fr); gap:4px;
-    margin-bottom:16px; border-radius:8px; overflow:hidden;
-  }
-  .crate-collage div{ aspect-ratio:1/1; }
+  .crate-collage{ display:grid; grid-template-columns: repeat(4,1fr); gap:4px; margin-bottom:16px; border-radius:8px; overflow:hidden; }
+  .crate-collage div{ aspect-ratio:1/1; background: var(--charcoal-2); }
   .crate h3{ font-family: var(--font-display); font-size:1.1rem; margin: 0 0 4px; }
   .crate p{ color: var(--muted); font-size:0.82rem; margin:0 0 10px; }
   .crate .by{ font-family: var(--font-mono); font-size:0.68rem; color: var(--amber-dim); }
+  .crate-del{ position:absolute; top:14px; right:14px; background:none; border:none; color: var(--muted); font-size:1.1rem; }
+  .crate-del:hover{ color: var(--wine); }
+
+  /* ---------- album page ---------- */
+  .album-hero{ display:grid; grid-template-columns: 300px 1fr; gap:44px; margin-bottom:56px; }
+  @media (max-width: 720px){ .album-hero{ grid-template-columns: 1fr; } }
+  .cover-lg{ position:relative; width:100%; aspect-ratio:1/1; border-radius:16px; overflow:hidden; box-shadow:0 24px 60px -20px rgba(0,0,0,0.7); isolation:isolate; }
+  .cover-lg .mark{ padding:22px; }
+  .cover-lg .mark .glyph{ font-size:5rem; }
+  .album-hero h1{ font-family: var(--font-display); font-weight: 800; font-size: clamp(2rem, 4vw, 2.8rem); margin: 4px 0 6px; line-height:1.05; }
+  .album-hero .meta{ color: var(--muted); font-size: 1rem; margin: 0 0 6px; }
+  .stat-pills{ display:flex; gap:10px; flex-wrap:wrap; margin:20px 0 6px; }
+  .stat-pill{ background: var(--charcoal); border: 1px solid var(--line); border-radius:12px; padding:10px 16px; font-size:0.72rem; color: var(--muted); text-align:left; min-width:96px; }
+  .stat-pill b{ display:block; font-family: var(--font-display); font-weight:700; font-size:1.4rem; color: var(--amber); }
+
+  #reviewText{
+    width:100%; background: var(--ink); border:1px solid var(--line); border-radius:10px; padding:12px 14px;
+    color: var(--bone); font-family: inherit; font-size:0.88rem; resize:vertical;
+  }
+  #reviewText:focus{ outline:none; border-color: var(--amber); }
+  .review-card{ border-top:1px solid var(--line); padding:18px 0; }
+  .review-card .head{ display:flex; justify-content:space-between; gap:12px; margin-bottom:4px; }
+  .review-card .user{ font-weight:700; font-size:0.88rem; }
+  a.user:hover{ color: var(--amber); }
+  .review-card .date{ color: var(--muted); font-size:0.72rem; font-family: var(--font-mono); }
+  .stars-mini{ color: var(--amber); font-size:0.82rem; letter-spacing:1px; }
+  .review-card p{ margin:8px 0 0; font-size:0.88rem; line-height:1.6; color: var(--bone); opacity:0.92; }
+
+  /* ---------- dashboard ---------- */
+  .dash-header{ display:flex; align-items:center; gap:18px; margin-bottom:20px; }
+  .av-lg{ width:64px; height:64px; border-radius:50%; background: linear-gradient(135deg,var(--wine),var(--amber)); display:flex; align-items:center; justify-content:center; font-family: var(--font-mono); font-weight:700; font-size:1.5rem; color: var(--ink); flex-shrink:0; }
+  .dash-header h1{ font-family: var(--font-display); margin:0; font-size:1.9rem; }
+  .crate-manage{ display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap; }
+  .crate-manage .field{ margin-bottom:0; }
+  .crate-manage input, .crate-manage select{ min-width:210px; }
+
+  /* ---------- form fields (reused by modal + dashboard) ---------- */
+  .field{ margin-bottom:14px; }
+  .field label{ display:block; font-size:0.75rem; color: var(--muted); margin-bottom:6px; }
+  .field input, .field select{ width:100%; background: var(--ink); border:1px solid var(--line); border-radius:8px; padding: 11px 12px; color: var(--bone); font-size:0.9rem; font-family:inherit; }
+  .field input:focus, .field select:focus{ outline:none; border-color: var(--amber); }
 
   /* ---------- footer ---------- */
-  footer{
-    border-top: 1px solid var(--line);
-    padding: 48px 0 32px;
-    position:relative; z-index:1;
-  }
-  .foot-grid{
-    display:flex; justify-content:space-between; align-items:flex-start; gap:24px; flex-wrap:wrap;
-  }
+  footer{ border-top: 1px solid var(--line); padding: 48px 0 32px; position:relative; z-index:1; }
+  .foot-grid{ display:flex; justify-content:space-between; align-items:flex-start; gap:24px; flex-wrap:wrap; }
   .foot-cols{ display:flex; gap:60px; flex-wrap:wrap; }
   .foot-col h4{ font-size:0.78rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--muted); margin:0 0 12px; }
   .foot-col a{ display:block; font-size:0.86rem; margin-bottom:8px; color: var(--bone); opacity:0.85; }
   .foot-col a:hover{ opacity:1; color: var(--amber); }
-  .foot-bottom{
-    margin-top:40px; padding-top:20px; border-top:1px solid var(--line);
-    display:flex; justify-content:space-between; color: var(--muted); font-size:0.78rem; flex-wrap:wrap; gap:10px;
-  }
+  .foot-bottom{ margin-top:40px; padding-top:20px; border-top:1px solid var(--line); display:flex; justify-content:space-between; color: var(--muted); font-size:0.78rem; flex-wrap:wrap; gap:10px; }
 
   /* ============================================================
      MODAL (login / signup)
   ============================================================ */
-  .modal-backdrop{
-    position:fixed; inset:0; background: rgba(6,7,10,0.72);
-    backdrop-filter: blur(4px);
-    display:none; align-items:center; justify-content:center;
-    z-index:100; padding:20px;
-  }
+  .modal-backdrop{ position:fixed; inset:0; background: rgba(6,7,10,0.72); backdrop-filter: blur(4px); display:none; align-items:center; justify-content:center; z-index:100; padding:20px; }
   .modal-backdrop.open{ display:flex; }
-  .modal{
-    background: var(--charcoal);
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    width: 100%; max-width: 400px;
-    padding: 30px;
-    position:relative;
-  }
-  .modal-close{
-    position:absolute; top:16px; right:16px;
-    background:none; border:none; color: var(--muted); font-size:1.3rem;
-  }
+  .modal{ background: var(--charcoal); border: 1px solid var(--line); border-radius: 16px; width: 100%; max-width: 400px; padding: 30px; position:relative; }
+  .modal-close{ position:absolute; top:16px; right:16px; background:none; border:none; color: var(--muted); font-size:1.3rem; }
   .modal-tabs{ display:flex; gap:4px; background: var(--ink); border-radius:100px; padding:4px; margin-bottom:24px; }
-  .modal-tabs button{
-    flex:1; background:none; border:none; padding:9px; border-radius:100px;
-    color: var(--muted); font-weight:700; font-size:0.82rem;
-  }
+  .modal-tabs button{ flex:1; background:none; border:none; padding:9px; border-radius:100px; color: var(--muted); font-weight:700; font-size:0.82rem; }
   .modal-tabs button.active{ background: var(--amber); color:#241703; }
   .modal h3{ font-family: var(--font-display); font-size:1.4rem; margin:0 0 6px; }
   .modal .lead{ color: var(--muted); font-size:0.85rem; margin:0 0 22px; }
-  .field{ margin-bottom:14px; }
-  .field label{ display:block; font-size:0.75rem; color: var(--muted); margin-bottom:6px; }
-  .field input{
-    width:100%; background: var(--ink); border:1px solid var(--line);
-    border-radius:8px; padding: 11px 12px; color: var(--bone); font-size:0.9rem;
-  }
-  .field input:focus{ outline:none; border-color: var(--amber); }
   .modal .btn-solid{ width:100%; padding:12px; margin-top:6px; }
   .modal-note{ font-size:0.7rem; color: var(--muted); margin-top:16px; line-height:1.5; }
 
   .toast{
     position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
-    background: var(--bone); color: var(--ink);
-    padding: 13px 22px; border-radius: 10px;
-    font-weight:600; font-size:0.85rem;
-    opacity:0; pointer-events:none; transition: opacity 0.3s, transform 0.3s;
-    z-index:200;
+    background: var(--bone); color: var(--ink); padding: 13px 22px; border-radius: 10px; font-weight:600; font-size:0.85rem;
+    opacity:0; pointer-events:none; transition: opacity 0.3s, transform 0.3s; z-index:200; max-width:90vw; text-align:center;
   }
   .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
 
-  /* ---------- responsive ---------- */
   @media (max-width: 900px){
     .hero{ grid-template-columns: 1fr; padding-top:56px; }
     .disc-stage{ height:280px; order:-1; }
@@ -540,7 +316,7 @@
   @media (max-width: 520px){
     .nav{ padding:14px 18px; }
     .wrap, .hero{ padding-left:18px; padding-right:18px; }
-    .search-pill{ display:none; }
+    .search-pill input{ width:90px; }
   }
 </style>
 </head>
@@ -548,20 +324,21 @@
 
 <!-- ============ NAV ============ -->
 <nav class="nav">
-  <div class="logo"><span class="disc"></span>VYNL</div>
+  <a class="logo" href="#/"><span class="disc"></span>VYNL</a>
   <div class="nav-links">
-    <a href="#novidades">Prensagens da semana</a>
-    <a href="#chart">A parada</a>
-    <a href="#crates">Crates</a>
+    <a href="#novidades" data-scroll>Prensagens da semana</a>
+    <a href="#chart" data-scroll>A parada</a>
+    <a href="#crates" data-scroll>Crates</a>
+    <a href="#/dashboard">Minha estante</a>
   </div>
   <div class="nav-actions">
-    <div class="search-pill">
+    <form class="search-pill" id="searchForm">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-      Buscar álbum, artista...
-    </div>
+      <input type="text" id="searchInput" placeholder="Buscar álbum, artista..." autocomplete="off">
+    </form>
     <button class="btn btn-ghost" id="openLogin">Entrar</button>
     <button class="btn btn-solid" id="openSignup">Criar conta</button>
-    <div class="user-chip" id="userChip"><span class="av" id="userAv">?</span><span id="userName"></span></div>
+    <a class="user-chip" id="userChip" href="#/dashboard"><span class="av" id="userAv">?</span><span id="userName"></span></a>
   </div>
 </nav>
 
@@ -569,92 +346,112 @@
   <div class="ticker-track" id="tickerTrack"></div>
 </div>
 
-<!-- ============ HERO ============ -->
-<header class="hero">
-  <div>
-    <p class="eyebrow">Sua estante, em forma de site</p>
-    <h1>Todo disco<br>merece um <em>veredito</em>.</h1>
-    <p>Dê nota de 1 a 5 estrelas pra cada álbum que você ouvir, monte suas crates e descubra o que o resto do mundo anda girando antes de virar unanimidade.</p>
-    <div class="hero-ctas">
-      <button class="btn btn-solid btn-lg" id="heroSignup">Começar a avaliar</button>
-      <a href="#chart" class="btn btn-ghost btn-lg">Ver a parada →</a>
-    </div>
-  </div>
-  <div class="disc-stage">
-    <div class="platter"></div>
-    <div class="record" id="heroRecord">
-      <div class="sleeve-art" id="heroSleeve" data-cover="6"></div>
-      <div class="grooves"></div>
-      <div class="label">
-        <div class="t" id="heroLabelTitle">SOS</div>
-        <div class="a" id="heroLabelArtist">SZA</div>
-      </div>
-      <div class="hole"></div>
-    </div>
-    <div class="tonearm">
-      <svg viewBox="0 0 130 130">
-        <line x1="118" y1="14" x2="30" y2="76" stroke="#d8d5c8" stroke-width="4" stroke-linecap="round"/>
-        <circle cx="118" cy="14" r="9" fill="#d8d5c8"/>
-        <circle cx="30" cy="76" r="4" fill="#e8a33d"/>
-      </svg>
-    </div>
-    <div class="now-spinning">tocando agora — <b id="heroNowText">SOS · SZA</b></div>
-  </div>
-</header>
+<!-- ============ HOME ============ -->
+<div data-view="home">
 
-<!-- ============ NEW RELEASES ============ -->
-<section id="novidades">
-  <div class="wrap">
-    <div class="section-head reveal">
-      <div>
-        <h2>Prensagens da semana</h2>
-        <div class="sub">O que acabou de sair da fábrica e já está pedindo nota.</div>
+  <header class="hero">
+    <div>
+      <p class="eyebrow">Sua estante, em forma de site</p>
+      <h1>Todo disco<br>merece um <em>veredito</em>.</h1>
+      <p>Dê nota de 1 a 5 estrelas pra cada álbum que você ouvir, escreva reviews, monte suas crates e descubra o que o resto do mundo anda girando antes de virar unanimidade.</p>
+      <div class="hero-ctas">
+        <button class="btn btn-solid btn-lg" id="heroSignup">Começar a avaliar</button>
+        <a href="#chart" class="btn btn-ghost btn-lg" data-scroll>Ver a parada →</a>
       </div>
-      <a href="#" class="section-link">Ver calendário completo →</a>
     </div>
-    <div class="shelf reveal" id="shelf"></div>
-  </div>
-</section>
+    <div class="disc-stage">
+      <div class="platter"></div>
+      <div class="record" id="heroRecord">
+        <div class="sleeve-art" id="heroSleeve" data-cover="6"></div>
+        <div class="grooves"></div>
+        <div class="label">
+          <div class="t" id="heroLabelTitle">SOS</div>
+          <div class="a" id="heroLabelArtist">SZA</div>
+        </div>
+        <div class="hole"></div>
+      </div>
+      <div class="tonearm">
+        <svg viewBox="0 0 130 130">
+          <line x1="118" y1="14" x2="30" y2="76" stroke="#d8d5c8" stroke-width="4" stroke-linecap="round"/>
+          <circle cx="118" cy="14" r="9" fill="#d8d5c8"/>
+          <circle cx="30" cy="76" r="4" fill="#e8a33d"/>
+        </svg>
+      </div>
+      <div class="now-spinning">tocando agora — <b id="heroNowText">SOS · SZA</b></div>
+    </div>
+  </header>
 
-<!-- ============ CHART ============ -->
-<section id="chart">
-  <div class="wrap">
-    <div class="section-head reveal">
-      <div>
-        <h2>A parada</h2>
-        <div class="sub">Ranqueado pela nota média da comunidade. Numeração ao estilo lado/faixa de vinil.</div>
+  <section id="novidades">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div>
+          <h2>Prensagens da semana</h2>
+          <div class="sub">O que acabou de sair da fábrica e já está pedindo nota.</div>
+        </div>
       </div>
-      <a href="#" class="section-link">Ver parada completa →</a>
+      <div class="shelf reveal" id="shelf"></div>
     </div>
-    <div class="chart-list reveal" id="chartList"></div>
-  </div>
-</section>
+  </section>
 
-<!-- ============ CRATES ============ -->
-<section id="crates">
-  <div class="wrap">
-    <div class="section-head reveal">
-      <div>
-        <h2>Crates da galera</h2>
-        <div class="sub">Listas montadas por quem realmente vasculha o catálogo.</div>
+  <section id="chart">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div>
+          <h2>A parada</h2>
+          <div class="sub">Ranqueado pela nota média da comunidade. Numeração ao estilo lado/faixa de vinil.</div>
+        </div>
       </div>
-      <a href="#" class="section-link">Montar minha crate →</a>
+      <div class="chart-list reveal" id="chartList"></div>
     </div>
-    <div class="crates-grid reveal" id="cratesGrid"></div>
+  </section>
+
+  <section id="crates">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div>
+          <h2>Crates da galera</h2>
+          <div class="sub">Listas montadas por quem realmente vasculha o catálogo.</div>
+        </div>
+        <a href="#/dashboard" class="section-link">Montar minha crate →</a>
+      </div>
+      <div class="crates-grid reveal" id="cratesGrid"></div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ============ ALBUM PAGE ============ -->
+<div data-view="album" style="display:none">
+  <div class="wrap page-pad">
+    <a href="#/" class="back-link">← Voltar</a>
+    <div class="album-hero" id="albumHero"></div>
+    <div id="albumReviews"></div>
   </div>
-</section>
+</div>
+
+<!-- ============ DASHBOARD ============ -->
+<div data-view="dashboard" style="display:none">
+  <div class="wrap page-pad" id="dashboardRoot"></div>
+</div>
+
+<!-- ============ SEARCH ============ -->
+<div data-view="search" style="display:none">
+  <div class="wrap page-pad">
+    <h2 class="reviews-title" id="searchHeading">Buscar</h2>
+    <div id="searchResults"></div>
+  </div>
+</div>
 
 <!-- ============ FOOTER ============ -->
 <footer>
   <div class="wrap">
     <div class="foot-grid">
-      <div class="logo" style="font-size:1.2rem"><span class="disc"></span>VYNL</div>
+      <a class="logo" href="#/" style="font-size:1.2rem"><span class="disc"></span>VYNL</a>
       <div class="foot-cols">
         <div class="foot-col">
           <h4>Explorar</h4>
-          <a href="#novidades">Novidades</a>
-          <a href="#chart">Parada</a>
-          <a href="#crates">Crates</a>
+          <a href="#/">Início</a>
+          <a href="#/dashboard">Minha estante</a>
         </div>
         <div class="foot-col">
           <h4>Comunidade</h4>
@@ -666,7 +463,7 @@
     </div>
     <div class="foot-bottom">
       <span>© 2026 VYNL — feito por quem ainda lê o encarte inteiro.</span>
-      <span>Protótipo de demonstração</span>
+      <span>Protótipo funcional (dados locais, sem servidor)</span>
     </div>
   </div>
 </footer>
@@ -760,9 +557,7 @@
     const token = await getSpotifyToken();
     if(!token) return null;
     try{
-      const res = await fetch(`https://api.spotify.com/v1${path}`, {
-        headers: { 'Authorization': `Bearer ${token}` },
-      });
+      const res = await fetch(`https://api.spotify.com/v1${path}`, { headers: { 'Authorization': `Bearer ${token}` } });
       if(!res.ok) throw new Error('spotify api ' + res.status);
       return await res.json();
     }catch(err){
@@ -771,42 +566,42 @@
     }
   }
 
-  // busca a capa real de um álbum específico da lista curada (parada, hero, crates)
   async function spotifySearchAlbumCover(title, artist){
     const q = encodeURIComponent(`album:${title} artist:${artist}`);
     const data = await spotifyFetch(`/search?q=${q}&type=album&limit=1`);
     const item = data?.albums?.items?.[0];
     if(!item) return null;
-    return {
-      cover: item.images?.[0]?.url || null,
-      url: item.external_urls?.spotify || null,
-    };
+    return { cover: item.images?.[0]?.url || null, url: item.external_urls?.spotify || null };
   }
 
-  // busca lançamentos reais e recentes pra substituir a prateleira mockada
   async function spotifyNewReleases(limit = 8){
     const data = await spotifyFetch(`/browse/new-releases?country=BR&limit=${limit}`);
     const items = data?.albums?.items;
     if(!items) return null;
     return items.map(al => ({
-      id: al.id,
-      title: al.name,
-      artist: al.artists.map(a => a.name).join(', '),
-      year: (al.release_date || '').slice(0, 4),
-      cover: al.images?.[0]?.url || null,
-      url: al.external_urls?.spotify || null,
-      hue: ["#3a5169", "#0a0c11"],
+      id: al.id, title: al.name, artist: al.artists.map(a => a.name).join(', '),
+      year: (al.release_date || '').slice(0, 4), genre: null,
+      cover: al.images?.[0]?.url || null, url: al.external_urls?.spotify || null,
+      avg: 0, spins: '0', hue: ["#3a5169", "#0a0c11"],
+    }));
+  }
+
+  async function spotifySearchAlbums(query, limit = 24){
+    const data = await spotifyFetch(`/search?q=${encodeURIComponent(query)}&type=album&limit=${limit}`);
+    const items = data?.albums?.items;
+    if(!items) return null;
+    return items.map(al => ({
+      id: al.id, title: al.name, artist: al.artists.map(a => a.name).join(', '),
+      year: (al.release_date || '').slice(0, 4), genre: null,
+      cover: al.images?.[0]?.url || null, url: al.external_urls?.spotify || null,
+      avg: 0, spins: '0', hue: ["#3a5169", "#0a0c11"],
     }));
   }
 
   /* ============================================================
-     LISTA CURADA
-     -----------------------------------------------------------
-     Usada como base fixa da "parada" (ranking) e das crates, pra
-     manter a demonstração consistente. Quando as chaves acima
-     estiverem preenchidas, cada um destes álbuns é enriquecido
-     com a capa real da Spotify (enrichWithSpotify, mais abaixo);
-     sem chaves, fica no gradiente placeholder mesmo.
+     LISTA CURADA (base fixa da parada / crates da galera / hero)
+     Enriquecida com capa real da Spotify quando as chaves acima
+     estão preenchidas — veja enrichWithSpotify() lá no final.
      ============================================================ */
   const ALBUMS = [
     { id:1, title:"In Rainbows", artist:"Radiohead", year:2007, genre:"Alt Rock", avg:4.6, spins:"18.2k", hue:["#3a5169","#0a0c11"] },
@@ -829,29 +624,53 @@
     { name:"Faixas que ninguém te contou", by:"@crateDigger93", desc:"Discos ótimos que passaram batido na época do lançamento.", ids:[7,4,5,8] },
   ];
 
+  const SEED_REVIEWS = {
+    1: [ { user:"marina.ouve", rating:5, text:"Textura perfeita, ouço até hoje sem cansar.", date:"2025-11-02" },
+         { user:"joao_baixista", rating:4, text:"O baixo carrega o disco inteiro. Nunca envelhece.", date:"2025-09-14" } ],
+    2: [ { user:"crateDigger93", rating:5, text:"Cada faixa é uma aula. Injustiça não ter ganhado mais prêmios.", date:"2025-12-01" } ],
+    3: [ { user:"julia.fm", rating:5, text:"Drama de banda virando obra-prima atemporal.", date:"2025-08-20" } ],
+    5: [ { user:"marco.synth", rating:5, text:"A trilha sonora perfeita pra qualquer road trip noturna.", date:"2025-07-11" } ],
+    6: [ { user:"julia.fm", rating:4, text:"Sequência de faixas impecável, mas o meio perde um pouco de força.", date:"2025-10-05" } ],
+    10: [ { user:"crateDigger93", rating:5, text:"30 minutos, zero desperdício. Referência absoluta.", date:"2025-06-18" } ],
+  };
+
+  /* ---------- estado persistido no navegador ---------- */
   const state = {
     ratings: JSON.parse(localStorage.getItem('vynl_ratings') || '{}'),
     user: JSON.parse(localStorage.getItem('vynl_user') || 'null'),
+    reviews: JSON.parse(localStorage.getItem('vynl_reviews') || '{}'),
+    crates: JSON.parse(localStorage.getItem('vynl_crates') || '[]'),
   };
-
   function saveRatings(){ localStorage.setItem('vynl_ratings', JSON.stringify(state.ratings)); }
+  function saveReviews(){ localStorage.setItem('vynl_reviews', JSON.stringify(state.reviews)); }
+  function saveCrates(){ localStorage.setItem('vynl_crates', JSON.stringify(state.crates)); }
+
+  /* ---------- registro global de álbuns já vistos (curados, buscados, lançamentos) ---------- */
+  const KNOWN_ALBUMS = new Map();
+  (function loadKnownAlbums(){
+    try{
+      const stored = JSON.parse(localStorage.getItem('vynl_known') || '{}');
+      Object.values(stored).forEach(al => KNOWN_ALBUMS.set(String(al.id), al));
+    }catch(e){ /* ignora cache corrompido */ }
+  })();
+  function persistKnownAlbums(){
+    const obj = {};
+    KNOWN_ALBUMS.forEach((al, id) => obj[id] = al);
+    localStorage.setItem('vynl_known', JSON.stringify(obj));
+  }
+  function registerAlbum(al){ if(al && al.id != null) KNOWN_ALBUMS.set(String(al.id), al); }
+  function registerMany(list){ list.forEach(registerAlbum); persistKnownAlbums(); }
+  registerMany(ALBUMS);
 
   function initials(title){ return title.trim()[0].toUpperCase(); }
+  function escapeHTML(str){ const d = document.createElement('div'); d.textContent = str ?? ''; return d.innerHTML; }
 
-  function coverStyle(hue){
-    return `background: linear-gradient(155deg, ${hue[0]}, ${hue[1]});`;
-  }
-
-  // usa a capa real da Spotify quando disponível; senão cai no gradiente
+  function coverStyle(hue){ return `background: linear-gradient(155deg, ${hue[0]}, ${hue[1]});`; }
   function coverStyleFor(al){
     if(al.cover) return `background-image:url("${al.cover}"); background-size:cover; background-position:center;`;
     return coverStyle(al.hue || ["#3a5169","#0a0c11"]);
   }
-  function glyphFor(al){
-    return al.cover ? '' : `<div class="mark"><span class="glyph">${initials(al.title)}</span></div>`;
-  }
-
-  // depois que a busca real chega, atualiza qualquer elemento já renderizado desse álbum
+  function glyphFor(al){ return al.cover ? '' : `<div class="mark"><span class="glyph">${initials(al.title)}</span></div>`; }
   function applyRealCover(albumId, url){
     if(!url) return;
     document.querySelectorAll(`[data-cover="${albumId}"]`).forEach(el=>{
@@ -869,16 +688,13 @@
     for(let i=1;i<=5;i++){
       out += `<button type="button" data-val="${i}" class="${i<=current?'on':''}" aria-label="Nota ${i}">★</button>`;
     }
-    out += `</div>`;
-    return out;
+    return out + `</div>`;
   }
-
   function wireStars(container){
     container.querySelectorAll('.stars').forEach(widget=>{
       const albumId = widget.dataset.album;
       const buttons = [...widget.querySelectorAll('button')];
       const applyVisual = (val)=> buttons.forEach(b => b.classList.toggle('on', +b.dataset.val <= val));
-
       buttons.forEach(btn=>{
         btn.addEventListener('mouseenter', ()=> applyVisual(+btn.dataset.val));
         btn.addEventListener('click', ()=>{
@@ -895,33 +711,40 @@
     });
   }
 
-  /* ---------- render: shelf de novidades ---------- */
-  const shelf = document.getElementById('shelf');
-  function renderShelf(list){
-    shelf.innerHTML = '';
-    list.forEach(al=>{
-      const rating = state.ratings[al.id] || 0;
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.innerHTML = `
+  function cardHTML(al){
+    const rating = state.ratings[al.id] || 0;
+    return `
+      <a class="card-link" href="#/album/${al.id}">
         <div class="cover" style="${coverStyleFor(al)}" data-cover="${al.id}">
           <div class="grain"></div>
           ${glyphFor(al)}
         </div>
         <p class="card-title">${al.title}</p>
-        <p class="card-artist">${al.artist} · ${al.year}</p>
-        <div class="rate-row">
-          ${starsHTML(al.id, rating)}
-          <span class="rate-note">${rating ? `sua nota: ${rating}/5` : 'ainda sem nota'}</span>
-        </div>
-      `;
+        <p class="card-artist">${al.artist}${al.year ? ' · '+al.year : ''}</p>
+      </a>
+      <div class="rate-row">
+        ${starsHTML(al.id, rating)}
+        <span class="rate-note">${rating ? `sua nota: ${rating}/5` : 'ainda sem nota'}</span>
+      </div>
+    `;
+  }
+
+  /* ---------- render: prateleira de novidades ---------- */
+  const shelf = document.getElementById('shelf');
+  function renderShelf(list){
+    shelf.innerHTML = '';
+    registerMany(list);
+    list.forEach(al=>{
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = cardHTML(al);
       shelf.appendChild(card);
     });
     wireStars(shelf);
   }
   renderShelf(ALBUMS.slice(0, 8));
 
-  /* ---------- render: chart ---------- */
+  /* ---------- render: parada (chart) ---------- */
   const chartList = document.getElementById('chartList');
   const sorted = [...ALBUMS].sort((a,b)=> b.avg - a.avg);
   sorted.forEach((al, idx)=>{
@@ -932,12 +755,14 @@
     row.className = 'chart-row';
     row.innerHTML = `
       <span class="matrix">${side}${num}</span>
-      <div class="mini-cover" style="${coverStyleFor(al)}" data-cover="${al.id}">${al.cover ? '' : `<span class="glyph">${initials(al.title)}</span>`}</div>
-      <div class="row-meta">
-        <div class="t">${al.title}</div>
-        <div class="a">${al.artist} · ${al.year}</div>
-        <span class="tag">${al.genre}</span>
-      </div>
+      <a class="row-link" href="#/album/${al.id}">
+        <div class="mini-cover" style="${coverStyleFor(al)}" data-cover="${al.id}">${al.cover ? '' : `<span class="glyph">${initials(al.title)}</span>`}</div>
+        <div class="row-meta">
+          <div class="t">${al.title}</div>
+          <div class="a">${al.artist} · ${al.year}</div>
+          <span class="tag">${al.genre}</span>
+        </div>
+      </a>
       <div class="row-stat">
         <span class="avg-stars">${'★'.repeat(full)}${'☆'.repeat(5-full)}</span>
         <span class="spins">média ${al.avg.toFixed(1)}</span>
@@ -951,7 +776,7 @@
   });
   wireStars(chartList);
 
-  /* ---------- render: crates ---------- */
+  /* ---------- render: crates da galera ---------- */
   const cratesGrid = document.getElementById('cratesGrid');
   CRATES.forEach(cr=>{
     const covers = cr.ids.map(id=>{
@@ -960,12 +785,7 @@
     }).join('');
     const el = document.createElement('div');
     el.className = 'crate';
-    el.innerHTML = `
-      <div class="crate-collage">${covers}</div>
-      <h3>${cr.name}</h3>
-      <p>${cr.desc}</p>
-      <span class="by">montada por ${cr.by}</span>
-    `;
+    el.innerHTML = `<div class="crate-collage">${covers}</div><h3>${cr.name}</h3><p>${cr.desc}</p><span class="by">montada por ${cr.by}</span>`;
     cratesGrid.appendChild(el);
   });
 
@@ -977,7 +797,7 @@
   const tickerItems = [
     "sarah.k avaliou <span>Discovery</span> com ★★★★★",
     "marco acabou de logar <span>In Rainbows</span>",
-    "nova crate: <span>\\'Fim de relacionamento\\'</span>",
+    "nova crate: <span>'Fim de relacionamento'</span>",
     "julia.fm avaliou <span>Homogenic</span> com ★★★★☆",
     "132 pessoas ouviram <span>SOS</span> essa semana",
   ];
@@ -1000,6 +820,315 @@
     toastTimer = setTimeout(()=> t.classList.remove('show'), 2600);
   }
 
+  /* ============================================================
+     PÁGINA DE ÁLBUM
+  ============================================================ */
+  async function renderAlbumPage(id){
+    let al = KNOWN_ALBUMS.get(String(id));
+    if(!al && spotifyKeysConfigured()){
+      const data = await spotifyFetch(`/albums/${id}`);
+      if(data){
+        al = { id:data.id, title:data.name, artist:data.artists.map(a=>a.name).join(', '), year:(data.release_date||'').slice(0,4),
+               cover:data.images?.[0]?.url||null, url:data.external_urls?.spotify||null, genre:null, avg:0, spins:'0', hue:["#3a5169","#0a0c11"] };
+        registerAlbum(al); persistKnownAlbums();
+      }
+    }
+    const root = document.getElementById('albumHero');
+    const reviewsRoot = document.getElementById('albumReviews');
+    if(!al){
+      root.innerHTML = `<p class="empty-state">Não achamos esse álbum. <a href="#/">Voltar pro início</a>.</p>`;
+      reviewsRoot.innerHTML = '';
+      return;
+    }
+    const rating = state.ratings[al.id] || 0;
+    root.innerHTML = `
+      <div class="cover-lg" style="${coverStyleFor(al)}" data-cover="${al.id}"><div class="grain"></div>${glyphFor(al)}</div>
+      <div>
+        <p class="eyebrow">${al.genre || 'Álbum'}</p>
+        <h1>${al.title}</h1>
+        <p class="meta">${al.artist}${al.year ? ' · '+al.year : ''}</p>
+        <div class="stat-pills">
+          <div class="stat-pill"><b>${al.avg ? al.avg.toFixed(1) : '—'}</b>nota da comunidade</div>
+          <div class="stat-pill"><b>${al.spins || '0'}</b>spins registrados</div>
+        </div>
+        <div class="rate-row" style="max-width:220px;margin-top:18px">
+          ${starsHTML(al.id, rating)}
+          <span class="rate-note">${rating ? `sua nota: ${rating}/5` : 'dê sua nota'}</span>
+        </div>
+        <div id="crateWidget" style="margin-top:16px"></div>
+        ${al.url ? `<a href="${al.url}" target="_blank" rel="noopener" class="section-link" style="display:inline-block;margin-top:16px">Abrir no Spotify →</a>` : ''}
+      </div>
+    `;
+    wireStars(root);
+    renderCrateWidget(al.id);
+    renderReviews(al.id);
+  }
+
+  function renderCrateWidget(albumId){
+    const el = document.getElementById('crateWidget');
+    if(!el) return;
+    if(!state.user){ el.innerHTML = `<p class="rate-note">Entre pra adicionar este álbum a uma crate.</p>`; return; }
+    if(!state.crates.length){ el.innerHTML = `<p class="rate-note">Você ainda não tem crates. <a href="#/dashboard">Crie uma no seu dashboard</a>.</p>`; return; }
+    const opts = state.crates.map(c=>`<option value="${c.id}">${escapeHTML(c.name)}</option>`).join('');
+    el.innerHTML = `
+      <div class="crate-manage">
+        <select id="crateSelect">${opts}</select>
+        <button type="button" class="btn btn-ghost" id="addToCrateBtn">+ Adicionar à crate</button>
+      </div>
+    `;
+    el.querySelector('#addToCrateBtn').addEventListener('click', ()=>{
+      const crateId = el.querySelector('#crateSelect').value;
+      const crate = state.crates.find(c=>c.id === crateId);
+      if(!crate) return;
+      if(!crate.albumIds.includes(albumId)) crate.albumIds.push(albumId);
+      saveCrates();
+      showToast(`Adicionado à crate "${crate.name}".`);
+    });
+  }
+
+  function renderReviews(albumId){
+    const root = document.getElementById('albumReviews');
+    const mine = state.reviews[albumId] || [];
+    const seed = SEED_REVIEWS[albumId] || [];
+    const all = [...mine, ...seed];
+    let formHTML;
+    if(state.user){
+      const existing = mine.find(r=> r.user === state.user.username);
+      formHTML = `
+        <form id="reviewForm">
+          <div class="rate-row" style="max-width:200px;margin-bottom:10px">
+            ${starsHTML(albumId, state.ratings[albumId] || 0)}
+            <span class="rate-note">sua nota</span>
+          </div>
+          <textarea id="reviewText" rows="3" placeholder="Escreva sua review...">${existing ? escapeHTML(existing.text) : ''}</textarea>
+          <button type="submit" class="btn btn-solid" style="margin-top:10px">${existing ? 'Atualizar review' : 'Publicar review'}</button>
+        </form>
+      `;
+    } else {
+      formHTML = `<p class="empty-state">Entre pra escrever uma review. <button type="button" class="btn btn-ghost" id="reviewLoginBtn">Entrar</button></p>`;
+    }
+    root.innerHTML = `
+      <h2 class="reviews-title">Reviews</h2>
+      ${formHTML}
+      <div id="reviewList">
+        ${all.length ? all.map(r=>`
+          <div class="review-card">
+            <div class="head"><span class="user">${escapeHTML(r.user)}</span><span class="date">${r.date}</span></div>
+            <span class="stars-mini">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</span>
+            <p>${escapeHTML(r.text)}</p>
+          </div>
+        `).join('') : '<p class="empty-state">Ninguém escreveu nada ainda. Seja o primeiro.</p>'}
+      </div>
+    `;
+    if(state.user){
+      wireStars(root);
+      root.querySelector('#reviewForm').addEventListener('submit', e=>{
+        e.preventDefault();
+        const val = state.ratings[albumId] || 0;
+        const text = root.querySelector('#reviewText').value.trim();
+        if(!val || !text){ showToast('Dê uma nota e escreva algo antes de publicar.'); return; }
+        const list = state.reviews[albumId] || (state.reviews[albumId] = []);
+        const idx = list.findIndex(r=> r.user === state.user.username);
+        const entry = { user: state.user.username, rating: val, text, date: new Date().toISOString().slice(0,10) };
+        if(idx > -1) list[idx] = entry; else list.push(entry);
+        saveReviews();
+        showToast('Review publicada.');
+        renderReviews(albumId);
+      });
+    } else {
+      root.querySelector('#reviewLoginBtn')?.addEventListener('click', ()=> openModal('login'));
+    }
+  }
+
+  /* ============================================================
+     BUSCA
+  ============================================================ */
+  async function renderSearchResults(query){
+    document.getElementById('searchHeading').textContent = query ? `Resultados para "${query}"` : 'Buscar';
+    const grid = document.getElementById('searchResults');
+    if(!query){ grid.innerHTML = '<p class="empty-state">Digite algo na busca lá em cima.</p>'; return; }
+    grid.innerHTML = '<p class="empty-state">Buscando...</p>';
+
+    let results = null;
+    if(spotifyKeysConfigured()) results = await spotifySearchAlbums(query, 24);
+    if(!results){
+      const q = query.toLowerCase();
+      results = ALBUMS.filter(al => al.title.toLowerCase().includes(q) || al.artist.toLowerCase().includes(q));
+    }
+    registerMany(results);
+
+    if(!results.length){ grid.innerHTML = '<p class="empty-state">Nada encontrado. Tenta outro termo.</p>'; return; }
+    grid.className = 'grid-cards';
+    grid.innerHTML = '';
+    results.forEach(al=>{
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = cardHTML(al);
+      grid.appendChild(card);
+    });
+    wireStars(grid);
+  }
+
+  document.getElementById('searchForm').addEventListener('submit', e=>{
+    e.preventDefault();
+    const q = document.getElementById('searchInput').value.trim();
+    if(!q) return;
+    location.hash = '#/search?q=' + encodeURIComponent(q);
+  });
+
+  /* ============================================================
+     DASHBOARD
+  ============================================================ */
+  function renderDashboard(){
+    const root = document.getElementById('dashboardRoot');
+    if(!state.user){
+      root.innerHTML = `
+        <div class="empty-state" style="padding:80px 0;text-align:center">
+          <p style="font-family:var(--font-display);font-size:1.4rem;color:var(--bone);margin-bottom:10px">Entre pra ver sua estante</p>
+          <p style="margin-bottom:20px">Seu histórico de notas, reviews e crates aparecem aqui depois do login.</p>
+          <button class="btn btn-solid" id="dashLoginBtn">Entrar</button>
+        </div>`;
+      root.querySelector('#dashLoginBtn').addEventListener('click', ()=> openModal('login'));
+      return;
+    }
+
+    const ratedIds = Object.keys(state.ratings).filter(id => +state.ratings[id] > 0);
+    const ratedAlbums = ratedIds.map(id => KNOWN_ALBUMS.get(String(id))).filter(Boolean);
+    const avgGiven = ratedIds.length ? (ratedIds.reduce((s,id)=> s + state.ratings[id], 0) / ratedIds.length).toFixed(1) : '—';
+    const genreCount = {};
+    ratedAlbums.forEach(al=>{ if(al.genre) genreCount[al.genre] = (genreCount[al.genre]||0) + 1; });
+    const favGenre = Object.entries(genreCount).sort((a,b)=> b[1]-a[1])[0]?.[0] || '—';
+
+    const myReviewsFlat = [];
+    Object.entries(state.reviews).forEach(([albumId, list])=>{
+      list.forEach(r=>{ if(r.user === state.user.username) myReviewsFlat.push({...r, albumId}); });
+    });
+
+    root.innerHTML = `
+      <div class="dash-header">
+        <div class="av-lg">${escapeHTML(state.user.username[0].toUpperCase())}</div>
+        <div><h1>${escapeHTML(state.user.username)}</h1><p class="meta">sua estante no VYNL</p></div>
+      </div>
+      <div class="stat-pills">
+        <div class="stat-pill"><b>${ratedIds.length}</b>álbuns avaliados</div>
+        <div class="stat-pill"><b>${avgGiven}</b>nota média dada</div>
+        <div class="stat-pill"><b>${favGenre}</b>gênero favorito</div>
+        <div class="stat-pill"><b>${myReviewsFlat.length}</b>reviews escritas</div>
+      </div>
+
+      <h2 class="reviews-title" style="margin-top:44px">Seu histórico</h2>
+      <div class="grid-cards" id="dashHistory">${ratedAlbums.length ? '' : '<p class="empty-state">Você ainda não avaliou nada. <a href="#/">Volta pro início</a> e começa.</p>'}</div>
+
+      <h2 class="reviews-title" style="margin-top:44px">Suas reviews</h2>
+      <div id="dashReviews">
+        ${myReviewsFlat.length ? myReviewsFlat.map(r=>{
+          const al = KNOWN_ALBUMS.get(String(r.albumId));
+          return `<div class="review-card">
+            <div class="head"><a href="#/album/${r.albumId}" class="user">${al ? escapeHTML(al.title) : 'álbum'}</a><span class="date">${r.date}</span></div>
+            <span class="stars-mini">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</span>
+            <p>${escapeHTML(r.text)}</p>
+          </div>`;
+        }).join('') : '<p class="empty-state">Você ainda não escreveu nenhuma review.</p>'}
+      </div>
+
+      <h2 class="reviews-title" style="margin-top:44px">Suas crates</h2>
+      <div class="crate-manage">
+        <div class="field"><label>Nome da crate</label><input type="text" id="newCrateName" placeholder="ex: Discos pra chuva"></div>
+        <button class="btn btn-solid" id="newCrateBtn">Criar crate</button>
+      </div>
+      <div class="crates-grid" id="dashCrates" style="margin-top:20px"></div>
+    `;
+
+    const historyGrid = document.getElementById('dashHistory');
+    ratedAlbums.forEach(al=>{
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = cardHTML(al);
+      historyGrid.appendChild(card);
+    });
+    wireStars(historyGrid);
+
+    renderDashCrates();
+    document.getElementById('newCrateBtn').addEventListener('click', ()=>{
+      const input = document.getElementById('newCrateName');
+      const name = input.value.trim();
+      if(!name) return;
+      state.crates.push({ id: 'c'+Date.now(), name, albumIds: [] });
+      saveCrates();
+      input.value = '';
+      renderDashCrates();
+      showToast(`Crate "${name}" criada.`);
+    });
+  }
+
+  function renderDashCrates(){
+    const grid = document.getElementById('dashCrates');
+    if(!grid) return;
+    if(!state.crates.length){ grid.innerHTML = '<p class="empty-state">Você ainda não criou nenhuma crate.</p>'; return; }
+    grid.innerHTML = '';
+    state.crates.forEach(cr=>{
+      const tiles = cr.albumIds.slice(0,4).map(id=>{
+        const al = KNOWN_ALBUMS.get(String(id));
+        return al ? `<div style="${coverStyleFor(al)}"></div>` : '<div></div>';
+      }).join('') || '<div></div><div></div><div></div><div></div>';
+      const el = document.createElement('div');
+      el.className = 'crate';
+      el.innerHTML = `
+        <button class="crate-del" data-del="${cr.id}" aria-label="Excluir crate">&times;</button>
+        <div class="crate-collage">${tiles}</div>
+        <h3>${escapeHTML(cr.name)}</h3>
+        <p>${cr.albumIds.length} ${cr.albumIds.length===1 ? 'álbum' : 'álbuns'}</p>
+      `;
+      grid.appendChild(el);
+    });
+    grid.querySelectorAll('[data-del]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        state.crates = state.crates.filter(c=> c.id !== btn.dataset.del);
+        saveCrates();
+        renderDashCrates();
+      });
+    });
+  }
+
+  /* ============================================================
+     ROTEADOR (hash-based, tudo dentro do mesmo arquivo)
+  ============================================================ */
+  function showView(name){
+    document.querySelectorAll('[data-view]').forEach(v=> v.style.display = (v.dataset.view === name) ? '' : 'none');
+    window.scrollTo({ top:0, behavior:'instant' });
+  }
+  function parseRoute(){
+    const hash = location.hash || '#/';
+    if(!hash.startsWith('#/')) return null; // deixa âncoras normais (#chart etc) em paz
+    const path = hash.slice(2);
+    const [rawPath, rawQuery] = path.split('?');
+    return { parts: rawPath.split('/').filter(Boolean), query: new URLSearchParams(rawQuery || '') };
+  }
+  function handleHash(){
+    const route = parseRoute();
+    if(!route){ return; }
+    const [seg, id] = route.parts;
+    if(seg === 'album' && id){ showView('album'); renderAlbumPage(id); }
+    else if(seg === 'dashboard'){ showView('dashboard'); renderDashboard(); }
+    else if(seg === 'search'){ showView('search'); renderSearchResults(route.query.get('q') || ''); }
+    else { showView('home'); }
+  }
+  window.addEventListener('hashchange', handleHash);
+  handleHash();
+
+  // links de âncora do nav (Prensagens/Chart/Crates) levam pra home antes de rolar, se necessário
+  document.querySelectorAll('[data-scroll]').forEach(a=>{
+    a.addEventListener('click', e=>{
+      const targetId = a.getAttribute('href').slice(1);
+      const home = parseRoute() === null || (parseRoute()?.parts?.length ?? 0) === 0;
+      if(!home){
+        e.preventDefault();
+        location.hash = '#/';
+        requestAnimationFrame(()=> requestAnimationFrame(()=> document.getElementById(targetId)?.scrollIntoView({ behavior:'smooth' })));
+      }
+    });
+  });
+
   /* ---------- modal login/signup (simulado) ---------- */
   const backdrop = document.getElementById('modalBackdrop');
   const tabLogin = document.getElementById('tabLogin');
@@ -1010,11 +1139,7 @@
   const submitBtn = document.querySelector('#authForm button[type="submit"]');
   let mode = 'login';
 
-  function openModal(m){
-    mode = m;
-    setTab(m);
-    backdrop.classList.add('open');
-  }
+  function openModal(m){ setTab(m); backdrop.classList.add('open'); }
   function setTab(m){
     mode = m;
     tabLogin.classList.toggle('active', m==='login');
@@ -1043,6 +1168,7 @@
     backdrop.classList.remove('open');
     showToast(mode === 'login' ? `Login simulado: bem-vindo(a), ${username}.` : `Conta simulada criada. Bem-vindo(a), ${username}!`);
     e.target.reset();
+    handleHash(); // re-renderiza a view atual (ex: dashboard ou reviews) já logado
   });
 
   function reflectUser(){
@@ -1059,11 +1185,8 @@
 
   /* ============================================================
      ENRIQUECIMENTO COM DADOS REAIS DA SPOTIFY
-     -----------------------------------------------------------
      Roda depois do primeiro render (que já funciona 100% com
-     dados mockados). Se as chaves acima não estiverem
-     preenchidas, esta função simplesmente não faz nada e o site
-     continua com os gradientes placeholder normalmente.
+     dados mockados). Sem chaves preenchidas, não faz nada.
      ============================================================ */
   async function enrichWithSpotify(){
     if(!spotifyKeysConfigured()){
@@ -1071,23 +1194,21 @@
       return;
     }
     const token = await getSpotifyToken();
-    if(!token) return; // getSpotifyToken já loga o motivo no console
+    if(!token) return;
 
-    // 1) busca a capa real de cada álbum da lista curada (parada, crates, hero)
     await Promise.all(ALBUMS.map(async al=>{
       const found = await spotifySearchAlbumCover(al.title, al.artist);
       if(found?.cover){
         al.cover = found.cover;
         al.spotifyUrl = found.url;
+        registerAlbum(al);
         applyRealCover(al.id, al.cover);
       }
     }));
+    persistKnownAlbums();
 
-    // 2) troca a prateleira "Prensagens da semana" pelos lançamentos reais de agora
     const releases = await spotifyNewReleases(8);
-    if(releases && releases.length){
-      renderShelf(releases);
-    }
+    if(releases && releases.length) renderShelf(releases);
 
     showToast('Dados reais da Spotify carregados.');
   }
