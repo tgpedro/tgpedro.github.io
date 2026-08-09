@@ -1,701 +1,1097 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="dark">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AURA — Acervo & Lançamentos de Artistas</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        darkbg: '#08080a',
-                        cardbg: '#141416',
-                        accent: '#a855f7',
-                        accenthover: '#9333ea',
-                    },
-                    fontFamily: {
-                        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        .masonry-grid {
-            column-count: 1;
-            column-gap: 1.25rem;
-        }
-        @media (min-width: 640px) { .masonry-grid { column-count: 2; } }
-        @media (min-width: 768px) { .masonry-grid { column-count: 3; } }
-        @media (min-width: 1280px) { .masonry-grid { column-count: 4; } }
-        @media (min-width: 1536px) { .masonry-grid { column-count: 5; } }
-        
-        .masonry-item {
-            break-inside: avoid;
-            margin-bottom: 1.25rem;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VYNL — dê uma nota pra cada disco</title>
+<meta name="description" content="VYNL — avalie álbuns, monte suas crates e veja o que o mundo anda ouvindo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     DESIGN TOKENS
+     ink        — fundo principal, quase preto com leve azul
+     charcoal   — superfícies (cards, nav)
+     charcoal-2 — superfícies elevadas / bordas
+     bone       — texto principal, branco quente (cor de papel de encarte)
+     muted      — texto secundário
+     amber      — destaque primário (agulha / VU meter)
+     wine       — destaque secundário (avaliação / ações)
+  ============================================================ */
+  :root{
+    --ink:#0a0c11;
+    --charcoal:#14161e;
+    --charcoal-2:#1e212c;
+    --bone:#f3efe4;
+    --muted:#8d8f9c;
+    --amber:#e8a33d;
+    --amber-dim:#a97b34;
+    --wine:#c1416a;
+    --line: rgba(243,239,228,0.08);
+    --font-display: 'Fraunces', serif;
+    --font-body: 'Inter', sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+  }
 
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #08080a;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #27272a;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #3f3f46;
-        }
-    </style>
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+  body{
+    margin:0;
+    background: var(--ink);
+    color: var(--bone);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  img{ max-width:100%; display:block; }
+  a{ color: inherit; text-decoration: none; }
+  button{ font-family: inherit; cursor: pointer; }
+
+  ::selection{ background: var(--amber); color: var(--ink); }
+
+  :focus-visible{
+    outline: 2px solid var(--amber);
+    outline-offset: 3px;
+  }
+
+  .wrap{
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 28px;
+  }
+
+  /* ---------- background texture ---------- */
+  body::before{
+    content:"";
+    position: fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:0;
+    opacity:0.5;
+    background-image:
+      radial-gradient(circle at 15% 8%, rgba(232,163,61,0.07), transparent 40%),
+      radial-gradient(circle at 85% 30%, rgba(193,65,106,0.06), transparent 45%);
+  }
+
+  /* ============================================================
+     NAV
+  ============================================================ */
+  .nav{
+    position: sticky;
+    top:0;
+    z-index: 60;
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 18px 28px;
+    background: rgba(10,12,17,0.82);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .logo{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 1.5rem;
+    letter-spacing: 0.02em;
+    color: var(--bone);
+    white-space: nowrap;
+  }
+  .logo .disc{
+    width: 26px; height:26px; border-radius:50%;
+    background: conic-gradient(from 90deg, var(--amber), var(--wine), var(--amber));
+    position: relative;
+    flex-shrink:0;
+  }
+  .logo .disc::after{
+    content:"";
+    position:absolute; inset:38%;
+    background: var(--ink);
+    border-radius:50%;
+  }
+  .nav-links{
+    display:flex;
+    gap: 28px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--muted);
+    flex:1;
+    justify-content:center;
+  }
+  .nav-links a{ transition: color 0.2s; padding: 4px 0; border-bottom: 2px solid transparent; }
+  .nav-links a:hover{ color: var(--bone); border-color: var(--amber); }
+
+  .nav-actions{ display:flex; align-items:center; gap:14px; }
+  .search-pill{
+    display:flex; align-items:center; gap:8px;
+    background: var(--charcoal);
+    border: 1px solid var(--line);
+    border-radius: 100px;
+    padding: 8px 14px;
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+  .search-pill svg{ width:14px; height:14px; opacity:0.7; }
+  .btn{
+    border:none;
+    border-radius: 100px;
+    padding: 9px 18px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+  }
+  .btn:hover{ transform: translateY(-1px); }
+  .btn-ghost{ background: transparent; color: var(--bone); border: 1px solid var(--line); }
+  .btn-ghost:hover{ border-color: var(--amber); }
+  .btn-solid{ background: var(--amber); color: #241703; }
+  .btn-solid:hover{ opacity:0.9; }
+  .user-chip{
+    display:none;
+    align-items:center; gap:8px;
+    background: var(--charcoal-2);
+    border-radius: 100px;
+    padding: 6px 14px 6px 6px;
+    font-size:0.85rem;
+    font-weight:600;
+  }
+  .user-chip .av{
+    width:26px; height:26px; border-radius:50%;
+    background: linear-gradient(135deg, var(--wine), var(--amber));
+    display:flex; align-items:center; justify-content:center;
+    font-family: var(--font-mono); font-size:0.75rem; font-weight:700;
+    color: var(--ink);
+  }
+
+  /* ---------- ticker ---------- */
+  .ticker-bar{
+    border-bottom: 1px solid var(--line);
+    background: var(--charcoal);
+    overflow:hidden;
+    white-space: nowrap;
+    padding: 7px 0;
+  }
+  .ticker-track{
+    display:inline-flex;
+    gap: 40px;
+    animation: scrollTicker 32s linear infinite;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+  }
+  .ticker-track span{ color: var(--amber-dim); }
+  @keyframes scrollTicker{
+    from{ transform: translateX(0); }
+    to{ transform: translateX(-50%); }
+  }
+
+  /* ============================================================
+     HERO
+  ============================================================ */
+  .hero{
+    position:relative; z-index:1;
+    display:grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 56px;
+    align-items:center;
+    padding: 88px 28px 80px;
+    max-width: 1180px;
+    margin: 0 auto;
+  }
+  .eyebrow{
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin: 0 0 18px;
+  }
+  .hero h1{
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: clamp(2.4rem, 5vw, 3.9rem);
+    line-height: 1.05;
+    margin: 0 0 22px;
+    letter-spacing: -0.01em;
+  }
+  .hero h1 em{
+    font-style: italic;
+    font-weight: 500;
+    color: var(--wine);
+  }
+  .hero p{
+    font-size: 1.08rem;
+    color: var(--muted);
+    max-width: 46ch;
+    line-height: 1.6;
+    margin: 0 0 34px;
+  }
+  .hero-ctas{ display:flex; gap:14px; flex-wrap:wrap; }
+  .btn-lg{ padding: 14px 26px; font-size:0.95rem; }
+
+  /* ---------- spinning disc centerpiece ---------- */
+  .disc-stage{
+    position:relative;
+    display:flex; align-items:center; justify-content:center;
+    height: 420px;
+  }
+  .platter{
+    position:absolute;
+    width: 360px; height:360px;
+    border-radius:50%;
+    background: repeating-radial-gradient(circle at center, #05060a 0 2px, #0d0f15 2px 4px);
+    box-shadow: 0 30px 80px -20px rgba(0,0,0,0.7), inset 0 0 0 1px var(--line);
+  }
+  .record{
+    position:relative;
+    width: 300px; height:300px;
+    border-radius:50%;
+    animation: spin 6s linear infinite;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+  }
+  @media (prefers-reduced-motion: reduce){ .record{ animation: none; } }
+  @keyframes spin{ to{ transform: rotate(360deg); } }
+  .record .sleeve-art{
+    position:absolute; inset:0; border-radius:50%; overflow:hidden;
+  }
+  .record .grooves{
+    position:absolute; inset:26px; border-radius:50%;
+    background: repeating-radial-gradient(circle at center, rgba(0,0,0,0.35) 0 1px, transparent 1px 5px);
+  }
+  .record .label{
+    position:absolute; inset:38%; border-radius:50%;
+    background: var(--ink);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center;
+    border: 2px solid rgba(243,239,228,0.12);
+  }
+  .record .label .t{ font-family: var(--font-display); font-weight:700; font-size:0.72rem; }
+  .record .label .a{ font-family: var(--font-mono); font-size:0.55rem; color: var(--muted); margin-top:2px; }
+  .record .hole{
+    position:absolute; inset:47%; border-radius:50%; background: var(--ink);
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.6);
+  }
+  .tonearm{
+    position:absolute;
+    top: 10px; right: -6px;
+    width: 130px; height: 130px;
+    transform-origin: 90% 10%;
+    transform: rotate(-18deg);
+    transition: transform 0.6s cubic-bezier(.4,1.4,.4,1);
+    z-index:5;
+  }
+  .disc-stage:hover .tonearm{ transform: rotate(2deg); }
+  .tonearm svg{ width:100%; height:100%; overflow:visible; }
+  .now-spinning{
+    position:absolute; bottom: -6px; left:50%; transform: translateX(-50%);
+    background: var(--charcoal);
+    border: 1px solid var(--line);
+    padding: 8px 18px;
+    border-radius: 100px;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    white-space:nowrap;
+  }
+  .now-spinning b{ color: var(--bone); font-weight:600; }
+
+  /* ============================================================
+     SECTIONS shared
+  ============================================================ */
+  section{ position: relative; z-index:1; padding: 64px 0; }
+  .section-head{
+    display:flex; align-items:flex-end; justify-content:space-between;
+    gap: 20px;
+    margin-bottom: 32px;
+    flex-wrap:wrap;
+  }
+  .section-head h2{
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 700;
+    margin:0;
+  }
+  .section-head .sub{ color: var(--muted); font-size:0.92rem; margin-top:6px; }
+  .section-link{
+    font-size:0.82rem; font-weight:700; color: var(--amber);
+    display:flex; align-items:center; gap:6px;
+    border-bottom: 1px solid transparent;
+  }
+  .section-link:hover{ border-color: var(--amber); }
+
+  .reveal{ opacity:0; transform: translateY(22px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.in{ opacity:1; transform:none; }
+  @media (prefers-reduced-motion: reduce){ .reveal{ opacity:1; transform:none; transition:none; } }
+
+  /* ---------- shelf (new releases) ---------- */
+  .shelf{
+    display:flex; gap:20px;
+    overflow-x:auto;
+    padding: 6px 4px 26px;
+    scroll-snap-type: x proximity;
+  }
+  .shelf::-webkit-scrollbar{ height:6px; }
+  .shelf::-webkit-scrollbar-thumb{ background: var(--charcoal-2); border-radius:10px; }
+
+  .card{
+    flex: 0 0 210px;
+    scroll-snap-align:start;
+  }
+  .cover{
+    position:relative;
+    width:100%; aspect-ratio:1/1;
+    border-radius: 10px;
+    overflow:hidden;
+    margin-bottom:14px;
+    box-shadow: 0 14px 30px -14px rgba(0,0,0,0.7);
+    isolation:isolate;
+  }
+  .cover .grain{
+    position:absolute; inset:0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
+    mix-blend-mode: overlay;
+    opacity:0.5;
+  }
+  .cover .mark{
+    position:absolute; inset:0;
+    display:flex; align-items:flex-end;
+    padding: 14px;
+  }
+  .cover .mark .glyph{
+    font-family: var(--font-display);
+    font-weight:900;
+    font-size: 3.4rem;
+    color: rgba(255,255,255,0.85);
+    line-height:1;
+  }
+  .card-title{ font-weight:700; font-size:0.94rem; margin: 0 0 2px; }
+  .card-artist{ color: var(--muted); font-size: 0.82rem; margin:0 0 10px; }
+
+  /* ---------- star rating widget ---------- */
+  .stars{ display:inline-flex; gap:2px; }
+  .stars button{
+    background:none; border:none; padding:0;
+    font-size: 1.05rem;
+    line-height:1;
+    color: var(--charcoal-2);
+    transition: color 0.12s, transform 0.12s;
+  }
+  .stars button.on{ color: var(--amber); }
+  .stars button:hover{ transform: scale(1.15); }
+  .stars.readonly button{ pointer-events:none; }
+  .rate-row{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  .rate-note{ font-family: var(--font-mono); font-size:0.68rem; color: var(--muted); }
+
+  /* ---------- chart / ranking ---------- */
+  .chart-list{ display:flex; flex-direction:column; border-top:1px solid var(--line); }
+  .chart-row{
+    display:grid;
+    grid-template-columns: 56px 52px 1fr auto auto;
+    align-items:center;
+    gap:18px;
+    padding: 16px 10px;
+    border-bottom: 1px solid var(--line);
+    transition: background 0.2s;
+  }
+  .chart-row:hover{ background: rgba(243,239,228,0.03); }
+  .matrix{
+    font-family: var(--font-mono);
+    font-weight:600;
+    font-size:0.85rem;
+    color: var(--amber-dim);
+    letter-spacing:0.02em;
+  }
+  .mini-cover{
+    width:52px; height:52px; border-radius:6px;
+    position:relative; overflow:hidden;
+    flex-shrink:0;
+  }
+  .mini-cover .glyph{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    font-family: var(--font-display); font-weight:900; font-size:1.3rem; color: rgba(255,255,255,0.85);
+  }
+  .row-meta .t{ font-weight:700; font-size:0.95rem; }
+  .row-meta .a{ color: var(--muted); font-size:0.82rem; }
+  .tag{
+    font-family: var(--font-mono);
+    font-size:0.65rem;
+    color: var(--muted);
+    border: 1px solid var(--line);
+    padding: 2px 8px;
+    border-radius: 100px;
+    display:inline-block;
+    margin-top:4px;
+  }
+  .row-stat{
+    display:flex; flex-direction:column; align-items:flex-end; gap:4px;
+  }
+  .avg-stars{ font-size:0.85rem; letter-spacing:1px; }
+  .spins{ font-family: var(--font-mono); font-size:0.68rem; color: var(--muted); }
+
+  @media (max-width: 720px){
+    .chart-row{ grid-template-columns: 34px 42px 1fr; }
+    .row-stat:last-child{ display:none; }
+  }
+
+  /* ---------- crates ---------- */
+  .crates-grid{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+  }
+  @media (max-width: 900px){ .crates-grid{ grid-template-columns: 1fr; } }
+  .crate{
+    background: var(--charcoal);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 20px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .crate:hover{ border-color: var(--amber-dim); transform: translateY(-3px); }
+  .crate-collage{
+    display:grid; grid-template-columns: repeat(4,1fr); gap:4px;
+    margin-bottom:16px; border-radius:8px; overflow:hidden;
+  }
+  .crate-collage div{ aspect-ratio:1/1; }
+  .crate h3{ font-family: var(--font-display); font-size:1.1rem; margin: 0 0 4px; }
+  .crate p{ color: var(--muted); font-size:0.82rem; margin:0 0 10px; }
+  .crate .by{ font-family: var(--font-mono); font-size:0.68rem; color: var(--amber-dim); }
+
+  /* ---------- footer ---------- */
+  footer{
+    border-top: 1px solid var(--line);
+    padding: 48px 0 32px;
+    position:relative; z-index:1;
+  }
+  .foot-grid{
+    display:flex; justify-content:space-between; align-items:flex-start; gap:24px; flex-wrap:wrap;
+  }
+  .foot-cols{ display:flex; gap:60px; flex-wrap:wrap; }
+  .foot-col h4{ font-size:0.78rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--muted); margin:0 0 12px; }
+  .foot-col a{ display:block; font-size:0.86rem; margin-bottom:8px; color: var(--bone); opacity:0.85; }
+  .foot-col a:hover{ opacity:1; color: var(--amber); }
+  .foot-bottom{
+    margin-top:40px; padding-top:20px; border-top:1px solid var(--line);
+    display:flex; justify-content:space-between; color: var(--muted); font-size:0.78rem; flex-wrap:wrap; gap:10px;
+  }
+
+  /* ============================================================
+     MODAL (login / signup)
+  ============================================================ */
+  .modal-backdrop{
+    position:fixed; inset:0; background: rgba(6,7,10,0.72);
+    backdrop-filter: blur(4px);
+    display:none; align-items:center; justify-content:center;
+    z-index:100; padding:20px;
+  }
+  .modal-backdrop.open{ display:flex; }
+  .modal{
+    background: var(--charcoal);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    width: 100%; max-width: 400px;
+    padding: 30px;
+    position:relative;
+  }
+  .modal-close{
+    position:absolute; top:16px; right:16px;
+    background:none; border:none; color: var(--muted); font-size:1.3rem;
+  }
+  .modal-tabs{ display:flex; gap:4px; background: var(--ink); border-radius:100px; padding:4px; margin-bottom:24px; }
+  .modal-tabs button{
+    flex:1; background:none; border:none; padding:9px; border-radius:100px;
+    color: var(--muted); font-weight:700; font-size:0.82rem;
+  }
+  .modal-tabs button.active{ background: var(--amber); color:#241703; }
+  .modal h3{ font-family: var(--font-display); font-size:1.4rem; margin:0 0 6px; }
+  .modal .lead{ color: var(--muted); font-size:0.85rem; margin:0 0 22px; }
+  .field{ margin-bottom:14px; }
+  .field label{ display:block; font-size:0.75rem; color: var(--muted); margin-bottom:6px; }
+  .field input{
+    width:100%; background: var(--ink); border:1px solid var(--line);
+    border-radius:8px; padding: 11px 12px; color: var(--bone); font-size:0.9rem;
+  }
+  .field input:focus{ outline:none; border-color: var(--amber); }
+  .modal .btn-solid{ width:100%; padding:12px; margin-top:6px; }
+  .modal-note{ font-size:0.7rem; color: var(--muted); margin-top:16px; line-height:1.5; }
+
+  .toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
+    background: var(--bone); color: var(--ink);
+    padding: 13px 22px; border-radius: 10px;
+    font-weight:600; font-size:0.85rem;
+    opacity:0; pointer-events:none; transition: opacity 0.3s, transform 0.3s;
+    z-index:200;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  /* ---------- responsive ---------- */
+  @media (max-width: 900px){
+    .hero{ grid-template-columns: 1fr; padding-top:56px; }
+    .disc-stage{ height:280px; order:-1; }
+    .platter{ width:230px; height:230px; }
+    .record{ width:190px; height:190px; }
+    .nav-links{ display:none; }
+  }
+  @media (max-width: 520px){
+    .nav{ padding:14px 18px; }
+    .wrap, .hero{ padding-left:18px; padding-right:18px; }
+    .search-pill{ display:none; }
+  }
+</style>
 </head>
-<body class="bg-darkbg text-zinc-100 font-sans antialiased min-h-screen selection:bg-purple-500 selection:text-white">
+<body>
 
-    <!-- HEADER / NAVIGATION -->
-    <header class="sticky top-0 z-50 backdrop-blur-xl bg-darkbg/85 border-b border-zinc-800/80 px-4 lg:px-8 py-3.5 transition-all">
-        <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
-            <!-- Logo & Brand -->
-            <div class="flex items-center gap-6 cursor-pointer" onclick="switchView('feed')">
-                <div class="flex items-center gap-2.5">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 via-indigo-600 to-zinc-950 flex items-center justify-center shadow-lg shadow-purple-900/30 border border-purple-500/30">
-                        <i data-lucide="radio" class="w-5 h-5 text-white"></i>
-                    </div>
-                    <div>
-                        <span class="text-lg font-extrabold tracking-wider bg-gradient-to-r from-white via-zinc-200 to-purple-400 bg-clip-text text-transparent">AURA</span>
-                        <span class="block text-[9px] text-purple-400 font-bold uppercase tracking-widest -mt-1">Music Archive</span>
-                    </div>
-                </div>
-
-                <!-- Navigation Links -->
-                <nav class="hidden md:flex items-center gap-1 font-medium text-sm">
-                    <button onclick="switchView('feed')" id="nav-feed" class="px-4 py-2 rounded-full bg-zinc-800 text-white transition-all shadow-sm">Acervo Geral</button>
-                    <button onclick="switchView('releases')" id="nav-releases" class="px-4 py-2 rounded-full text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all flex items-center gap-1.5">
-                        <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span> Top Lançamentos da Semana
-                    </button>
-                    <button onclick="switchView('artists')" id="nav-artists" class="px-4 py-2 rounded-full text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all">Artistas</button>
-                </nav>
-            </div>
-
-            <!-- Search Bar -->
-            <div class="flex-1 max-w-lg relative hidden sm:block">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-zinc-400">
-                    <i data-lucide="search" class="w-4 h-4"></i>
-                </span>
-                <input type="text" id="searchInput" placeholder="Buscar artista, álbum, capa, GIF ou show..." 
-                    class="w-full pl-11 pr-4 py-2 bg-zinc-900/90 border border-zinc-800 rounded-full text-sm text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all shadow-inner">
-            </div>
-
-            <!-- Actions -->
-            <div class="flex items-center gap-3">
-                <button onclick="switchView('releases')" class="px-3.5 py-2 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold transition shadow-lg shadow-purple-900/30 flex items-center gap-2">
-                    <i data-lucide="zap" class="w-3.5 h-3.5"></i> Lançamentos
-                </button>
-            </div>
-        </div>
-    </header>
-
-    <!-- MAIN CONTAINER -->
-    <main class="max-w-7xl mx-auto px-4 lg:px-8 py-6">
-
-        <!-- VIEW 1: FEED / ACERVO GERAL -->
-        <section id="view-feed" class="space-y-6">
-            <!-- Banner Destaque Lançamentos da Semana -->
-            <div onclick="switchView('releases')" class="relative rounded-3xl overflow-hidden bg-gradient-to-r from-purple-950 via-zinc-900 to-indigo-950 p-6 sm:p-8 border border-purple-500/30 cursor-pointer group shadow-2xl">
-                <div class="absolute right-0 top-0 bottom-0 w-1/2 opacity-30 bg-cover bg-center mix-blend-overlay pointer-events-none" style="background-image: url('https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&q=80&w=1200')"></div>
-                <div class="relative z-10 max-w-2xl space-y-3">
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs font-bold">
-                        <i data-lucide="flame" class="w-3.5 h-3.5"></i> ATUALIZADO HOJE
-                    </div>
-                    <h2 class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight group-hover:text-purple-300 transition">Top Lançamentos da Semana</h2>
-                    <p class="text-zinc-300 text-sm sm:text-base leading-relaxed">Confira os singles, álbuns e videoclipes que estão dominando os charts globais e o acervo visual oficial dos artistas.</p>
-                    <div class="pt-2 flex items-center gap-2 text-xs font-bold text-purple-400 group-hover:translate-x-1 transition-transform">
-                        <span>Ver todos os lançamentos</span> <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Filter Pills por Tipo de Mídia & Gênero -->
-            <div class="flex items-center justify-between gap-4 flex-wrap pt-2">
-                <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-                    <button onclick="filterCategory('all')" class="category-btn px-4 py-2 rounded-full text-xs font-semibold bg-white text-black transition flex-shrink-0 shadow-md">Todo Acervo</button>
-                    <button onclick="filterCategory('foto')" class="category-btn px-4 py-2 rounded-full text-xs font-semibold bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white transition flex-shrink-0 border border-zinc-800">📸 Fotos Oficiais</button>
-                    <button onclick="filterCategory('capa')" class="category-btn px-4 py-2 rounded-full text-xs font-semibold bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white transition flex-shrink-0 border border-zinc-800">💿 Capas & Álbuns</button>
-                    <button onclick="filterCategory('gif')" class="category-btn px-4 py-2 rounded-full text-xs font-semibold bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white transition flex-shrink-0 border border-zinc-800">✨ GIFs & Shows</button>
-                    <button onclick="filterCategory('bastidores')" class="category-btn px-4 py-2 rounded-full text-xs font-semibold bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white transition flex-shrink-0 border border-zinc-800">🎬 Bastidores</button>
-                </div>
-                
-                <!-- Quick Artist Selector -->
-                <div class="flex items-center gap-2 text-xs text-zinc-400 font-semibold">
-                    <span>Artistas em Destaque:</span>
-                    <button onclick="openArtistPage('The Weeknd')" class="px-3 py-1 rounded-full bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-800 transition">The Weeknd</button>
-                    <button onclick="openArtistPage('Dua Lipa')" class="px-3 py-1 rounded-full bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-800 transition">Dua Lipa</button>
-                    <button onclick="openArtistPage('Travis Scott')" class="px-3 py-1 rounded-full bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-800 transition">Travis Scott</button>
-                </div>
-            </div>
-
-            <!-- Masonry Feed Container (Acervo) -->
-            <div id="masonryFeed" class="masonry-grid pt-2">
-                <!-- Items injected via JS -->
-            </div>
-        </section>
-
-        <!-- VIEW 2: TOP LANÇAMENTOS DA SEMANA -->
-        <section id="view-releases" class="hidden space-y-8 animate-fadeIn">
-            <div class="space-y-2">
-                <div class="inline-flex items-center gap-2 text-rose-400 text-xs font-bold uppercase tracking-wider">
-                    <i data-lucide="trending-up" class="w-4 h-4"></i> Charts & Drops
-                </div>
-                <h1 class="text-3xl sm:text-4xl font-extrabold text-white">Top Lançamentos da Semana</h1>
-                <p class="text-zinc-400 text-sm">Os álbuns mais ouvidos e singles fresquinhos catalogados com materiais visuais exclusivos.</p>
-            </div>
-
-            <!-- Releases Grid -->
-            <div id="releasesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Injected via JS -->
-            </div>
-        </section>
-
-        <!-- VIEW 3: PÁGINA DO ARTISTA (ACERVO DEDICADO) -->
-        <section id="view-artist" class="hidden space-y-8 animate-fadeIn">
-            <!-- Artist Header Banner -->
-            <div class="relative rounded-3xl overflow-hidden bg-zinc-955 border border-zinc-800">
-                <div class="h-64 sm:h-96 w-full relative">
-                    <img id="artistBanner" src="" alt="Banner" class="w-full h-full object-cover opacity-60">
-                    <div class="absolute inset-0 bg-gradient-to-t from-darkbg via-darkbg/50 to-transparent"></div>
-                </div>
-
-                <!-- Profile Info Overlay -->
-                <div class="px-6 sm:px-10 pb-8 pt-0 relative -mt-24 sm:-mt-32 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6">
-                    <div class="flex flex-col sm:flex-row items-start sm:items-end gap-6">
-                        <img id="artistAvatar" src="" alt="Avatar" class="w-32 h-32 sm:w-40 sm:h-40 rounded-2xl object-cover ring-4 ring-darkbg shadow-2xl">
-                        <div class="space-y-1.5">
-                            <div class="flex items-center gap-2.5">
-                                <h1 id="artistName" class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white"></h1>
-                                <span class="bg-purple-500/20 text-purple-400 p-1.5 rounded-full border border-purple-500/30" title="Artista Oficial Verificado"><i data-lucide="badge-check" class="w-5 h-5"></i></span>
-                            </div>
-                            <p id="artistGenre" class="text-purple-400 text-sm font-semibold"></p>
-                            <p id="artistBio" class="text-zinc-300 text-sm max-w-xl leading-relaxed pt-1"></p>
-                        </div>
-                    </div>
-                    
-                    <div class="flex items-center gap-3 w-full sm:w-auto">
-                        <button onclick="switchView('feed')" class="px-6 py-2.5 rounded-full bg-zinc-800 hover:bg-zinc-700 text-white font-semibold text-sm transition border border-zinc-700 flex items-center gap-2">
-                            <i data-lucide="arrow-left" class="w-4 h-4"></i> Voltar ao Acervo
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Artist Section Tabs -->
-            <div class="flex items-center gap-6 border-b border-zinc-800 pb-3 text-sm font-semibold">
-                <button onclick="switchArtistTab('all')" id="art-tab-all" class="text-white pb-3 border-b-2 border-purple-500 -mb-3 transition">Todo Acervo do Artista</button>
-                <button onclick="switchArtistTab('capa')" id="art-tab-capa" class="text-zinc-400 hover:text-white pb-3 transition">Capas & Álbuns</button>
-                <button onclick="switchArtistTab('foto')" id="art-tab-foto" class="text-zinc-400 hover:text-white pb-3 transition">Fotos Oficiais & Presskit</button>
-                <button onclick="switchArtistTab('gif')" id="art-tab-gif" class="text-zinc-400 hover:text-white pb-3 transition">GIFs & Shows</button>
-            </div>
-
-            <!-- Artist Media Masonry Grid -->
-            <div id="artistMasonryGrid" class="masonry-grid">
-                <!-- Injected via JS -->
-            </div>
-        </section>
-
-    </main>
-
-    <!-- MODAL FOR MEDIA PREVIEW & DOWNLOAD -->
-    <div id="mediaModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden items-center justify-center p-4 sm:p-6">
-        <div class="bg-zinc-900 border border-zinc-800 rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col md:flex-row shadow-2xl relative animate-scaleUp">
-            
-            <!-- Close Button -->
-            <button onclick="closeModal()" class="absolute top-4 right-4 z-10 p-2 rounded-full bg-black/60 hover:bg-black text-white transition backdrop-blur-sm">
-                <i data-lucide="x" class="w-5 h-5"></i>
-            </button>
-
-            <!-- Modal Left: Media Preview -->
-            <div class="md:w-3/5 bg-black flex items-center justify-center relative overflow-hidden">
-                <img id="modalImage" src="" alt="Preview" class="w-full h-full object-cover max-h-[70vh] md:max-h-[85vh]">
-            </div>
-
-            <!-- Modal Right: Metadata -->
-            <div class="md:w-2/5 p-6 flex flex-col justify-between overflow-y-auto max-h-[85vh]">
-                <div class="space-y-6">
-                    <!-- Artist Ref -->
-                    <div class="flex items-center justify-between border-b border-zinc-800 pb-4">
-                        <div class="flex items-center gap-3 cursor-pointer" onclick="closeModal(); openArtistPage(currentMedia.artist)">
-                            <img id="modalAvatar" src="" alt="Artist" class="w-12 h-12 rounded-xl object-cover ring-2 ring-purple-500">
-                            <div>
-                                <h3 id="modalArtist" class="font-bold text-white hover:underline"></h3>
-                                <p id="modalCategory" class="text-xs text-purple-400 font-semibold uppercase tracking-wider"></p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Title & Description -->
-                    <div class="space-y-2">
-                        <h2 id="modalTitle" class="text-xl font-bold text-white"></h2>
-                        <p id="modalDesc" class="text-sm text-zinc-400 leading-relaxed"></p>
-                    </div>
-
-                    <!-- Resolution & Info -->
-                    <div class="bg-zinc-950 p-4 rounded-2xl border border-zinc-800/80 space-y-2 text-xs text-zinc-400">
-                        <div class="flex justify-between">
-                            <span>Formato:</span>
-                            <span class="text-white font-semibold" id="modalFormat">Alta Resolução (PNG / WebP)</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Dimensões:</span>
-                            <span class="text-white font-semibold">3840 x 2160 (4K Ultra HD)</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Licença de Acervo:</span>
-                            <span class="text-purple-400 font-semibold">Uso Editorial / Divulgação Oficial</span>
-                        </div>
-                    </div>
-
-                    <!-- Tags -->
-                    <div id="modalTags" class="flex flex-wrap gap-2"></div>
-                </div>
-
-                <!-- Modal Actions -->
-                <div class="pt-6 mt-6 border-t border-zinc-800 flex items-center justify-between">
-                    <button onclick="alert('Download do arquivo original iniciado em alta qualidade!')" class="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-sm transition shadow-lg shadow-purple-900/40 flex items-center justify-center gap-2">
-                        <i data-lucide="download" class="w-4 h-4"></i> Baixar Mídia Original (4K)
-                    </button>
-                </div>
-            </div>
-
-        </div>
+<!-- ============ NAV ============ -->
+<nav class="nav">
+  <div class="logo"><span class="disc"></span>VYNL</div>
+  <div class="nav-links">
+    <a href="#novidades">Prensagens da semana</a>
+    <a href="#chart">A parada</a>
+    <a href="#crates">Crates</a>
+  </div>
+  <div class="nav-actions">
+    <div class="search-pill">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      Buscar álbum, artista...
     </div>
+    <button class="btn btn-ghost" id="openLogin">Entrar</button>
+    <button class="btn btn-solid" id="openSignup">Criar conta</button>
+    <div class="user-chip" id="userChip"><span class="av" id="userAv">?</span><span id="userName"></span></div>
+  </div>
+</nav>
 
-    <!-- JAVASCRIPT LOGIC -->
-    <script>
-        // ==========================================
-        // SPOTIFY API CONFIGURATION (PRONTO PARA USO)
-        // ==========================================
-        const SPOTIFY_CREDENTIALS = {
-            clientId: '866fce2636ee446c9563c5fd62a05d23',       // Cole seu Client ID do Spotify aqui
-            clientSecret: '38902d99ce4a4aaa9128d277b2eb12e4' // Cole seu Client Secret do Spotify aqui
-        };
+<div class="ticker-bar">
+  <div class="ticker-track" id="tickerTrack"></div>
+</div>
 
-        async function getSpotifyAccessToken() {
-            if (SPOTIFY_CREDENTIALS.clientId === 'SEU_CLIENT_ID_AQUI') {
-                throw new Error("Por favor, insira suas credenciais do Spotify no objeto SPOTIFY_CREDENTIALS.");
-            }
-            
-            const response = await fetch('https://accounts.spotify.com/api/token', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'Authorization': 'Basic ' + btoa(SPOTIFY_CREDENTIALS.clientId + ':' + SPOTIFY_CREDENTIALS.clientSecret)
-                },
-                body: 'grant_type=client_credentials'
-            });
-            
-            const data = await response.json();
-            return data.access_token;
-        }
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div>
+    <p class="eyebrow">Sua estante, em forma de site</p>
+    <h1>Todo disco<br>merece um <em>veredito</em>.</h1>
+    <p>Dê nota de 1 a 5 estrelas pra cada álbum que você ouvir, monte suas crates e descubra o que o resto do mundo anda girando antes de virar unanimidade.</p>
+    <div class="hero-ctas">
+      <button class="btn btn-solid btn-lg" id="heroSignup">Começar a avaliar</button>
+      <a href="#chart" class="btn btn-ghost btn-lg">Ver a parada →</a>
+    </div>
+  </div>
+  <div class="disc-stage">
+    <div class="platter"></div>
+    <div class="record" id="heroRecord">
+      <div class="sleeve-art" id="heroSleeve" data-cover="6"></div>
+      <div class="grooves"></div>
+      <div class="label">
+        <div class="t" id="heroLabelTitle">SOS</div>
+        <div class="a" id="heroLabelArtist">SZA</div>
+      </div>
+      <div class="hole"></div>
+    </div>
+    <div class="tonearm">
+      <svg viewBox="0 0 130 130">
+        <line x1="118" y1="14" x2="30" y2="76" stroke="#d8d5c8" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="118" cy="14" r="9" fill="#d8d5c8"/>
+        <circle cx="30" cy="76" r="4" fill="#e8a33d"/>
+      </svg>
+    </div>
+    <div class="now-spinning">tocando agora — <b id="heroNowText">SOS · SZA</b></div>
+  </div>
+</header>
 
-        async function fetchSpotifyWeeklyReleases() {
-            try {
-                const token = await getSpotifyAccessToken();
-                const response = await fetch('https://api.spotify.com/v1/browse/new-releases?limit=6&country=BR', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                
-                const data = await response.json();
-                
-                // Mapeia para o formato do site
-                const apiReleases = data.albums.items.map(album => ({
-                    title: album.name,
-                    artist: album.artists.map(a => a.name).join(', '),
-                    type: album.album_type === 'single' ? 'Single Oficial' : 'Álbum Completo',
-                    date: 'Lançamento recente',
-                    image: album.images[0].url,
-                    streams: 'Disponível no Spotify',
-                    linkText: 'Ouvir no Spotify'
-                }));
+<!-- ============ NEW RELEASES ============ -->
+<section id="novidades">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <h2>Prensagens da semana</h2>
+        <div class="sub">O que acabou de sair da fábrica e já está pedindo nota.</div>
+      </div>
+      <a href="#" class="section-link">Ver calendário completo →</a>
+    </div>
+    <div class="shelf reveal" id="shelf"></div>
+  </div>
+</section>
 
-                renderDynamicReleases(apiReleases);
-            } catch (error) {
-                console.warn("Modo offline / API não configurada. Usando lançamentos padrão:", error.message);
-                renderReleases(); // Fallback para os dados mockados
-            }
-        }
-        // ==========================================
+<!-- ============ CHART ============ -->
+<section id="chart">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <h2>A parada</h2>
+        <div class="sub">Ranqueado pela nota média da comunidade. Numeração ao estilo lado/faixa de vinil.</div>
+      </div>
+      <a href="#" class="section-link">Ver parada completa →</a>
+    </div>
+    <div class="chart-list reveal" id="chartList"></div>
+  </div>
+</section>
 
-        // Initialize Lucide Icons & Data
-        document.addEventListener('DOMContentLoaded', () => {
-            lucide.createIcons();
-            renderFeed(mediaAcervo);
-            
-            // Tenta buscar da API do Spotify (caso as credenciais estejam configuradas, senão usa mock)
-            fetchSpotifyWeeklyReleases();
+<!-- ============ CRATES ============ -->
+<section id="crates">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div>
+        <h2>Crates da galera</h2>
+        <div class="sub">Listas montadas por quem realmente vasculha o catálogo.</div>
+      </div>
+      <a href="#" class="section-link">Montar minha crate →</a>
+    </div>
+    <div class="crates-grid reveal" id="cratesGrid"></div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="logo" style="font-size:1.2rem"><span class="disc"></span>VYNL</div>
+      <div class="foot-cols">
+        <div class="foot-col">
+          <h4>Explorar</h4>
+          <a href="#novidades">Novidades</a>
+          <a href="#chart">Parada</a>
+          <a href="#crates">Crates</a>
+        </div>
+        <div class="foot-col">
+          <h4>Comunidade</h4>
+          <a href="#">Sobre o VYNL</a>
+          <a href="#">Diretrizes</a>
+          <a href="#">Fale conosco</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 VYNL — feito por quem ainda lê o encarte inteiro.</span>
+      <span>Protótipo de demonstração</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ============ LOGIN / SIGNUP MODAL ============ -->
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal">
+    <button class="modal-close" id="modalClose">&times;</button>
+    <div class="modal-tabs">
+      <button id="tabLogin" class="active">Entrar</button>
+      <button id="tabSignup">Criar conta</button>
+    </div>
+    <h3 id="modalTitle">Bem-vindo de volta</h3>
+    <p class="lead" id="modalLead">Entre pra continuar avaliando seus discos.</p>
+    <form id="authForm">
+      <div class="field" id="nameField" style="display:none">
+        <label>Nome de usuário</label>
+        <input type="text" id="nameInput" placeholder="ex: crateDigger93">
+      </div>
+      <div class="field">
+        <label>E-mail</label>
+        <input type="email" id="emailInput" placeholder="voce@email.com" required>
+      </div>
+      <div class="field">
+        <label>Senha</label>
+        <input type="password" id="passInput" placeholder="••••••••" required>
+      </div>
+      <button type="submit" class="btn btn-solid">Entrar</button>
+    </form>
+    <p class="modal-note">Isto é uma demonstração de front-end: nenhuma senha é enviada ou armazenada de verdade. Um back-end real é necessário para autenticação segura.</p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   CONFIGURAÇÃO DA API DO SPOTIFY — SÓ PARA TESTE LOCAL
+   -----------------------------------------------------------
+   Cole aqui embaixo o Client ID e o Client Secret do seu app
+   no Spotify Developer Dashboard:
+   https://developer.spotify.com/dashboard
+
+   ATENÇÃO: colocar o client_secret direto no HTML deixa ele
+   visível pra qualquer pessoa que abrir "ver código-fonte" da
+   página. Isso é aceitável enquanto o arquivo roda só na sua
+   máquina — NUNCA publique este arquivo assim (site público,
+   repositório público, etc). Pra publicar de verdade, essa
+   troca de token precisa acontecer num back-end seu, não aqui.
+
+   Se você abrir este arquivo com duplo-clique (file://...) e a
+   busca não funcionar, é CORS bloqueando o protocolo local.
+   Rode um servidor simples na pasta e abra via http://:
+     python3 -m http.server 8000
+     → depois abra http://localhost:8000/vynl.html
+   ============================================================ */
+  const SPOTIFY_CLIENT_ID     = '866fce2636ee446c9563c5fd62a05d23';
+  const SPOTIFY_CLIENT_SECRET = '38902d99ce4a4aaa9128d277b2eb12e4';
+
+  let spotifyToken = null;
+  let spotifyTokenExpiresAt = 0;
+
+  function spotifyKeysConfigured(){
+    return SPOTIFY_CLIENT_ID && SPOTIFY_CLIENT_SECRET && !SPOTIFY_CLIENT_ID.startsWith('COLE_');
+  }
+
+  async function getSpotifyToken(){
+    if(!spotifyKeysConfigured()) return null;
+    if(spotifyToken && Date.now() < spotifyTokenExpiresAt) return spotifyToken;
+    try{
+      const res = await fetch('https://accounts.spotify.com/api/token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Authorization': 'Basic ' + btoa(`${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`),
+        },
+        body: 'grant_type=client_credentials',
+      });
+      if(!res.ok) throw new Error('token request failed: ' + res.status);
+      const data = await res.json();
+      spotifyToken = data.access_token;
+      spotifyTokenExpiresAt = Date.now() + (data.expires_in - 60) * 1000;
+      return spotifyToken;
+    }catch(err){
+      console.warn('[VYNL] Não deu pra autenticar na Spotify API:', err);
+      return null;
+    }
+  }
+
+  async function spotifyFetch(path){
+    const token = await getSpotifyToken();
+    if(!token) return null;
+    try{
+      const res = await fetch(`https://api.spotify.com/v1${path}`, {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      if(!res.ok) throw new Error('spotify api ' + res.status);
+      return await res.json();
+    }catch(err){
+      console.warn('[VYNL] Chamada à Spotify API falhou:', err);
+      return null;
+    }
+  }
+
+  // busca a capa real de um álbum específico da lista curada (parada, hero, crates)
+  async function spotifySearchAlbumCover(title, artist){
+    const q = encodeURIComponent(`album:${title} artist:${artist}`);
+    const data = await spotifyFetch(`/search?q=${q}&type=album&limit=1`);
+    const item = data?.albums?.items?.[0];
+    if(!item) return null;
+    return {
+      cover: item.images?.[0]?.url || null,
+      url: item.external_urls?.spotify || null,
+    };
+  }
+
+  // busca lançamentos reais e recentes pra substituir a prateleira mockada
+  async function spotifyNewReleases(limit = 8){
+    const data = await spotifyFetch(`/browse/new-releases?country=BR&limit=${limit}`);
+    const items = data?.albums?.items;
+    if(!items) return null;
+    return items.map(al => ({
+      id: al.id,
+      title: al.name,
+      artist: al.artists.map(a => a.name).join(', '),
+      year: (al.release_date || '').slice(0, 4),
+      cover: al.images?.[0]?.url || null,
+      url: al.external_urls?.spotify || null,
+      hue: ["#3a5169", "#0a0c11"],
+    }));
+  }
+
+  /* ============================================================
+     LISTA CURADA
+     -----------------------------------------------------------
+     Usada como base fixa da "parada" (ranking) e das crates, pra
+     manter a demonstração consistente. Quando as chaves acima
+     estiverem preenchidas, cada um destes álbuns é enriquecido
+     com a capa real da Spotify (enrichWithSpotify, mais abaixo);
+     sem chaves, fica no gradiente placeholder mesmo.
+     ============================================================ */
+  const ALBUMS = [
+    { id:1, title:"In Rainbows", artist:"Radiohead", year:2007, genre:"Alt Rock", avg:4.6, spins:"18.2k", hue:["#3a5169","#0a0c11"] },
+    { id:2, title:"To Pimp a Butterfly", artist:"Kendrick Lamar", year:2015, genre:"Hip Hop", avg:4.8, spins:"31.4k", hue:["#8a4a2b","#241004"] },
+    { id:3, title:"Rumours", artist:"Fleetwood Mac", year:1977, genre:"Rock", avg:4.5, spins:"22.9k", hue:["#6b4c7a","#1a0e22"] },
+    { id:4, title:"IGOR", artist:"Tyler, The Creator", year:2019, genre:"Hip Hop", avg:4.4, spins:"19.7k", hue:["#b5563c","#2a0f08"] },
+    { id:5, title:"Discovery", artist:"Daft Punk", year:2001, genre:"Eletrônica", avg:4.7, spins:"27.1k", hue:["#3a7d7a","#0a1f1d"] },
+    { id:6, title:"SOS", artist:"SZA", year:2022, genre:"R&B", avg:4.5, spins:"24.6k", hue:["#5b3a52","#170a15"] },
+    { id:7, title:"Music Has the Right to Children", artist:"Boards of Canada", year:1998, genre:"Eletrônica", avg:4.6, spins:"9.8k", hue:["#4a5b39","#0e1408"] },
+    { id:8, title:"Currents", artist:"Tame Impala", year:2015, genre:"Psych Rock", avg:4.3, spins:"20.3k", hue:["#7a4a6b","#1e0e1a"] },
+    { id:9, title:"The Land Is Inhospitable and So Are We", artist:"Mitski", year:2023, genre:"Indie", avg:4.4, spins:"11.2k", hue:["#5c5240","#120f08"] },
+    { id:10, title:"Donuts", artist:"J Dilla", year:2006, genre:"Instrumental", avg:4.7, spins:"14.5k", hue:["#8a6a2b","#201404"] },
+    { id:11, title:"21", artist:"Adele", year:2011, genre:"Pop", avg:4.2, spins:"29.8k", hue:["#3a4a69","#0a0f22"] },
+    { id:12, title:"Homogenic", artist:"Björk", year:1997, genre:"Art Pop", avg:4.5, spins:"8.4k", hue:["#2b7a6a","#04211a"] },
+  ];
+
+  const CRATES = [
+    { name:"Café de domingo", by:"@marina.ouve", desc:"Discos pra acordar devagar, sem pressa de sair da cama.", ids:[1,10,12,6] },
+    { name:"Fim de relacionamento", by:"@joao_baixista", desc:"A trilha sonora não-oficial de terminar tudo e seguir em frente.", ids:[2,11,9,3] },
+    { name:"Faixas que ninguém te contou", by:"@crateDigger93", desc:"Discos ótimos que passaram batido na época do lançamento.", ids:[7,4,5,8] },
+  ];
+
+  const state = {
+    ratings: JSON.parse(localStorage.getItem('vynl_ratings') || '{}'),
+    user: JSON.parse(localStorage.getItem('vynl_user') || 'null'),
+  };
+
+  function saveRatings(){ localStorage.setItem('vynl_ratings', JSON.stringify(state.ratings)); }
+
+  function initials(title){ return title.trim()[0].toUpperCase(); }
+
+  function coverStyle(hue){
+    return `background: linear-gradient(155deg, ${hue[0]}, ${hue[1]});`;
+  }
+
+  // usa a capa real da Spotify quando disponível; senão cai no gradiente
+  function coverStyleFor(al){
+    if(al.cover) return `background-image:url("${al.cover}"); background-size:cover; background-position:center;`;
+    return coverStyle(al.hue || ["#3a5169","#0a0c11"]);
+  }
+  function glyphFor(al){
+    return al.cover ? '' : `<div class="mark"><span class="glyph">${initials(al.title)}</span></div>`;
+  }
+
+  // depois que a busca real chega, atualiza qualquer elemento já renderizado desse álbum
+  function applyRealCover(albumId, url){
+    if(!url) return;
+    document.querySelectorAll(`[data-cover="${albumId}"]`).forEach(el=>{
+      el.style.backgroundImage = `url("${url}")`;
+      el.style.backgroundSize = 'cover';
+      el.style.backgroundPosition = 'center';
+      const glyph = el.querySelector('.glyph');
+      if(glyph) glyph.style.display = 'none';
+    });
+  }
+
+  /* ---------- estrelas interativas ---------- */
+  function starsHTML(albumId, current){
+    let out = `<div class="stars" data-album="${albumId}">`;
+    for(let i=1;i<=5;i++){
+      out += `<button type="button" data-val="${i}" class="${i<=current?'on':''}" aria-label="Nota ${i}">★</button>`;
+    }
+    out += `</div>`;
+    return out;
+  }
+
+  function wireStars(container){
+    container.querySelectorAll('.stars').forEach(widget=>{
+      const albumId = widget.dataset.album;
+      const buttons = [...widget.querySelectorAll('button')];
+      const applyVisual = (val)=> buttons.forEach(b => b.classList.toggle('on', +b.dataset.val <= val));
+
+      buttons.forEach(btn=>{
+        btn.addEventListener('mouseenter', ()=> applyVisual(+btn.dataset.val));
+        btn.addEventListener('click', ()=>{
+          const val = +btn.dataset.val;
+          state.ratings[albumId] = val;
+          saveRatings();
+          applyVisual(val);
+          const note = widget.parentElement.querySelector('.rate-note');
+          if(note) note.textContent = `sua nota: ${val}/5`;
+          showToast(`Nota ${val}★ salva.`);
         });
+      });
+      widget.addEventListener('mouseleave', ()=> applyVisual(state.ratings[albumId] || 0));
+    });
+  }
 
-        // Mock Database: Acervo Oficial de Artistas
-        const mediaAcervo = [
-            {
-                id: 1,
-                title: "After Hours - Álbum Official Cover & Photoshoot",
-                artist: "The Weeknd",
-                genre: "R&B / Synth-Pop",
-                type: "capa",
-                image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&q=80&w=1000",
-                avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200",
-                banner: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&q=80&w=1600",
-                bio: "Cantor, compositor e produtor canadense, conhecido por sua versatilidade sônica e estética cinematográfica sombria.",
-                desc: "Sessão fotográfica oficial para a era After Hours, destacando o terno vermelho icônico e iluminação neon dramática.",
-                tags: ["TheWeeknd", "AfterHours", "AlbumCover", "Neon"]
-            },
-            {
-                id: 2,
-                title: "Future Nostalgia Tour - Live Stage Performance GIF",
-                artist: "Dua Lipa",
-                genre: "Pop / Disco",
-                type: "gif",
-                image: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&q=80&w=1000",
-                avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&q=80&w=200",
-                banner: "https://images.unsplash.com/photo-1465847899084-d164df4dedc6?auto=format&fit=crop&q=80&w=1600",
-                bio: "Ícone pop global britânica-albanesa, referência em dance-pop futurista e visuais sofisticados.",
-                desc: "Momento dinâmico capturado durante a turnê mundial Future Nostalgia, misturando coreografia espacial e lasers.",
-                tags: ["DuaLipa", "LiveTour", "PopMusic", "StageDesign"]
-            },
-            {
-                id: 3,
-                title: "UTOPIA Stadium Tour - Pyro & Stage Production",
-                artist: "Travis Scott",
-                genre: "Hip-Hop / Trap",
-                type: "foto",
-                image: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&q=80&w=1000",
-                avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=200",
-                banner: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&q=80&w=1600",
-                bio: "Rapper, produtor e designer norte-americano, pioneiro em experiências imersivas de grande escala e concertos sísmicos.",
-                desc: "Produção de palco titânica para a turnê UTOPIA, incorporando estruturas rochosas e pirotecnia de alto impacto.",
-                tags: ["TravisScott", "Utopia", "StadiumTour", "HipHop"]
-            },
-            {
-                id: 4,
-                title: "Starboy Era - Studio Recording Session",
-                artist: "The Weeknd",
-                genre: "R&B / Synth-Pop",
-                type: "bastidores",
-                image: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&q=80&w=1000",
-                avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200",
-                banner: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&q=80&w=1600",
-                bio: "Cantor, compositor e produtor canadense, conhecido por sua versatilidade sônica e estética cinematográfica sombria.",
-                desc: "Bastidores de gravação no estúdio com console SSL e iluminação em LED ultravioleta.",
-                tags: ["StudioSession", "Recording", "TheWeeknd", "Gear"]
-            },
-            {
-                id: 5,
-                title: "Radical Optimism - Album Artwork & Typography",
-                artist: "Dua Lipa",
-                genre: "Pop / Disco",
-                type: "capa",
-                image: "https://images.unsplash.com/photo-1520523839896-5c6264906f36?auto=format&fit=crop&q=80&w=1000",
-                avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&q=80&w=200",
-                banner: "https://images.unsplash.com/photo-1465847899084-d164df4dedc6?auto=format&fit=crop&q=80&w=1600",
-                bio: "Ícone pop global britânica-albanesa, referência em dance-pop futurista e visuais sofisticados.",
-                desc: "Concepção visual psicodélica e aquática para o álbum Radical Optimism.",
-                tags: ["RadicalOptimism", "AlbumCover", "DuaLipa"]
-            },
-            {
-                id: 6,
-                title: "ASTROWORLD Festival - Crowd Control & Atmosphere",
-                artist: "Travis Scott",
-                genre: "Hip-Hop / Trap",
-                type: "gif",
-                image: "https://images.unsplash.com/photo-1563308121-36a468d9230c?auto=format&fit=crop&q=80&w=1000",
-                avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=200",
-                banner: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&q=80&w=1600",
-                bio: "Rapper, produtor e designer norte-americano, pioneiro em experiências imersivas de grande escala e concertos sísmicos.",
-                desc: "GIF animado mostrando a energia explosiva do público durante a abertura do show principal.",
-                tags: ["Astroworld", "Festival", "LiveGif", "TravisScott"]
-            },
-            {
-                id: 7,
-                title: "Dark Harmonic Soundscapes - Synth Rack Closeup",
-                artist: "The Weeknd",
-                genre: "R&B / Synth-Pop",
-                type: "bastidores",
-                image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&q=80&w=1000",
-                avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200",
-                banner: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&q=80&w=1600",
-                bio: "Cantor, compositor e produtor canadense, conhecido por sua versatilidade sônica e estética cinematográfica sombria.",
-                desc: "Equipamentos de sintetizadores analógicos utilizados na criação das atmosferas oitentistas.",
-                tags: ["Synthesizer", "Gear", "Analog", "Production"]
-            },
-            {
-                id: 8,
-                title: "Vogue Magazine Editorial Photoshoot",
-                artist: "Dua Lipa",
-                genre: "Pop / Disco",
-                type: "foto",
-                image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=1000",
-                avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&q=80&w=200",
-                banner: "https://images.unsplash.com/photo-1465847899084-d164df4dedc6?auto=format&fit=crop&q=80&w=1600",
-                bio: "Ícone pop global britânica-albanesa, referência em dance-pop futurista e visuais sofisticados.",
-                desc: "Ensaio fotográfico exclusivo para edição de moda internacional.",
-                tags: ["Vogue", "Fashion", "Editorial", "DuaLipa"]
-            }
-        ];
+  /* ---------- render: shelf de novidades ---------- */
+  const shelf = document.getElementById('shelf');
+  function renderShelf(list){
+    shelf.innerHTML = '';
+    list.forEach(al=>{
+      const rating = state.ratings[al.id] || 0;
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <div class="cover" style="${coverStyleFor(al)}" data-cover="${al.id}">
+          <div class="grain"></div>
+          ${glyphFor(al)}
+        </div>
+        <p class="card-title">${al.title}</p>
+        <p class="card-artist">${al.artist} · ${al.year}</p>
+        <div class="rate-row">
+          ${starsHTML(al.id, rating)}
+          <span class="rate-note">${rating ? `sua nota: ${rating}/5` : 'ainda sem nota'}</span>
+        </div>
+      `;
+      shelf.appendChild(card);
+    });
+    wireStars(shelf);
+  }
+  renderShelf(ALBUMS.slice(0, 8));
 
-        // Top Lançamentos da Semana Fallback Data
-        const releasesData = [
-            {
-                title: "Hurry Up Tomorrow (Album)",
-                artist: "The Weeknd",
-                type: "Álbum Completo • 14 Faixas",
-                date: "Lançado esta semana",
-                image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&q=80&w=800",
-                streams: "48.2M streams no dia de estreia",
-                linkText: "Ouvir no Spotify"
-            },
-            {
-                title: "Training Season (Remixes EP)",
-                artist: "Dua Lipa",
-                type: "EP / Club Mixes",
-                date: "Lançado há 3 dias",
-                image: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&q=80&w=800",
-                streams: "19.5M streams",
-                linkText: "Ouvir no Spotify"
-            },
-            {
-                title: "TO JACKSONVILLE (Single & Video)",
-                artist: "Travis Scott",
-                type: "Single Oficial + 4K MV",
-                date: "Lançado há 5 dias",
-                image: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&q=80&w=800",
-                streams: "31.0M streams",
-                linkText: "Assistir Videoclipe"
-            }
-        ];
+  /* ---------- render: chart ---------- */
+  const chartList = document.getElementById('chartList');
+  const sorted = [...ALBUMS].sort((a,b)=> b.avg - a.avg);
+  sorted.forEach((al, idx)=>{
+    const side = idx < 6 ? 'A' : 'B';
+    const num = (idx % 6) + 1;
+    const full = Math.round(al.avg);
+    const row = document.createElement('div');
+    row.className = 'chart-row';
+    row.innerHTML = `
+      <span class="matrix">${side}${num}</span>
+      <div class="mini-cover" style="${coverStyleFor(al)}" data-cover="${al.id}">${al.cover ? '' : `<span class="glyph">${initials(al.title)}</span>`}</div>
+      <div class="row-meta">
+        <div class="t">${al.title}</div>
+        <div class="a">${al.artist} · ${al.year}</div>
+        <span class="tag">${al.genre}</span>
+      </div>
+      <div class="row-stat">
+        <span class="avg-stars">${'★'.repeat(full)}${'☆'.repeat(5-full)}</span>
+        <span class="spins">média ${al.avg.toFixed(1)}</span>
+      </div>
+      <div class="row-stat">
+        ${starsHTML(al.id, state.ratings[al.id] || 0)}
+        <span class="spins">${al.spins} spins</span>
+      </div>
+    `;
+    chartList.appendChild(row);
+  });
+  wireStars(chartList);
 
-        let currentMedia = null;
+  /* ---------- render: crates ---------- */
+  const cratesGrid = document.getElementById('cratesGrid');
+  CRATES.forEach(cr=>{
+    const covers = cr.ids.map(id=>{
+      const al = ALBUMS.find(a=>a.id===id);
+      return `<div style="${coverStyleFor(al)}" data-cover="${al.id}"></div>`;
+    }).join('');
+    const el = document.createElement('div');
+    el.className = 'crate';
+    el.innerHTML = `
+      <div class="crate-collage">${covers}</div>
+      <h3>${cr.name}</h3>
+      <p>${cr.desc}</p>
+      <span class="by">montada por ${cr.by}</span>
+    `;
+    cratesGrid.appendChild(el);
+  });
 
-        // Render Feed (Acervo Geral)
-        function renderFeed(data, containerId = 'masonryFeed') {
-            const container = document.getElementById(containerId);
-            container.innerHTML = '';
+  /* ---------- disco do hero ---------- */
+  const featured = ALBUMS[5]; // SOS
+  document.getElementById('heroSleeve').style.cssText = coverStyleFor(featured);
 
-            if (data.length === 0) {
-                container.innerHTML = `<div class="col-span-full py-16 text-center text-zinc-500">Nenhum item encontrado neste acervo.</div>`;
-                return;
-            }
+  /* ---------- ticker ---------- */
+  const tickerItems = [
+    "sarah.k avaliou <span>Discovery</span> com ★★★★★",
+    "marco acabou de logar <span>In Rainbows</span>",
+    "nova crate: <span>\\'Fim de relacionamento\\'</span>",
+    "julia.fm avaliou <span>Homogenic</span> com ★★★★☆",
+    "132 pessoas ouviram <span>SOS</span> essa semana",
+  ];
+  const track = document.getElementById('tickerTrack');
+  track.innerHTML = (tickerItems.concat(tickerItems)).map(t=>`<span style="color:inherit">${t}</span>`).join(' &nbsp;•&nbsp; ');
 
-            data.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'masonry-item group cursor-pointer';
-                card.onclick = () => openModal(item);
+  /* ---------- scroll reveal ---------- */
+  const io = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.reveal').forEach(el=> io.observe(el));
 
-                card.innerHTML = `
-                    <div class="relative rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-800/80 transition-all duration-300 group-hover:border-purple-500/50 group-hover:shadow-xl group-hover:shadow-purple-950/30">
-                        <!-- Media Image -->
-                        <div class="relative overflow-hidden">
-                            <img src="${item.image}" alt="${item.title}" class="w-full object-cover transition-transform duration-500 group-hover:scale-105">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-4">
-                                <div class="flex justify-between items-center">
-                                    <span class="px-3 py-1 rounded-full bg-black/70 backdrop-blur-md text-[11px] font-bold text-purple-300 border border-purple-500/30 uppercase tracking-wider">
-                                        ${item.type}
-                                    </span>
-                                    <span class="p-2 rounded-full bg-purple-600 text-white shadow-lg">
-                                        <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i>
-                                    </span>
-                                </div>
-                                <div class="text-xs text-zinc-300 font-medium">
-                                    <span>Clique para ampliar & baixar</span>
-                                </div>
-                            </div>
-                        </div>
+  /* ---------- toast ---------- */
+  let toastTimer;
+  function showToast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=> t.classList.remove('show'), 2600);
+  }
 
-                        <!-- Footer Info -->
-                        <div class="p-3.5 space-y-1.5">
-                            <h3 class="font-bold text-sm text-zinc-100 group-hover:text-purple-400 transition line-clamp-1">${item.title}</h3>
-                            <div class="flex items-center justify-between pt-1">
-                                <div class="flex items-center gap-2 cursor-pointer" onclick="event.stopPropagation(); openArtistPage('${item.artist}')">
-                                    <img src="${item.avatar}" alt="${item.artist}" class="w-5 h-5 rounded-full object-cover">
-                                    <span class="text-xs text-zinc-400 hover:text-white transition font-medium">${item.artist}</span>
-                                </div>
-                                <span class="text-[10px] text-zinc-500 font-semibold uppercase">${item.genre || 'Music'}</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-            lucide.createIcons();
-        }
+  /* ---------- modal login/signup (simulado) ---------- */
+  const backdrop = document.getElementById('modalBackdrop');
+  const tabLogin = document.getElementById('tabLogin');
+  const tabSignup = document.getElementById('tabSignup');
+  const nameField = document.getElementById('nameField');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalLead = document.getElementById('modalLead');
+  const submitBtn = document.querySelector('#authForm button[type="submit"]');
+  let mode = 'login';
 
-        // Render Top Lançamentos (Fallback or Mock)
-        function renderReleases() {
-            renderDynamicReleases(releasesData);
-        }
+  function openModal(m){
+    mode = m;
+    setTab(m);
+    backdrop.classList.add('open');
+  }
+  function setTab(m){
+    mode = m;
+    tabLogin.classList.toggle('active', m==='login');
+    tabSignup.classList.toggle('active', m==='signup');
+    nameField.style.display = m==='signup' ? 'block' : 'none';
+    modalTitle.textContent = m==='login' ? 'Bem-vindo de volta' : 'Crie sua conta';
+    modalLead.textContent = m==='login' ? 'Entre pra continuar avaliando seus discos.' : 'Comece a montar sua estante em segundos.';
+    submitBtn.textContent = m==='login' ? 'Entrar' : 'Criar conta';
+  }
+  document.getElementById('openLogin').addEventListener('click', ()=> openModal('login'));
+  document.getElementById('openSignup').addEventListener('click', ()=> openModal('signup'));
+  document.getElementById('heroSignup').addEventListener('click', ()=> openModal('signup'));
+  tabLogin.addEventListener('click', ()=> setTab('login'));
+  tabSignup.addEventListener('click', ()=> setTab('signup'));
+  document.getElementById('modalClose').addEventListener('click', ()=> backdrop.classList.remove('open'));
+  backdrop.addEventListener('click', e=>{ if(e.target === backdrop) backdrop.classList.remove('open'); });
 
-        function renderDynamicReleases(releases) {
-            const container = document.getElementById('releasesGrid');
-            container.innerHTML = '';
+  document.getElementById('authForm').addEventListener('submit', e=>{
+    e.preventDefault();
+    const email = document.getElementById('emailInput').value;
+    const nameInput = document.getElementById('nameInput').value;
+    const username = mode === 'signup' && nameInput ? nameInput : email.split('@')[0];
+    state.user = { username };
+    localStorage.setItem('vynl_user', JSON.stringify(state.user));
+    reflectUser();
+    backdrop.classList.remove('open');
+    showToast(mode === 'login' ? `Login simulado: bem-vindo(a), ${username}.` : `Conta simulada criada. Bem-vindo(a), ${username}!`);
+    e.target.reset();
+  });
 
-            releases.forEach(rel => {
-                const card = document.createElement('div');
-                card.className = 'bg-zinc-900 border border-zinc-800 rounded-3xl overflow-hidden flex flex-col justify-between group hover:border-purple-500/50 transition shadow-xl';
-                card.innerHTML = `
-                    <div class="relative h-64 overflow-hidden">
-                        <img src="${rel.image}" alt="${rel.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                        <div class="absolute top-4 left-4 bg-black/70 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-rose-400 border border-rose-500/30 flex items-center gap-1.5">
-                            <i data-lucide="flame" class="w-3.5 h-3.5"></i> ${rel.date}
-                        </div>
-                    </div>
-                    <div class="p-6 space-y-4">
-                        <div class="space-y-1">
-                            <span class="text-xs font-bold text-purple-400 uppercase tracking-widest">${rel.type}</span>
-                            <h3 class="text-xl font-bold text-white">${rel.title}</h3>
-                            <p class="text-sm text-zinc-400 font-semibold">por <span class="text-white hover:underline cursor-pointer" onclick="openArtistPage('${rel.artist}')">${rel.artist}</span></p>
-                        </div>
-                        <div class="flex items-center justify-between pt-2 border-t border-zinc-800 text-xs text-zinc-400">
-                            <span class="flex items-center gap-1 font-medium text-zinc-300"><i data-lucide="headphones" class="w-4 h-4 text-purple-400"></i> ${rel.streams}</span>
-                            <button onclick="alert('Redirecionando para a plataforma oficial de streaming.')" class="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold transition shadow-md">
-                                ${rel.linkText}
-                            </button>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-            lucide.createIcons();
-        }
+  function reflectUser(){
+    const chip = document.getElementById('userChip');
+    if(state.user){
+      chip.style.display = 'flex';
+      document.getElementById('openLogin').style.display = 'none';
+      document.getElementById('openSignup').style.display = 'none';
+      document.getElementById('userAv').textContent = state.user.username[0].toUpperCase();
+      document.getElementById('userName').textContent = state.user.username;
+    }
+  }
+  reflectUser();
 
-        // Switch Views
-        function switchView(viewName) {
-            document.getElementById('view-feed').classList.add('hidden');
-            document.getElementById('view-releases').classList.add('hidden');
-            document.getElementById('view-artist').classList.add('hidden');
+  /* ============================================================
+     ENRIQUECIMENTO COM DADOS REAIS DA SPOTIFY
+     -----------------------------------------------------------
+     Roda depois do primeiro render (que já funciona 100% com
+     dados mockados). Se as chaves acima não estiverem
+     preenchidas, esta função simplesmente não faz nada e o site
+     continua com os gradientes placeholder normalmente.
+     ============================================================ */
+  async function enrichWithSpotify(){
+    if(!spotifyKeysConfigured()){
+      console.info('[VYNL] Rodando com dados mockados — preencha SPOTIFY_CLIENT_ID / SPOTIFY_CLIENT_SECRET pra usar dados reais.');
+      return;
+    }
+    const token = await getSpotifyToken();
+    if(!token) return; // getSpotifyToken já loga o motivo no console
 
-            document.getElementById('nav-feed').className = 'px-4 py-2 rounded-full text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all';
-            document.getElementById('nav-releases').className = 'px-4 py-2 rounded-full text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all';
-            document.getElementById('nav-artists').className = 'px-4 py-2 rounded-full text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all';
+    // 1) busca a capa real de cada álbum da lista curada (parada, crates, hero)
+    await Promise.all(ALBUMS.map(async al=>{
+      const found = await spotifySearchAlbumCover(al.title, al.artist);
+      if(found?.cover){
+        al.cover = found.cover;
+        al.spotifyUrl = found.url;
+        applyRealCover(al.id, al.cover);
+      }
+    }));
 
-            if (viewName === 'feed') {
-                document.getElementById('view-feed').classList.remove('hidden');
-                document.getElementById('nav-feed').className = 'px-4 py-2 rounded-full bg-zinc-800 text-white transition-all shadow-sm';
-                renderFeed(mediaAcervo);
-            } else if (viewName === 'releases') {
-                document.getElementById('view-releases').classList.remove('hidden');
-                document.getElementById('nav-releases').className = 'px-4 py-2 rounded-full bg-zinc-800 text-white transition-all shadow-sm';
-            } else if (viewName === 'artists') {
-                openArtistPage('The Weeknd');
-            }
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+    // 2) troca a prateleira "Prensagens da semana" pelos lançamentos reais de agora
+    const releases = await spotifyNewReleases(8);
+    if(releases && releases.length){
+      renderShelf(releases);
+    }
 
-        // Open Dedicated Artist Page (.html like view)
-        function openArtistPage(artistName) {
-            const item = mediaAcervo.find(m => m.artist === artistName) || mediaAcervo[0];
-
-            document.getElementById('artistBanner').src = item.banner;
-            document.getElementById('artistAvatar').src = item.avatar;
-            document.getElementById('artistName').innerText = item.artist;
-            document.getElementById('artistGenre').innerText = `Gênero: ${item.genre} • Acervo Oficial`;
-            document.getElementById('artistBio').innerText = item.bio;
-
-            const artistItems = mediaAcervo.filter(m => m.artist === item.artist);
-            renderFeed(artistItems, 'artistMasonryGrid');
-
-            document.getElementById('view-feed').classList.add('hidden');
-            document.getElementById('view-releases').classList.add('hidden');
-            document.getElementById('view-artist').classList.remove('hidden');
-
-            document.getElementById('nav-artists').className = 'px-4 py-2 rounded-full bg-zinc-800 text-white transition-all shadow-sm';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            lucide.createIcons();
-        }
-
-        // Filter Categories
-        function filterCategory(cat) {
-            document.querySelectorAll('.category-btn').forEach(btn => {
-                btn.className = 'category-btn px-4 py-2 rounded-full text-xs font-semibold bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white transition flex-shrink-0 border border-zinc-800';
-            });
-            event.target.className = 'category-btn px-4 py-2 rounded-full text-xs font-semibold bg-white text-black transition flex-shrink-0 shadow-md';
-
-            if (cat === 'all') {
-                renderFeed(mediaAcervo);
-            } else {
-                const filtered = mediaAcervo.filter(m => m.type === cat);
-                renderFeed(filtered);
-            }
-        }
-
-        // Artist Tab Filter
-        function switchArtistTab(tab) {
-            document.getElementById('art-tab-all').className = 'text-zinc-400 hover:text-white pb-3 transition';
-            document.getElementById('art-tab-capa').className = 'text-zinc-400 hover:text-white pb-3 transition';
-            document.getElementById('art-tab-foto').className = 'text-zinc-400 hover:text-white pb-3 transition';
-            document.getElementById('art-tab-gif').className = 'text-zinc-400 hover:text-white pb-3 transition';
-
-            document.getElementById(`art-tab-${tab}`).className = 'text-white pb-3 border-b-2 border-purple-500 -mb-3 transition';
-
-            const currentArtist = document.getElementById('artistName').innerText;
-            const artistItems = mediaAcervo.filter(m => m.artist === currentArtist);
-
-            if (tab === 'all') {
-                renderFeed(artistItems, 'artistMasonryGrid');
-            } else {
-                const filtered = artistItems.filter(m => m.type === tab);
-                renderFeed(filtered, 'artistMasonryGrid');
-            }
-        }
-
-        // Modal View
-        function openModal(item) {
-            currentMedia = item;
-            document.getElementById('modalImage').src = item.image;
-            document.getElementById('modalAvatar').src = item.avatar;
-            document.getElementById('modalArtist').innerText = item.artist;
-            document.getElementById('modalCategory').innerText = `Acervo • ${(item.type || 'Media').toUpperCase()}`;
-            document.getElementById('modalTitle').innerText = item.title;
-            document.getElementById('modalDesc').innerText = item.desc || 'Material oficial de divulgação e acervo do artista.';
-
-            const tagsContainer = document.getElementById('modalTags');
-            tagsContainer.innerHTML = '';
-            (item.tags || ['Music', 'Artist']).forEach(tag => {
-                const t = document.createElement('span');
-                t.className = 'px-3 py-1 bg-zinc-800/80 text-purple-300 text-xs rounded-full font-medium border border-zinc-700/60';
-                t.innerText = `#${tag}`;
-                tagsContainer.appendChild(t);
-            });
-
-            document.getElementById('mediaModal').classList.remove('hidden');
-            document.getElementById('mediaModal').classList.add('flex');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeModal() {
-            document.getElementById('mediaModal').classList.add('hidden');
-            document.getElementById('mediaModal').classList.remove('flex');
-            document.body.style.overflow = 'auto';
-        }
-
-        // Live Search
-        document.getElementById('searchInput').addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase();
-            const filtered = mediaAcervo.filter(m => 
-                m.title.toLowerCase().includes(query) || 
-                m.artist.toLowerCase().includes(query) || 
-                (m.genre && m.genre.toLowerCase().includes(query)) ||
-                (m.tags && m.tags.some(t => t.toLowerCase().includes(query)))
-            );
-            renderFeed(filtered);
-            switchView('feed');
-        });
-    </script>
+    showToast('Dados reais da Spotify carregados.');
+  }
+  enrichWithSpotify();
+</script>
 </body>
 </html>
