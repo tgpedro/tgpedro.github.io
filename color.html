@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Color — gerador de cores</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: Inter, Arial, sans-serif;
+    background: #f4f4f5;
+    color: #171717;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .app {
+    width: min(900px, 100%);
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 18px 60px rgba(0,0,0,.08);
+  }
+  header {
+    padding: 28px 30px 20px;
+    border-bottom: 1px solid #eee;
+  }
+  h1 { margin: 0; font-size: 28px; letter-spacing: -1px; }
+  header p { margin: 7px 0 0; color: #737373; }
+  .preview {
+    height: 330px;
+    background: #000000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .15s ease;
+  }
+  .preview span {
+    background: rgba(255,255,255,.88);
+    color: #171717;
+    padding: 9px 13px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .3px;
+  }
+  .controls { padding: 26px 30px 30px; }
+  .row {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 16px;
+    align-items: center;
+    margin-bottom: 18px;
+  }
+  label { font-size: 14px; font-weight: 700; }
+  input[type="color"] {
+    width: 100px;
+    height: 48px;
+    padding: 3px;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    background: white;
+    cursor: pointer;
+  }
+  input[type="text"] {
+    width: 100%;
+    height: 48px;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 0 14px;
+    font-size: 16px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    outline: none;
+  }
+  input[type="text"]:focus { border-color: #999; }
+  .swatches {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .swatch {
+    width: 34px;
+    height: 34px;
+    border: 1px solid rgba(0,0,0,.12);
+    border-radius: 9px;
+    cursor: pointer;
+  }
+  .actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 24px;
+  }
+  button {
+    border: 0;
+    border-radius: 12px;
+    padding: 13px 18px;
+    font-size: 14px;
+    font-weight: 750;
+    cursor: pointer;
+  }
+  .download { background: #171717; color: white; flex: 1; }
+  .copy { background: #f0f0f0; color: #171717; }
+  .info {
+    margin-top: 14px;
+    font-size: 12px;
+    color: #888;
+    text-align: center;
+  }
+  @media (max-width: 600px) {
+    .preview { height: 260px; }
+    header, .controls { padding-left: 20px; padding-right: 20px; }
+    .row { grid-template-columns: 1fr; gap: 9px; }
+    input[type="color"] { width: 100%; }
+    .actions { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+<main class="app">
+  <header>
+    <h1>Color</h1>
+    <p>Escolha uma cor e transforme-a em uma imagem PNG.</p>
+  </header>
+
+  <section class="preview" id="preview">
+    <span id="previewHex">#000000</span>
+  </section>
+
+  <section class="controls">
+    <div class="row">
+      <label for="picker">Cor</label>
+      <input id="picker" type="color" value="#000000">
+    </div>
+
+    <div class="row">
+      <label for="hex">HEX</label>
+      <input id="hex" type="text" value="#000000" maxlength="7" spellcheck="false" placeholder="#000000">
+    </div>
+
+    <div class="row">
+      <label>Recentes</label>
+      <div class="swatches" id="swatches"></div>
+    </div>
+
+    <div class="actions">
+      <button class="download" id="download">Baixar como PNG</button>
+      <button class="copy" id="copy">Copiar HEX</button>
+    </div>
+    <div class="info">A imagem será baixada em 1920 × 1080 px.</div>
+  </section>
+</main>
+
+<script>
+const picker = document.getElementById('picker');
+const hex = document.getElementById('hex');
+const preview = document.getElementById('preview');
+const previewHex = document.getElementById('previewHex');
+const download = document.getElementById('download');
+const copy = document.getElementById('copy');
+const swatches = document.getElementById('swatches');
+
+let recent = JSON.parse(localStorage.getItem('colorRecent') || '[]');
+
+function normalize(value) {
+  value = value.trim();
+  if (!value.startsWith('#')) value = '#' + value;
+  if (/^#[0-9a-fA-F]{6}$/.test(value)) return value.toUpperCase();
+  return null;
+}
+
+function setColor(value, save = true) {
+  const color = normalize(value);
+  if (!color) return false;
+
+  picker.value = color;
+  hex.value = color;
+  preview.style.background = color;
+  previewHex.textContent = color;
+
+  if (save) {
+    recent = [color, ...recent.filter(c => c !== color)].slice(0, 12);
+    localStorage.setItem('colorRecent', JSON.stringify(recent));
+    renderRecent();
+  }
+  return true;
+}
+
+function renderRecent() {
+  swatches.innerHTML = '';
+  recent.forEach(color => {
+    const b = document.createElement('button');
+    b.className = 'swatch';
+    b.style.background = color;
+    b.title = color;
+    b.setAttribute('aria-label', color);
+    b.onclick = () => setColor(color);
+    swatches.appendChild(b);
+  });
+}
+
+picker.addEventListener('input', () => setColor(picker.value));
+hex.addEventListener('input', () => {
+  const color = normalize(hex.value);
+  if (color) setColor(color);
+});
+hex.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    if (!setColor(hex.value)) {
+      hex.value = picker.value.toUpperCase();
+    }
+  }
+});
+
+copy.addEventListener('click', async () => {
+  await navigator.clipboard.writeText(hex.value);
+  const old = copy.textContent;
+  copy.textContent = 'Copiado!';
+  setTimeout(() => copy.textContent = old, 1000);
+});
+
+download.addEventListener('click', () => {
+  const canvas = document.createElement('canvas');
+  canvas.width = 1920;
+  canvas.height = 1080;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = hex.value;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const link = document.createElement('a');
+  link.download = `cor-${hex.value.slice(1).toLowerCase()}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+});
+
+setColor('#000000', false);
+renderRecent();
+</script>
+</body>
+</html>
