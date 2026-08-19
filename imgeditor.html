@@ -623,6 +623,49 @@
     @media (prefers-reduced-motion: reduce) {
       .controls, .preview-panel, .control-section, .status-dot { animation: none !important; }
     }
+
+    /* Modal central do editor de layouts */
+    body.sheet-open { overflow: hidden; }
+    .sheet-backdrop {
+      z-index: 79;
+      background: radial-gradient(circle at 50% 45%, rgba(19,15,32,.36), rgba(0,0,0,.76) 72%), rgba(0,0,0,.52);
+      backdrop-filter: blur(7px) saturate(82%);
+      -webkit-backdrop-filter: blur(7px) saturate(82%);
+    }
+    .layout-sheet {
+      top: 50%;
+      left: 50%;
+      right: auto;
+      bottom: auto;
+      width: min(520px, calc(100vw - 32px));
+      max-height: min(780px, calc(100dvh - 32px));
+      transform: translate(-50%, calc(-50% + 18px)) scale(.96);
+      transform-origin: center center;
+    }
+    @keyframes studioModalReveal {
+      from { opacity: 0; transform: translate(-50%, calc(-50% + 18px)) scale(.96); }
+      to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    }
+    .layout-sheet.open {
+      transform: translate(-50%, -50%) scale(1);
+      animation: studioModalReveal .28s cubic-bezier(.2,.8,.2,1) both;
+    }
+    .layout-sheet::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      border-radius: inherit;
+      pointer-events: none;
+      background: linear-gradient(135deg, rgba(181,156,255,.08), transparent 32%, rgba(110,231,210,.035));
+    }
+    @media (max-width: 560px) {
+      .layout-sheet {
+        width: calc(100vw - 20px);
+        max-height: calc(100dvh - 20px);
+        padding: 14px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1576,6 +1619,7 @@
       const open = typeof force === 'boolean' ? force : !layoutSheet.classList.contains('open');
       layoutSheet.classList.toggle('open', open);
       sheetBackdrop.classList.toggle('show', open);
+      document.body.classList.toggle('sheet-open', open);
       layoutLauncher.setAttribute('aria-expanded', String(open));
     }
 
