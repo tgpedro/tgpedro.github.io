@@ -332,6 +332,15 @@
     .crop-box::before { content: ''; position: absolute; inset: 0 33.333%; border-left: 1px solid rgba(255,255,255,.28); border-right: 1px solid rgba(255,255,255,.28); }
     .crop-size { position: absolute; left: 8px; top: 7px; z-index: 1; padding: 3px 5px; border-radius: 5px; color: #0a0a0a; background: var(--accent); font-size: 9px; font-weight: 700; }
 
+    .video-controls { display: none; }
+    .video-controls.visible { display: block; animation: panel-in .2s ease both; }
+    .video-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-bottom: 10px; }
+    .video-actions .button { min-height: 34px; font-size: 10px; }
+    .video-range-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 9px; }
+    .video-range-cell { min-width: 0; }
+    .video-range-cell .range-row { margin-bottom: 5px; }
+    .video-hint { margin-top: 9px; color: var(--muted-2); font-size: 9px; line-height: 1.4; }
+    @media (max-width: 560px) { .video-range-grid { grid-template-columns: 1fr; gap: 6px; } }
     .toast { position: fixed; z-index: 100; right: 22px; bottom: 22px; max-width: calc(100% - 44px); padding: 12px 15px; border: 1px solid #333; border-radius: 12px; color: #eee; background: #151515; box-shadow: 0 12px 35px rgba(0,0,0,.4); font-size: 11px; opacity: 0; pointer-events: none; transform: translateY(10px); transition: .25s; }
     .toast.show { opacity: 1; transform: translateY(0); }
     .toast.error { color: var(--danger); border-color: rgba(255,158,158,.35); }
@@ -427,6 +436,18 @@
         <div class="crop-actions"><button class="button" type="button" id="btn-crop-toggle"><svg class="icon" viewBox="0 0 24 24"><path d="M6 3v12a3 3 0 0 0 3 3h12"/><path d="M18 21V9a3 3 0 0 0-3-3H3"/></svg><span>Ativar crop</span></button><button class="button primary" type="button" id="btn-apply-crop" disabled><svg class="icon" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg><span>Aplicar</span></button></div>
       </section>
 
+      <section class="control-section video-controls" id="video-controls">
+        <div class="section-label"><span>Vídeo</span><span id="video-time-label">00:00 / 00:00</span></div>
+        <div class="video-actions"><button class="button primary" type="button" id="video-play-toggle"><span>Reproduzir</span></button><button class="button" type="button" id="video-reset-time"><span>Voltar ao início</span></button></div>
+        <input type="range" id="video-timeline" min="0" max="0" value="0" step="0.01" aria-label="Linha do tempo do vídeo">
+        <div class="video-range-grid">
+          <label class="video-range-cell"><div class="range-row"><span class="field-label" style="margin:0">Início</span><span class="range-value" id="video-start-label">00:00</span></div><input type="range" id="video-start" min="0" max="0" value="0" step="0.01" aria-label="Início do trecho"></label>
+          <label class="video-range-cell"><div class="range-row"><span class="field-label" style="margin:0">Fim</span><span class="range-value" id="video-end-label">00:00</span></div><input type="range" id="video-end" min="0" max="0" value="0" step="0.01" aria-label="Fim do trecho"></label>
+        </div>
+        <label class="field" style="margin-top:10px"><span class="field-label">Formato do vídeo</span><span class="input-wrap"><select class="select-input" id="video-format"><option value="video/webm">WEBM</option><option value="video/mp4">MP4, se suportado</option></select><span class="select-chevron"><svg class="icon" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span></span></label>
+        <p class="video-hint">Processamento local. O download usa o trecho selecionado e inclui áudio quando o navegador permite.</p>
+      </section>
+
       <section class="control-section">
         <div class="section-label"><span>Exportar</span><span id="quality-value">90%</span></div>
         <label class="field"><span class="field-label">Formato</span><span class="input-wrap"><select class="select-input" id="select-format"><option value="image/jpeg">JPEG</option><option value="image/png">PNG</option><option value="image/webp">WEBP</option></select><span class="select-chevron"><svg class="icon" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span></span></label>
@@ -463,10 +484,10 @@
             <div class="crop-box" id="crop-box"><span class="crop-size" id="crop-size">—</span></div>
             <div class="empty-state" id="empty-state">
               <div class="upload-mark"><svg class="icon" viewBox="0 0 24 24"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M20 16.5V19a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2.5"/></svg></div>
-              <p class="empty-title">Solte uma imagem para começar</p>
-              <p class="empty-subtitle">JPG, PNG ou WEBP</p>
+              <p class="empty-title">Solte uma imagem ou vídeo para começar</p>
+              <p class="empty-subtitle">JPG, PNG, WEBP, MP4, MOV ou WEBM</p>
               <button class="upload-button" type="button" id="btn-upload">Selecionar imagem</button>
-              <input class="sr-only" type="file" id="file-input" accept="image/*">
+              <input class="sr-only" type="file" id="file-input" accept="image/*,video/*">
             </div>
           </div>
         </div>
@@ -566,6 +587,16 @@
     const pickColorButton = $('#btn-pick-color');
     const colorPickerTarget = $('#color-picker-target');
     const pickerHint = $('#picker-hint');
+    const videoControls = $('#video-controls');
+    const videoPlayToggle = $('#video-play-toggle');
+    const videoResetTime = $('#video-reset-time');
+    const videoTimeline = $('#video-timeline');
+    const videoStartRange = $('#video-start');
+    const videoEndRange = $('#video-end');
+    const videoTimeLabel = $('#video-time-label');
+    const videoStartLabel = $('#video-start-label');
+    const videoEndLabel = $('#video-end-label');
+    const videoFormat = $('#video-format');
 
     const filterRanges = {
       brightness: $('#range-brightness'),
@@ -585,6 +616,12 @@
     };
 
     let image = null;
+    let mediaType = 'image';
+    let videoSource = null;
+    let videoObjectUrl = null;
+    let videoStart = 0;
+    let videoEnd = 0;
+    let videoFrameRequest = null;
     let originalWidth = 0;
     let originalHeight = 0;
     let imageBaseName = 'imagem';
@@ -625,9 +662,9 @@
 
     function captureHistoryState() {
       const imageKey = image ? imageToken : null;
-      if (image && !historyImageSources.has(imageKey)) historyImageSources.set(imageKey, image.src);
+      if (image && !historyImageSources.has(imageKey)) historyImageSources.set(imageKey, { src: image.currentSrc || image.src, type: mediaType });
       return {
-        imageKey, originalWidth, originalHeight, imageBaseName, rotation, flipHorizontal, flipVertical,
+        imageKey, mediaType, videoStart, videoEnd, originalWidth, originalHeight, imageBaseName, rotation, flipHorizontal, flipVertical,
         cropMode, cropSelection: cropSelection ? { ...cropSelection } : null, layoutMode, layoutZoom, layoutPanX, layoutPanY,
         backgroundMode, backgroundColor1: backgroundColor1.value, backgroundColor2: backgroundColor2.value, backgroundBlur: backgroundBlurRange.value, colorPickerTarget: colorPickerTarget.value, layoutFit,
         width: widthInput.value, height: heightInput.value, scale: scaleRange.value, quality: qualityRange.value,
@@ -675,6 +712,10 @@
       historyMuted = true;
       const restoreImage = state.imageKey !== null && (!image || state.imageKey !== imageToken);
       const applyState = () => {
+        mediaType = state.mediaType || 'image';
+        videoSource = mediaType === 'video' && image && image.tagName === 'VIDEO' ? image : null;
+        videoStart = Number(state.videoStart) || 0;
+        videoEnd = Number(state.videoEnd) || (videoSource ? videoSource.duration : 0);
         originalWidth = state.originalWidth;
         originalHeight = state.originalHeight;
         imageBaseName = state.imageBaseName;
@@ -718,9 +759,10 @@
         $('#btn-flip-horizontal').classList.toggle('active', flipHorizontal);
         $('#btn-flip-vertical').classList.toggle('active', flipVertical);
         qualityContainer.style.display = formatSelect.value === 'image/png' ? 'none' : 'block';
-        fileName.textContent = image ? `${imageBaseName}` : 'Nenhuma imagem selecionada';
-        fileDim.textContent = image ? `${originalWidth} × ${originalHeight}px` : '—';
+        fileName.textContent = image ? `${imageBaseName}` : 'Nenhuma mídia selecionada';
+        fileDim.textContent = image ? `${originalWidth} × ${originalHeight}px${isVideo() ? ` · ${formatVideoTime(videoEnd)}` : ''}` : '—';
         downloadButton.disabled = !image;
+        updateVideoUI();
         canvas.style.display = image ? 'block' : 'none';
         uploadScreen.style.display = image ? 'none' : 'block';
         updateCropBox();
@@ -729,11 +771,20 @@
         else { originalDim.textContent = '—'; newDim.textContent = '—'; sizeInfo.textContent = '—'; statusText.textContent = 'Pronto'; }
       };
       if (restoreImage) {
-        const source = historyImageSources.get(state.imageKey);
-        const loaded = new Image();
-        loaded.onload = () => { image = loaded; imageToken = state.imageKey; applyState(); historyMuted = false; };
-        loaded.onerror = () => { historyMuted = false; showToast('Não foi possível restaurar este estado.', true); };
-        loaded.src = source;
+        const saved = historyImageSources.get(state.imageKey);
+        const record = typeof saved === 'string' ? { src: saved, type: 'image' } : saved;
+        if (record && record.type === 'video') {
+          const loaded = document.createElement('video');
+          loaded.preload = 'auto'; loaded.muted = true; loaded.playsInline = true;
+          loaded.onloadedmetadata = () => { image = loaded; videoSource = loaded; mediaType = 'video'; bindVideoEvents(loaded); imageToken = state.imageKey; applyState(); historyMuted = false; };
+          loaded.onerror = () => { historyMuted = false; showToast('Não foi possível restaurar este vídeo.', true); };
+          loaded.src = record.src; loaded.load();
+        } else {
+          const loaded = new Image();
+          loaded.onload = () => { image = loaded; videoSource = null; mediaType = 'image'; imageToken = state.imageKey; applyState(); historyMuted = false; };
+          loaded.onerror = () => { historyMuted = false; showToast('Não foi possível restaurar este estado.', true); };
+          loaded.src = record ? record.src : saved;
+        }
       } else {
         if (state.imageKey === null) { image = null; }
         applyState();
@@ -966,15 +1017,179 @@
       const blur = Number(backgroundBlurRange.value) || 28;
       const rotatedWidth = rotation % 180 === 0 ? originalWidth : originalHeight;
       const rotatedHeight = rotation % 180 === 0 ? originalHeight : originalWidth;
-      const margin = blur * 2.4;
-      const coverScale = Math.max((width + margin) / rotatedWidth, (height + margin) / rotatedHeight);
+
+      // Fallback universal para Safari/iOS e navegadores móveis que não aplicam
+      // ctx.filter = blur(...) no Canvas: renderiza uma cópia em baixa resolução
+      // e amplia com imageSmoothing. O downscaling cria um desfoque real sem
+      // depender do suporte ao filtro CSS/Canvas do dispositivo.
+      const blurScale = Math.max(0.025, Math.min(0.42, 5 / Math.max(blur, 5)));
+      let lowWidth = Math.max(32, Math.round(width * blurScale));
+      let lowHeight = Math.max(32, Math.round(height * blurScale));
+      const maxLowPixels = 220000;
+      if (lowWidth * lowHeight > maxLowPixels) {
+        const memoryScale = Math.sqrt(maxLowPixels / (lowWidth * lowHeight));
+        lowWidth = Math.max(32, Math.round(lowWidth * memoryScale));
+        lowHeight = Math.max(32, Math.round(lowHeight * memoryScale));
+      }
+
+      const lowCanvas = document.createElement('canvas');
+      lowCanvas.width = lowWidth;
+      lowCanvas.height = lowHeight;
+      const lowContext = lowCanvas.getContext('2d', { willReadFrequently: false });
+      if (!lowContext) return;
+      lowContext.imageSmoothingEnabled = true;
+      lowContext.imageSmoothingQuality = 'high';
+
+      const coverScale = Math.max(lowWidth / rotatedWidth, lowHeight / rotatedHeight) * 1.08;
+      lowContext.save();
+      lowContext.translate(lowWidth / 2, lowHeight / 2);
+      lowContext.rotate(rotation * Math.PI / 180);
+      lowContext.scale(coverScale * (flipHorizontal ? -1 : 1), coverScale * (flipVertical ? -1 : 1));
+      // Mantemos os filtros de cor quando o navegador suporta Canvas filters,
+      // mas removemos o blur da string porque o desfoque já é feito pelo fallback.
+      const colorFilter = getFilterString().replace(/\\s*blur\\([^)]*\\)/gi, '').trim();
+      try { lowContext.filter = colorFilter || 'none'; } catch (_) { lowContext.filter = 'none'; }
+      lowContext.drawImage(image, -originalWidth / 2, -originalHeight / 2, originalWidth, originalHeight);
+      lowContext.restore();
+
       context.save();
-      context.translate(width / 2, height / 2);
-      context.rotate(rotation * Math.PI / 180);
-      context.scale(coverScale * (flipHorizontal ? -1 : 1), coverScale * (flipVertical ? -1 : 1));
-      context.filter = `${getFilterString()} blur(${blur}px)`;
-      context.drawImage(image, -originalWidth / 2, -originalHeight / 2, originalWidth, originalHeight);
+      context.imageSmoothingEnabled = true;
+      context.imageSmoothingQuality = 'high';
+      context.drawImage(lowCanvas, 0, 0, lowWidth, lowHeight, 0, 0, width, height);
       context.restore();
+    }
+
+    function isVideo() {
+      return mediaType === 'video' && Boolean(videoSource);
+    }
+
+    function formatVideoTime(value) {
+      const seconds = Math.max(0, Number(value) || 0);
+      return `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`;
+    }
+
+    function updateVideoUI() {
+      const visible = isVideo();
+      videoControls.classList.toggle('visible', visible);
+      if (!visible) return;
+      const duration = Number(videoSource.duration) || 0;
+      videoStart = Math.max(0, Math.min(videoStart, Math.max(0, duration - 0.05)));
+      videoEnd = Math.min(duration || videoEnd, Math.max(videoStart + 0.05, videoEnd || duration));
+      videoTimeline.max = duration;
+      videoTimeline.value = Math.min(duration, Number(videoSource.currentTime) || 0);
+      videoStartRange.max = duration;
+      videoStartRange.value = videoStart;
+      videoEndRange.max = duration;
+      videoEndRange.value = videoEnd;
+      videoTimeLabel.textContent = `${formatVideoTime(videoSource.currentTime)} / ${formatVideoTime(duration)}`;
+      videoStartLabel.textContent = formatVideoTime(videoStart);
+      videoEndLabel.textContent = formatVideoTime(videoEnd);
+      videoPlayToggle.querySelector('span').textContent = videoSource.paused ? 'Reproduzir' : 'Pausar';
+    }
+
+    function scheduleVideoPreview() {
+      if (!isVideo()) return;
+      updateVideoUI();
+      scheduleRender({ estimate: false });
+      if (!videoSource.paused && !videoSource.ended) videoFrameRequest = requestAnimationFrame(scheduleVideoPreview);
+    }
+
+    function stopVideoPreviewLoop() {
+      if (videoFrameRequest) cancelAnimationFrame(videoFrameRequest);
+      videoFrameRequest = null;
+    }
+
+    function handleVideoTimeUpdate() {
+      if (!isVideo()) return;
+      if (videoSource.currentTime >= videoEnd - 0.03) {
+        videoSource.pause();
+        videoSource.currentTime = videoStart;
+      }
+      updateVideoUI();
+      scheduleRender({ estimate: false });
+    }
+
+    function bindVideoEvents(element) {
+      element.addEventListener('timeupdate', handleVideoTimeUpdate);
+      element.addEventListener('play', () => scheduleVideoPreview());
+      element.addEventListener('pause', () => { stopVideoPreviewLoop(); updateVideoUI(); scheduleRender({ estimate: false }); });
+      element.addEventListener('ended', () => { stopVideoPreviewLoop(); updateVideoUI(); });
+    }
+
+    function seekVideo(time) {
+      return new Promise((resolve) => {
+        if (!videoSource) return resolve();
+        const target = Math.max(0, Math.min(Number(time) || 0, Number(videoSource.duration) || 0));
+        if (Math.abs(videoSource.currentTime - target) < 0.02) return resolve();
+        const done = () => resolve();
+        videoSource.addEventListener('seeked', done, { once: true });
+        videoSource.currentTime = target;
+      });
+    }
+
+    async function toggleVideoPlayback() {
+      if (!isVideo()) return;
+      if (videoSource.paused) {
+        if (videoSource.currentTime < videoStart || videoSource.currentTime >= videoEnd - 0.03) await seekVideo(videoStart);
+        try { await videoSource.play(); } catch (_) { showToast('Toque novamente para iniciar o vídeo.', true); }
+      } else {
+        videoSource.pause();
+      }
+      updateVideoUI();
+    }
+
+    function loadVideo(file) {
+      if (!file || !file.type.startsWith('video/')) { cancelHistoryAction(); showToast('Selecione um arquivo de vídeo válido.', true); return; }
+      if (file.size > 300 * 1024 * 1024) { cancelHistoryAction(); showToast('O vídeo deve ter no máximo 300 MB.', true); return; }
+      const url = URL.createObjectURL(file);
+      const loaded = document.createElement('video');
+      loaded.preload = 'auto';
+      loaded.muted = true;
+      loaded.playsInline = true;
+      loaded.onloadedmetadata = () => {
+        image = loaded;
+        videoSource = loaded;
+        mediaType = 'video';
+        videoObjectUrl = url;
+        bindVideoEvents(loaded);
+        imageToken += 1;
+        historyImageSources.set(imageToken, { src: url, type: 'video' });
+        originalWidth = loaded.videoWidth;
+        originalHeight = loaded.videoHeight;
+        videoStart = 0;
+        videoEnd = Number.isFinite(loaded.duration) ? loaded.duration : 0;
+        imageBaseName = file.name.replace(/\.[^/.]+$/, '') || 'video';
+        widthInput.value = originalWidth;
+        heightInput.value = originalHeight;
+        rotation = 0;
+        flipHorizontal = false;
+        flipVertical = false;
+        cropMode = false;
+        cropSelection = null;
+        cropToggle.classList.remove('active');
+        cropToggle.querySelector('span').textContent = 'Ativar crop';
+        cropStatus.textContent = 'Livre';
+        layoutZoom = 100;
+        layoutPanX = 0;
+        layoutPanY = 0;
+        updateLayoutZoomUI();
+        resetFilters();
+        setScaleUI(100);
+        fileName.textContent = file.name;
+        fileDim.textContent = `${originalWidth} × ${originalHeight}px · ${formatVideoTime(videoEnd)}`;
+        downloadButton.disabled = false;
+        updateVideoUI();
+        const finalizeVideoLoad = () => {
+          render();
+          finishHistoryAction();
+          showToast('Vídeo carregado.');
+        };
+        if (loaded.readyState >= 2) finalizeVideoLoad();
+        else loaded.addEventListener('loadeddata', finalizeVideoLoad, { once: true });
+      };
+      loaded.onerror = () => { URL.revokeObjectURL(url); cancelHistoryAction(); showToast('Não foi possível abrir este vídeo neste navegador.', true); };
+      loaded.src = url;
+      loaded.load();
     }
 
     function drawLayout(targetWidth, targetHeight, useSharpen = false) {
@@ -1048,8 +1263,10 @@
       const nextImage = new Image();
       nextImage.onload = () => {
         image = nextImage;
+        mediaType = 'image';
+        videoSource = null;
         imageToken += 1;
-        historyImageSources.set(imageToken, nextImage.src);
+        historyImageSources.set(imageToken, { src: nextImage.src, type: 'image' });
         originalWidth = width;
         originalHeight = height;
         widthInput.value = width;
@@ -1118,16 +1335,21 @@
       uploadScreen.style.display = 'none';
       originalDim.textContent = `${originalWidth} × ${originalHeight}px`;
       newDim.textContent = `${width} × ${height}px`;
-      fileDim.textContent = `${originalWidth} × ${originalHeight}px`;
-      statusText.textContent = cropMode ? 'Selecione o recorte' : isLayoutMode() ? 'Layout editável' : 'Editável';
+      fileDim.textContent = `${originalWidth} × ${originalHeight}px${isVideo() ? ` · ${formatVideoTime(videoEnd)}` : ''}`;
+      statusText.textContent = cropMode ? 'Selecione o recorte' : isVideo() ? (videoSource.paused ? 'Vídeo pausado' : 'Vídeo em reprodução') : isLayoutMode() ? 'Layout editável' : 'Editável';
+      if (isVideo()) updateVideoUI();
       rotationValue.textContent = `${rotation}°`;
       document.body.classList.toggle('layout-mode-active', isLayoutMode());
       if (estimateSize) {
-        const quality = Number(qualityRange.value) / 100;
-        const dataUrl = canvas.toDataURL(formatSelect.value, quality);
-        const base64 = dataUrl.split(',')[1] || '';
-        const bytes = Math.ceil(base64.length * 3 / 4);
-        sizeInfo.textContent = bytes > 1048576 ? `${(bytes / 1048576).toFixed(2)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`;
+        if (isVideo()) {
+          sizeInfo.textContent = 'Exportação de vídeo';
+        } else {
+          const quality = Number(qualityRange.value) / 100;
+          const dataUrl = canvas.toDataURL(formatSelect.value, quality);
+          const base64 = dataUrl.split(',')[1] || '';
+          const bytes = Math.ceil(base64.length * 3 / 4);
+          sizeInfo.textContent = bytes > 1048576 ? `${(bytes / 1048576).toFixed(2)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`;
+        }
       }
       if (cropSelection) updateCropBox();
       updateLayoutOverlay();
@@ -1273,8 +1495,10 @@
       const croppedImage = new Image();
       croppedImage.onload = () => {
         image = croppedImage;
+        mediaType = 'image';
+        videoSource = null;
         imageToken += 1;
-        historyImageSources.set(imageToken, croppedImage.src);
+        historyImageSources.set(imageToken, { src: croppedImage.src, type: 'image' });
         originalWidth = sw;
         originalHeight = sh;
         widthInput.value = sw;
@@ -1317,9 +1541,11 @@
         const loaded = new Image();
         loaded.onload = () => {
           image = loaded;
+          mediaType = 'image';
+          videoSource = null;
           setColorPickMode(false);
           imageToken += 1;
-          historyImageSources.set(imageToken, loaded.src);
+          historyImageSources.set(imageToken, { src: loaded.src, type: 'image' });
           originalWidth = loaded.naturalWidth;
           originalHeight = loaded.naturalHeight;
           imageBaseName = file.name.replace(/\.[^/.]+$/, '') || 'imagem';
@@ -1352,18 +1578,32 @@
       reader.readAsDataURL(file);
     }
 
+    function loadMedia(file) {
+      if (!file) { cancelHistoryAction(); return; }
+      if (file.type.startsWith('video/')) loadVideo(file);
+      else loadImage(file);
+    }
+
     function resetImage() {
+      if (videoSource) videoSource.pause();
+      stopVideoPreviewLoop();
+      if (videoObjectUrl) { URL.revokeObjectURL(videoObjectUrl); videoObjectUrl = null; }
       image = null;
+      videoSource = null;
+      mediaType = 'image';
+      videoStart = 0;
+      videoEnd = 0;
       fileInput.value = '';
       canvas.style.display = 'none';
       uploadScreen.style.display = 'block';
-      fileName.textContent = 'Nenhuma imagem selecionada';
+      fileName.textContent = 'Nenhuma mídia selecionada';
       fileDim.textContent = '—';
       originalDim.textContent = '—';
       newDim.textContent = '—';
       sizeInfo.textContent = '—';
       statusText.textContent = 'Pronto';
       downloadButton.disabled = true;
+      updateVideoUI();
       selectLayout('free', false);
       rotation = 0;
       flipHorizontal = false;
@@ -1379,10 +1619,10 @@
 
     $('#btn-upload').addEventListener('click', (event) => { event.stopPropagation(); fileInput.click(); });
     dropZone.addEventListener('click', (event) => { if (event.target !== fileInput && !cropMode && !image) fileInput.click(); });
-    fileInput.addEventListener('change', (event) => { beginHistoryAction(); loadImage(event.target.files[0]); });
+    fileInput.addEventListener('change', (event) => { beginHistoryAction(); loadMedia(event.target.files[0]); });
     dropZone.addEventListener('dragover', (event) => { event.preventDefault(); if (!cropMode) uploadScreen.classList.add('dragging'); });
     dropZone.addEventListener('dragleave', () => uploadScreen.classList.remove('dragging'));
-    dropZone.addEventListener('drop', (event) => { event.preventDefault(); uploadScreen.classList.remove('dragging'); if (!cropMode) { beginHistoryAction(); loadImage(event.dataTransfer.files[0]); } });
+    dropZone.addEventListener('drop', (event) => { event.preventDefault(); uploadScreen.classList.remove('dragging'); if (!cropMode) { beginHistoryAction(); loadMedia(event.dataTransfer.files[0]); } });
     $('#btn-new-image').addEventListener('click', () => { beginHistoryAction(); resetImage(); finishHistoryAction(); });
     $('#btn-reset').addEventListener('click', () => { beginHistoryAction(); resetImage(); finishHistoryAction(); });
     layoutLauncher.addEventListener('click', () => toggleLayoutSheet());
@@ -1547,8 +1787,68 @@
     formatSelect.addEventListener('change', () => { qualityContainer.style.display = formatSelect.value === 'image/png' ? 'none' : 'block'; scheduleRender(); });
     sharpenCheck.addEventListener('change', scheduleRender);
 
+    videoPlayToggle.addEventListener('click', () => toggleVideoPlayback());
+    videoResetTime.addEventListener('click', async () => { if (!isVideo()) return; videoSource.pause(); await seekVideo(videoStart); updateVideoUI(); scheduleRender({ estimate: false }); });
+    videoTimeline.addEventListener('input', async () => { if (!isVideo()) return; await seekVideo(videoTimeline.value); updateVideoUI(); scheduleRender({ estimate: false }); });
+    videoStartRange.addEventListener('input', async () => { if (!isVideo()) return; videoStart = Math.min(Number(videoStartRange.value), Math.max(0, videoEnd - 0.05)); if (videoSource.currentTime < videoStart) await seekVideo(videoStart); updateVideoUI(); });
+    videoEndRange.addEventListener('input', async () => { if (!isVideo()) return; videoEnd = Math.max(Number(videoEndRange.value), videoStart + 0.05); videoEnd = Math.min(videoEnd, Number(videoSource.duration) || videoEnd); if (videoSource.currentTime > videoEnd) await seekVideo(videoEnd); updateVideoUI(); });
+
+    async function exportVideo() {
+      if (!isVideo()) return;
+      if (!canvas.captureStream || typeof MediaRecorder === 'undefined') { showToast('Este navegador não oferece exportação de vídeo local.', true); return; }
+      const { width, height } = getOutputDimensions();
+      const captureCanvas = document.createElement('canvas');
+      captureCanvas.width = width;
+      captureCanvas.height = height;
+      const captureContext = captureCanvas.getContext('2d');
+      const stream = captureCanvas.captureStream(30);
+      if (typeof videoSource.captureStream === 'function') videoSource.captureStream().getAudioTracks().forEach((track) => stream.addTrack(track));
+      const candidates = videoFormat.value === 'video/mp4' ? ['video/mp4;codecs=h264,aac', 'video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm'] : ['video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'];
+      const mime = candidates.find((type) => MediaRecorder.isTypeSupported(type));
+      if (!mime) { showToast('Nenhum formato de vídeo compatível foi encontrado.', true); return; }
+      const recorder = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 8000000 });
+      const chunks = [];
+      const previousTime = videoSource.currentTime;
+      const wasPlaying = !videoSource.paused;
+      const start = Math.max(0, videoStart);
+      const end = Math.min(videoEnd, Number(videoSource.duration) || videoEnd);
+      let frameId = null;
+      let stopped = false;
+      const stopRecording = () => { if (stopped) return; stopped = true; if (frameId) cancelAnimationFrame(frameId); if (recorder.state !== 'inactive') recorder.stop(); };
+      const drawFrame = () => {
+        const composed = isLayoutMode() ? drawLayout(width, height, sharpenCheck.checked) : drawResized(width, height, sharpenCheck.checked, true);
+        captureContext.clearRect(0, 0, width, height);
+        captureContext.drawImage(composed, 0, 0);
+        if (!stopped && videoSource.currentTime < end - 0.03 && !videoSource.paused) frameId = requestAnimationFrame(drawFrame);
+        else stopRecording();
+      };
+      recorder.ondataavailable = (event) => { if (event.data.size) chunks.push(event.data); };
+      recorder.onstop = async () => {
+        const blob = new Blob(chunks, { type: mime });
+        const extension = mime.includes('mp4') ? 'mp4' : 'webm';
+        const link = document.createElement('a');
+        link.download = `${imageBaseName}_${width}x${height}.${extension}`;
+        link.href = URL.createObjectURL(blob);
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+        await seekVideo(Math.min(previousTime, Number(videoSource.duration) || previousTime));
+        if (wasPlaying) videoSource.play().catch(() => {});
+        updateVideoUI();
+        scheduleRender({ estimate: false });
+        statusText.textContent = 'Editável';
+        showToast(`Vídeo exportado em ${extension.toUpperCase()}.`);
+      };
+      statusText.textContent = 'Exportando vídeo…';
+      videoSource.pause();
+      await seekVideo(start);
+      recorder.start(250);
+      try { await videoSource.play(); } catch (_) { stopRecording(); showToast('Toque em reproduzir antes de exportar o vídeo.', true); return; }
+      drawFrame();
+    }
+
     downloadButton.addEventListener('click', () => {
       if (!image) return;
+      if (isVideo()) { exportVideo(); return; }
       const { width, height } = getOutputDimensions();
       const exportCanvas = isLayoutMode()
         ? drawLayout(width, height, sharpenCheck.checked)
@@ -1565,6 +1865,7 @@
 
     setQualityUI(qualityRange.value);
     updateFilterUI();
+    updateVideoUI();
     updateHistoryUI();
     setBackgroundMode('solid');
     setLayoutFit('cover');
