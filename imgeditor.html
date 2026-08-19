@@ -1285,13 +1285,24 @@
       backgroundBlurControl.classList.toggle('visible', backgroundMode === 'blur');
     }
 
+    function ensureBlurFit() {
+      if (backgroundMode !== 'blur' || !isLayoutMode() || layoutFit === 'contain') return false;
+      layoutFit = 'contain';
+      document.querySelectorAll('[data-fit]').forEach((button) => button.classList.toggle('active', button.dataset.fit === layoutFit));
+      updateLayoutZoomUI();
+      applyLayoutConstraints();
+      return true;
+    }
+
     function setBackgroundMode(mode) {
       backgroundMode = ['solid', 'gradient', 'blur', 'transparent'].includes(mode) ? mode : 'solid';
       document.querySelectorAll('[data-background]').forEach((button) => button.classList.toggle('active', button.dataset.background === backgroundMode));
       backgroundName.textContent = backgroundMode === 'gradient' ? 'Gradiente' : backgroundMode === 'blur' ? 'Blur da imagem' : backgroundMode === 'transparent' ? 'Transparente' : 'Sólido';
       backgroundColor2Field.style.display = backgroundMode === 'gradient' ? 'flex' : 'none';
       updateBackgroundBlurUI();
+      const switchedToContain = ensureBlurFit();
       if (image) scheduleRender();
+      if (switchedToContain) showToast('Blur ativado: mostrando a imagem inteira para revelar o fundo.');
     }
 
     function fillLayoutBackground(context, width, height) {
@@ -1308,72 +1319,111 @@
       }
     }
 
-    const blurSurfaceCache = { key: '', midCanvas: null, lowCanvas: null, midContext: null, lowContext: null };
+    const blurSurfaceCache = { key: '', sourceCanvas: null, outputCanvas: null, sourceContext: null, outputContext: null, sourceStamp: '' };
+
+    // Box blur manual em duas passagens. Diferente de ctx.filter e do downscaling
+    // agressivo, este caminho funciona também em Safari/iOS e navegadores móveis
+    // que ignoram filtros de Canvas. A resolução de trabalho é baixa de propósito,
+    // mantendo o efeito suave sem travar o preview ou o vídeo.
+    function applyBoxBlur(imageData, radius, passes = 2) {
+      const width = imageData.width;
+      const height = imageData.height;
+      const size = width * height * 4;
+      let current = new Uint8ClampedArray(imageData.data);
+      const horizontal = new Uint8ClampedArray(size);
+      const output = new Uint8ClampedArray(size);
+      const safeRadius = Math.max(1, Math.min(24, radius));
+
+      for (let pass = 0; pass < passes; pass += 1) {
+        const diameter = safeRadius * 2 + 1;
+        for (let y = 0; y < height; y += 1) {
+          const row = y * width;
+          for (let channel = 0; channel < 4; channel += 1) {
+            let sum = 0;
+            for (let offset = -safeRadius; offset <= safeRadius; offset += 1) {
+              const x = Math.max(0, Math.min(width - 1, offset));
+              sum += current[(row + x) * 4 + channel];
+            }
+            for (let x = 0; x < width; x += 1) {
+              horizontal[(row + x) * 4 + channel] = Math.round(sum / diameter);
+              const removeX = Math.max(0, x - safeRadius);
+              const addX = Math.min(width - 1, x + safeRadius + 1);
+              sum += current[(row + addX) * 4 + channel] - current[(row + removeX) * 4 + channel];
+            }
+          }
+        }
+
+        for (let x = 0; x < width; x += 1) {
+          for (let channel = 0; channel < 4; channel += 1) {
+            let sum = 0;
+            for (let offset = -safeRadius; offset <= safeRadius; offset += 1) {
+              const y = Math.max(0, Math.min(height - 1, offset));
+              sum += horizontal[(y * width + x) * 4 + channel];
+            }
+            for (let y = 0; y < height; y += 1) {
+              output[(y * width + x) * 4 + channel] = Math.round(sum / diameter);
+              const removeY = Math.max(0, y - safeRadius);
+              const addY = Math.min(height - 1, y + safeRadius + 1);
+              sum += horizontal[(addY * width + x) * 4 + channel] - horizontal[(removeY * width + x) * 4 + channel];
+            }
+          }
+        }
+        current = new Uint8ClampedArray(output);
+      }
+      return new ImageData(current, width, height);
+    }
 
     function drawBlurBackground(context, width, height) {
       if (!image || !width || !height) return;
       const blur = Math.max(4, Math.min(80, Number(backgroundBlurRange.value) || 28));
       const rotatedWidth = rotation % 180 === 0 ? originalWidth : originalHeight;
       const rotatedHeight = rotation % 180 === 0 ? originalHeight : originalWidth;
+      const workScale = blur >= 48 ? 0.22 : blur >= 24 ? 0.28 : 0.34;
+      const workWidth = Math.max(160, Math.min(520, Math.round(width * workScale)));
+      const workHeight = Math.max(160, Math.min(760, Math.round(height * workScale)));
+      const sourceStamp = isVideo() ? `${videoSource.currentTime.toFixed(3)}` : `${imageToken}`;
+      const key = `${width}x${height}:${workWidth}x${workHeight}:${rotation}:${flipHorizontal}:${flipVertical}:${blur}:${getFilterString()}`;
 
-      // Multi-pass downscaling: a primeira superfície preserva detalhes suaves,
-      // a segunda reduz ainda mais a frequência e só então o resultado é ampliado.
-      // Isso evita os blocos gigantes do downscaling agressivo anterior em mobile.
-      const midScale = Math.max(0.42, Math.min(0.78, 26 / (blur + 10)));
-      const lowScale = Math.max(0.32, Math.min(midScale * 0.72, midScale - 0.08));
-      let midWidth = Math.max(96, Math.round(width * midScale));
-      let midHeight = Math.max(96, Math.round(height * midScale));
-      let lowWidth = Math.max(64, Math.round(width * lowScale));
-      let lowHeight = Math.max(64, Math.round(height * lowScale));
-      const maxWorkPixels = 420000;
-      if (midWidth * midHeight > maxWorkPixels) {
-        const memoryScale = Math.sqrt(maxWorkPixels / (midWidth * midHeight));
-        midWidth = Math.max(96, Math.round(midWidth * memoryScale));
-        midHeight = Math.max(96, Math.round(midHeight * memoryScale));
-        lowWidth = Math.max(64, Math.round(lowWidth * memoryScale));
-        lowHeight = Math.max(64, Math.round(lowHeight * memoryScale));
-      }
-
-      const key = `${width}x${height}:${midWidth}x${midHeight}:${lowWidth}x${lowHeight}:${rotation}:${flipHorizontal}:${flipVertical}`;
-      if (blurSurfaceCache.key !== key) {
+      if (blurSurfaceCache.key !== key || !blurSurfaceCache.sourceCanvas || blurSurfaceCache.sourceStamp !== sourceStamp) {
         blurSurfaceCache.key = key;
-        blurSurfaceCache.midCanvas = document.createElement('canvas');
-        blurSurfaceCache.lowCanvas = document.createElement('canvas');
-        blurSurfaceCache.midCanvas.width = midWidth;
-        blurSurfaceCache.midCanvas.height = midHeight;
-        blurSurfaceCache.lowCanvas.width = lowWidth;
-        blurSurfaceCache.lowCanvas.height = lowHeight;
-        blurSurfaceCache.midContext = blurSurfaceCache.midCanvas.getContext('2d');
-        blurSurfaceCache.lowContext = blurSurfaceCache.lowCanvas.getContext('2d');
+        blurSurfaceCache.sourceStamp = sourceStamp;
+        blurSurfaceCache.sourceCanvas ||= document.createElement('canvas');
+        blurSurfaceCache.outputCanvas ||= document.createElement('canvas');
+        blurSurfaceCache.sourceCanvas.width = workWidth;
+        blurSurfaceCache.sourceCanvas.height = workHeight;
+        blurSurfaceCache.outputCanvas.width = workWidth;
+        blurSurfaceCache.outputCanvas.height = workHeight;
+        blurSurfaceCache.sourceContext ||= blurSurfaceCache.sourceCanvas.getContext('2d', { willReadFrequently: true });
+        blurSurfaceCache.outputContext ||= blurSurfaceCache.outputCanvas.getContext('2d', { willReadFrequently: true });
+
+        const sourceContext = blurSurfaceCache.sourceContext;
+        const outputContext = blurSurfaceCache.outputContext;
+        if (!sourceContext || !outputContext) return;
+        sourceContext.clearRect(0, 0, workWidth, workHeight);
+        sourceContext.imageSmoothingEnabled = true;
+        sourceContext.imageSmoothingQuality = 'high';
+        const coverScale = Math.max(workWidth / rotatedWidth, workHeight / rotatedHeight) * 1.08;
+        sourceContext.save();
+        sourceContext.translate(workWidth / 2, workHeight / 2);
+        sourceContext.rotate(rotation * Math.PI / 180);
+        sourceContext.scale(coverScale * (flipHorizontal ? -1 : 1), coverScale * (flipVertical ? -1 : 1));
+        const colorFilter = getFilterString().replace(/\s*blur\([^)]*\)/gi, '').trim();
+        try { sourceContext.filter = colorFilter || 'none'; } catch (_) { sourceContext.filter = 'none'; }
+        sourceContext.drawImage(image, -originalWidth / 2, -originalHeight / 2, originalWidth, originalHeight);
+        sourceContext.restore();
+
+        const pixels = sourceContext.getImageData(0, 0, workWidth, workHeight);
+        const radius = Math.max(2, Math.min(20, Math.round(blur * workScale * 0.72)));
+        outputContext.putImageData(applyBoxBlur(pixels, radius, 2), 0, 0);
       }
-      const midCanvas = blurSurfaceCache.midCanvas;
-      const lowCanvas = blurSurfaceCache.lowCanvas;
-      const midContext = blurSurfaceCache.midContext;
-      const lowContext = blurSurfaceCache.lowContext;
-      if (!midContext || !lowContext) return;
 
-      midContext.clearRect(0, 0, midWidth, midHeight);
-      midContext.imageSmoothingEnabled = true;
-      midContext.imageSmoothingQuality = 'high';
-      const midCoverScale = Math.max(midWidth / rotatedWidth, midHeight / rotatedHeight) * 1.08;
-      midContext.save();
-      midContext.translate(midWidth / 2, midHeight / 2);
-      midContext.rotate(rotation * Math.PI / 180);
-      midContext.scale(midCoverScale * (flipHorizontal ? -1 : 1), midCoverScale * (flipVertical ? -1 : 1));
-      const colorFilter = getFilterString().replace(/\s*blur\([^)]*\)/gi, '').trim();
-      try { midContext.filter = colorFilter || 'none'; } catch (_) { midContext.filter = 'none'; }
-      midContext.drawImage(image, -originalWidth / 2, -originalHeight / 2, originalWidth, originalHeight);
-      midContext.restore();
-
-      lowContext.clearRect(0, 0, lowWidth, lowHeight);
-      lowContext.imageSmoothingEnabled = true;
-      lowContext.imageSmoothingQuality = 'high';
-      lowContext.drawImage(midCanvas, 0, 0, midWidth, midHeight, 0, 0, lowWidth, lowHeight);
-
+      const outputContext = blurSurfaceCache.outputContext;
+      const outputCanvas = blurSurfaceCache.outputCanvas;
+      if (!outputContext || !outputCanvas) return;
       context.save();
       context.imageSmoothingEnabled = true;
       context.imageSmoothingQuality = 'high';
-      context.drawImage(lowCanvas, 0, 0, lowWidth, lowHeight, 0, 0, width, height);
+      context.drawImage(outputCanvas, 0, 0, outputCanvas.width, outputCanvas.height, 0, 0, width, height);
       context.restore();
     }
 
@@ -1575,6 +1625,11 @@
         widthInput.disabled = true;
         heightInput.disabled = true;
         scaleRange.disabled = true;
+        if (backgroundMode === 'blur' && layoutFit === 'cover') {
+          layoutFit = 'contain';
+          document.querySelectorAll('[data-fit]').forEach((button) => button.classList.toggle('active', button.dataset.fit === layoutFit));
+          updateLayoutZoomUI();
+        }
       }
       if (shouldRender && image) render();
     }
