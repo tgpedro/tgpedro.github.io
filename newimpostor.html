@@ -204,10 +204,24 @@ input[type=text]:focus{ border-color:var(--orange); }
   gap:8px;
   background:var(--panel);
   border:1.5px solid var(--border);
-  padding:6px 8px 6px 6px;
-  border-radius:30px;
+  padding:6px 8px 6px 8px;
+  border-radius:20px;
   animation:pop .18s ease;
 }
+.order-btns{
+  display:flex; flex-direction:column; gap:1px;
+  margin-left:-2px;
+}
+.order-btns button{
+  width:18px; height:14px;
+  border:none; background:transparent;
+  color:var(--text-faint);
+  font-size:9px; line-height:1;
+  display:flex; align-items:center; justify-content:center;
+  padding:0;
+}
+.order-btns button:disabled{ opacity:0.25; }
+.order-btns button:not(:disabled):active{ color:var(--orange); }
 @keyframes pop{ from{transform:scale(0.85); opacity:0;} to{transform:scale(1); opacity:1;} }
 .avatar{
   width:28px;height:28px;border-radius:50%;
@@ -286,6 +300,12 @@ input[type=text]:focus{ border-color:var(--orange); }
 .custom-add-card .plus{ font-size:20px; color:var(--orange); }
 
 /* ---------- SETTINGS ROWS ---------- */
+.order-num{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;
+  color:var(--text-faint);
+  min-width:12px;
+}
 .setting-row{
   display:flex;
   align-items:center;
@@ -665,11 +685,20 @@ textarea:focus{ border-color:var(--orange); }
       </div>
       <div class="players-wrap" id="playersWrap"></div>
       <div class="empty-hint" id="emptyHint">Adicione pelo menos 3 jogadores para começar.</div>
+      <div class="empty-hint" id="orderHint" style="display:none;">Use as setinhas para definir a ordem em que o celular vai passar de mão em mão.</div>
 
       <div class="section-label">Categorias <span class="n" id="catCount">0</span></div>
       <div class="cat-grid" id="catGrid"></div>
 
       <div class="section-label">Configurações</div>
+
+      <div class="setting-row">
+        <div class="sl">
+          <div class="st">Ordem de passagem</div>
+          <div class="sd" id="orderModeHint">Sorteada a cada rodada</div>
+        </div>
+        <div class="switch on" id="orderSwitch"><div class="knob"></div></div>
+      </div>
 
       <div class="setting-row">
         <div class="sl">
@@ -831,6 +860,7 @@ let state = {
   categories: JSON.parse(JSON.stringify(BASE_CATEGORIES)),
   selectedCatIds: new Set(["comida","animais","lugares","filmes"]),
   impostorCount: 1,
+  shuffleOrder: true,
   timerEnabled: true,
   timerMinutes: 2,
 
@@ -881,28 +911,64 @@ const playerCountEl = document.getElementById("playerCount");
 
 function renderPlayers(){
   playersWrap.innerHTML = "";
+  const manual = !state.shuffleOrder;
   state.players.forEach((p, i)=>{
     const chip = document.createElement("div");
     chip.className = "player-chip";
     chip.innerHTML = `
+      ${manual ? `
+      <div class="order-btns">
+        <button class="order-up" data-i="${i}" ${i===0 ? "disabled":""}>▲</button>
+        <button class="order-down" data-i="${i}" ${i===state.players.length-1 ? "disabled":""}>▼</button>
+      </div>` : ``}
       <div class="avatar" style="background:${avatarColor(i)}">${initials(p.name)}</div>
       <div class="pname">${escapeHtml(p.name)}</div>
+      ${manual ? `<div class="order-num">${i+1}º</div>` : ``}
       <button class="chip-x" data-i="${i}">✕</button>
     `;
     playersWrap.appendChild(chip);
   });
   playerCountEl.textContent = state.players.length;
   emptyHint.classList.toggle("hidden", state.players.length > 0);
+  document.getElementById("orderHint").style.display = (manual && state.players.length>0) ? "block" : "none";
   syncImpostorLimit();
   validateStart();
 }
 
 playersWrap.addEventListener("click", e=>{
-  const btn = e.target.closest(".chip-x");
-  if(!btn) return;
-  state.players.splice(+btn.dataset.i, 1);
-  renderPlayers();
+  const xBtn = e.target.closest(".chip-x");
+  if(xBtn){
+    state.players.splice(+xBtn.dataset.i, 1);
+    renderPlayers();
+    return;
+  }
+  const upBtn = e.target.closest(".order-up");
+  if(upBtn){
+    const i = +upBtn.dataset.i;
+    if(i>0){
+      [state.players[i-1], state.players[i]] = [state.players[i], state.players[i-1]];
+      renderPlayers();
+    }
+    return;
+  }
+  const downBtn = e.target.closest(".order-down");
+  if(downBtn){
+    const i = +downBtn.dataset.i;
+    if(i<state.players.length-1){
+      [state.players[i+1], state.players[i]] = [state.players[i], state.players[i+1]];
+      renderPlayers();
+    }
+    return;
+  }
 });
+
+document.getElementById("orderSwitch").onclick = function(){
+  state.shuffleOrder = !state.shuffleOrder;
+  this.classList.toggle("on", state.shuffleOrder);
+  document.getElementById("orderModeHint").textContent =
+    state.shuffleOrder ? "Sorteada a cada rodada" : "Você define a ordem abaixo";
+  renderPlayers();
+};
 
 function addPlayer(){
   const val = playerInput.value.trim();
@@ -1075,11 +1141,13 @@ function startRound(){
   state.category = cat;
   state.word = word;
 
-  // shuffle order
+  // pass order: aleatória ou a ordem definida manualmente pelo jogador
   state.order = state.players.map((p,i)=>i);
-  for(let i=state.order.length-1;i>0;i--){
-    const j = Math.floor(Math.random()*(i+1));
-    [state.order[i], state.order[j]] = [state.order[j], state.order[i]];
+  if(state.shuffleOrder){
+    for(let i=state.order.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [state.order[i], state.order[j]] = [state.order[j], state.order[i]];
+    }
   }
 
   state.impostorIdx = new Set();
