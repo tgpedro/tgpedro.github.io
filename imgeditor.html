@@ -371,6 +371,258 @@
       .layout-option { min-height: 78px; }
       .file-name { max-width: 56vw; }
     }
+    /* Neo-Noir Studio — premium visual system */
+    :root {
+      --bg: #040405;
+      --surface: #0b0b0e;
+      --surface-2: #111116;
+      --surface-3: #17171e;
+      --border: rgba(255,255,255,.10);
+      --border-soft: rgba(255,255,255,.065);
+      --text: #f7f7fb;
+      --muted: #94949f;
+      --muted-2: #666672;
+      --accent: #b59cff;
+      --accent-strong: #8d6cff;
+      --accent-soft: rgba(181,156,255,.14);
+      --accent-cyan: #6ee7d2;
+      --success: #9ce7c0;
+      --danger: #ff9eac;
+      --radius-xl: 26px;
+      --radius-lg: 18px;
+      --radius-md: 13px;
+    }
+
+    html { background: #040405; }
+    body {
+      position: relative;
+      isolation: isolate;
+      background:
+        radial-gradient(900px 560px at 78% -8%, rgba(139,92,246,.16), transparent 64%),
+        radial-gradient(700px 520px at -12% 108%, rgba(45,212,191,.075), transparent 62%),
+        linear-gradient(145deg, #030304 0%, #08080b 48%, #050507 100%);
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      z-index: -1;
+      inset: 0;
+      pointer-events: none;
+      opacity: .20;
+      background-image: linear-gradient(rgba(255,255,255,.028) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.028) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: linear-gradient(to bottom, black, transparent 78%);
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      z-index: -1;
+      width: 28vw;
+      height: 28vw;
+      right: -9vw;
+      top: 20vh;
+      pointer-events: none;
+      border-radius: 50%;
+      background: rgba(167,139,250,.09);
+      filter: blur(80px);
+    }
+
+    .app {
+      width: min(1580px, 100%);
+      padding: clamp(12px, 2vw, 24px);
+      grid-template-columns: minmax(292px, 350px) minmax(0, 1fr);
+      gap: clamp(12px, 1.5vw, 22px);
+    }
+    .panel {
+      border-color: rgba(255,255,255,.095);
+      background: linear-gradient(150deg, rgba(20,20,27,.91), rgba(7,7,10,.95));
+      box-shadow: 0 30px 90px rgba(0,0,0,.50), inset 0 1px 0 rgba(255,255,255,.065), inset 0 0 0 1px rgba(255,255,255,.018);
+      backdrop-filter: blur(26px) saturate(135%);
+      -webkit-backdrop-filter: blur(26px) saturate(135%);
+    }
+    .controls {
+      position: sticky;
+      top: clamp(12px, 2vw, 24px);
+      padding: 18px;
+      gap: 19px;
+      border-radius: 24px;
+      background: linear-gradient(155deg, rgba(19,19,25,.94), rgba(7,7,10,.97));
+    }
+    .controls::before {
+      content: '';
+      display: block;
+      height: 2px;
+      margin: -18px 12px 1px;
+      border-radius: 99px;
+      background: linear-gradient(90deg, transparent, rgba(181,156,255,.78), rgba(110,231,210,.35), transparent);
+      box-shadow: 0 0 22px rgba(181,156,255,.42);
+    }
+    .control-section { gap: 12px; }
+    .control-section + .control-section { padding-top: 19px; border-top-color: rgba(255,255,255,.075); }
+    .section-label { color: #777784; letter-spacing: .19em; }
+    .section-label span:last-child, .range-value { color: var(--accent); text-shadow: 0 0 18px rgba(181,156,255,.24); }
+    .field-label { color: #7d7d89; }
+    .text-input, .select-input {
+      border-color: rgba(255,255,255,.095);
+      background: rgba(0,0,0,.34);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.035);
+    }
+    .text-input:hover, .select-input:hover { border-color: rgba(255,255,255,.19); }
+    .text-input:focus, .select-input:focus { border-color: rgba(181,156,255,.78); box-shadow: 0 0 0 4px rgba(181,156,255,.09), 0 0 28px rgba(141,108,255,.12); }
+    input[type="range"] { height: 4px; background: linear-gradient(90deg, rgba(181,156,255,.36), #24242d 62%); }
+    input[type="range"]::-webkit-slider-thumb { width: 16px; height: 16px; border: 3px solid #0b0b0f; background: linear-gradient(135deg, #d2c6ff, #9174ff); box-shadow: 0 0 0 1px rgba(181,156,255,.92), 0 0 18px rgba(141,108,255,.48); }
+    input[type="range"]::-moz-range-thumb { width: 13px; height: 13px; border: 2px solid #0b0b0f; background: #b59cff; box-shadow: 0 0 0 1px rgba(181,156,255,.92), 0 0 18px rgba(141,108,255,.48); }
+    .preset, .button, .tool-button, .icon-button, .layout-launcher, .layout-option, .history-button, .upload-button {
+      border-color: rgba(255,255,255,.10);
+      background: linear-gradient(145deg, rgba(29,29,37,.72), rgba(13,13,17,.92));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.045), 0 8px 24px rgba(0,0,0,.12);
+      transition: transform .22s cubic-bezier(.2,.8,.2,1), border-color .22s, background .22s, color .22s, box-shadow .22s;
+    }
+    .preset:hover, .button:hover:not(:disabled), .tool-button:hover:not(:disabled), .icon-button:hover, .history-button:hover:not(:disabled), .upload-button:hover, .layout-launcher:hover, .layout-option:hover {
+      border-color: rgba(181,156,255,.56);
+      background: linear-gradient(145deg, rgba(45,38,63,.78), rgba(17,16,23,.96));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 10px 30px rgba(0,0,0,.22), 0 0 0 3px rgba(181,156,255,.05);
+      transform: translateY(-2px);
+    }
+    .button:active, .tool-button:active, .icon-button:active, .history-button:active, .layout-launcher:active, .layout-option:active { transform: translateY(0) scale(.975); }
+    .preset.active, .button.primary { color: #0a0910; border-color: #b59cff; background: linear-gradient(135deg, #d0c3ff, #9b7dff 70%, #7e61ef); box-shadow: 0 12px 32px rgba(141,108,255,.28), inset 0 1px 0 rgba(255,255,255,.55); }
+    .button.primary:hover { border-color: #ddd5ff; background: linear-gradient(135deg, #e1d9ff, #b39bff 70%, #9274ff); box-shadow: 0 16px 42px rgba(141,108,255,.38), inset 0 1px 0 rgba(255,255,255,.72); }
+
+    .preview-panel {
+      min-height: calc(100dvh - clamp(24px, 4vw, 48px));
+      border-radius: 28px;
+      background: linear-gradient(145deg, rgba(17,17,22,.90), rgba(5,5,8,.96));
+      box-shadow: 0 34px 110px rgba(0,0,0,.62), inset 0 1px 0 rgba(255,255,255,.07), inset 0 0 0 1px rgba(255,255,255,.02);
+    }
+    .preview-topbar {
+      position: relative;
+      min-height: 68px;
+      padding: 0 clamp(14px, 2vw, 24px);
+      border-bottom-color: rgba(255,255,255,.08);
+      background: linear-gradient(180deg, rgba(255,255,255,.058), rgba(255,255,255,.012));
+    }
+    .preview-topbar::before {
+      content: '';
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      bottom: -1px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(181,156,255,.55), rgba(110,231,210,.28), transparent);
+    }
+    .file-icon { color: #d1c6ff; background: linear-gradient(135deg, rgba(181,156,255,.22), rgba(110,231,210,.10)); box-shadow: 0 0 0 1px rgba(181,156,255,.22), 0 0 28px rgba(141,108,255,.16); }
+    .file-name { color: #eeeeF5; letter-spacing: -.01em; }
+    .status-dot { background: var(--accent-cyan); box-shadow: 0 0 0 4px rgba(110,231,210,.09), 0 0 15px rgba(110,231,210,.78); }
+    .canvas-stage {
+      padding: clamp(18px, 4vw, 72px);
+      background-color: #08080c;
+      background-image: radial-gradient(circle at center, rgba(181,156,255,.06), transparent 38%), linear-gradient(45deg, #0c0c11 25%, transparent 25%), linear-gradient(-45deg, #0c0c11 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #0c0c11 75%), linear-gradient(-45deg, transparent 75%, #0c0c11 75%);
+      background-size: auto, 28px 28px, 28px 28px, 28px 28px, 28px 28px;
+      background-position: center, 0 0, 0 14px, 14px -14px, -14px 0;
+    }
+    .canvas-wrap { filter: drop-shadow(0 28px 55px rgba(0,0,0,.5)); }
+    #preview-canvas { border-color: rgba(255,255,255,.19); border-radius: 16px; box-shadow: 0 0 0 7px rgba(255,255,255,.018), 0 30px 90px rgba(0,0,0,.72), 0 0 50px rgba(141,108,255,.08); }
+    .empty-state { border-color: rgba(181,156,255,.24); border-radius: 24px; background: linear-gradient(145deg, rgba(16,16,22,.88), rgba(7,7,10,.82)); box-shadow: inset 0 1px 0 rgba(255,255,255,.065), 0 24px 70px rgba(0,0,0,.34); }
+    .empty-state.dragging { border-color: var(--accent); background: rgba(39,29,64,.7); box-shadow: 0 0 0 5px rgba(181,156,255,.09), 0 26px 80px rgba(141,108,255,.18); }
+    .upload-mark { color: var(--accent-cyan); border-color: rgba(110,231,210,.28); background: linear-gradient(135deg, rgba(181,156,255,.17), rgba(110,231,210,.12)); box-shadow: 0 0 30px rgba(110,231,210,.08); }
+    .empty-title { letter-spacing: -.02em; font-size: 15px; }
+    .preview-bottombar { min-height: 50px; border-top-color: rgba(255,255,255,.075); background: rgba(0,0,0,.12); }
+    .preview-stats strong { color: #d4d1dc; }
+    .hint { color: #686876; }
+
+    .layout-launcher { min-height: 48px; border-radius: 15px; }
+    .layout-launcher.active { border-color: rgba(181,156,255,.72); background: linear-gradient(135deg, rgba(50,40,72,.76), rgba(17,15,24,.96)); box-shadow: 0 0 0 4px rgba(181,156,255,.07), 0 12px 28px rgba(0,0,0,.22); }
+    .layout-launcher-copy svg, .layout-launcher.active .layout-launcher-arrow { color: var(--accent-cyan); }
+    .layout-sheet { border-color: rgba(181,156,255,.28); background: rgba(13,13,18,.94); box-shadow: 0 32px 110px rgba(0,0,0,.72), 0 0 0 6px rgba(181,156,255,.04), inset 0 1px 0 rgba(255,255,255,.08); }
+    .layout-sheet::before { background: linear-gradient(90deg, #514b63, #b59cff, #514b63); box-shadow: 0 0 16px rgba(181,156,255,.3); }
+    .layout-option.active { border-color: var(--accent); color: #d8ccff; background: linear-gradient(145deg, rgba(58,46,88,.72), rgba(20,17,29,.95)); box-shadow: 0 0 0 3px rgba(181,156,255,.09), 0 12px 25px rgba(0,0,0,.2); }
+    .layout-option:hover { color: #e8e2ff; }
+    .layout-divider { background: rgba(255,255,255,.085); }
+    .layout-subhead strong { color: var(--accent-cyan); }
+    .layout-align-status { color: var(--accent-cyan); }
+    .layout-align-status.flash { box-shadow: 0 0 0 4px rgba(110,231,210,.07); }
+    .toast { border-color: rgba(181,156,255,.26); background: rgba(17,15,25,.92); box-shadow: 0 18px 45px rgba(0,0,0,.42), 0 0 0 4px rgba(181,156,255,.05); backdrop-filter: blur(18px); }
+
+    @media (max-width: 980px) {
+      .app { grid-template-columns: minmax(260px, 310px) minmax(0, 1fr); gap: 12px; }
+      .controls { padding: 15px; }
+      .preview-topbar { min-height: 60px; }
+    }
+    @media (max-width: 760px) {
+      .app { display: flex; flex-direction: column; padding: 10px; }
+      .preview-panel { order: 1; min-height: min(78dvh, 720px); border-radius: 22px; }
+      .controls { order: 2; position: relative; top: auto; max-height: none; border-radius: 22px; }
+      .canvas-stage { min-height: 55dvh; padding: 18px; }
+      #preview-canvas { max-height: 60dvh; border-radius: 13px; }
+      .preview-bottombar { padding: 0 14px; }
+      .meta-right { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+    }
+    /* Studio motion layer */
+    @keyframes studioReveal { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes studioGlow { 0%, 100% { opacity: .38; transform: scaleX(.72); } 50% { opacity: .85; transform: scaleX(1); } }
+    @keyframes studioPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(110,231,210,0); } 50% { box-shadow: 0 0 0 6px rgba(110,231,210,.08); } }
+    .controls, .preview-panel { animation: studioReveal .55s cubic-bezier(.2,.8,.2,1) both; }
+    .preview-panel { animation-delay: .04s; }
+    .control-section { animation: studioReveal .42s cubic-bezier(.2,.8,.2,1) both; }
+    .control-section:nth-child(2) { animation-delay: .04s; }
+    .control-section:nth-child(3) { animation-delay: .08s; }
+    .control-section:nth-child(4) { animation-delay: .12s; }
+    .control-section:nth-child(5) { animation-delay: .16s; }
+    .control-section:nth-child(6) { animation-delay: .20s; }
+    .preview-topbar::after { height: 2px; opacity: .42; filter: blur(.35px); animation: studioGlow 4s ease-in-out infinite; }
+    .button, .tool-button, .icon-button, .history-button, .layout-launcher, .layout-option, .upload-button { position: relative; overflow: hidden; isolation: isolate; }
+    .button::before, .tool-button::before, .icon-button::before, .history-button::before, .layout-launcher::before, .layout-option::before, .upload-button::before {
+      content: '';
+      position: absolute;
+      z-index: -1;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0;
+      background: linear-gradient(115deg, transparent 20%, rgba(255,255,255,.14) 48%, transparent 72%);
+      transform: translateX(-120%);
+      transition: opacity .2s;
+    }
+    .button:hover::before, .tool-button:hover::before, .icon-button:hover::before, .history-button:hover:not(:disabled)::before, .layout-launcher:hover::before, .layout-option:hover::before, .upload-button:hover::before { opacity: 1; animation: studioShine .65s ease-out; }
+    @keyframes studioShine { to { transform: translateX(120%); } }
+    .status-dot { animation: studioPulse 2.8s ease-in-out infinite; }
+    .file-meta, .meta-right { transition: opacity .2s, transform .2s; }
+    .file-meta:hover, .meta-right:hover { transform: translateY(-1px); }
+    .canvas-stage::before {
+      content: 'STUDIO CANVAS';
+      position: absolute;
+      left: clamp(18px, 3vw, 42px);
+      top: clamp(14px, 2vw, 26px);
+      color: rgba(255,255,255,.20);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: .24em;
+      pointer-events: none;
+    }
+    .canvas-stage::after {
+      content: '';
+      position: absolute;
+      right: clamp(18px, 3vw, 42px);
+      bottom: clamp(14px, 2vw, 26px);
+      width: 44px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(181,156,255,.55));
+      pointer-events: none;
+    }
+    .preview-bottombar { position: relative; }
+    .preview-bottombar::after { content: 'LOCAL · PRIVATE'; color: rgba(110,231,210,.52); font-size: 8px; font-weight: 800; letter-spacing: .16em; }
+    .layout-sheet.open { animation: studioReveal .28s cubic-bezier(.2,.8,.2,1) both; }
+    .toast { animation: studioReveal .28s cubic-bezier(.2,.8,.2,1) both; }
+    @media (max-width: 760px) {
+      .canvas-stage::before { left: 16px; top: 12px; }
+      .canvas-stage::after { right: 16px; bottom: 12px; }
+      .preview-bottombar::after { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .controls, .preview-panel, .control-section, .status-dot { animation: none !important; }
+    }
   </style>
 </head>
 <body>
@@ -622,6 +874,7 @@
     let videoStart = 0;
     let videoEnd = 0;
     let videoFrameRequest = null;
+    let videoFrameMode = 'raf';
     let originalWidth = 0;
     let originalHeight = 0;
     let imageBaseName = 'imagem';
@@ -1012,45 +1265,67 @@
       }
     }
 
+    const blurSurfaceCache = { key: '', midCanvas: null, lowCanvas: null, midContext: null, lowContext: null };
+
     function drawBlurBackground(context, width, height) {
-      if (!image) return;
-      const blur = Number(backgroundBlurRange.value) || 28;
+      if (!image || !width || !height) return;
+      const blur = Math.max(4, Math.min(80, Number(backgroundBlurRange.value) || 28));
       const rotatedWidth = rotation % 180 === 0 ? originalWidth : originalHeight;
       const rotatedHeight = rotation % 180 === 0 ? originalHeight : originalWidth;
 
-      // Fallback universal para Safari/iOS e navegadores móveis que não aplicam
-      // ctx.filter = blur(...) no Canvas: renderiza uma cópia em baixa resolução
-      // e amplia com imageSmoothing. O downscaling cria um desfoque real sem
-      // depender do suporte ao filtro CSS/Canvas do dispositivo.
-      const blurScale = Math.max(0.025, Math.min(0.42, 5 / Math.max(blur, 5)));
-      let lowWidth = Math.max(32, Math.round(width * blurScale));
-      let lowHeight = Math.max(32, Math.round(height * blurScale));
-      const maxLowPixels = 220000;
-      if (lowWidth * lowHeight > maxLowPixels) {
-        const memoryScale = Math.sqrt(maxLowPixels / (lowWidth * lowHeight));
-        lowWidth = Math.max(32, Math.round(lowWidth * memoryScale));
-        lowHeight = Math.max(32, Math.round(lowHeight * memoryScale));
+      // Multi-pass downscaling: a primeira superfície preserva detalhes suaves,
+      // a segunda reduz ainda mais a frequência e só então o resultado é ampliado.
+      // Isso evita os blocos gigantes do downscaling agressivo anterior em mobile.
+      const midScale = Math.max(0.42, Math.min(0.78, 26 / (blur + 10)));
+      const lowScale = Math.max(0.32, Math.min(midScale * 0.72, midScale - 0.08));
+      let midWidth = Math.max(96, Math.round(width * midScale));
+      let midHeight = Math.max(96, Math.round(height * midScale));
+      let lowWidth = Math.max(64, Math.round(width * lowScale));
+      let lowHeight = Math.max(64, Math.round(height * lowScale));
+      const maxWorkPixels = 420000;
+      if (midWidth * midHeight > maxWorkPixels) {
+        const memoryScale = Math.sqrt(maxWorkPixels / (midWidth * midHeight));
+        midWidth = Math.max(96, Math.round(midWidth * memoryScale));
+        midHeight = Math.max(96, Math.round(midHeight * memoryScale));
+        lowWidth = Math.max(64, Math.round(lowWidth * memoryScale));
+        lowHeight = Math.max(64, Math.round(lowHeight * memoryScale));
       }
 
-      const lowCanvas = document.createElement('canvas');
-      lowCanvas.width = lowWidth;
-      lowCanvas.height = lowHeight;
-      const lowContext = lowCanvas.getContext('2d', { willReadFrequently: false });
-      if (!lowContext) return;
+      const key = `${width}x${height}:${midWidth}x${midHeight}:${lowWidth}x${lowHeight}:${rotation}:${flipHorizontal}:${flipVertical}`;
+      if (blurSurfaceCache.key !== key) {
+        blurSurfaceCache.key = key;
+        blurSurfaceCache.midCanvas = document.createElement('canvas');
+        blurSurfaceCache.lowCanvas = document.createElement('canvas');
+        blurSurfaceCache.midCanvas.width = midWidth;
+        blurSurfaceCache.midCanvas.height = midHeight;
+        blurSurfaceCache.lowCanvas.width = lowWidth;
+        blurSurfaceCache.lowCanvas.height = lowHeight;
+        blurSurfaceCache.midContext = blurSurfaceCache.midCanvas.getContext('2d');
+        blurSurfaceCache.lowContext = blurSurfaceCache.lowCanvas.getContext('2d');
+      }
+      const midCanvas = blurSurfaceCache.midCanvas;
+      const lowCanvas = blurSurfaceCache.lowCanvas;
+      const midContext = blurSurfaceCache.midContext;
+      const lowContext = blurSurfaceCache.lowContext;
+      if (!midContext || !lowContext) return;
+
+      midContext.clearRect(0, 0, midWidth, midHeight);
+      midContext.imageSmoothingEnabled = true;
+      midContext.imageSmoothingQuality = 'high';
+      const midCoverScale = Math.max(midWidth / rotatedWidth, midHeight / rotatedHeight) * 1.08;
+      midContext.save();
+      midContext.translate(midWidth / 2, midHeight / 2);
+      midContext.rotate(rotation * Math.PI / 180);
+      midContext.scale(midCoverScale * (flipHorizontal ? -1 : 1), midCoverScale * (flipVertical ? -1 : 1));
+      const colorFilter = getFilterString().replace(/\s*blur\([^)]*\)/gi, '').trim();
+      try { midContext.filter = colorFilter || 'none'; } catch (_) { midContext.filter = 'none'; }
+      midContext.drawImage(image, -originalWidth / 2, -originalHeight / 2, originalWidth, originalHeight);
+      midContext.restore();
+
+      lowContext.clearRect(0, 0, lowWidth, lowHeight);
       lowContext.imageSmoothingEnabled = true;
       lowContext.imageSmoothingQuality = 'high';
-
-      const coverScale = Math.max(lowWidth / rotatedWidth, lowHeight / rotatedHeight) * 1.08;
-      lowContext.save();
-      lowContext.translate(lowWidth / 2, lowHeight / 2);
-      lowContext.rotate(rotation * Math.PI / 180);
-      lowContext.scale(coverScale * (flipHorizontal ? -1 : 1), coverScale * (flipVertical ? -1 : 1));
-      // Mantemos os filtros de cor quando o navegador suporta Canvas filters,
-      // mas removemos o blur da string porque o desfoque já é feito pelo fallback.
-      const colorFilter = getFilterString().replace(/\\s*blur\\([^)]*\\)/gi, '').trim();
-      try { lowContext.filter = colorFilter || 'none'; } catch (_) { lowContext.filter = 'none'; }
-      lowContext.drawImage(image, -originalWidth / 2, -originalHeight / 2, originalWidth, originalHeight);
-      lowContext.restore();
+      lowContext.drawImage(midCanvas, 0, 0, midWidth, midHeight, 0, 0, lowWidth, lowHeight);
 
       context.save();
       context.imageSmoothingEnabled = true;
@@ -1091,11 +1366,21 @@
       if (!isVideo()) return;
       updateVideoUI();
       scheduleRender({ estimate: false });
-      if (!videoSource.paused && !videoSource.ended) videoFrameRequest = requestAnimationFrame(scheduleVideoPreview);
+      if (videoSource.paused || videoSource.ended) return;
+      if (typeof videoSource.requestVideoFrameCallback === 'function') {
+        videoFrameMode = 'video';
+        videoFrameRequest = videoSource.requestVideoFrameCallback(() => scheduleVideoPreview());
+      } else {
+        videoFrameMode = 'raf';
+        videoFrameRequest = requestAnimationFrame(scheduleVideoPreview);
+      }
     }
 
     function stopVideoPreviewLoop() {
-      if (videoFrameRequest) cancelAnimationFrame(videoFrameRequest);
+      if (videoFrameRequest !== null) {
+        if (videoFrameMode === 'video' && videoSource && typeof videoSource.cancelVideoFrameCallback === 'function') videoSource.cancelVideoFrameCallback(videoFrameRequest);
+        else cancelAnimationFrame(videoFrameRequest);
+      }
       videoFrameRequest = null;
     }
 
@@ -1806,21 +2091,31 @@
       const candidates = videoFormat.value === 'video/mp4' ? ['video/mp4;codecs=h264,aac', 'video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm'] : ['video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'];
       const mime = candidates.find((type) => MediaRecorder.isTypeSupported(type));
       if (!mime) { showToast('Nenhum formato de vídeo compatível foi encontrado.', true); return; }
-      const recorder = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 8000000 });
+      const videoBitrate = Math.min(24000000, Math.max(8000000, Math.round(width * height * 6)));
+      const recorder = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: videoBitrate, audioBitsPerSecond: 128000 });
       const chunks = [];
       const previousTime = videoSource.currentTime;
       const wasPlaying = !videoSource.paused;
       const start = Math.max(0, videoStart);
       const end = Math.min(videoEnd, Number(videoSource.duration) || videoEnd);
       let frameId = null;
+      let frameMode = 'raf';
       let stopped = false;
-      const stopRecording = () => { if (stopped) return; stopped = true; if (frameId) cancelAnimationFrame(frameId); if (recorder.state !== 'inactive') recorder.stop(); };
+      const cancelCaptureFrame = () => {
+        if (frameId === null) return;
+        if (frameMode === 'video' && typeof videoSource.cancelVideoFrameCallback === 'function') videoSource.cancelVideoFrameCallback(frameId);
+        else cancelAnimationFrame(frameId);
+        frameId = null;
+      };
+      const stopRecording = () => { if (stopped) return; stopped = true; cancelCaptureFrame(); if (recorder.state !== 'inactive') recorder.stop(); };
       const drawFrame = () => {
         const composed = isLayoutMode() ? drawLayout(width, height, sharpenCheck.checked) : drawResized(width, height, sharpenCheck.checked, true);
         captureContext.clearRect(0, 0, width, height);
         captureContext.drawImage(composed, 0, 0);
-        if (!stopped && videoSource.currentTime < end - 0.03 && !videoSource.paused) frameId = requestAnimationFrame(drawFrame);
-        else stopRecording();
+        if (!stopped && videoSource.currentTime < end - 0.03 && !videoSource.paused) {
+          if (typeof videoSource.requestVideoFrameCallback === 'function') { frameMode = 'video'; frameId = videoSource.requestVideoFrameCallback(() => drawFrame()); }
+          else { frameMode = 'raf'; frameId = requestAnimationFrame(drawFrame); }
+        } else stopRecording();
       };
       recorder.ondataavailable = (event) => { if (event.data.size) chunks.push(event.data); };
       recorder.onstop = async () => {
