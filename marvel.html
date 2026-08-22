@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b0d12">
+<title>Marvel — Maratona Definitiva</title>
+<style>
+:root{--bg:#f5f5f7;--panel:rgba(255,255,255,.72);--panel-solid:#fff;--panel-2:#e9e9ed;--text:#1d1d1f;--muted:#6e6e73;--line:rgba(0,0,0,.09);--red:#0071e3;--red-2:#0077ed;--blue:#0071e3;--green:#248a3d;--shadow:0 14px 40px rgba(0,0,0,.08);--ease:cubic-bezier(.23,1,.32,1)}
+[data-theme="dark"]{--bg:#000;--panel:rgba(28,28,30,.82);--panel-solid:#1c1c1e;--panel-2:#2c2c2e;--text:#f5f5f7;--muted:#98989d;--line:rgba(255,255,255,.13);--red:#2997ff;--red-2:#2997ff;--blue:#2997ff;--green:#30d158;--shadow:0 14px 40px rgba(0,0,0,.35)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-height:100vh;color:var(--text);background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}.wrap{width:min(980px,100%);margin:auto;padding:28px 24px 72px}.topbar{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:72px}.brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:-.03em}.brand-mark{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:var(--text);color:var(--bg);box-shadow:none;font-size:18px}.top-actions{display:flex;gap:8px}.icon-btn,.btn{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:13px;padding:10px 13px;font:inherit;cursor:pointer;transition:transform .16s var(--ease),background .2s,border-color .2s,box-shadow .2s}.icon-btn{width:42px;height:42px;padding:0;font-size:18px}.btn:hover,.icon-btn:hover{background:var(--panel-2);border-color:rgba(255,255,255,.22);box-shadow:0 8px 25px rgba(0,0,0,.12)}button:active{transform:scale(.97)}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid rgba(110,168,254,.45);outline-offset:2px}.hero{display:grid;grid-template-columns:1.25fr .75fr;align-items:end;gap:30px;margin-bottom:34px}.eyebrow{color:var(--muted);font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}.hero h1{font-size:clamp(46px,8vw,86px);letter-spacing:-.065em;line-height:.96;margin:14px 0 20px;max-width:700px}.hero h1 span{color:var(--red-2)}.subtitle{max-width:620px;color:var(--muted);font-size:17px;line-height:1.6;margin:0}.hero-card{position:relative;padding:24px;border:1px solid var(--line);border-radius:25px;background:var(--panel);box-shadow:var(--shadow);overflow:hidden}.hero-card:after{content:"";position:absolute;width:130px;height:130px;right:-38px;top:-45px;border:18px solid rgba(255,255,255,.08);border-radius:50%}.hero-card strong{display:block;font-size:36px;letter-spacing:-.06em}.hero-card small{color:var(--muted)}.progress-box{padding:22px;border:1px solid var(--line);border-radius:25px;background:var(--panel);backdrop-filter:blur(18px);box-shadow:var(--shadow);margin-bottom:18px}.progress-top{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:14px}.progress-top strong{font-size:19px}.progress-top span{color:var(--muted);font-size:13px}.bar{height:10px;background:var(--panel-2);border-radius:99px;overflow:hidden}.bar-fill{height:100%;width:0;border-radius:99px;background:var(--red-2);transition:width .55s var(--ease);position:relative}.bar-fill:after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent,rgba(255,255,255,.35),transparent);animation:shine 2.2s infinite}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0 28px}.stat{padding:16px 18px;border:1px solid var(--line);border-radius:18px;background:var(--panel);transition:transform .2s var(--ease)}.stat:hover{transform:translateY(-3px)}.stat-label{display:block;color:var(--muted);font-size:12px;margin-bottom:8px}.stat-value{font-size:24px;font-weight:800;letter-spacing:-.04em}.tools{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:18px 0 26px}.search{flex:1;min-width:220px;position:relative}.search input{width:100%;padding:13px 16px 13px 42px;border:1px solid var(--line);border-radius:14px;background:var(--panel);color:var(--text);font:inherit}.search-icon{position:absolute;left:15px;top:12px;color:var(--muted)}.btn.active{background:rgba(240,68,93,.14);border-color:rgba(240,68,93,.55);color:var(--red-2)}.select{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:13px;padding:12px 13px;font:inherit}.section{margin:52px 0 18px;animation:rise .4s var(--ease) both}.section-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:20px 0 14px;border-top:1px solid var(--line);cursor:pointer}.section h2{font-size:23px;letter-spacing:-.04em;margin:0 0 6px}.section p{color:var(--muted);margin:0;font-size:13px}.section-toggle{flex:0 0 auto;border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:10px;width:34px;height:34px;cursor:pointer;transition:transform .2s var(--ease)}.section.collapsed .section-toggle{transform:rotate(-90deg)}.section.collapsed .items{display:none}.item{display:grid;grid-template-columns:48px 1fr auto;gap:14px;align-items:center;padding:14px 12px;border:1px solid transparent;border-bottom-color:var(--line);border-radius:14px;transition:background .2s,transform .2s var(--ease),border-color .2s}.item:hover{background:var(--panel);border-color:var(--line);transform:none}.num{color:var(--muted);font-size:12px;text-align:center;font-variant-numeric:tabular-nums}.title{font-size:15px;font-weight:700;line-height:1.35}.meta{font-size:12px;color:var(--muted);margin-top:4px}.item.watched .title{text-decoration:line-through;color:var(--muted)}.item.watched .num{color:var(--green)}.item-controls{display:flex;align-items:center;gap:8px}.status{min-width:118px;border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:11px;padding:9px 8px;font:inherit;font-size:12px}.fav{width:34px;height:34px;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:10px;cursor:pointer;font-size:16px;transition:transform .16s var(--ease),color .2s,background .2s}.fav.active{color:#ffcc66;background:rgba(255,204,102,.1);border-color:rgba(255,204,102,.35)}.empty{padding:45px 20px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:20px}.footer{color:var(--muted);text-align:center;font-size:12px;line-height:1.7;margin-top:55px}.toast{position:fixed;left:50%;bottom:24px;z-index:5;transform:translate(-50%,20px);opacity:0;pointer-events:none;padding:13px 17px;border:1px solid var(--line);border-radius:14px;background:var(--panel-solid);box-shadow:var(--shadow);transition:opacity .2s,transform .2s var(--ease);font-size:13px}.toast.show{opacity:1;transform:translate(-50%,0)}.backtop{position:fixed;right:20px;bottom:20px;opacity:0;pointer-events:none;transform:translateY(12px);transition:.2s var(--ease)}.backtop.show{opacity:1;pointer-events:auto;transform:none}.confetti{position:fixed;z-index:9;width:8px;height:14px;top:-20px;animation:fall 1.2s linear forwards}@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}@keyframes shine{0%,35%{transform:translateX(-100%)}70%,100%{transform:translateX(100%)}}@keyframes fall{to{transform:translateY(105vh) rotate(720deg);opacity:0}}@media(max-width:760px){.hero{grid-template-columns:1fr}.hero-card{display:none}.topbar{margin-bottom:42px}.stats{grid-template-columns:1fr 1fr}.stats .stat:last-child{grid-column:span 2}.item{grid-template-columns:32px 1fr}.item-controls{grid-column:2}.status{flex:1}.item-controls{width:100%}}@media(max-width:520px){.wrap{padding:20px 14px 55px}.hero h1{font-size:54px}.tools .btn{flex:1}.search{min-width:100%}.section h2{font-size:19px}.item{padding:13px 5px}.stats{gap:8px}.stat{padding:14px}.stat-value{font-size:20px}}@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
+
+svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px}.icon-btn svg{width:18px;height:18px}.btn svg{margin-right:5px}.utility-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:54px}.next-panel{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:24px 26px;margin:0 0 28px;border:1px solid var(--line);border-radius:22px;background:var(--panel);box-shadow:var(--shadow);animation:appleIn .7s var(--ease) both}.next-panel strong{display:block;max-width:620px;font-size:clamp(25px,4vw,42px);line-height:1.04;letter-spacing:-.055em;margin:7px 0}.next-panel small{display:block;color:var(--muted);font-size:12px}.next-panel .btn{white-space:nowrap}.top-actions{gap:6px}.icon-btn,.btn{transition:transform .32s var(--ease),background .25s,border-color .25s,box-shadow .32s var(--ease)}.icon-btn:hover,.btn:hover{transform:translateY(-2px)}.progress-box{animation:appleIn .7s .08s var(--ease) both}.stats{animation:appleIn .7s .14s var(--ease) both}.tools{animation:appleIn .7s .2s var(--ease) both}.search-icon{top:11px}.search-icon svg{width:18px;height:18px}.section-head{transition:opacity .25s,transform .32s var(--ease)}.section-head:hover{transform:translateX(4px)}.section-toggle svg{transition:transform .35s var(--ease)}.section.collapsed .section-toggle svg{transform:rotate(-90deg)}.item{animation:itemIn .5s var(--ease) both}.item:nth-child(2){animation-delay:35ms}.item:nth-child(3){animation-delay:70ms}.item:nth-child(4){animation-delay:105ms}.item:nth-child(5){animation-delay:140ms}.item:nth-child(6){animation-delay:175ms}.item:nth-child(7){animation-delay:210ms}.item:nth-child(8){animation-delay:245ms}.item:nth-child(9){animation-delay:280ms}.item:nth-child(10){animation-delay:315ms}.item:nth-child(n+11){animation-delay:350ms}.bar-fill{transition:width .8s var(--ease)}@keyframes appleIn{from{opacity:0;transform:translateY(18px) scale(.985)}to{opacity:1;transform:none}}@keyframes itemIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}@media(max-width:600px){.utility-bar{margin-bottom:34px}.next-panel{align-items:flex-start;flex-direction:column;padding:21px}.next-panel .btn{width:100%}.next-panel strong{font-size:30px}}
+
+.next-panel{position:relative;overflow:hidden}.next-copy{position:relative;z-index:1;flex:1}.multiverse-mark{width:102px;height:102px;flex:0 0 102px;display:grid;place-items:center;border-radius:50%;background:linear-gradient(145deg,rgba(0,113,227,.12),rgba(255,59,48,.08));color:var(--red-2);animation:orbitFloat 5s ease-in-out infinite}.multiverse-mark svg{width:86px;height:86px;fill:none;stroke:currentColor;stroke-width:1.15;stroke-linecap:round}.multiverse-mark .energy-dot{fill:currentColor;stroke:none;filter:drop-shadow(0 0 8px currentColor);animation:energyPulse 2.4s ease-in-out infinite}.star-icon{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linejoin:round;vertical-align:-3px}.star-icon.filled{fill:currentColor}.fav{display:grid;place-items:center}.fav.active{color:#d99b19}.section h2{font-weight:650}.section h2:first-letter{color:var(--red-2)}@keyframes orbitFloat{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-5px) rotate(3deg)}}@keyframes energyPulse{0%,100%{transform:scale(.85);opacity:.7}50%{transform:scale(1.12);opacity:1}}@media(max-width:600px){.multiverse-mark{width:74px;height:74px;flex-basis:74px;position:absolute;right:-8px;top:-8px;opacity:.22}.multiverse-mark svg{width:70px;height:70px}.next-copy{padding-right:24px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="utility-bar"><div></div><div class="top-actions"><button class="icon-btn" id="themeBtn" title="Alternar tema" aria-label="Alternar tema"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v2m0 14v2M3 12h2m14 0h2m-3.36-6.64-1.41 1.41M7.77 16.23l-1.41 1.41m0-12.28 1.41 1.41m8.46 8.46 1.41 1.41M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/></svg></button><button class="icon-btn" id="exportBtn" title="Exportar progresso" aria-label="Exportar progresso"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0-12 4 4m-4-4L8 7M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg></button><button class="icon-btn" id="importBtn" title="Importar progresso" aria-label="Importar progresso"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3m0 12-4-4m4 4 4-4M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg></button><input id="importFile" type="file" accept="application/json" hidden></div></div>
+  <section class="next-panel"><div class="multiverse-mark" aria-hidden="true"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="39"/><ellipse cx="60" cy="60" rx="52" ry="20"/><ellipse cx="60" cy="60" rx="20" ry="52"/><circle class="energy-dot" cx="60" cy="60" r="7"/></svg></div><div class="next-copy"><small>Próximo capítulo</small><strong id="nextTitle">—</strong><small id="nextMeta">Escolha uma produção para começar</small></div><button class="btn" id="nextBtn">Continuar <span aria-hidden="true">→</span></button></section>
+  <section class="progress-box"><div class="progress-top"><strong id="progressText">0% concluído</strong><span id="count">0 de 0 vistos</span></div><div class="bar"><div class="bar-fill" id="barFill"></div></div></section>
+  <section class="stats"><div class="stat"><span class="stat-label">Vistos</span><span class="stat-value" id="watchedStat">0</span></div><div class="stat"><span class="stat-label">Restantes</span><span class="stat-value" id="remainingStat">0</span></div><div class="stat"><span class="stat-label">Favoritos</span><span class="stat-value" id="favoriteStat">0</span></div></section>
+  <div class="tools"><div class="search"><span class="search-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg></span><input id="search" type="search" placeholder="Buscar filme, série ou universo…" autocomplete="off"></div><button class="btn active" data-filter="all">Todos</button><button class="btn" data-filter="unwatched">Não vistos</button><button class="btn" data-filter="watched">Vistos</button><button class="btn" data-filter="favorites">Favoritos</button><select class="select" id="typeFilter" aria-label="Filtrar por tipo"><option value="all">Todos os tipos</option><option value="Filme">Filmes</option><option value="Série">Séries</option><option value="Animação">Animações</option><option value="Especial">Especiais</option></select><button class="btn" id="randomBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 1.7 5.3L19 10l-5.3 1.7L12 17l-1.7-5.3L5 10l5.3-1.7L12 3Zm6 12 .8 2.2L21 18l-2.2.8L18 21l-.8-2.2L15 18l2.2-.8L18 15Z"/></svg> Surpreenda-me</button><button class="btn" id="resetBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.34-5.66L4 8.68M4 4v4.68h4.68"/></svg> Resetar</button></div>
+  <main id="list"></main>
+  <footer class="footer">Seu progresso e favoritos ficam salvos neste navegador.<br>Use <strong>/</strong> para buscar, <strong>Enter</strong> para selecionar e <strong>Esc</strong> para limpar a busca.</footer>
+</div><button class="icon-btn backtop" id="backtop" aria-label="Voltar ao topo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 14 6-6 6 6"/></svg></button><div class="toast" id="toast"></div>
+<script>
+const sections = [
+{
+ title:"PARTE 1 — MCU: COMEÇO DA HISTÓRIA",
+ desc:"A origem do MCU e as primeiras conexões.",
+ items:[
+  ["Eyes of Wakanda","Série — períodos históricos de Wakanda"],
+  ["Capitão América: O Primeiro Vingador","Filme — Segunda Guerra Mundial"],
+  ["Agent Carter — Temporada 1","Série"],
+  ["Agent Carter — Temporada 2","Série"],
+  ["Marvel One-Shot: Agent Carter","Especial"],
+  ["Capitã Marvel","Filme — 1995"],
+  ["Homem de Ferro","Filme — 2010"],
+  ["Homem de Ferro 2","Filme — 2011"],
+  ["O Incrível Hulk","Filme — 2011"],
+  ["Marvel One-Shot: A Funny Thing Happened on the Way to Thor's Hammer","Especial"],
+  ["Thor","Filme — 2011"],
+  ["Os Vingadores","Filme — 2012"],
+  ["Marvel One-Shot: The Consultant","Especial"],
+  ["Marvel One-Shot: Item 47","Especial"]
+ ]
+},
+{
+ title:"PARTE 2 — A ERA DOS VINGADORES",
+ desc:"O MCU cresce e a S.H.I.E.L.D. ganha espaço.",
+ items:[
+  ["Homem de Ferro 3","Filme — 2012"],
+  ["Agents of S.H.I.E.L.D. — Temporada 1","Série"],
+  ["Thor: O Mundo Sombrio","Filme — 2013"],
+  ["Marvel One-Shot: All Hail the King","Especial"],
+  ["Agents of S.H.I.E.L.D. — Temporada 2","Série"],
+  ["Capitão América: O Soldado Invernal","Filme — 2014"],
+  ["Guardiões da Galáxia","Filme — 2014"],
+  ["Guardiões da Galáxia Vol. 2","Filme — logo após o primeiro"],
+  ["Agents of S.H.I.E.L.D. — Temporada 3","Série"],
+  ["Vingadores: Era de Ultron","Filme — 2015"],
+  ["Homem-Formiga","Filme — 2015"]
+ ]
+},
+{
+ title:"PARTE 3 — GUERRA CIVIL",
+ desc:"Os heróis se dividem e o MCU entra em uma nova fase.",
+ items:[
+  ["Capitão América: Guerra Civil","Filme — 2016"],
+  ["Viúva Negra","Filme — 2016"],
+  ["Homem-Aranha: De Volta ao Lar","Filme — 2016"],
+  ["Doutor Estranho","Filme — 2016/2017"],
+  ["Demolidor — Temporada 1","Série"],
+  ["Jessica Jones — Temporada 1","Série"],
+  ["Luke Cage — Temporada 1","Série"],
+  ["Punho de Ferro — Temporada 1","Série"],
+  ["Os Defensores","Série"],
+  ["O Justiceiro — Temporada 1","Série"],
+  ["Jessica Jones — Temporada 2","Série"],
+  ["Luke Cage — Temporada 2","Série"],
+  ["Punho de Ferro — Temporada 2","Série"],
+  ["Demolidor — Temporada 2","Série"],
+  ["O Justiceiro — Temporada 2","Série"],
+  ["Demolidor — Temporada 3","Série"],
+  ["Jessica Jones — Temporada 3","Série"]
+ ]
+},
+{
+ title:"PARTE 4 — GUERRA INFINITA",
+ desc:"A preparação para Thanos e a maior batalha do MCU.",
+ items:[
+  ["Pantera Negra","Filme"],
+  ["Thor: Ragnarok","Filme"],
+  ["Homem-Formiga e a Vespa","Filme"],
+  ["Vingadores: Guerra Infinita","Filme"],
+  ["Vingadores: Ultimato","Filme"]
+ ]
+},
+{
+ title:"PARTE 5 — O MULTIVERSO COMEÇA",
+ desc:"Depois do Ultimato, as realidades começam a se abrir.",
+ items:[
+  ["Loki — Temporada 1","Série — multiverso"],
+  ["What If...? — Temporada 1","Animação — multiverso"],
+  ["WandaVision","Série"],
+  ["Falcão e o Soldado Invernal","Série"],
+  ["Shang-Chi e a Lenda dos Dez Anéis","Filme"],
+  ["Homem-Aranha: Longe de Casa","Filme"],
+  ["Eternos","Filme"],
+  ["Homem-Aranha: Sem Volta Para Casa","Filme — multiverso"]
+ ]
+},
+{
+ title:"PARTE 6 — MULTIVERSO",
+ desc:"Variantes, linhas temporais e realidades alternativas.",
+ items:[
+  ["Hawkeye","Série"],
+  ["Moon Knight","Série"],
+  ["Ms. Marvel","Série"],
+  ["Doutor Estranho no Multiverso da Loucura","Filme — multiverso"],
+  ["She-Hulk","Série"],
+  ["Thor: Amor e Trovão","Filme"],
+  ["Werewolf by Night","Especial"],
+  ["Guardiões da Galáxia: Especial de Festas","Especial"],
+  ["Pantera Negra: Wakanda Para Sempre","Filme"],
+  ["Homem-Formiga e a Vespa: Quantumania","Filme"],
+  ["Guardiões da Galáxia Vol. 3","Filme"],
+  ["Invasão Secreta","Série"],
+  ["As Marvels","Filme"],
+  ["Loki — Temporada 2","Série — multiverso"],
+  ["What If...? — Temporada 2","Animação — multiverso"],
+  ["What If...? — Temporada 3","Animação — multiverso"],
+  ["Echo","Série"],
+  ["Agatha All Along","Série"],
+  ["Marvel Zombies","Animação — multiverso"],
+  ["Ironheart","Série"]
+ ]
+},
+{
+ title:"PARTE 7 — NOVA GERAÇÃO DO MCU",
+ desc:"As produções mais recentes antes de Doomsday.",
+ items:[
+  ["Deadpool & Wolverine","Filme — multiverso"],
+  ["Capitão América: Admirável Mundo Novo","Filme"],
+  ["Thunderbolts*","Filme"],
+  ["Quarteto Fantástico: Primeiros Passos","Filme — realidade alternativa"],
+  ["Daredevil: Born Again — Temporada 1","Série"],
+  ["Daredevil: Born Again — Temporada 2","Série"],
+  ["Wonder Man","Série"],
+  ["Homem-Aranha: Um Novo Dia","Filme"]
+ ]
+},
+{
+ title:"PARTE 8 — HOMEM-ARANHA: TOBEY MAGUIRE",
+ desc:"O universo original de Peter Parker.",
+ items:[
+  ["Homem-Aranha","Filme — 2002"],
+  ["Homem-Aranha 2","Filme — 2004"],
+  ["Homem-Aranha 3","Filme — 2007"]
+ ]
+},
+{
+ title:"PARTE 9 — HOMEM-ARANHA: ANDREW GARFIELD",
+ desc:"A segunda continuidade live-action.",
+ items:[
+  ["O Espetacular Homem-Aranha","Filme — 2012"],
+  ["O Espetacular Homem-Aranha 2: A Ameaça de Electro","Filme — 2014"]
+ ]
+},
+{
+ title:"PARTE 10 — X-MEN / FOX",
+ desc:"A grande saga mutante. Dias de um Futuro Esquecido cria uma nova linha temporal.",
+ items:[
+  ["X-Men: Primeira Classe","Filme — 1962"],
+  ["X-Men: Dias de um Futuro Esquecido","Filme — 1973 + futuro"],
+  ["X-Men: Apocalipse","Filme — 1983"],
+  ["X-Men: Fênix Negra","Filme — 1992"],
+  ["X-Men Origens: Wolverine","Filme — 1845–1979"],
+  ["X-Men","Filme — 2000"],
+  ["X-Men 2","Filme — 2003"],
+  ["X-Men: O Confronto Final","Filme — 2006"],
+  ["Wolverine: Imortal","Filme — 2013"],
+  ["Os Novos Mutantes","Filme — universo X-Men"],
+  ["Logan","Filme — 2029"]
+ ]
+},
+{
+ title:"PARTE 11 — DEADPOOL",
+ desc:"A franquia mutante que virou uma das pontes do multiverso.",
+ items:[
+  ["Deadpool","Filme"],
+  ["Deadpool 2","Filme"],
+  ["Deadpool & Wolverine","Filme — multiverso"]
+ ]
+},
+{
+ title:"PARTE 12 — OUTRAS PRODUÇÕES MUTANTES",
+ desc:"Séries e animações relacionadas aos mutantes.",
+ items:[
+  ["Legion — Temporada 1","Série"],
+  ["Legion — Temporada 2","Série"],
+  ["Legion — Temporada 3","Série"],
+  ["The Gifted — Temporada 1","Série"],
+  ["The Gifted — Temporada 2","Série"],
+  ["X-Men '97 — Temporada 1","Animação"],
+  ["X-Men '97 — Temporada 2","Animação"]
+ ]
+},
+{
+ title:"PARTE 13 — SONY / VENOM",
+ desc:"O universo de personagens ligado ao Homem-Aranha da Sony.",
+ items:[
+  ["Venom","Filme"],
+  ["Venom: Tempo de Carnificina","Filme"],
+  ["Morbius","Filme"],
+  ["Madame Teia","Filme"],
+  ["Venom: A Última Rodada","Filme"],
+  ["Kraven, o Caçador","Filme"]
+ ]
+},
+{
+ title:"PARTE 14 — ARANHAVERSO",
+ desc:"A trilogia animada do multiverso do Homem-Aranha.",
+ items:[
+  ["Homem-Aranha no Aranhaverso","Animação"],
+  ["Homem-Aranha: Através do Aranhaverso","Animação"],
+  ["Homem-Aranha: Além do Aranhaverso","Ainda não lançado"]
+ ]
+},
+{
+ title:"PARTE 15 — MARVEL ANTES DO MCU",
+ desc:"Adaptações Marvel antigas, fora da continuidade principal.",
+ items:[
+  ["Howard, o Super-Herói","Filme — 1986"],
+  ["Blade","Filme — 1998"],
+  ["Blade II","Filme — 2002"],
+  ["Demolidor","Filme — 2003"],
+  ["Hulk","Filme — 2003"],
+  ["O Justiceiro","Filme — 2004"],
+  ["Blade: Trinity","Filme — 2004"],
+  ["Elektra","Filme — 2005"],
+  ["Quarteto Fantástico","Filme — 2005"],
+  ["Motoqueiro Fantasma","Filme — 2007"],
+  ["Quarteto Fantástico e o Surfista Prateado","Filme — 2007"],
+  ["Motoqueiro Fantasma: Espírito de Vingança","Filme — 2011"],
+  ["O Justiceiro: Em Zona de Guerra","Filme — 2008"],
+  ["Quarteto Fantástico","Filme — 2015"],
+  ["Man-Thing: O Monstro do Pântano","Filme — 2005"]
+ ]
+},
+{
+ title:"PARTE 16 — OUTRAS SÉRIES MARVEL",
+ desc:"Para quem realmente quer completar o máximo possível da Marvel na TV.",
+ items:[
+  ["Agents of S.H.I.E.L.D. — Temporada 4","Série"],
+  ["Agents of S.H.I.E.L.D. — Temporada 5","Série"],
+  ["Agents of S.H.I.E.L.D. — Temporada 6","Série"],
+  ["Agents of S.H.I.E.L.D. — Temporada 7","Série"],
+  ["Inhumans","Série"],
+  ["Runaways — Temporada 1","Série"],
+  ["Runaways — Temporada 2","Série"],
+  ["Runaways — Temporada 3","Série"],
+  ["Cloak & Dagger — Temporada 1","Série"],
+  ["Cloak & Dagger — Temporada 2","Série"],
+  ["Hit-Monkey — Temporada 1","Animação"],
+  ["Hit-Monkey — Temporada 2","Animação"],
+  ["M.O.D.O.K.","Animação"],
+  ["Moon Girl and Devil Dinosaur","Animação"],
+  ["Your Friendly Neighborhood Spider-Man — Temporada 1","Animação — realidade alternativa"],
+  ["Marvel's Spider-Man","Animação"],
+  ["Marvel's Avengers","Animação"],
+  ["Guardians of the Galaxy","Animação"],
+  ["Marvel Rising","Animação"]
+ ]
+},
+{
+ title:"PARTE 17 — CHEGANDO EM AVENGERS: DOOMSDAY",
+ desc:"Depois de completar o essencial, esta é a chegada ao próximo grande evento.",
+ items:[
+  ["Revisão: Loki — Temporadas 1 e 2","Revisão opcional — multiverso"],
+  ["Revisão: Homem-Aranha: Sem Volta Para Casa","Revisão opcional — multiverso"],
+  ["Revisão: Deadpool & Wolverine","Revisão opcional — multiverso"],
+  ["Avengers: Doomsday","PRÓXIMO GRANDE EVENTO — assistir por último"]
+ ]
+}
+];
+const KEY='marvel-marathon-v2';
+let saved={};try{saved=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){}
+let state={watched:saved.watched||{},favorites:saved.favorites||{},collapsed:saved.collapsed||{},theme:saved.theme||'light'};let filter='all';
+const $=id=>document.getElementById(id), allItems=()=>sections.flatMap((s,si)=>s.items.map((x,ii)=>({si,ii,title:x[0],meta:x[1],id:`${si}-${ii}`})));
+function persist(){localStorage.setItem(KEY,JSON.stringify(state))}function toast(msg){$('toast').textContent=msg;$('toast').classList.add('show');clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>$('toast').classList.remove('show'),2200)}
+function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
+function updateProgress(){let all=allItems(),watched=all.filter(x=>state.watched[x.id]).length,pct=all.length?Math.round(watched/all.length*100):0;$('progressText').textContent=`${pct}% concluído`;$('count').textContent=`${watched} de ${all.length} vistos`;$('barFill').style.width=pct+'%';$('watchedStat').textContent=watched;$('remainingStat').textContent=all.length-watched;$('favoriteStat').textContent=all.filter(x=>state.favorites[x.id]).length;let next=all.find(x=>!state.watched[x.id]);$('nextTitle').textContent=next?next.title:'Maratona concluída!';$('nextMeta').textContent=next?next.meta:'Você desbloqueou todos os capítulos.';$('nextBtn').textContent=next?'Continuar maratona →':'Recomeçar jornada';if(pct===100&&!state.celebrated){state.celebrated=true;persist();celebrate()}}
+function matches(x){let q=$('search').value.trim().toLowerCase(),type=$('typeFilter').value;return(!q||(x.title+' '+x.meta).toLowerCase().includes(q))&&(!type||type==='all'||x.meta.includes(type))&&(filter==='all'||(filter==='watched'&&state.watched[x.id])||(filter==='unwatched'&&!state.watched[x.id])||(filter==='favorites'&&state.favorites[x.id]))}
+function render(){let root=$('list');root.innerHTML='';let global=0,shown=0;sections.forEach((sec,si)=>{let visible=sec.items.map((x,ii)=>({title:x[0],meta:x[1],id:`${si}-${ii}`,ii})).filter(matches);sec.items.forEach(()=>global++);if(!visible.length)return;shown+=visible.length;let el=document.createElement('section');el.className='section'+(state.collapsed[si]?' collapsed':'');el.style.animationDelay=Math.min(si*35,400)+'ms';el.innerHTML=`<div class="section-head" data-section="${si}"><div><h2>${sec.title}</h2><p>${sec.desc} · ${visible.length} resultado${visible.length===1?'':'s'}</p></div><button class="section-toggle" aria-label="Recolher seção"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></div><div class="items"></div>`;let items=el.querySelector('.items');visible.forEach(x=>{let watched=!!state.watched[x.id],fav=!!state.favorites[x.id],item=document.createElement('div');item.className='item'+(watched?' watched':'');item.innerHTML=`<div class="num">${x.ii+1}</div><div><div class="title">${escapeHtml(x.title)}</div><div class="meta">${escapeHtml(x.meta)}</div></div><div class="item-controls"><button class="fav ${fav?'active':''}" data-fav="${x.id}" aria-label="${fav?'Remover dos favoritos':'Adicionar aos favoritos'}">${fav?'<svg viewBox="0 0 24 24" aria-hidden="true" class="star-icon filled"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9L12 3Z"/></svg>':'<svg viewBox="0 0 24 24" aria-hidden="true" class="star-icon"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9L12 3Z"/></svg>'}</button><select class="status" data-id="${x.id}" aria-label="Status de ${escapeHtml(x.title)}"><option value="unwatched" ${!watched?'selected':''}>Não vi</option><option value="watched" ${watched?'selected':''}>✓ Já vi</option></select></div>`;items.appendChild(item)});root.appendChild(el)});if(!shown)root.innerHTML='<div class="empty"><strong>Nenhum capítulo encontrado.</strong><br>Tente outro termo ou limpe os filtros.</div>';bind();updateProgress()}
+function bind(){$$('.status').forEach(s=>s.onchange=e=>{let id=e.target.dataset.id;state.watched[id]=e.target.value==='watched';persist();render();toast(state.watched[id]?'Capítulo marcado como visto.':'Capítulo voltou para a lista.')});$$('.fav').forEach(b=>b.onclick=e=>{let id=e.currentTarget.dataset.fav;state.favorites[id]=!state.favorites[id];if(!state.favorites[id])delete state.favorites[id];persist();render();toast(state.favorites[id]?'Adicionado aos favoritos.':'Removido dos favoritos.')});$$('.section-head').forEach(h=>h.onclick=e=>{if(e.target.closest('button')||e.currentTarget){let i=h.dataset.section;state.collapsed[i]=!state.collapsed[i];persist();render()}})}
+function $$(sel){return Array.from(document.querySelectorAll(sel))}function celebrate(){for(let i=0;i<34;i++){let c=document.createElement('i');c.className='confetti';c.style.left=Math.random()*100+'vw';c.style.background=['#f0445d','#ffcc66','#6ea8fe','#44d483'][i%4];c.style.animationDelay=Math.random()*.6+'s';document.body.appendChild(c);setTimeout(()=>c.remove(),1900)}toast('Parabéns! Você completou a maratona.')}
+function exportData(){let blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='marvel-progresso.json';a.click();URL.revokeObjectURL(a.href);toast('Progresso exportado.')}
+$('search').oninput=render;$('typeFilter').onchange=render;$$('[data-filter]').forEach(b=>b.onclick=()=>{filter=b.dataset.filter;$$('[data-filter]').forEach(x=>x.classList.toggle('active',x===b));render()});$('resetBtn').onclick=()=>{if(confirm('Apagar todo o seu progresso e favoritos?')){state.watched={};state.favorites={};state.celebrated=false;persist();render();toast('Progresso resetado.')}};$('randomBtn').onclick=()=>{let options=allItems().filter(x=>!state.watched[x.id]),pick=options[Math.floor(Math.random()*options.length)]||allItems()[0];$('search').value=pick.title;filter='all';$$('[data-filter]').forEach(x=>x.classList.toggle('active',x.dataset.filter==='all'));render();setTimeout(()=>document.querySelector('.item')?.scrollIntoView({behavior:'smooth',block:'center'}),80);toast('Que tal este capítulo?')};$('nextBtn').onclick=()=>{let next=allItems().find(x=>!state.watched[x.id]);if(next){$('search').value=next.title;filter='all';render();setTimeout(()=>document.querySelector('.item')?.scrollIntoView({behavior:'smooth',block:'center'}),80)}else{state.watched={};state.celebrated=false;persist();render()}};$('themeBtn').onclick=()=>{state.theme=state.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=state.theme;$('themeBtn').textContent=state.theme==='dark'?'☀':'☾';persist()};$('exportBtn').onclick=exportData;$('importBtn').onclick=()=>$('importFile').click();$('importFile').onchange=e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let d=JSON.parse(r.result);state={...state,...d};persist();render();toast('Progresso importado.')}catch(err){toast('Arquivo inválido.')}};r.readAsText(f)};document.addEventListener('keydown',e=>{if(e.key==='/'&&document.activeElement.tagName!=='INPUT'){e.preventDefault();$('search').focus()}if(e.key==='Escape'){$('search').value='';render()}});window.addEventListener('scroll',()=>$('backtop').classList.toggle('show',scrollY>500));$('backtop').onclick=()=>scrollTo({top:0,behavior:'smooth'});document.documentElement.dataset.theme=state.theme;$('themeBtn').textContent=state.theme==='dark'?'☀':'☾';render();
+</script></body></html>
