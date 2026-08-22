@@ -1,460 +1,860 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Financeiro</title>
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <style>
-    :root{
-      --blue:#007AFF;
-      --red:#FF3B30;
-      --green:#34C759;
-      --orange:#FF9500;
-      --purple:#AF52DE;
-      --gray:#8E8E93;
-      --bg:#F2F2F7;
-      --card:rgba(255,255,255,.84);
-      --text:#000;
-      --sub:#636366;
-      --line:rgba(0,0,0,.06);
-      --soft:rgba(118,118,128,.12);
-      --blur:blur(25px) saturate(180%);
-      --safe-top:env(safe-area-inset-top);
-      --safe-bottom:env(safe-area-inset-bottom);
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0" />
+<title>Financeiro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    --bg:#000000;
+    --elev:#0D0D0D;
+    --elev-2:#161616;
+    --elev-3:#1E1E1E;
+    --border:rgba(255,255,255,.08);
+    --border-strong:rgba(255,255,255,.16);
+    --text:#F5F5F5;
+    --dim:#8A8A8E;
+    --faint:#525256;
+    --accent:#3ECF8E;
+    --accent-dim:rgba(62,207,142,.14);
+    --red:#FF5C5C;
+    --red-dim:rgba(255,92,92,.14);
+    --amber:#F5C242;
+    --safe-top:env(safe-area-inset-top);
+    --safe-bottom:env(safe-area-inset-bottom);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif}
+  html,body{background:var(--bg);color:var(--text)}
+  button,input,select{font:inherit;color:inherit}
+  button{border:0;background:none;cursor:pointer}
+  input,select{background:none;border:0;outline:0}
+  .mono{font-family:'JetBrains Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
 
-    @media (prefers-color-scheme: dark){
-      :root{
-        --bg:#000;
-        --card:rgba(28,28,30,.84);
-        --text:#fff;
-        --sub:#AEAEB2;
-        --line:rgba(255,255,255,.10);
-        --soft:rgba(118,118,128,.24);
-      }
-    }
+  .app{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;position:relative}
 
-    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",Arial,sans-serif}
+  /* topbar */
+  .topbar{position:sticky;top:0;z-index:40;padding:calc(14px + var(--safe-top)) 18px 14px;display:flex;align-items:center;justify-content:space-between;background:rgba(0,0,0,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+  .topbar h1{font-size:20px;font-weight:700;letter-spacing:-.3px}
+  .sync-badge{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--dim);font-weight:600;padding:6px 10px;border-radius:999px;background:var(--elev);border:1px solid var(--border)}
+  .sync-badge i{width:13px;height:13px}
+  .sync-badge.ok{color:var(--accent)}
+  .sync-badge.err{color:var(--red)}
+  .sync-badge .spin{animation:spin 1s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
 
-    body{
-      min-height:100vh;
-      background-color:var(--bg);
-      background-image:radial-gradient(circle at top right,rgba(0,122,255,.12),transparent 42%),radial-gradient(circle at bottom left,rgba(52,199,89,.12),transparent 42%);
-      background-attachment:fixed;
-      color:var(--text);
-      padding:calc(20px + var(--safe-top)) 16px calc(30px + var(--safe-bottom));
-      display:flex;
-      justify-content:center;
-    }
+  main{flex:1;padding:18px 16px calc(100px + var(--safe-bottom))}
+  .page{display:none;animation:fade .25s ease-out}
+  .page.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
-    button,input,select{font:inherit}
-    button{border:0;cursor:pointer;color:inherit;background:none}
-    .container{width:100%;max-width:440px}
+  /* tabbar */
+  .tabbar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;display:flex;background:rgba(8,8,8,.9);backdrop-filter:blur(20px);border-top:1px solid var(--border);padding:8px 6px calc(8px + var(--safe-bottom));z-index:50}
+  .tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 2px;color:var(--faint);border-radius:12px;position:relative}
+  .tab-btn i{width:21px;height:21px}
+  .tab-btn span{font-size:10px;font-weight:600;letter-spacing:.2px}
+  .tab-btn.active{color:var(--accent)}
+  .tab-btn.active::before{content:"";position:absolute;top:-9px;width:4px;height:4px;border-radius:50%;background:var(--accent)}
 
-    .back-button{
-      width:42px;height:42px;border-radius:14px;background:var(--card);color:var(--text);border:1px solid var(--line);
-      backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);display:grid;place-items:center;margin-bottom:14px;
-      box-shadow:0 4px 15px rgba(0,0,0,.04);transition:.2s ease
-    }
-    .back-button:active,.btn:active,.mini-btn:active,.add-btn:active{transform:scale(.95);opacity:.76}
-    .back-button i{width:21px;height:21px}
+  .section-label{font-size:11px;text-transform:uppercase;letter-spacing:.7px;color:var(--dim);font-weight:700;margin:20px 2px 8px}
+  .section-label:first-child{margin-top:0}
 
-    header{padding:0 8px;margin-bottom:18px}
-    header h1{font-size:34px;font-weight:800;letter-spacing:-1px;line-height:1.05;text-transform:lowercase}
-    .subtitle{font-size:14px;color:var(--sub);margin-top:6px;text-transform:lowercase}
+  .card{background:var(--elev);border:1px solid var(--border);border-radius:18px;overflow:hidden;margin-bottom:12px}
+  .card-pad{padding:16px}
 
-    .tab-container{
-      background:var(--soft);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-radius:14px;padding:3px;display:flex;
-      margin-bottom:22px;position:sticky;top:calc(10px + var(--safe-top));z-index:50;border:.5px solid var(--line)
-    }
-    .tab-button{
-      flex:1;border:0;background:none;padding:10px 6px;font-size:13px;font-weight:700;color:var(--text);border-radius:11px;cursor:pointer;
-      transition:.25s cubic-bezier(.4,0,.2,1);display:flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap
-    }
-    .tab-button i{width:16px;height:16px}
-    .tab-button.active{background:var(--card);box-shadow:0 4px 12px rgba(0,0,0,.10)}
+  .row{display:flex;align-items:center;gap:12px;min-height:56px;padding:10px 16px;border-bottom:1px solid var(--border)}
+  .row:last-child{border-bottom:0}
+  .row-icon{width:32px;height:32px;border-radius:9px;background:var(--elev-2);display:grid;place-items:center;color:var(--dim);flex:0 0 auto}
+  .row-icon i{width:17px;height:17px}
+  .row .text{flex:1;font-size:15px;min-width:0}
+  .row .text .sub{display:block;font-size:12px;color:var(--dim);margin-top:2px;font-weight:400}
+  .row input,.row select{text-align:right;font-size:16px;font-weight:600;color:var(--text);width:118px;flex:0 0 auto}
+  .row select{appearance:none;-webkit-appearance:none;text-align:right}
+  .row input::placeholder{color:var(--faint)}
 
-    .tab-content{display:none;animation:fadeIn .28s ease-out}
-    .tab-content.active{display:block}
-    @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .switch{position:relative;width:46px;height:27px;flex:0 0 auto}
+  .switch input{opacity:0;width:0;height:0;position:absolute}
+  .switch .slider{position:absolute;inset:0;background:var(--elev-3);border-radius:30px;transition:.2s}
+  .switch .slider:before{content:"";position:absolute;width:21px;height:21px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}
+  .switch input:checked+.slider{background:var(--accent)}
+  .switch input:checked+.slider:before{transform:translateX(19px)}
 
-    .section-title{font-size:13px;text-transform:uppercase;color:var(--sub);margin:22px 16px 8px;font-weight:650;letter-spacing:.5px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .stat{background:var(--elev);border:1px solid var(--border);border-radius:16px;padding:14px;min-height:88px;display:flex;flex-direction:column;justify-content:space-between}
+  .stat-label{font-size:11px;color:var(--dim);font-weight:700;text-transform:uppercase;letter-spacing:.4px;display:flex;align-items:center;gap:5px}
+  .stat-label i{width:13px;height:13px}
+  .stat-value{font-size:19px;font-weight:700;margin-top:8px}
+  .stat-value.pos{color:var(--accent)}
+  .stat-value.neg{color:var(--red)}
 
-    .ios-list{background:var(--card);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-radius:16px;overflow:hidden;margin-bottom:12px;border:1px solid var(--line);box-shadow:0 4px 15px rgba(0,0,0,.03)}
-    .ios-item{display:flex;align-items:center;min-height:54px;padding:12px 16px;border-bottom:.5px solid var(--line);gap:12px}
-    .ios-item:last-child{border-bottom:0}
-    .icon-box{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;color:white;flex:0 0 auto}
-    .icon-box i{width:18px;height:18px}
-    .ios-item label.text{flex:1;font-size:17px;font-weight:400;line-height:1.2}
-    .subrow{display:block;font-size:13px;color:var(--sub);margin-top:2px}
-    .ios-item input,.ios-item select{background:none;border:0;outline:0;color:var(--blue);font-size:17px;text-align:right;width:125px;font-weight:520;flex:0 0 auto;min-width:0}
-    .ios-item select{appearance:none;-webkit-appearance:none}
-    .ios-item input::placeholder{color:var(--sub);opacity:.75}
+  .hero{grid-column:span 2;border-radius:20px;padding:22px;text-align:center;background:linear-gradient(180deg,#0F0F0F,#060606);border:1px solid var(--border-strong);border-top:2px solid var(--accent)}
+  .hero.neg{border-top-color:var(--red)}
+  .hero .label{font-size:12px;color:var(--dim);font-weight:700;text-transform:uppercase;letter-spacing:.8px}
+  .hero .value{font-size:42px;font-weight:700;margin-top:6px;letter-spacing:-1px}
+  .hero .value.pos{color:var(--accent)}
+  .hero .value.neg{color:var(--red)}
 
-    .switch{position:relative;display:inline-block;width:51px!important;height:31px!important;min-width:51px!important;flex:0 0 auto}
-    .switch input{opacity:0;width:0;height:0}
-    .slider{position:absolute;inset:0;background:rgba(120,120,128,.32);transition:.3s cubic-bezier(.4,0,.2,1);border-radius:34px;cursor:pointer}
-    .slider:before{content:"";position:absolute;width:27px;height:27px;left:2px;top:2px;background:#fff;border-radius:50%;box-shadow:0 3px 8px rgba(0,0,0,.15);transition:.3s cubic-bezier(.4,0,.2,1)}
-    input:checked+.slider{background:var(--green)}
-    input:checked+.slider:before{transform:translateX(20px)}
+  .add-line{display:grid;grid-template-columns:1fr 96px 42px;gap:8px;padding:14px 16px}
+  .add-line input{height:42px;border-radius:12px;background:var(--elev-2);padding:0 12px;font-size:14px;min-width:0}
+  .add-line input.money{text-align:right;font-weight:600}
+  .add-line.wide3{grid-template-columns:1fr 78px 78px 42px}
+  .add-btn{width:42px;height:42px;border-radius:12px;background:var(--accent);color:#000;display:grid;place-items:center}
+  .add-btn i{width:19px;height:19px}
 
-    .result-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
-    .widget{background:var(--card);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-radius:22px;padding:16px;border:1px solid var(--line);min-height:96px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 4px 15px rgba(0,0,0,.03)}
-    .widget-title{font-size:12px;font-weight:700;color:var(--sub);display:flex;align-items:center;gap:5px;text-transform:uppercase;letter-spacing:.35px}
-    .widget-title i{width:15px;height:15px}
-    .widget-value{font-size:20px;font-weight:780;margin-top:9px;letter-spacing:-.5px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;padding:0 16px 14px}
+  .chip{display:inline-flex;align-items:center;gap:7px;background:var(--elev-2);border-radius:999px;padding:7px 8px 7px 12px;font-size:13px;font-weight:600}
+  .chip button{width:18px;height:18px;border-radius:50%;background:var(--elev-3);color:var(--dim);display:grid;place-items:center;font-size:12px}
 
-    .total-banner{grid-column:span 2;background:linear-gradient(135deg,var(--blue),#5856D6);color:white;padding:24px;border-radius:24px;text-align:center;box-shadow:0 10px 30px rgba(0,122,255,.30);margin-top:2px}
-    .total-banner.green{background:linear-gradient(135deg,var(--green),#28CD41);box-shadow:0 10px 30px rgba(52,199,89,.26)}
-    .total-banner.red{background:linear-gradient(135deg,var(--orange),var(--red));box-shadow:0 10px 30px rgba(255,59,48,.25)}
-    .total-banner .label{font-size:13px;font-weight:750;opacity:.9;text-transform:uppercase;letter-spacing:.9px}
-    .total-banner .value{font-size:40px;font-weight:850;margin-top:4px;letter-spacing:-1.5px;line-height:1}
+  .cat{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border)}
+  .cat:last-child{border-bottom:0}
+  .cat-info{flex:1;min-width:0}
+  .cat-name{display:block;font-size:15px}
+  .cat-value{display:block;color:var(--dim);font-size:12px;margin-top:2px}
+  .cat-pct{font-size:14px;font-weight:700;color:var(--accent);margin-right:2px}
+  .cat-actions{display:flex;gap:6px}
+  .icon-btn{width:30px;height:30px;border-radius:9px;background:var(--elev-2);color:var(--dim);display:grid;place-items:center}
+  .icon-btn i{width:14px;height:14px}
+  .icon-btn.danger{color:var(--red)}
+  .empty{padding:20px 16px;text-align:center;color:var(--faint);font-size:13px}
 
-    .summary-card{background:var(--card);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border:1px solid var(--line);border-radius:22px;padding:16px;margin-top:14px;box-shadow:0 4px 15px rgba(0,0,0,.03)}
-    .summary-title{font-size:13px;text-transform:uppercase;letter-spacing:.5px;color:var(--sub);font-weight:750;margin-bottom:10px}
-    .summary-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:.5px solid var(--line);font-size:16px;gap:12px}
-    .summary-row:last-child{border-bottom:0;padding-bottom:0}
-    .summary-row span:first-child{color:var(--sub)}
-    .summary-row strong{font-size:18px;text-align:right}
-    .summary-row.final strong{color:var(--green);font-size:22px}
-    .summary-row.final.red strong{color:var(--red)}
+  .progress-wrap{padding:14px 16px}
+  .progress-top{display:flex;justify-content:space-between;font-size:12px;color:var(--dim);font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-bottom:9px}
+  .bar{height:8px;border-radius:999px;background:var(--elev-2);overflow:hidden}
+  .bar div{height:100%;width:0%;border-radius:999px;background:var(--accent);transition:.25s}
+  .bar.over div{background:var(--red)}
 
-    .add-line{display:grid;grid-template-columns:1fr 104px 42px;gap:8px;padding:14px 16px}
-    .add-line input{height:42px;border:0;outline:0;border-radius:13px;background:var(--soft);color:var(--text);padding:0 12px;font-size:15px;min-width:0}
-    .add-line input.money{text-align:right;color:var(--blue);font-weight:650}
-    .add-btn{width:42px;height:42px;border-radius:13px;background:var(--blue);color:white;display:grid;place-items:center}
-    .add-btn i{width:20px;height:20px}
+  .spark{display:flex;align-items:flex-end;gap:6px;padding:16px;height:90px}
+  .spark-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+  .spark-bar{width:100%;border-radius:5px 5px 2px 2px;background:var(--accent);min-height:4px}
+  .spark-bar.neg{background:var(--red)}
+  .spark-label{font-size:9px;color:var(--faint);font-weight:600}
 
-    .chips{display:flex;gap:8px;flex-wrap:wrap;padding:0 16px 14px;margin-top:-2px}
-    .chip{min-height:32px;display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:0 9px 0 11px;background:var(--soft);font-size:13px;font-weight:650}
-    .chip button{width:19px;height:19px;border-radius:999px;background:rgba(118,118,128,.28);color:var(--sub);display:grid;place-items:center;font-size:14px}
+  .btn{height:46px;border-radius:14px;background:var(--accent);color:#000;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;gap:8px}
+  .btn i{width:17px;height:17px}
+  .btn-ghost{background:var(--elev-2);color:var(--text)}
+  .btn-outline{background:none;border:1px solid var(--border-strong);color:var(--text)}
+  .btn-danger{background:var(--red-dim);color:var(--red)}
+  .btn-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+  .btn:active{opacity:.75;transform:scale(.98)}
 
-    .cat{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;border-bottom:.5px solid var(--line)}
-    .cat:last-child{border-bottom:0}
-    .cat-info{flex:1;min-width:0}
-    .cat-name{display:block;font-size:17px;text-transform:lowercase;line-height:1.2}
-    .cat-value{display:block;color:var(--sub);font-size:13px;margin-top:3px}
-    .cat-right{text-align:right;flex:0 0 auto}
-    .cat-percent{display:block;color:var(--blue);font-size:17px;font-weight:700}
-    .cat-actions{display:flex;gap:6px;margin-top:6px;justify-content:flex-end}
-    .tiny{min-height:27px;padding:0 8px;border-radius:999px;background:var(--soft);color:var(--sub);font-size:12px;font-weight:750}
-    .tiny.red{color:var(--red)}
-    .empty{padding:18px 16px;text-align:center;color:var(--sub);font-size:14px}
+  .calendar-head{display:flex;justify-content:space-between;align-items:center;padding:14px 16px 4px}
+  .calendar-head strong{font-size:15px;text-transform:capitalize}
+  .calendar-head span{font-size:12px;color:var(--accent);font-weight:700}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;padding:10px 16px 16px}
+  .weekday{font-size:10px;color:var(--faint);text-align:center;font-weight:700}
+  .day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:13px;border-radius:9px;background:var(--elev-2);cursor:pointer;border:1px solid transparent}
+  .day.thu{color:var(--accent);border-color:rgba(62,207,142,.25)}
+  .day.today{border-color:var(--dim)}
+  .day.sel{background:var(--accent);color:#000;font-weight:800}
+  .empty-day{aspect-ratio:1}
 
-    .progress{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px 16px;margin-top:12px;backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur)}
-    .progress-top{display:flex;justify-content:space-between;color:var(--sub);font-size:13px;font-weight:750;text-transform:uppercase;letter-spacing:.35px;margin-bottom:10px}
-    .bar{height:9px;border-radius:999px;background:var(--soft);overflow:hidden}
-    .bar div{height:100%;width:0%;border-radius:999px;background:var(--blue);transition:.25s ease}
-    .bar.red div{background:var(--red)}
-
-    .calendar-container{padding:16px}
-    .calendar-header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
-    .calendar-header strong{font-size:16px}
-    .calendar-note{font-size:12px;color:var(--sub);margin:0 0 12px;line-height:1.35}
-    .calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;text-align:center}
-    .weekday{font-size:12px;color:var(--sub);font-weight:650}
-    .day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:15px;border-radius:10px;transition:.2s;user-select:none;cursor:pointer;color:var(--text);background:rgba(118,118,128,.08);border:1px solid transparent}
-    .day.today{border-color:rgba(52,199,89,.7)}
-    .day.thursday{color:var(--blue);font-weight:750;background:rgba(0,122,255,.08)}
-    .day.selected{background:var(--blue);color:white;font-weight:800;box-shadow:0 4px 10px rgba(0,122,255,.30);transform:scale(1.04)}
-    .empty-day{aspect-ratio:1}
-
-    .mini-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px 16px}
-    .mini-btn{height:40px;border-radius:13px;background:var(--soft);color:var(--text);font-size:14px;font-weight:750}
-    .footer-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
-
-    .note{font-size:12px;color:var(--sub);line-height:1.35;margin:10px 16px 0}
-
-    @media(max-width:430px){
-      body{padding-left:12px;padding-right:12px}
-      .tab-button{font-size:12px;gap:4px}
-      .total-banner .value{font-size:35px}
-      .add-line{grid-template-columns:1fr;gap:9px}
-      .add-btn{width:100%}
-      .ios-item input,.ios-item select{width:105px}
-    }
-  </style>
+  .field{padding:14px 16px;border-bottom:1px solid var(--border)}
+  .field:last-child{border-bottom:0}
+  .field label{display:block;font-size:11px;color:var(--dim);font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px}
+  .field input{width:100%;background:var(--elev-2);border-radius:12px;height:44px;padding:0 12px;font-size:15px}
+  .field input::placeholder{color:var(--faint)}
+  .hint{font-size:12px;color:var(--faint);line-height:1.5;padding:0 2px;margin:10px 0}
+  .hint a{color:var(--accent)}
+  .msg{font-size:13px;padding:10px 12px;border-radius:10px;margin:0 16px 14px;font-weight:600}
+  .msg.err{background:var(--red-dim);color:var(--red)}
+  .msg.ok{background:var(--accent-dim);color:var(--accent)}
+  .account-status{display:flex;align-items:center;gap:12px;padding:16px}
+  .avatar{width:44px;height:44px;border-radius:50%;background:var(--accent-dim);color:var(--accent);display:grid;place-items:center;font-weight:800;flex:0 0 auto}
+  .account-status .who{flex:1;min-width:0}
+  .account-status .who strong{display:block;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .account-status .who span{font-size:12px;color:var(--dim)}
+</style>
 </head>
 <body>
-  <div class="container">
-    <button class="back-button" onclick="window.location.href='index.html'" aria-label="voltar">
-      <i data-lucide="chevron-left"></i>
+<div class="app">
+
+  <div class="topbar">
+    <h1 id="pageTitle">Resumo</h1>
+    <button class="sync-badge" id="syncBadge" onclick="sincronizarAgora()">
+      <i data-lucide="cloud-off"></i><span id="syncText">local</span>
     </button>
-
-    <header>
-      <h1>Financeiro</h1>
-      <div class="subtitle"></div>
-    </header>
-
-    <div class="tab-container">
-      <button class="tab-button active" onclick="switchTab('calculo')"><i data-lucide="calculator"></i> calcular</button>
-      <button class="tab-button" onclick="switchTab('plano')"><i data-lucide="wallet"></i> planejar</button>
-      <button class="tab-button" onclick="switchTab('vt')"><i data-lucide="bus"></i> transporte</button>
-    </div>
-
-    <section id="tab-calculo" class="tab-content active">
-      <div class="section-title">salário bruto</div>
-      <div class="ios-list">
-        <div class="ios-item"><div class="icon-box" style="background:var(--blue)"><i data-lucide="dollar-sign"></i></div><label class="text">Valor/hora</label><input id="valorHora" type="text" inputmode="decimal" placeholder="0,00"></div>
-        <div class="ios-item"><div class="icon-box" style="background:var(--orange)"><i data-lucide="clock"></i></div><label class="text">Horas/dia</label><input id="horasDia" type="text" inputmode="decimal" placeholder="0"></div>
-        <div class="ios-item"><div class="icon-box" style="background:var(--green)"><i data-lucide="calendar-check"></i></div><label class="text">Dias trabalhados</label><input id="diasMes" type="text" inputmode="numeric" placeholder="0"></div>
-        <div class="ios-item"><div class="icon-box" style="background:var(--gray)"><i data-lucide="calendar"></i></div><label class="text">Dias no mês</label><select id="diasCalendario"><option value="30">30 dias</option><option value="31">31 dias</option></select></div>
-      </div>
-
-      <div class="section-title">descontos</div>
-      <div class="ios-list">
-        <div class="ios-item"><div class="icon-box" style="background:#5856D6"><i data-lucide="bus"></i></div><label class="text">Vale-transporte<span class="subrow">6,5% do bruto</span></label><label class="switch"><input id="valeTransporte" type="checkbox" checked><span class="slider"></span></label></div>
-        <div class="ios-item"><div class="icon-box" style="background:var(--red)"><i data-lucide="shield-check"></i></div><label class="text">INSS<span class="subrow">7% do bruto</span></label><label class="switch"><input id="inss" type="checkbox" checked><span class="slider"></span></label></div>
-        <div class="ios-item"><div class="icon-box" style="background:var(--purple)"><i data-lucide="arrow-down-circle"></i></div><label class="text">Adiantamento<span class="subrow">R$ 196 ou R$ 203</span></label><label class="switch"><input id="adiantamento" type="checkbox" checked><span class="slider"></span></label></div>
-      </div>
-
-      <div class="result-grid">
-        <div class="widget"><div class="widget-title"><i data-lucide="trending-up"></i> bruto</div><div id="salarioBruto" class="widget-value">R$ 0,00</div></div>
-        <div class="widget"><div class="widget-title"><i data-lucide="trending-down"></i> descontos</div><div id="totalDescontos" class="widget-value" style="color:var(--red)">R$ 0,00</div></div>
-        <div class="total-banner"><div class="label">salário líquido</div><div id="salarioLiquido" class="value">R$ 0,00</div></div>
-      </div>
-
-      <div class="summary-card">
-        <div class="summary-title">para usar no planejamento</div>
-        <div class="summary-row"><span>Líquido calculado</span><strong id="liquidoCalculadoResumo">R$ 0,00</strong></div>
-        <div class="summary-row final"><span>Enviar para planejar</span><button class="tiny" onclick="usarLiquidoNoPlano()">usar valor</button></div>
-      </div>
-    </section>
-
-    <section id="tab-plano" class="tab-content">
-      <div class="result-grid" style="margin-top:0">
-        <div class="widget"><div class="widget-title"><i data-lucide="wallet"></i> entra</div><div id="planoEntrada" class="widget-value">R$ 0,00</div></div>
-        <div class="widget"><div class="widget-title"><i data-lucide="receipt"></i> sai</div><div id="planoSaida" class="widget-value" style="color:var(--red)">R$ 0,00</div></div>
-        <div class="total-banner green" id="planoBanner"><div class="label" id="planoBannerLabel">sobra</div><div id="planoSobra" class="value">R$ 0,00</div></div>
-      </div>
-
-      <div class="section-title">dinheiro para planejar</div>
-      <div class="ios-list">
-        <div class="ios-item"><div class="icon-box" style="background:var(--blue)"><i data-lucide="banknote"></i></div><label class="text">Salário líquido</label><input id="planoSalario" type="text" inputmode="decimal" placeholder="0,00" oninput="salvarPlano()"></div>
-        <div class="ios-item"><div class="icon-box" style="background:var(--green)"><i data-lucide="piggy-bank"></i></div><label class="text">Guardar</label><input id="planoGuardar" type="text" inputmode="decimal" placeholder="0,00" oninput="salvarPlano()"></div>
-      </div>
-
-      <div class="section-title">entradas extras</div>
-      <div class="ios-list">
-        <div class="ios-item"><div class="icon-box" style="background:var(--orange)"><i data-lucide="plus-circle"></i></div><label class="text">Total extra</label><strong id="planoExtraTotal" style="color:var(--blue);font-size:17px">R$ 0,00</strong></div>
-        <div class="add-line"><input id="entradaNome" placeholder="ex: pensão"><input id="entradaValor" class="money" type="text" inputmode="decimal" placeholder="0,00"><button class="add-btn" onclick="adicionarEntrada()"><i data-lucide="plus"></i></button></div>
-        <div id="entradaLista" class="chips"></div>
-      </div>
-
-      <div class="section-title">contas rápidas</div>
-      <div class="ios-list">
-        <div class="ios-item"><div class="icon-box" style="background:var(--blue)"><i data-lucide="smartphone"></i></div><label class="text">Claro<span class="subrow">R$ 60</span></label><label class="switch"><input id="fixoClaro" type="checkbox" onchange="alternarFixo('claro')"><span class="slider"></span></label></div>
-        <div class="ios-item"><div class="icon-box" style="background:var(--purple)"><i data-lucide="scissors"></i></div><label class="text">Barbeiro<span class="subrow">R$ 75</span></label><label class="switch"><input id="fixoBarbeiro" type="checkbox" onchange="alternarFixo('barbeiro')"><span class="slider"></span></label></div>
-      </div>
-
-      <div class="section-title">outros gastos</div>
-      <div class="ios-list">
-        <div class="add-line"><input id="catNome" placeholder="ex: comida"><input id="catValor" class="money" type="text" inputmode="decimal" placeholder="0,00"><button class="add-btn" onclick="adicionarCategoria()"><i data-lucide="plus"></i></button></div>
-      </div>
-      <div class="ios-list" id="categoriaLista"></div>
-
-      <div class="progress"><div class="progress-top"><span>planejado</span><span id="planoUsoTexto">0%</span></div><div class="bar" id="planoBarra"><div></div></div></div>
-      <div class="footer-actions"><button class="mini-btn" onclick="limparCategorias()">limpar gastos</button><button class="mini-btn" onclick="resetarPlano()">limpar plano</button></div>
-    </section>
-
-    <section id="tab-vt" class="tab-content">
-      <div class="section-title">período</div>
-      <div class="ios-list">
-        <div class="ios-item"><div class="icon-box" style="background:var(--blue)"><i data-lucide="calendar-days"></i></div><label class="text">Mês</label><select id="mesVT"></select></div>
-        <div class="ios-item"><div class="icon-box" style="background:var(--gray)"><i data-lucide="hash"></i></div><label class="text">Ano</label><input id="anoVT" type="text" inputmode="numeric"></div>
-      </div>
-
-      <div class="section-title">tarifas</div>
-      <div class="ios-list">
-        <div class="ios-item"><div class="icon-box" style="background:var(--orange)"><i data-lucide="ticket"></i></div><label class="text">Paraty</label><select id="tarifaParaty"><option value="7.25">R$ 7,25</option><option value="3.625">R$ 3,63 (50%)</option><option value="0">Não usar</option></select></div>
-        <div class="ios-item"><div class="icon-box" style="background:var(--blue)"><i data-lucide="map-pin"></i></div><label class="text">Interno</label><select id="tarifaInterna"><option value="5.20">R$ 5,20</option><option value="2.50">R$ 2,50 (50%)</option><option value="0">Não usar</option></select></div>
-        <div class="ios-item"><div class="icon-box" style="background:var(--purple)"><i data-lucide="repeat-2"></i></div><label class="text">Viagens/dia</label><select id="viagensPorDia"><option value="2">2 vezes</option><option value="1">1 vez</option><option value="4">4 vezes</option></select></div>
-      </div>
-
-      <div class="section-title">calendário</div>
-      <div class="ios-list">
-        <div class="calendar-container">
-          <div class="calendar-header"><strong id="tituloCalendario">mês</strong><span id="totalDiasSelecionados" style="color:var(--blue);font-weight:700">0 selecionados</span></div>
-          <p class="calendar-note"></p>
-          <div class="calendar-grid"><div class="weekday">D</div><div class="weekday">S</div><div class="weekday">T</div><div class="weekday">Q</div><div class="weekday">Q</div><div class="weekday">S</div><div class="weekday">S</div></div>
-          <div id="diasCalendarioVisual" class="calendar-grid" style="margin-top:8px"></div>
-        </div>
-        <div class="mini-actions"><button class="mini-btn" onclick="selecionarTodasQuintas()">selecionar quintas</button><button class="mini-btn" onclick="limparDias()">limpar dias</button></div>
-      </div>
-
-      <div class="result-grid">
-        <div class="widget"><div class="widget-title"><i data-lucide="calendar-range"></i> dias</div><div id="diasResultado" class="widget-value">0</div></div>
-        <div class="widget"><div class="widget-title"><i data-lucide="coins"></i> por dia</div><div id="valorPorDia" class="widget-value">R$ 0,00</div></div>
-        <div class="widget"><div class="widget-title"><i data-lucide="ticket"></i> paraty</div><div id="totalParaty" class="widget-value">R$ 0,00</div></div>
-        <div class="widget"><div class="widget-title"><i data-lucide="map-pin"></i> interno</div><div id="totalInterno" class="widget-value">R$ 0,00</div></div>
-        <div class="total-banner green"><div class="label">passagens usadas</div><div id="valeUsado" class="value">R$ 0,00</div></div>
-      </div>
-      <p class="note"></p>
-    </section>
   </div>
 
-  <script>
-    lucide.createIcons();
+  <main>
 
-    const KEY_PLANO = 'financeiro_plano_separado_v1';
-    let currentTab = 'calculo';
-    let ultimoSalarioLiquido = 0;
-    let diasSelecionados = new Set();
-    const nomesMeses = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+    <!-- RESUMO -->
+    <section id="tab-resumo" class="page active">
+      <div class="grid2">
+        <div class="hero" id="heroSobra">
+          <div class="label">sobra do mês</div>
+          <div class="value mono" id="resSobra">R$ 0,00</div>
+        </div>
+        <div class="stat"><div class="stat-label"><i data-lucide="arrow-down-circle"></i>entra</div><div class="stat-value mono" id="resEntra">R$ 0,00</div></div>
+        <div class="stat"><div class="stat-label"><i data-lucide="arrow-up-circle"></i>sai</div><div class="stat-value mono neg" id="resSai">R$ 0,00</div></div>
+      </div>
 
-    let plano = JSON.parse(localStorage.getItem(KEY_PLANO) || 'null') || {
-      salario:'', guardar:'', entradas:[], fixos:{claro:false,barbeiro:false}, categorias:[
-        {id:id(),nome:'transporte',valor:80}, {id:id(),nome:'comida',valor:120}, {id:id(),nome:'lazer',valor:60}
-      ]
-    };
+      <div class="section-label">meta de economia</div>
+      <div class="card">
+        <div class="progress-wrap">
+          <div class="progress-top"><span id="metaTexto">defina uma meta</span><span id="metaPct">0%</span></div>
+          <div class="bar" id="metaBarra"><div></div></div>
+        </div>
+      </div>
 
-    const el = idName => document.getElementById(idName);
-    function id(){return Math.random().toString(36).slice(2)}
-    function numero(v){ if(typeof v === 'number') return v; if(!v) return 0; return parseFloat(String(v).replace(',', '.').replace(/[^\d.-]/g,'')) || 0; }
-    function dinheiro(v){ return numero(v).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); }
-    function gravarPlano(){ localStorage.setItem(KEY_PLANO, JSON.stringify(plano)); }
-    function esc(t){return String(t).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
+      <div class="section-label">últimos meses</div>
+      <div class="card">
+        <div class="spark" id="sparkHistorico"></div>
+      </div>
 
-    function switchTab(tab){
-      currentTab = tab;
-      document.querySelectorAll('.tab-button').forEach(b=>b.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
-      const map = {calculo:1, plano:2, vt:3};
-      document.querySelector(`.tab-button:nth-child(${map[tab]})`).classList.add('active');
-      el(`tab-${tab}`).classList.add('active');
-      if(tab === 'vt') atualizarCalendario(false);
-      lucide.createIcons();
-    }
+      <div class="section-label">maiores gastos</div>
+      <div class="card" id="resTopCategorias"></div>
 
-    function calcularSalario(){
-      const bruto = numero(el('valorHora').value) * numero(el('horasDia').value) * numero(el('diasMes').value);
-      const descVT = el('valeTransporte').checked ? bruto * .065 : 0;
-      const descINSS = el('inss').checked ? bruto * .07 : 0;
-      const adiantamento = el('adiantamento').checked ? (el('diasCalendario').value === '31' ? 203 : 196) : 0;
-      const descontos = descVT + descINSS + adiantamento;
-      ultimoSalarioLiquido = bruto - descontos;
-      el('salarioBruto').textContent = dinheiro(bruto);
-      el('totalDescontos').textContent = '-' + dinheiro(descontos);
-      el('salarioLiquido').textContent = dinheiro(ultimoSalarioLiquido);
-      el('liquidoCalculadoResumo').textContent = dinheiro(ultimoSalarioLiquido);
-    }
+      <button class="btn" style="width:100%;margin-top:14px" onclick="salvarNoHistorico()"><i data-lucide="save"></i>salvar mês no histórico</button>
+    </section>
 
-    function usarLiquidoNoPlano(){
-      plano.salario = ultimoSalarioLiquido.toFixed(2).replace('.', ',');
-      el('planoSalario').value = plano.salario;
-      gravarPlano();
-      renderPlano();
-      switchTab('plano');
-    }
+    <!-- SALARIO -->
+    <section id="tab-salario" class="page">
+      <div class="section-label">salário bruto</div>
+      <div class="card">
+        <div class="row"><div class="row-icon"><i data-lucide="dollar-sign"></i></div><label class="text">Valor/hora</label><input id="valorHora" type="text" inputmode="decimal" placeholder="0,00"></div>
+        <div class="row"><div class="row-icon"><i data-lucide="clock"></i></div><label class="text">Horas/dia</label><input id="horasDia" type="text" inputmode="decimal" placeholder="0"></div>
+        <div class="row"><div class="row-icon"><i data-lucide="calendar-check"></i></div><label class="text">Dias trabalhados</label><input id="diasMes" type="text" inputmode="numeric" placeholder="0"></div>
+        <div class="row"><div class="row-icon"><i data-lucide="calendar"></i></div><label class="text">Dias no mês</label>
+          <select id="diasCalendario"><option value="30">30 dias</option><option value="31">31 dias</option></select>
+        </div>
+      </div>
 
-    function carregarPlano(){
-      if(!Array.isArray(plano.entradas)) plano.entradas = [];
-      if(!plano.fixos) plano.fixos = {claro:false, barbeiro:false};
-      el('planoSalario').value = plano.salario;
-      el('planoGuardar').value = plano.guardar;
-      renderPlano();
-    }
+      <div class="section-label">descontos fixos</div>
+      <div class="card">
+        <div class="row"><div class="row-icon"><i data-lucide="bus"></i></div><label class="text">Vale-transporte<span class="sub">6,5% do bruto</span></label><label class="switch"><input id="valeTransporte" type="checkbox" checked><span class="slider"></span></label></div>
+        <div class="row"><div class="row-icon"><i data-lucide="shield-check"></i></div><label class="text">INSS<span class="sub">7% do bruto</span></label><label class="switch"><input id="inss" type="checkbox" checked><span class="slider"></span></label></div>
+        <div class="row"><div class="row-icon"><i data-lucide="arrow-down-circle"></i></div><label class="text">Adiantamento<span class="sub">R$ 196 ou R$ 203</span></label><label class="switch"><input id="adiantamento" type="checkbox" checked><span class="slider"></span></label></div>
+      </div>
 
-    function salvarPlano(){
-      plano.salario = el('planoSalario').value;
-      plano.guardar = el('planoGuardar').value;
-      gravarPlano(); renderPlano();
-    }
+      <div class="section-label">outros descontos</div>
+      <div class="card">
+        <div class="add-line wide3">
+          <input id="descNome" placeholder="ex: vale-refeição">
+          <input id="descValor" class="money" type="text" inputmode="decimal" placeholder="valor">
+          <select id="descTipo" style="background:var(--elev-2);border-radius:12px;text-align:center;font-size:13px"><option value="fixo">R$</option><option value="percentual">%</option></select>
+          <button class="add-btn" onclick="adicionarDesconto()"><i data-lucide="plus"></i></button>
+        </div>
+        <div id="descLista" class="chips"></div>
+      </div>
 
-    function totalEntradasPlano(){return plano.entradas.reduce((s,e)=>s+numero(e.valor),0)}
-    function totalCategoriasPlano(){return plano.categorias.reduce((s,c)=>s+numero(c.valor),0)}
-    function totalFixosPlano(){return (plano.fixos.claro?60:0)+(plano.fixos.barbeiro?75:0)}
+      <div class="grid2">
+        <div class="stat"><div class="stat-label"><i data-lucide="trending-up"></i>bruto</div><div class="stat-value mono" id="salarioBruto">R$ 0,00</div></div>
+        <div class="stat"><div class="stat-label"><i data-lucide="trending-down"></i>descontos</div><div class="stat-value mono neg" id="totalDescontos">R$ 0,00</div></div>
+        <div class="hero" id="heroLiquido"><div class="label">salário líquido</div><div class="value mono pos" id="salarioLiquido">R$ 0,00</div></div>
+      </div>
 
-    function renderPlano(){
-      if(!Array.isArray(plano.entradas)) plano.entradas=[];
-      if(!plano.fixos) plano.fixos={claro:false,barbeiro:false};
-      const salario = numero(plano.salario), extras = totalEntradasPlano(), entrada = salario + extras;
-      const guardar = numero(plano.guardar), fixos = totalFixosPlano(), categorias = totalCategoriasPlano();
-      const saida = guardar + fixos + categorias, sobra = entrada - saida, usado = entrada ? saida / entrada * 100 : 0;
-      el('fixoClaro').checked = !!plano.fixos.claro;
-      el('fixoBarbeiro').checked = !!plano.fixos.barbeiro;
-      el('planoExtraTotal').textContent = dinheiro(extras);
-      el('planoEntrada').textContent = dinheiro(entrada);
-      el('planoSaida').textContent = '-' + dinheiro(saida);
-      el('planoSobra').textContent = dinheiro(sobra);
-      el('planoBanner').classList.toggle('red', sobra < 0);
-      el('planoBanner').classList.toggle('green', sobra >= 0);
-      el('planoBannerLabel').textContent = sobra < 0 ? 'acima do plano' : 'sobra';
-      el('planoBarra').classList.toggle('red', usado > 100);
-      el('planoBarra').querySelector('div').style.width = Math.min(100, usado) + '%';
-      el('planoUsoTexto').textContent = Math.round(usado) + '%';
-      renderEntradas(); renderCategorias(entrada); lucide.createIcons();
-    }
+      <button class="btn" style="width:100%;margin-top:14px" onclick="usarLiquidoNoOrcamento()"><i data-lucide="wallet"></i>usar no orçamento</button>
+    </section>
 
-    function alternarFixo(nome){ plano.fixos[nome] = el(nome==='claro'?'fixoClaro':'fixoBarbeiro').checked; gravarPlano(); renderPlano(); }
-    function adicionarEntrada(){ const nome=el('entradaNome').value.trim()||'extra'; const valor=numero(el('entradaValor').value); if(!valor)return; plano.entradas.push({id:id(),nome,valor}); el('entradaNome').value=''; el('entradaValor').value=''; gravarPlano(); renderPlano(); }
-    function apagarEntrada(eid){ plano.entradas = plano.entradas.filter(e=>e.id!==eid); gravarPlano(); renderPlano(); }
-    function renderEntradas(){ el('entradaLista').innerHTML = plano.entradas.map(e=>`<span class="chip">${esc(e.nome)} · ${dinheiro(e.valor)} <button onclick="apagarEntrada('${e.id}')">×</button></span>`).join(''); }
+    <!-- ORCAMENTO -->
+    <section id="tab-orcamento" class="page">
+      <div class="grid2">
+        <div class="stat"><div class="stat-label"><i data-lucide="wallet"></i>entra</div><div class="stat-value mono" id="orcEntrada">R$ 0,00</div></div>
+        <div class="stat"><div class="stat-label"><i data-lucide="receipt"></i>sai</div><div class="stat-value mono neg" id="orcSaida">R$ 0,00</div></div>
+        <div class="hero" id="orcHero"><div class="label" id="orcHeroLabel">sobra</div><div class="value mono" id="orcSobra">R$ 0,00</div></div>
+      </div>
 
-    function adicionarCategoria(){ const nome=el('catNome').value.trim(); const valor=numero(el('catValor').value); if(!nome||!valor)return; plano.categorias.push({id:id(),nome,valor}); el('catNome').value=''; el('catValor').value=''; gravarPlano(); renderPlano(); }
-    function editarCategoria(cid){ const cat=plano.categorias.find(c=>c.id===cid); if(!cat)return; const nome=prompt('nome',cat.nome); if(nome===null)return; const valor=prompt('valor',cat.valor); if(valor===null)return; cat.nome=nome.trim()||cat.nome; cat.valor=numero(valor); gravarPlano(); renderPlano(); }
-    function apagarCategoria(cid){ plano.categorias = plano.categorias.filter(c=>c.id!==cid); gravarPlano(); renderPlano(); }
-    function limparCategorias(){ if(!confirm('limpar gastos?'))return; plano.categorias=[]; gravarPlano(); renderPlano(); }
-    function resetarPlano(){ if(!confirm('limpar plano?'))return; localStorage.removeItem(KEY_PLANO); location.reload(); }
+      <div class="section-label">renda</div>
+      <div class="card">
+        <div class="row"><div class="row-icon"><i data-lucide="banknote"></i></div><label class="text">Salário líquido</label><input id="orcSalario" type="text" inputmode="decimal" placeholder="0,00" oninput="salvarOrcamentoInputs()"></div>
+        <div class="add-line"><input id="extraNome" placeholder="ex: pensão"><input id="extraValor" class="money" type="text" inputmode="decimal" placeholder="0,00"><button class="add-btn" onclick="adicionarExtra()"><i data-lucide="plus"></i></button></div>
+        <div id="extraLista" class="chips"></div>
+      </div>
 
-    function renderCategorias(entrada){
-      if(!plano.categorias.length){el('categoriaLista').innerHTML='<div class="empty">nenhum gasto</div>';return;}
-      const colors=['var(--blue)','var(--green)','var(--orange)','var(--purple)','var(--red)','var(--gray)'];
-      const icons=['bus','utensils','sparkles','shopping-bag','receipt','circle-dollar-sign'];
-      el('categoriaLista').innerHTML = plano.categorias.map((c,i)=>{
-        const percent = entrada ? Math.round(numero(c.valor)/entrada*100) : 0;
-        return `<div class="cat"><div class="icon-box" style="background:${colors[i%colors.length]}"><i data-lucide="${icons[i%icons.length]}"></i></div><div class="cat-info"><span class="cat-name">${esc(c.nome)}</span><span class="cat-value">${dinheiro(c.valor)}</span></div><div class="cat-right"><span class="cat-percent">${percent}%</span><div class="cat-actions"><button class="tiny" onclick="editarCategoria('${c.id}')">editar</button><button class="tiny red" onclick="apagarCategoria('${c.id}')">apagar</button></div></div></div>`;
-      }).join('');
-    }
+      <div class="section-label">meta de economia</div>
+      <div class="card">
+        <div class="row"><div class="row-icon"><i data-lucide="piggy-bank"></i></div><label class="text">Guardar este mês</label><input id="orcGuardar" type="text" inputmode="decimal" placeholder="0,00" oninput="salvarOrcamentoInputs()"></div>
+        <div class="row"><div class="row-icon"><i data-lucide="target"></i></div><label class="text">Meta total</label><input id="orcMeta" type="text" inputmode="decimal" placeholder="0,00" oninput="salvarOrcamentoInputs()"></div>
+      </div>
 
-    function diasNoMes(ano, mes){return new Date(ano, mes+1, 0).getDate()}
-    function chaveData(ano, mes, dia){return `${ano}-${String(mes+1).padStart(2,'0')}-${String(dia).padStart(2,'0')}`}
-    function pegarAnoVT(){return numero(el('anoVT').value) || new Date().getFullYear()}
-    function diasDoMesAtual(){const mes=Number(el('mesVT').value), ano=pegarAnoVT(), total=diasNoMes(ano,mes), arr=[]; for(let d=1;d<=total;d++)arr.push(chaveData(ano,mes,d)); return arr;}
-    function quintasDoMesAtual(){const mes=Number(el('mesVT').value), ano=pegarAnoVT(), total=diasNoMes(ano,mes), arr=[]; for(let d=1;d<=total;d++) if(new Date(ano,mes,d).getDay()===4) arr.push(chaveData(ano,mes,d)); return arr;}
+      <div class="section-label">contas fixas</div>
+      <div class="card">
+        <div class="add-line"><input id="fixoNome" placeholder="ex: internet"><input id="fixoValor" class="money" type="text" inputmode="decimal" placeholder="0,00"><button class="add-btn" onclick="adicionarFixo()"><i data-lucide="plus"></i></button></div>
+        <div id="fixoLista"></div>
+      </div>
 
-    function prepararMeses(){
-      nomesMeses.forEach((nome,i)=>{const opt=document.createElement('option'); opt.value=i; opt.textContent=nome; el('mesVT').appendChild(opt);});
-      const hoje=new Date(); el('mesVT').value=hoje.getMonth(); el('anoVT').value=hoje.getFullYear(); diasSelecionados = new Set(quintasDoMesAtual());
-    }
+      <div class="section-label">outros gastos</div>
+      <div class="card">
+        <div class="add-line"><input id="catNome" placeholder="ex: comida"><input id="catValor" class="money" type="text" inputmode="decimal" placeholder="0,00"><button class="add-btn" onclick="adicionarCategoria()"><i data-lucide="plus"></i></button></div>
+      </div>
+      <div class="card" id="categoriaLista"></div>
 
-    function atualizarCalendario(manter=true){
-      const mes=Number(el('mesVT').value), ano=pegarAnoVT(), total=diasNoMes(ano,mes), primeiro=new Date(ano,mes,1).getDay(), hoje=new Date();
-      if(!manter){const permitidos=new Set(diasDoMesAtual()); diasSelecionados=new Set([...diasSelecionados].filter(d=>permitidos.has(d))); if(!diasSelecionados.size)diasSelecionados=new Set(quintasDoMesAtual());}
-      el('tituloCalendario').textContent = `${nomesMeses[mes]} ${ano}`;
-      el('diasCalendarioVisual').innerHTML='';
-      for(let i=0;i<primeiro;i++){const div=document.createElement('div'); div.className='empty-day'; el('diasCalendarioVisual').appendChild(div);}
-      for(let dia=1;dia<=total;dia++){
-        const data=new Date(ano,mes,dia), key=chaveData(ano,mes,dia), day=document.createElement('div');
-        day.className='day'; day.textContent=dia;
-        if(data.getDay()===4) day.classList.add('thursday');
-        if(hoje.getFullYear()===ano&&hoje.getMonth()===mes&&hoje.getDate()===dia) day.classList.add('today');
-        if(diasSelecionados.has(key)) day.classList.add('selected');
-        day.onclick=()=>{diasSelecionados.has(key)?diasSelecionados.delete(key):diasSelecionados.add(key); atualizarCalendario(true); calcularVT();};
-        el('diasCalendarioVisual').appendChild(day);
-      }
-      const selecionados = contarDiasSelecionadosDoMes();
-      el('totalDiasSelecionados').textContent = `${selecionados} ${selecionados===1?'selecionado':'selecionados'}`;
-      return selecionados;
-    }
+      <div class="card"><div class="progress-wrap"><div class="progress-top"><span>planejado</span><span id="planoUsoTexto">0%</span></div><div class="bar" id="planoBarra"><div></div></div></div></div>
 
-    function contarDiasSelecionadosDoMes(){const permitidos=new Set(diasDoMesAtual()); return [...diasSelecionados].filter(d=>permitidos.has(d)).length;}
-    function selecionarTodasQuintas(){diasSelecionados=new Set(quintasDoMesAtual()); atualizarCalendario(true); calcularVT();}
-    function limparDias(){const permitidos=new Set(diasDoMesAtual()); diasSelecionados=new Set([...diasSelecionados].filter(d=>!permitidos.has(d))); atualizarCalendario(true); calcularVT();}
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="limparCategorias()"><i data-lucide="trash-2"></i>limpar gastos</button>
+        <button class="btn btn-danger" onclick="resetarOrcamento()"><i data-lucide="refresh-cw"></i>limpar tudo</button>
+      </div>
+    </section>
 
-    function calcularVT(){
-      const dias=atualizarCalendario(true), viagens=numero(el('viagensPorDia').value), paraty=numero(el('tarifaParaty').value), interno=numero(el('tarifaInterna').value);
-      const paratyDia=paraty*viagens, internoDia=interno*viagens, valorDia=paratyDia+internoDia;
-      const totalParaty=paratyDia*dias, totalInterno=internoDia*dias, total=totalParaty+totalInterno;
-      el('diasResultado').textContent=dias; el('valorPorDia').textContent=dinheiro(valorDia); el('totalParaty').textContent=dinheiro(totalParaty); el('totalInterno').textContent=dinheiro(totalInterno); el('valeUsado').textContent=dinheiro(total);
-    }
+    <!-- TRANSPORTE -->
+    <section id="tab-transporte" class="page">
+      <div class="section-label">período</div>
+      <div class="card">
+        <div class="row"><div class="row-icon"><i data-lucide="calendar-days"></i></div><label class="text">Mês</label><select id="mesVT"></select></div>
+        <div class="row"><div class="row-icon"><i data-lucide="hash"></i></div><label class="text">Ano</label><input id="anoVT" type="text" inputmode="numeric"></div>
+      </div>
 
-    ['valorHora','horasDia','diasMes','diasCalendario','valeTransporte','inss','adiantamento'].forEach(k=>{el(k).addEventListener('input',calcularSalario); el(k).addEventListener('change',calcularSalario);});
-    ['mesVT','anoVT'].forEach(k=>{el(k).addEventListener('input',()=>{atualizarCalendario(false);calcularVT();}); el(k).addEventListener('change',()=>{atualizarCalendario(false);calcularVT();});});
-    ['tarifaParaty','tarifaInterna','viagensPorDia'].forEach(k=>{el(k).addEventListener('input',calcularVT); el(k).addEventListener('change',calcularVT);});
+      <div class="section-label">tarifas</div>
+      <div class="card">
+        <div class="row"><div class="row-icon"><i data-lucide="ticket"></i></div><label class="text">Linha A</label>
+          <select id="tarifaParaty"><option value="7.25">R$ 7,25</option><option value="3.625">R$ 3,63 (50%)</option><option value="0">não usar</option></select></div>
+        <div class="row"><div class="row-icon"><i data-lucide="map-pin"></i></div><label class="text">Linha B</label>
+          <select id="tarifaInterna"><option value="5.20">R$ 5,20</option><option value="2.50">R$ 2,50 (50%)</option><option value="0">não usar</option></select></div>
+        <div class="row"><div class="row-icon"><i data-lucide="repeat-2"></i></div><label class="text">Viagens/dia</label>
+          <select id="viagensPorDia"><option value="2">2 vezes</option><option value="1">1 vez</option><option value="4">4 vezes</option></select></div>
+      </div>
 
-    carregarPlano(); prepararMeses(); calcularSalario(); calcularVT(); lucide.createIcons();
-  </script>
+      <div class="section-label">calendário</div>
+      <div class="card">
+        <div class="calendar-head"><strong id="tituloCalendario">mês</strong><span id="totalDiasSelecionados">0 selecionados</span></div>
+        <div class="cal-grid">
+          <div class="weekday">D</div><div class="weekday">S</div><div class="weekday">T</div><div class="weekday">Q</div><div class="weekday">Q</div><div class="weekday">S</div><div class="weekday">S</div>
+        </div>
+        <div id="diasCalendarioVisual" class="cal-grid" style="margin-top:2px"></div>
+        <div class="btn-row" style="padding:0 16px 16px">
+          <button class="btn btn-ghost" onclick="selecionarTodasQuintas()"><i data-lucide="calendar-check"></i>quintas</button>
+          <button class="btn btn-ghost" onclick="limparDias()"><i data-lucide="x"></i>limpar</button>
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div class="stat"><div class="stat-label"><i data-lucide="calendar-range"></i>dias</div><div class="stat-value mono" id="diasResultado">0</div></div>
+        <div class="stat"><div class="stat-label"><i data-lucide="coins"></i>por dia</div><div class="stat-value mono" id="valorPorDia">R$ 0,00</div></div>
+        <div class="hero"><div class="label">total do mês</div><div class="value mono" id="valeUsado">R$ 0,00</div></div>
+      </div>
+
+      <button class="btn" style="width:100%;margin-top:14px" onclick="usarVTnoOrcamento()"><i data-lucide="wallet"></i>enviar como conta fixa</button>
+    </section>
+
+    <!-- CONTA -->
+    <section id="tab-conta" class="page">
+      <div id="contaLogado" style="display:none">
+        <div class="section-label">conta</div>
+        <div class="card">
+          <div class="account-status">
+            <div class="avatar" id="avatarLetra">?</div>
+            <div class="who"><strong id="emailLogado">-</strong><span id="statusSync">sincronizado</span></div>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-ghost" onclick="sincronizarAgora()"><i data-lucide="refresh-cw"></i>sincronizar</button>
+          <button class="btn btn-danger" onclick="sair()"><i data-lucide="log-out"></i>sair</button>
+        </div>
+      </div>
+
+      <div id="contaDeslogado">
+        <div class="section-label">conectar ao supabase</div>
+        <div class="card">
+          <div class="field"><label>URL do projeto</label><input id="sbUrl" placeholder="https://xxxxx.supabase.co"></div>
+          <div class="field"><label>Chave anon/public</label><input id="sbKey" placeholder="eyJhbGciOi..."></div>
+        </div>
+        <button class="btn btn-ghost" style="width:100%" onclick="salvarConfigSupabase()"><i data-lucide="database"></i>salvar configuração</button>
+        <p class="hint">crie um projeto grátis em supabase.com, cole a URL e a chave "anon public" (em Project Settings → API). depois rode o SQL do arquivo que te enviei, no SQL Editor do projeto.</p>
+
+        <div class="section-label">entrar</div>
+        <div class="card">
+          <div class="field"><label>E-mail</label><input id="authEmail" type="email" placeholder="voce@email.com"></div>
+          <div class="field"><label>Senha</label><input id="authSenha" type="password" placeholder="••••••••"></div>
+        </div>
+        <div id="authMsg"></div>
+        <div class="btn-row">
+          <button class="btn btn-ghost" onclick="criarConta()"><i data-lucide="user-plus"></i>criar conta</button>
+          <button class="btn" onclick="entrar()"><i data-lucide="log-in"></i>entrar</button>
+        </div>
+      </div>
+
+      <div class="section-label">backup local</div>
+      <div class="card">
+        <div class="row" style="cursor:pointer" onclick="exportarBackup()"><div class="row-icon"><i data-lucide="download"></i></div><label class="text" style="cursor:pointer">Exportar backup (.json)</label></div>
+        <div class="row" style="cursor:pointer" onclick="document.getElementById('importFile').click()"><div class="row-icon"><i data-lucide="upload"></i></div><label class="text" style="cursor:pointer">Importar backup</label></div>
+        <input type="file" id="importFile" accept="application/json" style="display:none" onchange="importarBackup(event)">
+      </div>
+    </section>
+
+  </main>
+
+  <nav class="tabbar">
+    <button class="tab-btn active" onclick="trocarAba('resumo')"><i data-lucide="home"></i><span>resumo</span></button>
+    <button class="tab-btn" onclick="trocarAba('salario')"><i data-lucide="calculator"></i><span>salário</span></button>
+    <button class="tab-btn" onclick="trocarAba('orcamento')"><i data-lucide="wallet"></i><span>orçamento</span></button>
+    <button class="tab-btn" onclick="trocarAba('transporte')"><i data-lucide="bus"></i><span>transporte</span></button>
+    <button class="tab-btn" onclick="trocarAba('conta')"><i data-lucide="user"></i><span>conta</span></button>
+  </nav>
+</div>
+
+<script>
+lucide.createIcons();
+
+/* ---------- utilidades ---------- */
+const STORAGE_KEY = 'financeiro_v2_estado';
+const el = i => document.getElementById(i);
+const uid = () => Math.random().toString(36).slice(2, 10);
+function numero(v){ if(typeof v === 'number') return v; if(!v) return 0; return parseFloat(String(v).replace(/\./g,'').replace(',', '.').replace(/[^\d.-]/g,'')) || 0; }
+function numeroSimples(v){ if(typeof v === 'number') return v; if(!v) return 0; return parseFloat(String(v).replace(',', '.').replace(/[^\d.-]/g,'')) || 0; }
+function dinheiro(v){ return (v || 0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); }
+function esc(t){ return String(t).replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
+const nomesMeses = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+const nomesMesesAbrev = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+const iconesCategorias = ['bus','utensils','sparkles','shopping-bag','receipt','heart','gamepad-2','dumbbell','book-open','circle-dollar-sign'];
+
+/* ---------- estado ---------- */
+function estadoPadrao(){
+  return {
+    salario: { valorHora:'', horasDia:'', diasMes:'', diasCalendario:'30', vt:true, inss:true, adiantamento:true, extras: [] },
+    orcamento: { salario:'', guardar:'', meta:'', extras: [], fixos: [], categorias: [
+      {id:uid(), nome:'transporte', valor:80}, {id:uid(), nome:'comida', valor:120}, {id:uid(), nome:'lazer', valor:60}
+    ]},
+    transporte: { mes: new Date().getMonth(), ano: new Date().getFullYear(), tarifaParaty:'7.25', tarifaInterna:'5.20', viagensPorDia:'2', dias: [] },
+    historico: []
+  };
+}
+let state = carregarLocal();
+function carregarLocal(){
+  try{ const salvo = JSON.parse(localStorage.getItem(STORAGE_KEY)); if(salvo) return { ...estadoPadrao(), ...salvo }; }catch(e){}
+  return estadoPadrao();
+}
+let salvarTimer = null;
+function salvar(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  clearTimeout(salvarTimer);
+  salvarTimer = setTimeout(sincronizarNuvem, 1200);
+}
+
+/* ---------- navegação ---------- */
+const titulos = { resumo:'Resumo', salario:'Salário', orcamento:'Orçamento', transporte:'Transporte', conta:'Conta' };
+function trocarAba(nome){
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active', Object.keys(titulos)[i]===nome));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  el('tab-'+nome).classList.add('active');
+  el('pageTitle').textContent = titulos[nome];
+  if(nome==='transporte') atualizarCalendario(false);
+  if(nome==='resumo') renderResumo();
+  lucide.createIcons();
+}
+
+/* ---------- SALÁRIO ---------- */
+function carregarSalario(){
+  el('valorHora').value = state.salario.valorHora;
+  el('horasDia').value = state.salario.horasDia;
+  el('diasMes').value = state.salario.diasMes;
+  el('diasCalendario').value = state.salario.diasCalendario;
+  el('valeTransporte').checked = state.salario.vt;
+  el('inss').checked = state.salario.inss;
+  el('adiantamento').checked = state.salario.adiantamento;
+  renderDescontosExtras();
+  calcularSalario();
+}
+function salvarCamposSalario(){
+  state.salario.valorHora = el('valorHora').value;
+  state.salario.horasDia = el('horasDia').value;
+  state.salario.diasMes = el('diasMes').value;
+  state.salario.diasCalendario = el('diasCalendario').value;
+  state.salario.vt = el('valeTransporte').checked;
+  state.salario.inss = el('inss').checked;
+  state.salario.adiantamento = el('adiantamento').checked;
+  salvar();
+  calcularSalario();
+}
+function adicionarDesconto(){
+  const nome = el('descNome').value.trim();
+  const valor = numeroSimples(el('descValor').value);
+  const tipo = el('descTipo').value;
+  if(!nome || !valor) return;
+  state.salario.extras.push({id:uid(), nome, valor, tipo});
+  el('descNome').value=''; el('descValor').value='';
+  salvar(); renderDescontosExtras(); calcularSalario();
+}
+function apagarDesconto(id){
+  state.salario.extras = state.salario.extras.filter(d=>d.id!==id);
+  salvar(); renderDescontosExtras(); calcularSalario();
+}
+function renderDescontosExtras(){
+  el('descLista').innerHTML = state.salario.extras.map(d=>{
+    const rotulo = d.tipo==='percentual' ? `${d.valor}%` : dinheiro(d.valor);
+    return `<span class="chip">${esc(d.nome)} · ${rotulo}<button onclick="apagarDesconto('${d.id}')"><i data-lucide="x" style="width:11px;height:11px"></i></button></span>`;
+  }).join('');
+  lucide.createIcons();
+}
+function calcularSalario(){
+  const bruto = numeroSimples(el('valorHora').value) * numeroSimples(el('horasDia').value) * numeroSimples(el('diasMes').value);
+  const descVT = el('valeTransporte').checked ? bruto * .065 : 0;
+  const descINSS = el('inss').checked ? bruto * .07 : 0;
+  const adiantamento = el('adiantamento').checked ? (el('diasCalendario').value === '31' ? 203 : 196) : 0;
+  const descExtras = state.salario.extras.reduce((s,d)=> s + (d.tipo==='percentual' ? bruto*d.valor/100 : d.valor), 0);
+  const descontos = descVT + descINSS + adiantamento + descExtras;
+  const liquido = bruto - descontos;
+  el('salarioBruto').textContent = dinheiro(bruto);
+  el('totalDescontos').textContent = '-' + dinheiro(descontos);
+  el('salarioLiquido').textContent = dinheiro(liquido);
+  window._ultimoLiquido = liquido;
+}
+function usarLiquidoNoOrcamento(){
+  state.orcamento.salario = String((window._ultimoLiquido||0).toFixed(2)).replace('.', ',');
+  salvar();
+  el('orcSalario').value = state.orcamento.salario;
+  renderOrcamento();
+  trocarAba('orcamento');
+}
+
+/* ---------- ORÇAMENTO ---------- */
+function carregarOrcamento(){
+  el('orcSalario').value = state.orcamento.salario;
+  el('orcGuardar').value = state.orcamento.guardar;
+  el('orcMeta').value = state.orcamento.meta;
+  renderOrcamento();
+}
+function salvarOrcamentoInputs(){
+  state.orcamento.salario = el('orcSalario').value;
+  state.orcamento.guardar = el('orcGuardar').value;
+  state.orcamento.meta = el('orcMeta').value;
+  salvar(); renderOrcamento();
+}
+function totalExtrasOrc(){ return state.orcamento.extras.reduce((s,e)=>s+numeroSimples(e.valor),0); }
+function totalFixosAtivos(){ return state.orcamento.fixos.filter(f=>f.ativo!==false).reduce((s,f)=>s+numeroSimples(f.valor),0); }
+function totalCategorias(){ return state.orcamento.categorias.reduce((s,c)=>s+numeroSimples(c.valor),0); }
+
+function renderOrcamento(){
+  const salario = numeroSimples(state.orcamento.salario), extras = totalExtrasOrc(), entrada = salario + extras;
+  const guardar = numeroSimples(state.orcamento.guardar), fixos = totalFixosAtivos(), categorias = totalCategorias();
+  const saida = guardar + fixos + categorias, sobra = entrada - saida, usado = entrada ? saida/entrada*100 : 0;
+
+  el('orcEntrada').textContent = dinheiro(entrada);
+  el('orcSaida').textContent = '-' + dinheiro(saida);
+  el('orcSobra').textContent = dinheiro(sobra);
+  el('orcSobra').classList.toggle('pos', sobra>=0);
+  el('orcSobra').classList.toggle('neg', sobra<0);
+  el('orcHero').classList.toggle('neg', sobra<0);
+  el('orcHeroLabel').textContent = sobra<0 ? 'acima do planejado' : 'sobra';
+  el('planoBarra').classList.toggle('over', usado>100);
+  el('planoBarra').querySelector('div').style.width = Math.min(100, usado) + '%';
+  el('planoUsoTexto').textContent = Math.round(usado) + '%';
+
+  el('extraLista').innerHTML = state.orcamento.extras.map(e=>`<span class="chip">${esc(e.nome)} · ${dinheiro(e.valor)}<button onclick="apagarExtra('${e.id}')"><i data-lucide="x" style="width:11px;height:11px"></i></button></span>`).join('');
+
+  if(!state.orcamento.fixos.length){
+    el('fixoLista').innerHTML = '<div class="empty">nenhuma conta fixa</div>';
+  } else {
+    el('fixoLista').innerHTML = state.orcamento.fixos.map(f=>`
+      <div class="row">
+        <div class="row-icon"><i data-lucide="repeat"></i></div>
+        <label class="text">${esc(f.nome)}<span class="sub">${dinheiro(f.valor)}</span></label>
+        <div class="cat-actions" style="margin-right:8px">
+          <button class="icon-btn danger" onclick="apagarFixo('${f.id}')"><i data-lucide="trash-2"></i></button>
+        </div>
+        <label class="switch"><input type="checkbox" ${f.ativo!==false?'checked':''} onchange="alternarFixo('${f.id}')"><span class="slider"></span></label>
+      </div>`).join('');
+  }
+
+  if(!state.orcamento.categorias.length){
+    el('categoriaLista').innerHTML = '<div class="empty">nenhum gasto</div>';
+  } else {
+    el('categoriaLista').innerHTML = state.orcamento.categorias.map((c,i)=>{
+      const pct = entrada ? Math.round(numeroSimples(c.valor)/entrada*100) : 0;
+      return `<div class="cat">
+        <div class="row-icon"><i data-lucide="${iconesCategorias[i%iconesCategorias.length]}"></i></div>
+        <div class="cat-info"><span class="cat-name">${esc(c.nome)}</span><span class="cat-value">${dinheiro(c.valor)}</span></div>
+        <span class="cat-pct">${pct}%</span>
+        <div class="cat-actions">
+          <button class="icon-btn" onclick="editarCategoria('${c.id}')"><i data-lucide="pencil"></i></button>
+          <button class="icon-btn danger" onclick="apagarCategoria('${c.id}')"><i data-lucide="trash-2"></i></button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  lucide.createIcons();
+}
+function adicionarExtra(){ const nome=el('extraNome').value.trim()||'extra'; const valor=numeroSimples(el('extraValor').value); if(!valor)return; state.orcamento.extras.push({id:uid(),nome,valor}); el('extraNome').value=''; el('extraValor').value=''; salvar(); renderOrcamento(); }
+function apagarExtra(id){ state.orcamento.extras = state.orcamento.extras.filter(e=>e.id!==id); salvar(); renderOrcamento(); }
+function adicionarFixo(){ const nome=el('fixoNome').value.trim(); const valor=numeroSimples(el('fixoValor').value); if(!nome||!valor)return; state.orcamento.fixos.push({id:uid(),nome,valor,ativo:true}); el('fixoNome').value=''; el('fixoValor').value=''; salvar(); renderOrcamento(); }
+function apagarFixo(id){ state.orcamento.fixos = state.orcamento.fixos.filter(f=>f.id!==id); salvar(); renderOrcamento(); }
+function alternarFixo(id){ const f = state.orcamento.fixos.find(f=>f.id===id); if(f){ f.ativo = !(f.ativo!==false); salvar(); renderOrcamento(); } }
+function adicionarCategoria(){ const nome=el('catNome').value.trim(); const valor=numeroSimples(el('catValor').value); if(!nome||!valor)return; state.orcamento.categorias.push({id:uid(),nome,valor}); el('catNome').value=''; el('catValor').value=''; salvar(); renderOrcamento(); }
+function editarCategoria(id){ const c = state.orcamento.categorias.find(c=>c.id===id); if(!c)return; const nome=prompt('nome', c.nome); if(nome===null)return; const valor=prompt('valor', c.valor); if(valor===null)return; c.nome=nome.trim()||c.nome; c.valor=numeroSimples(valor); salvar(); renderOrcamento(); }
+function apagarCategoria(id){ state.orcamento.categorias = state.orcamento.categorias.filter(c=>c.id!==id); salvar(); renderOrcamento(); }
+function limparCategorias(){ if(!confirm('limpar todos os gastos?'))return; state.orcamento.categorias=[]; salvar(); renderOrcamento(); }
+function resetarOrcamento(){ if(!confirm('isso apaga renda, contas fixas e gastos. continuar?'))return; state.orcamento = estadoPadrao().orcamento; salvar(); carregarOrcamento(); }
+function usarVTnoOrcamento(){
+  const total = numeroSimples(el('valeUsado').textContent.replace(/[^\d,.-]/g,''));
+  if(!total) return;
+  const existente = state.orcamento.fixos.find(f=>f.nome==='transporte (VT)');
+  if(existente) existente.valor = total;
+  else state.orcamento.fixos.push({id:uid(), nome:'transporte (VT)', valor: total, ativo:true});
+  salvar(); renderOrcamento(); trocarAba('orcamento');
+}
+
+/* ---------- RESUMO ---------- */
+function renderResumo(){
+  const salario = numeroSimples(state.orcamento.salario), extras = totalExtrasOrc(), entrada = salario + extras;
+  const guardar = numeroSimples(state.orcamento.guardar), fixos = totalFixosAtivos(), categorias = totalCategorias();
+  const saida = guardar + fixos + categorias, sobra = entrada - saida;
+
+  el('resEntra').textContent = dinheiro(entrada);
+  el('resSai').textContent = '-' + dinheiro(saida);
+  el('resSobra').textContent = dinheiro(sobra);
+  el('heroSobra').classList.toggle('neg', sobra<0);
+  el('resSobra').classList.toggle('pos', sobra>=0);
+  el('resSobra').classList.toggle('neg', sobra<0);
+
+  const meta = numeroSimples(state.orcamento.meta);
+  const acumulado = state.historico.reduce((s,h)=>s+numeroSimples(h.guardado),0) + guardar;
+  if(meta>0){
+    const pct = Math.min(100, acumulado/meta*100);
+    el('metaTexto').textContent = `${dinheiro(acumulado)} de ${dinheiro(meta)}`;
+    el('metaPct').textContent = Math.round(pct) + '%';
+    el('metaBarra').querySelector('div').style.width = pct + '%';
+  } else {
+    el('metaTexto').textContent = 'defina uma meta no orçamento';
+    el('metaPct').textContent = '';
+    el('metaBarra').querySelector('div').style.width = '0%';
+  }
+
+  const hist = state.historico.slice(0,6).reverse();
+  if(!hist.length){
+    el('sparkHistorico').innerHTML = '<div class="empty" style="padding:0">salve o mês para começar o histórico</div>';
+  } else {
+    const max = Math.max(...hist.map(h=>Math.abs(numeroSimples(h.sobra))), 1);
+    el('sparkHistorico').innerHTML = hist.map(h=>{
+      const altura = Math.max(6, Math.abs(numeroSimples(h.sobra))/max*70);
+      const neg = numeroSimples(h.sobra) < 0;
+      return `<div class="spark-col"><div class="spark-bar ${neg?'neg':''}" style="height:${altura}px"></div><span class="spark-label">${esc(h.label)}</span></div>`;
+    }).join('');
+  }
+
+  const top = [...state.orcamento.categorias].sort((a,b)=>numeroSimples(b.valor)-numeroSimples(a.valor)).slice(0,4);
+  if(!top.length){
+    el('resTopCategorias').innerHTML = '<div class="empty">nenhum gasto cadastrado</div>';
+  } else {
+    el('resTopCategorias').innerHTML = top.map((c,i)=>`
+      <div class="row"><div class="row-icon"><i data-lucide="${iconesCategorias[i%iconesCategorias.length]}"></i></div><label class="text">${esc(c.nome)}</label><strong class="mono">${dinheiro(c.valor)}</strong></div>
+    `).join('');
+  }
+  lucide.createIcons();
+}
+function salvarNoHistorico(){
+  const agora = new Date();
+  const label = `${nomesMesesAbrev[agora.getMonth()]}/${String(agora.getFullYear()).slice(2)}`;
+  const salario = numeroSimples(state.orcamento.salario), entrada = salario + totalExtrasOrc();
+  const guardado = numeroSimples(state.orcamento.guardar);
+  const gastos = totalFixosAtivos() + totalCategorias();
+  const sobra = entrada - guardado - gastos;
+  const existente = state.historico.find(h=>h.label===label);
+  if(existente){
+    if(!confirm(`já existe um registro para ${label}. substituir?`)) return;
+    Object.assign(existente, { liquido:entrada, guardado, gastos, sobra });
+  } else {
+    state.historico.unshift({ id:uid(), label, liquido:entrada, guardado, gastos, sobra });
+  }
+  state.historico = state.historico.slice(0, 12);
+  salvar(); renderResumo();
+}
+
+/* ---------- TRANSPORTE ---------- */
+function diasNoMes(ano, mes){ return new Date(ano, mes+1, 0).getDate(); }
+function chaveData(ano, mes, dia){ return `${ano}-${String(mes+1).padStart(2,'0')}-${String(dia).padStart(2,'0')}`; }
+function diasDoMesAtual(){ const mes=Number(el('mesVT').value), ano=numeroSimples(el('anoVT').value)||new Date().getFullYear(), total=diasNoMes(ano,mes), arr=[]; for(let d=1;d<=total;d++) arr.push(chaveData(ano,mes,d)); return arr; }
+function quintasDoMesAtual(){ const mes=Number(el('mesVT').value), ano=numeroSimples(el('anoVT').value)||new Date().getFullYear(), total=diasNoMes(ano,mes), arr=[]; for(let d=1;d<=total;d++) if(new Date(ano,mes,d).getDay()===4) arr.push(chaveData(ano,mes,d)); return arr; }
+
+function carregarTransporte(){
+  nomesMeses.forEach((nome,i)=>{ const opt=document.createElement('option'); opt.value=i; opt.textContent=nome; el('mesVT').appendChild(opt); });
+  el('mesVT').value = state.transporte.mes;
+  el('anoVT').value = state.transporte.ano;
+  el('tarifaParaty').value = state.transporte.tarifaParaty;
+  el('tarifaInterna').value = state.transporte.tarifaInterna;
+  el('viagensPorDia').value = state.transporte.viagensPorDia;
+  diasSelecionados = new Set(state.transporte.dias.length ? state.transporte.dias : quintasDoMesAtual());
+  atualizarCalendario(true);
+  calcularVT();
+}
+let diasSelecionados = new Set();
+function salvarCamposTransporte(){
+  state.transporte.mes = Number(el('mesVT').value);
+  state.transporte.ano = numeroSimples(el('anoVT').value);
+  state.transporte.tarifaParaty = el('tarifaParaty').value;
+  state.transporte.tarifaInterna = el('tarifaInterna').value;
+  state.transporte.viagensPorDia = el('viagensPorDia').value;
+  state.transporte.dias = [...diasSelecionados];
+  salvar();
+}
+function atualizarCalendario(manter){
+  const mes=Number(el('mesVT').value), ano=numeroSimples(el('anoVT').value)||new Date().getFullYear(), total=diasNoMes(ano,mes), primeiro=new Date(ano,mes,1).getDay(), hoje=new Date();
+  if(!manter){ const permitidos=new Set(diasDoMesAtual()); diasSelecionados=new Set([...diasSelecionados].filter(d=>permitidos.has(d))); if(!diasSelecionados.size) diasSelecionados=new Set(quintasDoMesAtual()); }
+  el('tituloCalendario').textContent = `${nomesMeses[mes]} ${ano}`;
+  el('diasCalendarioVisual').innerHTML='';
+  for(let i=0;i<primeiro;i++){ const div=document.createElement('div'); div.className='empty-day'; el('diasCalendarioVisual').appendChild(div); }
+  for(let dia=1; dia<=total; dia++){
+    const data=new Date(ano,mes,dia), key=chaveData(ano,mes,dia), div=document.createElement('div');
+    div.className='day'; div.textContent=dia;
+    if(data.getDay()===4) div.classList.add('thu');
+    if(hoje.getFullYear()===ano && hoje.getMonth()===mes && hoje.getDate()===dia) div.classList.add('today');
+    if(diasSelecionados.has(key)) div.classList.add('sel');
+    div.onclick = ()=>{ diasSelecionados.has(key)?diasSelecionados.delete(key):diasSelecionados.add(key); atualizarCalendario(true); calcularVT(); salvarCamposTransporte(); };
+    el('diasCalendarioVisual').appendChild(div);
+  }
+  const selecionados = [...diasSelecionados].filter(d=>diasDoMesAtual().includes(d)).length;
+  el('totalDiasSelecionados').textContent = `${selecionados} ${selecionados===1?'selecionado':'selecionados'}`;
+  return selecionados;
+}
+function selecionarTodasQuintas(){ diasSelecionados=new Set(quintasDoMesAtual()); atualizarCalendario(true); calcularVT(); salvarCamposTransporte(); }
+function limparDias(){ const permitidos=new Set(diasDoMesAtual()); diasSelecionados=new Set([...diasSelecionados].filter(d=>!permitidos.has(d))); atualizarCalendario(true); calcularVT(); salvarCamposTransporte(); }
+function calcularVT(){
+  const dias = atualizarCalendario(true);
+  const viagens = numeroSimples(el('viagensPorDia').value), paraty = numeroSimples(el('tarifaParaty').value), interno = numeroSimples(el('tarifaInterna').value);
+  const valorDia = paraty*viagens + interno*viagens;
+  el('diasResultado').textContent = dias;
+  el('valorPorDia').textContent = dinheiro(valorDia);
+  el('valeUsado').textContent = dinheiro(valorDia*dias);
+}
+
+/* ---------- SUPABASE / SYNC ---------- */
+let supa = null, usuarioAtual = null;
+function carregarConfigSupabase(){
+  const url = localStorage.getItem('sb_url'), key = localStorage.getItem('sb_key');
+  if(url && key){
+    el('sbUrl').value = url; el('sbKey').value = key;
+    try{ supa = window.supabase.createClient(url, key); observarSessao(); }catch(e){}
+  }
+}
+function salvarConfigSupabase(){
+  const url = el('sbUrl').value.trim(), key = el('sbKey').value.trim();
+  if(!url || !key) return;
+  localStorage.setItem('sb_url', url); localStorage.setItem('sb_key', key);
+  supa = window.supabase.createClient(url, key);
+  observarSessao();
+  mostrarMensagem('configuração salva. agora crie uma conta ou entre.', 'ok');
+}
+function mostrarMensagem(texto, tipo){
+  el('authMsg').innerHTML = `<div class="msg ${tipo}">${esc(texto)}</div>`;
+}
+async function criarConta(){
+  if(!supa) return mostrarMensagem('configure o supabase primeiro.', 'err');
+  const email = el('authEmail').value.trim(), senha = el('authSenha').value;
+  if(!email || senha.length<6) return mostrarMensagem('e-mail e senha (mín. 6 caracteres) são obrigatórios.', 'err');
+  const { error } = await supa.auth.signUp({ email, password: senha });
+  if(error) return mostrarMensagem(error.message, 'err');
+  mostrarMensagem('conta criada! verifique seu e-mail se a confirmação estiver ativada, ou tente entrar.', 'ok');
+}
+async function entrar(){
+  if(!supa) return mostrarMensagem('configure o supabase primeiro.', 'err');
+  const email = el('authEmail').value.trim(), senha = el('authSenha').value;
+  const { data, error } = await supa.auth.signInWithPassword({ email, password: senha });
+  if(error) return mostrarMensagem(error.message, 'err');
+  usuarioAtual = data.user;
+  aoLogar();
+}
+async function sair(){
+  if(supa) await supa.auth.signOut();
+  usuarioAtual = null;
+  atualizarUISync();
+}
+async function observarSessao(){
+  if(!supa) return;
+  const { data } = await supa.auth.getSession();
+  if(data.session){ usuarioAtual = data.session.user; aoLogar(); }
+  supa.auth.onAuthStateChange((_evt, session)=>{
+    usuarioAtual = session ? session.user : null;
+    atualizarUISync();
+  });
+}
+async function aoLogar(){
+  atualizarUISync();
+  await puxarDaNuvem();
+}
+function atualizarUISync(){
+  const logado = !!usuarioAtual;
+  el('contaLogado').style.display = logado ? 'block' : 'none';
+  el('contaDeslogado').style.display = logado ? 'none' : 'block';
+  if(logado){
+    el('emailLogado').textContent = usuarioAtual.email;
+    el('avatarLetra').textContent = usuarioAtual.email[0].toUpperCase();
+  }
+  const badge = el('syncBadge'), texto = el('syncText');
+  badge.classList.remove('ok','err');
+  if(!supa){ badge.innerHTML = '<i data-lucide="cloud-off"></i><span>local</span>'; }
+  else if(!logado){ badge.innerHTML = '<i data-lucide="cloud-off"></i><span>não conectado</span>'; }
+  else { badge.classList.add('ok'); badge.innerHTML = '<i data-lucide="cloud"></i><span>sincronizado</span>'; }
+  lucide.createIcons();
+}
+async function puxarDaNuvem(){
+  if(!supa || !usuarioAtual) return;
+  const { data, error } = await supa.from('financeiro_dados').select('dados').eq('user_id', usuarioAtual.id).maybeSingle();
+  if(!error && data && data.dados){
+    state = { ...estadoPadrao(), ...data.dados };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    renderTudo();
+  } else {
+    await sincronizarNuvem();
+  }
+}
+async function sincronizarNuvem(){
+  if(!supa || !usuarioAtual) return;
+  const badge = el('syncBadge');
+  badge.classList.remove('ok','err');
+  badge.innerHTML = '<i data-lucide="loader-2" class="spin"></i><span>sincronizando</span>';
+  lucide.createIcons();
+  const { error } = await supa.from('financeiro_dados').upsert(
+    { user_id: usuarioAtual.id, dados: state, atualizado_em: new Date().toISOString() },
+    { onConflict: 'user_id' }
+  );
+  if(error){ badge.classList.add('err'); badge.innerHTML = '<i data-lucide="cloud-off"></i><span>erro ao sincronizar</span>'; }
+  else { badge.classList.add('ok'); badge.innerHTML = '<i data-lucide="cloud"></i><span>sincronizado</span>'; }
+  lucide.createIcons();
+}
+function sincronizarAgora(){ sincronizarNuvem(); }
+
+/* ---------- backup local ---------- */
+function exportarBackup(){
+  const blob = new Blob([JSON.stringify(state, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `financeiro-backup-${Date.now()}.json`;
+  a.click();
+}
+function importarBackup(evento){
+  const arquivo = evento.target.files[0];
+  if(!arquivo) return;
+  const leitor = new FileReader();
+  leitor.onload = () => {
+    try{
+      const dados = JSON.parse(leitor.result);
+      state = { ...estadoPadrao(), ...dados };
+      salvar(); renderTudo();
+      alert('backup importado com sucesso.');
+    }catch(e){ alert('arquivo inválido.'); }
+  };
+  leitor.readAsText(arquivo);
+  evento.target.value = '';
+}
+
+/* ---------- inicialização ---------- */
+function renderTudo(){
+  carregarSalario();
+  carregarOrcamento();
+  el('mesVT').innerHTML = '';
+  carregarTransporte();
+  renderResumo();
+}
+['valorHora','horasDia','diasMes','diasCalendario','valeTransporte','inss','adiantamento'].forEach(k=>{
+  el(k).addEventListener('input', salvarCamposSalario);
+  el(k).addEventListener('change', salvarCamposSalario);
+});
+['mesVT','anoVT','tarifaParaty','tarifaInterna','viagensPorDia'].forEach(k=>{
+  el(k).addEventListener('input', ()=>{ if(k==='mesVT'||k==='anoVT') atualizarCalendario(false); calcularVT(); salvarCamposTransporte(); });
+  el(k).addEventListener('change', ()=>{ if(k==='mesVT'||k==='anoVT') atualizarCalendario(false); calcularVT(); salvarCamposTransporte(); });
+});
+
+carregarSalario();
+carregarOrcamento();
+carregarTransporte();
+renderResumo();
+carregarConfigSupabase();
+atualizarUISync();
+lucide.createIcons();
+</script>
 </body>
 </html>
