@@ -1,0 +1,42 @@
+name: Supabase Keep Alive
+
+on:
+  schedule:
+    # Tenta executar a cada 5 minutos.
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          set -e
+
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
+            echo "Configure os secrets SUPABASE_URL e SUPABASE_ANON_KEY no GitHub."
+            exit 1
+          fi
+
+          echo "Enviando ping para o Supabase..."
+
+          HTTP_CODE=$(curl -sS -o response.json -w "%{http_code}" \
+            -X POST \
+            "$SUPABASE_URL/rest/v1/rpc/healthcheck" \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
+            -H "Content-Type: application/json")
+
+          echo "HTTP Status: $HTTP_CODE"
+          cat response.json
+
+          if [ "$HTTP_CODE" -lt 200 ] || [ "$HTTP_CODE" -ge 300 ]; then
+            echo "O Supabase não respondeu com sucesso."
+            exit 1
+          fi
+
+          echo "Ping concluído com sucesso."
