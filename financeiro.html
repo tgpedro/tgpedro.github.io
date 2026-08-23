@@ -179,6 +179,32 @@
   .account-status .who strong{display:block;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .account-status .who span{font-size:12px;color:var(--dim)}
 
+  /* ---------- metas ---------- */
+  .goal-card{background:var(--elev);border:1px solid var(--border);border-radius:18px;margin-bottom:12px;overflow:hidden}
+  .goal-top{display:flex;align-items:center;gap:12px;padding:14px 16px 6px}
+  .goal-icon{width:36px;height:36px;border-radius:10px;background:var(--elev-2);display:grid;place-items:center;color:var(--accent);flex:0 0 auto}
+  .goal-icon i{width:18px;height:18px}
+  .goal-icon.late{color:var(--red)}
+  .goal-title{flex:1;min-width:0}
+  .goal-title strong{display:block;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .goal-title span{display:block;font-size:12px;color:var(--dim);margin-top:1px}
+  .goal-top .cat-actions{flex:0 0 auto}
+  .goal-bar-wrap{padding:2px 16px 12px}
+  .goal-nums{display:flex;justify-content:space-between;font-size:12px;color:var(--dim);font-weight:600;margin:8px 0 6px}
+  .goal-nums b{color:var(--text);font-weight:700}
+  .goal-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);margin-top:2px}
+  .goal-cell{background:var(--elev);padding:12px 16px}
+  .goal-cell .l{font-size:10px;color:var(--dim);font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+  .goal-cell .v{font-size:15px;font-weight:700;margin-top:4px}
+  .goal-cell .v.warn{color:var(--amber)}
+  .goal-cell .v.late{color:var(--red)}
+  .goal-actions{display:flex;gap:1px;background:var(--border)}
+  .goal-actions button{flex:1;background:var(--elev);padding:12px;font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;justify-content:center;gap:6px}
+  .goal-actions button i{width:14px;height:14px}
+  .goal-actions button.danger{color:var(--red)}
+  .goal-done{color:var(--accent);font-weight:700;font-size:12px;display:flex;align-items:center;gap:5px}
+  .goal-done i{width:13px;height:13px}
+
   /* ---------- DESKTOP: layout diferente do mobile ---------- */
   @media (min-width:900px){
     .app{
@@ -204,6 +230,7 @@
     .grid2{grid-template-columns:repeat(4,1fr)}
     .hero{grid-column:span 4}
     .btn-row{grid-template-columns:repeat(4,1fr)}
+    .goal-grid{grid-template-columns:repeat(4,1fr)}
   }
 </style>
 </head>
@@ -230,13 +257,8 @@
         <div class="stat"><div class="stat-label"><i data-lucide="arrow-up-circle"></i>sai</div><div class="stat-value mono neg" id="resSai">R$ 0,00</div></div>
       </div>
 
-      <div class="section-label">meta de economia</div>
-      <div class="card">
-        <div class="progress-wrap">
-          <div class="progress-top"><span id="metaTexto">defina uma meta</span><span id="metaPct">0%</span></div>
-          <div class="bar" id="metaBarra"><div></div></div>
-        </div>
-      </div>
+      <div class="section-label">metas</div>
+      <div class="card" id="resMetas"></div>
 
       <div class="section-label">últimos meses</div>
       <div class="card">
@@ -303,10 +325,9 @@
         <div id="extraLista" class="chips"></div>
       </div>
 
-      <div class="section-label">meta de economia</div>
+      <div class="section-label">quanto guardar este mês</div>
       <div class="card">
         <div class="row"><div class="row-icon"><i data-lucide="piggy-bank"></i></div><label class="text">Guardar este mês</label><input id="orcGuardar" type="text" inputmode="decimal" placeholder="0,00" oninput="salvarOrcamentoInputs()"></div>
-        <div class="row"><div class="row-icon"><i data-lucide="target"></i></div><label class="text">Meta total</label><input id="orcMeta" type="text" inputmode="decimal" placeholder="0,00" oninput="salvarOrcamentoInputs()"></div>
       </div>
 
       <div class="section-label">contas fixas</div>
@@ -327,6 +348,21 @@
         <button class="btn btn-ghost" onclick="limparCategorias()"><i data-lucide="trash-2"></i>limpar gastos</button>
         <button class="btn btn-danger" onclick="resetarOrcamento()"><i data-lucide="refresh-cw"></i>limpar tudo</button>
       </div>
+    </section>
+
+    <!-- METAS -->
+    <section id="tab-metas" class="page">
+      <div class="section-label">nova meta</div>
+      <div class="card">
+        <div class="field"><label>Nome da meta</label><input id="metaNome" placeholder="ex: viagem, reserva, PS5"></div>
+        <div class="field"><label>Já guardado (opcional)</label><input id="metaAtual" type="text" inputmode="decimal" placeholder="0,00"></div>
+        <div class="field"><label>Valor da meta</label><input id="metaValorNova" type="text" inputmode="decimal" placeholder="0,00"></div>
+        <div class="field"><label>Depositar até (opcional)</label><input id="metaData" type="date"></div>
+        <div style="padding:0 16px 16px"><button class="btn" style="width:100%" onclick="adicionarMeta()"><i data-lucide="plus"></i>criar meta</button></div>
+      </div>
+
+      <div class="section-label">suas metas</div>
+      <div id="metasLista"></div>
     </section>
 
     <!-- TRANSPORTE -->
@@ -414,6 +450,7 @@
     <button class="tab-btn active" onclick="trocarAba('resumo')"><i data-lucide="home"></i><span>resumo</span></button>
     <button class="tab-btn" onclick="trocarAba('salario')"><i data-lucide="calculator"></i><span>salário</span></button>
     <button class="tab-btn" onclick="trocarAba('orcamento')"><i data-lucide="wallet"></i><span>orçamento</span></button>
+    <button class="tab-btn" onclick="trocarAba('metas')"><i data-lucide="target"></i><span>metas</span></button>
     <button class="tab-btn" onclick="trocarAba('transporte')"><i data-lucide="bus"></i><span>transporte</span></button>
     <button class="tab-btn" onclick="trocarAba('conta')"><i data-lucide="user"></i><span>conta</span></button>
   </nav>
@@ -478,9 +515,10 @@ function valorCsel(containerId){ return el(containerId).dataset.value; }
 function estadoPadrao(){
   return {
     salario: { valorHora:'', horasDia:'', diasMes:'', diasCalendario:'30', vt:true, inss:true, adiantamento:true, extras: [] },
-    orcamento: { salario:'', guardar:'', meta:'', extras: [], fixos: [], categorias: [
+    orcamento: { salario:'', guardar:'', extras: [], fixos: [], categorias: [
       {id:uid(), nome:'transporte', valor:80}, {id:uid(), nome:'comida', valor:120}, {id:uid(), nome:'lazer', valor:60}
     ]},
+    metas: [],
     transporte: { mes: new Date().getMonth(), ano: new Date().getFullYear(), viagensPorDia:'2', dias: [],
       linhas: [ {id:uid(), nome:'intermunicipal', valor:7.25, ativo:true}, {id:uid(), nome:'municipal', valor:5.20, ativo:true} ]
     },
@@ -500,7 +538,7 @@ function salvar(){
 }
 
 /* ---------- navegação ---------- */
-const titulos = { resumo:'Resumo', salario:'Salário', orcamento:'Orçamento', transporte:'Transporte', conta:'Conta' };
+const titulos = { resumo:'Resumo', salario:'Salário', orcamento:'Orçamento', metas:'Metas', transporte:'Transporte', conta:'Conta' };
 function trocarAba(nome){
   document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active', Object.keys(titulos)[i]===nome));
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -508,6 +546,7 @@ function trocarAba(nome){
   el('pageTitle').textContent = titulos[nome];
   if(nome==='transporte') atualizarCalendario(false);
   if(nome==='resumo') renderResumo();
+  if(nome==='metas') renderMetas();
   lucide.createIcons();
 }
 
@@ -580,13 +619,11 @@ function usarLiquidoNoOrcamento(){
 function carregarOrcamento(){
   el('orcSalario').value = state.orcamento.salario;
   el('orcGuardar').value = state.orcamento.guardar;
-  el('orcMeta').value = state.orcamento.meta;
   renderOrcamento();
 }
 function salvarOrcamentoInputs(){
   state.orcamento.salario = el('orcSalario').value;
   state.orcamento.guardar = el('orcGuardar').value;
-  state.orcamento.meta = el('orcMeta').value;
   salvar(); renderOrcamento();
 }
 function totalExtrasOrc(){ return state.orcamento.extras.reduce((s,e)=>s+numeroSimples(e.valor),0); }
@@ -662,6 +699,135 @@ function usarVTnoOrcamento(){
   salvar(); renderOrcamento(); trocarAba('orcamento');
 }
 
+/* ---------- METAS ---------- */
+function mesesAteData(dataStr){
+  if(!dataStr) return null;
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const alvo = new Date(dataStr + 'T00:00:00');
+  const diffDias = Math.ceil((alvo - hoje) / 86400000);
+  const meses = Math.max(1, Math.ceil(diffDias / 30));
+  return { diffDias, meses };
+}
+function formatarDataBr(dataStr){
+  if(!dataStr) return '';
+  const [a,m,d] = dataStr.split('-');
+  return `${d}/${m}/${a}`;
+}
+function adicionarMeta(){
+  const nome = el('metaNome').value.trim();
+  const valorMeta = numeroSimples(el('metaValorNova').value);
+  const atual = numeroSimples(el('metaAtual').value);
+  const data = el('metaData').value || '';
+  if(!nome || !valorMeta) return;
+  state.metas.push({ id:uid(), nome, atual, meta:valorMeta, data });
+  el('metaNome').value=''; el('metaAtual').value=''; el('metaValorNova').value=''; el('metaData').value='';
+  salvar(); renderMetas(); renderResumo();
+}
+function apagarMeta(id){
+  if(!confirm('apagar esta meta?')) return;
+  state.metas = state.metas.filter(m=>m.id!==id);
+  salvar(); renderMetas(); renderResumo();
+}
+function depositarMeta(id){
+  const m = state.metas.find(m=>m.id===id);
+  if(!m) return;
+  const valor = prompt('quanto você quer adicionar a esta meta?', '');
+  if(valor===null) return;
+  m.atual = Math.max(0, numeroSimples(m.atual) + numeroSimples(valor));
+  salvar(); renderMetas(); renderResumo();
+}
+function editarMeta(id){
+  const m = state.metas.find(m=>m.id===id);
+  if(!m) return;
+  const nome = prompt('nome da meta', m.nome); if(nome===null) return;
+  const valorMeta = prompt('valor da meta', m.meta); if(valorMeta===null) return;
+  const atual = prompt('quanto já tem guardado', m.atual); if(atual===null) return;
+  const data = prompt('depositar até (aaaa-mm-dd, deixe vazio se não tiver prazo)', m.data||''); if(data===null) return;
+  m.nome = nome.trim() || m.nome;
+  m.meta = numeroSimples(valorMeta);
+  m.atual = numeroSimples(atual);
+  m.data = data.trim();
+  salvar(); renderMetas(); renderResumo();
+}
+function cardMeta(m){
+  const atual = numeroSimples(m.atual), meta = numeroSimples(m.meta);
+  const restante = Math.max(0, meta - atual);
+  const pct = meta ? Math.min(100, atual/meta*100) : 0;
+  const concluida = restante <= 0 && meta > 0;
+  const info = mesesAteData(m.data);
+  let atrasada = false;
+  let celulaExtra = '';
+  if(concluida){
+    celulaExtra = `<div class="goal-cell"><div class="l">status</div><div class="v goal-done"><i data-lucide="check-circle-2"></i>concluída</div></div>`;
+  } else if(m.data){
+    if(info.diffDias < 0){
+      atrasada = true;
+      celulaExtra = `<div class="goal-cell"><div class="l">prazo</div><div class="v late">venceu em ${formatarDataBr(m.data)}</div></div>`;
+    } else {
+      const porMes = restante / info.meses;
+      celulaExtra = `<div class="goal-cell"><div class="l">depositar/mês</div><div class="v ${info.diffDias<=30?'warn':''}">${dinheiro(porMes)}</div></div>`;
+    }
+  } else {
+    celulaExtra = `<div class="goal-cell"><div class="l">prazo</div><div class="v" style="color:var(--faint)">sem data definida</div></div>`;
+  }
+  const subLabel = m.data ? (concluida ? 'meta atingida' : (atrasada ? `prazo era ${formatarDataBr(m.data)}` : `até ${formatarDataBr(m.data)} · ${info.diffDias} dias`)) : `${Math.round(pct)}% guardado`;
+  return `
+  <div class="goal-card">
+    <div class="goal-top">
+      <div class="goal-icon ${atrasada?'late':''}"><i data-lucide="${concluida?'check-circle-2':(atrasada?'alarm-clock':'target')}"></i></div>
+      <div class="goal-title"><strong>${esc(m.nome)}</strong><span>${esc(subLabel)}</span></div>
+      <div class="cat-actions">
+        <button class="icon-btn" onclick="editarMeta('${m.id}')"><i data-lucide="pencil"></i></button>
+        <button class="icon-btn danger" onclick="apagarMeta('${m.id}')"><i data-lucide="trash-2"></i></button>
+      </div>
+    </div>
+    <div class="goal-bar-wrap">
+      <div class="bar"><div style="width:${pct}%"></div></div>
+      <div class="goal-nums"><span>guardado: <b class="mono">${dinheiro(atual)}</b></span><span>meta: <b class="mono">${dinheiro(meta)}</b></span></div>
+    </div>
+    <div class="goal-grid">
+      <div class="goal-cell"><div class="l">falta</div><div class="v mono">${dinheiro(restante)}</div></div>
+      ${celulaExtra}
+    </div>
+    <div class="goal-actions">
+      <button onclick="depositarMeta('${m.id}')"><i data-lucide="plus-circle"></i>adicionar valor</button>
+    </div>
+  </div>`;
+}
+function renderMetas(){
+  if(!state.metas.length){
+    el('metasLista').innerHTML = '<div class="card"><div class="empty">nenhuma meta criada ainda</div></div>';
+  } else {
+    el('metasLista').innerHTML = state.metas.map(cardMeta).join('');
+  }
+  lucide.createIcons();
+}
+function renderResumoMetas(){
+  if(!state.metas.length){
+    el('resMetas').innerHTML = '<div class="empty">nenhuma meta criada — vá na aba metas para criar uma</div>';
+    return;
+  }
+  const ativas = [...state.metas].sort((a,b)=>{
+    const ra = Math.max(0, numeroSimples(a.meta)-numeroSimples(a.atual));
+    const rb = Math.max(0, numeroSimples(b.meta)-numeroSimples(b.atual));
+    if((ra<=0) !== (rb<=0)) return ra<=0 ? 1 : -1;
+    if(!!a.data !== !!b.data) return a.data ? -1 : 1;
+    return (a.data||'').localeCompare(b.data||'');
+  }).slice(0,3);
+  el('resMetas').innerHTML = ativas.map(m=>{
+    const atual = numeroSimples(m.atual), meta = numeroSimples(m.meta);
+    const restante = Math.max(0, meta-atual);
+    const pct = meta ? Math.min(100, atual/meta*100) : 0;
+    const concluida = restante<=0 && meta>0;
+    return `<div class="row">
+      <div class="row-icon"><i data-lucide="${concluida?'check-circle-2':'target'}"></i></div>
+      <label class="text">${esc(m.nome)}<span class="sub">${concluida?'concluída':dinheiro(restante)+' restando'}</span></label>
+      <strong class="mono">${Math.round(pct)}%</strong>
+    </div>`;
+  }).join('');
+  lucide.createIcons();
+}
+
 /* ---------- RESUMO ---------- */
 function renderResumo(){
   const salario = numeroSimples(state.orcamento.salario), extras = totalExtrasOrc(), entrada = salario + extras;
@@ -675,18 +841,7 @@ function renderResumo(){
   el('resSobra').classList.toggle('pos', sobra>=0);
   el('resSobra').classList.toggle('neg', sobra<0);
 
-  const meta = numeroSimples(state.orcamento.meta);
-  const acumulado = state.historico.reduce((s,h)=>s+numeroSimples(h.guardado),0) + guardar;
-  if(meta>0){
-    const pct = Math.min(100, acumulado/meta*100);
-    el('metaTexto').textContent = `${dinheiro(acumulado)} de ${dinheiro(meta)}`;
-    el('metaPct').textContent = Math.round(pct) + '%';
-    el('metaBarra').querySelector('div').style.width = pct + '%';
-  } else {
-    el('metaTexto').textContent = 'defina uma meta no orçamento';
-    el('metaPct').textContent = '';
-    el('metaBarra').querySelector('div').style.width = '0%';
-  }
+  renderResumoMetas();
 
   const hist = state.historico.slice(0,6).reverse();
   if(!hist.length){
@@ -928,6 +1083,7 @@ function renderTudo(){
   carregarSalario();
   carregarOrcamento();
   carregarTransporte();
+  renderMetas();
   renderResumo();
 }
 ['valorHora','horasDia','diasMes','valeTransporte','inss','adiantamento'].forEach(k=>{
@@ -940,6 +1096,7 @@ el('anoVT').addEventListener('change', ()=>{ atualizarCalendario(false); calcula
 carregarSalario();
 carregarOrcamento();
 carregarTransporte();
+renderMetas();
 renderResumo();
 iniciarSupabase();
 lucide.createIcons();
