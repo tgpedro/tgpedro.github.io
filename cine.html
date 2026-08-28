@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>CineLocal</title>
 <style>
   :root{
@@ -15,9 +15,13 @@
     --text-dim:#a1a1a6;
     --text-faint:#636366;
     --accent:#0a84ff;
+    --danger:#ff453a;
     --radius:14px;
+    --sub-size:20px;
+    --sub-color:#ffffff;
+    --sub-bg:rgba(0,0,0,.65);
   }
-  *{box-sizing:border-box;}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{margin:0;padding:0;}
   body{
     background:var(--bg);
@@ -28,7 +32,7 @@
     -webkit-font-smoothing:antialiased;
   }
   ::selection{background:var(--accent);color:#fff;}
-  a,button,input{font-family:inherit;}
+  a,button,input,select{font-family:inherit;}
   :focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
 
   /* ---------- header ---------- */
@@ -38,16 +42,17 @@
     backdrop-filter:blur(16px);
     -webkit-backdrop-filter:blur(16px);
     border-bottom:1px solid rgba(255,255,255,.08);
+    padding-top:env(safe-area-inset-top);
   }
   .headerbar{
-    display:flex;align-items:center;gap:18px;
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap;
     padding:14px 28px;max-width:1400px;margin:0 auto;
   }
   .brand{
-    font-weight:600;font-size:19px;color:var(--text);white-space:nowrap;letter-spacing:-.01em;
+    font-weight:600;font-size:19px;color:var(--text);white-space:nowrap;letter-spacing:-.01em;margin-right:4px;
   }
   .brand span{color:var(--text-dim);font-weight:500;}
-  .search-wrap{flex:1;max-width:420px;position:relative;}
+  .search-wrap{flex:1;min-width:120px;max-width:420px;position:relative;order:1;}
   .search-wrap input{
     width:100%;padding:8px 14px 8px 34px;
     background:var(--surface);border:1px solid rgba(255,255,255,.08);border-radius:10px;
@@ -56,14 +61,19 @@
   .search-wrap input::placeholder{color:var(--text-faint);}
   .search-wrap svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);opacity:.5;}
   .btn{
-    display:inline-flex;align-items:center;gap:8px;
+    display:inline-flex;align-items:center;gap:7px;
     background:var(--surface-2);color:var(--text);border:none;
-    padding:9px 16px;border-radius:10px;font-weight:600;font-size:14px;
+    padding:9px 14px;border-radius:10px;font-weight:600;font-size:13.5px;
     cursor:pointer;transition:background .15s, transform .1s;
     white-space:nowrap;
   }
   .btn:hover{background:var(--surface-3);}
   .btn:active{transform:scale(.97);}
+  .btn.round{width:38px;height:38px;padding:0;justify-content:center;border-radius:50%;}
+  @media (max-width:560px){
+    .btn .label{display:none;}
+    .btn{padding:9px;border-radius:50%;width:38px;height:38px;justify-content:center;}
+  }
 
   /* ---------- main / rows ---------- */
   main{max-width:1400px;margin:0 auto;padding:28px 28px 80px;min-height:60vh;}
@@ -73,7 +83,7 @@
   }
   .track{
     display:flex;gap:14px;overflow-x:auto;padding:6px 2px 14px;
-    scroll-snap-type:x proximity;
+    scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;
   }
   .track::-webkit-scrollbar{height:8px;}
   .track::-webkit-scrollbar-thumb{background:var(--surface-2);border-radius:4px;}
@@ -105,6 +115,12 @@
     color:var(--text);font-size:10.5px;font-weight:600;padding:2px 7px;border-radius:5px;
     backdrop-filter:blur(2px);
   }
+  .card-del{
+    position:absolute;top:6px;left:6px;z-index:2;width:26px;height:26px;border-radius:50%;
+    background:rgba(0,0,0,.55);backdrop-filter:blur(4px);border:none;color:#fff;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:.75;
+  }
+  .card-del:hover{opacity:1;background:var(--danger);}
 
   /* ---------- empty states ---------- */
   .empty{
@@ -114,6 +130,40 @@
   .empty svg{opacity:.35;margin-bottom:4px;}
   .empty h1{font-size:22px;color:var(--text);margin:0;font-weight:600;letter-spacing:-.01em;}
   .empty p{max-width:440px;margin:0;font-size:14.5px;line-height:1.5;color:var(--text-faint);}
+
+  /* ---------- generic dialog (settings / add link) ---------- */
+  .dialog-overlay{
+    position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);
+    z-index:200;display:none;align-items:center;justify-content:center;padding:20px;
+  }
+  .dialog-overlay.open{display:flex;}
+  .dialog{
+    background:#1c1c1ef2;border:1px solid rgba(255,255,255,.08);border-radius:16px;
+    width:100%;max-width:380px;padding:22px;max-height:86vh;overflow-y:auto;
+  }
+  .dialog h2{font-size:17px;font-weight:600;margin:0 0 16px;letter-spacing:-.01em;}
+  .field{margin-bottom:14px;}
+  .field label{display:block;font-size:12.5px;color:var(--text-dim);margin-bottom:6px;}
+  .field input[type=text],.field input[type=url],.field select{
+    width:100%;padding:9px 12px;background:var(--surface);border:1px solid rgba(255,255,255,.1);
+    border-radius:9px;color:var(--text);font-size:14px;
+  }
+  .field-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;}
+  .field-row label{font-size:13.5px;color:var(--text);}
+  .switch{position:relative;width:42px;height:24px;flex:0 0 auto;}
+  .switch input{opacity:0;width:0;height:0;}
+  .switch span{position:absolute;inset:0;background:var(--surface-3);border-radius:999px;transition:background .15s;cursor:pointer;}
+  .switch span::before{content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .15s;}
+  .switch input:checked + span{background:var(--accent);}
+  .switch input:checked + span::before{transform:translateX(18px);}
+  .dialog-actions{display:flex;gap:10px;margin-top:6px;}
+  .dialog-actions .btn{flex:1;justify-content:center;}
+  .btn.primary{background:var(--accent);}
+  .btn.primary:hover{background:#0071e3;}
+  .btn.danger-ghost{background:transparent;border:1px solid rgba(255,69,58,.4);color:var(--danger);width:100%;justify-content:center;margin-top:6px;}
+  .btn.danger-ghost:hover{background:rgba(255,69,58,.12);}
+  .dialog hr{border:none;border-top:1px solid rgba(255,255,255,.08);margin:18px 0;}
+  .dialog .section-title{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-faint);margin:0 0 10px;}
 
   /* ---------- player modal ---------- */
   .modal{
@@ -127,31 +177,35 @@
   .stage.idle .player-ui{opacity:0;pointer-events:none;}
 
   video::cue{
-    background:rgba(0,0,0,.65);color:#fff;font-family:var(--font-sf);font-size:1.05em;
-    font-weight:500;
+    background:var(--sub-bg);color:var(--sub-color);font-family:var(--font-sf);
+    font-size:var(--sub-size);font-weight:500;
   }
 
   .player-ui{position:absolute;inset:0;transition:opacity .35s ease;}
   .ui-top{
     position:absolute;top:0;left:0;right:0;z-index:2;
-    padding:18px 24px;display:flex;align-items:center;gap:14px;
+    padding:calc(16px + env(safe-area-inset-top)) 24px 16px;display:flex;align-items:center;gap:14px;
     background:linear-gradient(180deg,rgba(0,0,0,.75),transparent);
   }
   .ui-top h3{font-weight:600;font-size:15.5px;margin:0;color:var(--text);letter-spacing:-.01em;}
   .ui-bottom{
     position:absolute;left:0;right:0;bottom:0;z-index:2;
-    padding:8px 24px 20px;display:flex;flex-direction:column;gap:6px;
+    padding:8px 24px calc(20px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:8px;
     background:linear-gradient(0deg,rgba(0,0,0,.82),transparent);
   }
 
+  /* circular, frosted-glass icon buttons — the whole player control language */
   .icon-btn{
-    position:relative;background:none;border:none;color:var(--text);
-    width:36px;height:36px;border-radius:8px;cursor:pointer;
+    position:relative;background:rgba(255,255,255,.09);border:none;color:var(--text);
+    width:40px;height:40px;border-radius:50%;cursor:pointer;
     display:flex;align-items:center;justify-content:center;flex:0 0 auto;
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    transition:background .15s, transform .1s;
   }
-  .icon-btn:hover{background:rgba(255,255,255,.12);}
-  .skip-label{position:absolute;font-size:9px;font-weight:700;top:54%;left:50%;transform:translate(-50%,-50%);pointer-events:none;}
-  .cc-btn{font-size:10px;font-weight:700;border:1.4px solid currentColor;border-radius:4px;width:28px;height:20px;padding:0;color:var(--text-dim);}
+  .icon-btn:hover{background:rgba(255,255,255,.18);}
+  .icon-btn:active{transform:scale(.93);}
+  .cc-btn{font-size:10px;font-weight:700;color:var(--text-dim);}
+  .cc-btn.active-cc{color:var(--accent);}
 
   .scrub{position:relative;height:16px;display:flex;align-items:center;cursor:pointer;touch-action:none;}
   .scrub .track-bg,.scrub .buffered,.scrub .played{
@@ -178,7 +232,7 @@
   .scrub-preview img{width:140px;height:79px;object-fit:cover;display:block;background:#111;}
   .scrub-preview span{display:block;text-align:center;font-size:11px;padding:3px 0;color:var(--text-dim);}
 
-  .ui-controls{display:flex;align-items:center;gap:6px;}
+  .ui-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
   .time{font-size:12.5px;color:var(--text-dim);font-variant-numeric:tabular-nums;padding:0 2px;}
   .ui-controls .spacer{flex:1;}
   .volume{display:flex;align-items:center;gap:2px;}
@@ -186,17 +240,18 @@
 
   .menu-wrap{position:relative;}
   .dropdown{
-    position:absolute;bottom:44px;right:0;background:#1c1c1eee;border:1px solid rgba(255,255,255,.1);
-    border-radius:10px;padding:6px;display:none;min-width:110px;z-index:3;
+    position:absolute;bottom:48px;right:0;background:#1c1c1eee;border:1px solid rgba(255,255,255,.1);
+    border-radius:10px;padding:6px;display:none;min-width:120px;z-index:3;
     backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
   }
   .dropdown.open{display:block;}
   .dropdown button{
-    display:block;width:100%;text-align:left;padding:7px 10px;background:none;border:none;
+    display:block;width:100%;text-align:left;padding:8px 10px;background:none;border:none;
     color:var(--text-dim);font-size:13px;border-radius:6px;cursor:pointer;white-space:nowrap;
   }
   .dropdown button:hover{background:rgba(255,255,255,.08);color:var(--text);}
   .dropdown button.active{color:var(--accent);}
+  .dropdown .hint{padding:8px 10px;font-size:12px;color:var(--text-faint);white-space:normal;width:170px;}
 
   .spinner{
     position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
@@ -213,8 +268,6 @@
     max-width:80vw;overflow:hidden;text-overflow:ellipsis;
   }
   .status-label.show{display:block;}
-  .dropdown .hint{padding:8px 10px;font-size:12px;color:var(--text-faint);white-space:normal;width:170px;}
-  .dropdown button small{display:block;color:var(--text-faint);font-size:10.5px;font-weight:400;}
 
   .center-flash{
     position:absolute;top:50%;left:50%;width:60px;height:60px;z-index:1;
@@ -229,13 +282,14 @@
   }
 
   @media (max-width:640px){
-    .headerbar{padding:12px 16px;gap:10px;}
+    .headerbar{padding:12px 16px;gap:8px;}
     .brand{font-size:16px;}
     main{padding:20px 16px 60px;}
     .card{width:180px;}
-    .ui-top{padding:14px 14px;}
-    .ui-bottom{padding:6px 14px 16px;}
-    .volume input[type=range]{width:40px;}
+    .ui-top{padding:calc(12px + env(safe-area-inset-top)) 14px 12px;}
+    .ui-bottom{padding:6px 14px calc(16px + env(safe-area-inset-bottom));}
+    .icon-btn{width:36px;height:36px;}
+    .volume{display:none;}
     .time{font-size:11px;}
     .scrub-preview{display:none !important;}
   }
@@ -250,7 +304,17 @@
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-3.5-3.5"/></svg>
       <input id="search" type="search" placeholder="Buscar na sua biblioteca..." disabled>
     </div>
-    <button class="btn" id="openBtn">Abrir pasta</button>
+    <button class="btn" id="openBtn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg>
+      <span class="label">Abrir pasta</span>
+    </button>
+    <button class="btn" id="addLinkBtn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1-1"/></svg>
+      <span class="label">Adicionar link</span>
+    </button>
+    <button class="btn round" id="settingsBtn" aria-label="Configurações" title="Configurações">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
     <input type="file" id="fallbackInput" webkitdirectory multiple style="display:none">
   </div>
 </header>
@@ -259,9 +323,79 @@
   <div class="empty" id="emptyState">
     <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="6" width="20" height="14" rx="2"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
     <h1>Sua biblioteca está vazia</h1>
-    <p>Clique em <strong>Abrir pasta</strong> e selecione a pasta onde ficam seus vídeos extraídos (ex: downloads do uTorrent). Tudo é lido localmente — nada sai do seu computador.</p>
+    <p>Clique em <strong>Abrir pasta</strong> e selecione onde ficam seus vídeos (ex: downloads do uTorrent), ou use <strong>Adicionar link</strong> para tocar um link direto de vídeo. Tudo roda localmente — nada sai do seu computador.</p>
   </div>
 </main>
+
+<!-- add-link dialog -->
+<div class="dialog-overlay" id="linkDialogOverlay">
+  <div class="dialog">
+    <h2>Adicionar por link</h2>
+    <div class="field">
+      <label for="linkUrlInput">Link direto do arquivo de vídeo</label>
+      <input type="url" id="linkUrlInput" placeholder="https://exemplo.com/video.mp4">
+    </div>
+    <div class="field">
+      <label for="linkTitleInput">Título (opcional)</label>
+      <input type="text" id="linkTitleInput" placeholder="Deixe em branco para usar o nome do arquivo">
+    </div>
+    <div class="dialog-actions">
+      <button class="btn" id="linkCancelBtn">Cancelar</button>
+      <button class="btn primary" id="linkAddBtn">Adicionar</button>
+    </div>
+  </div>
+</div>
+
+<!-- settings dialog -->
+<div class="dialog-overlay" id="settingsDialogOverlay">
+  <div class="dialog">
+    <h2>Configurações</h2>
+
+    <p class="section-title">Legenda</p>
+    <div class="field">
+      <label for="subSizeSelect">Tamanho</label>
+      <select id="subSizeSelect">
+        <option value="16">Pequena</option>
+        <option value="20">Média</option>
+        <option value="26">Grande</option>
+        <option value="34">Enorme</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="subColorSelect">Cor do texto</label>
+      <select id="subColorSelect">
+        <option value="#ffffff">Branco</option>
+        <option value="#ffe066">Amarelo</option>
+        <option value="#7ee7ff">Ciano</option>
+        <option value="#8fff8f">Verde</option>
+      </select>
+    </div>
+    <div class="field-row">
+      <label for="subBgToggle">Fundo escuro atrás do texto</label>
+      <div class="switch"><input type="checkbox" id="subBgToggle" checked><span></span></div>
+    </div>
+
+    <hr>
+    <p class="section-title">Reprodução</p>
+    <div class="field">
+      <label for="skipSelect">Avançar / voltar</label>
+      <select id="skipSelect">
+        <option value="10">10 segundos</option>
+        <option value="15">15 segundos</option>
+        <option value="30">30 segundos</option>
+      </select>
+    </div>
+
+    <hr>
+    <p class="section-title">Biblioteca</p>
+    <button class="btn danger-ghost" id="forgetFolderBtn">Esquecer pasta salva</button>
+    <button class="btn danger-ghost" id="clearLinksBtn">Remover todos os links</button>
+
+    <div class="dialog-actions" style="margin-top:18px;">
+      <button class="btn primary" id="settingsCloseBtn" style="width:100%;">Concluído</button>
+    </div>
+  </div>
+</div>
 
 <div class="modal" id="modal">
   <div class="stage" id="stage">
@@ -273,7 +407,7 @@
     <div class="player-ui" id="playerUi">
       <div class="ui-top">
         <button class="icon-btn" id="closeBtn" aria-label="Fechar">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
         </button>
         <h3 id="modalTitle"></h3>
       </div>
@@ -292,13 +426,11 @@
 
         <div class="ui-controls">
           <button class="icon-btn" id="playBtn" aria-label="Play/Pausa"></button>
-          <button class="icon-btn" id="backBtn" aria-label="Voltar 10s">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
-            <span class="skip-label">10</span>
+          <button class="icon-btn" id="backBtn" aria-label="Voltar" title="Voltar 10s">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor"><path d="M11 6L4 12l7 6V6z"/><path d="M20 6l-7 6 7 6V6z"/></svg>
           </button>
-          <button class="icon-btn" id="fwdBtn" aria-label="Avançar 10s">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg>
-            <span class="skip-label">10</span>
+          <button class="icon-btn" id="fwdBtn" aria-label="Avançar" title="Avançar 10s">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor"><path d="M13 6l7 6-7 6V6z"/><path d="M4 6l7 6-7 6V6z"/></svg>
           </button>
           <span class="time" id="curTime">0:00</span>
           <span style="color:var(--text-faint);font-size:12px;">/</span>
@@ -313,13 +445,13 @@
 
           <div class="menu-wrap" id="audioWrap">
             <button class="icon-btn" id="audioBtn" aria-label="Áudio / idioma">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18"/><path d="M12 3a15 15 0 0 0 0 18"/></svg>
+              <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18"/><path d="M12 3a15 15 0 0 0 0 18"/></svg>
             </button>
             <div class="dropdown" id="audioMenu"></div>
           </div>
 
           <div class="menu-wrap">
-            <button class="icon-btn" id="speedBtn" style="font-size:12px;font-weight:600;width:auto;padding:0 8px;">1x</button>
+            <button class="icon-btn" id="speedBtn" style="font-size:12px;font-weight:600;width:auto;padding:0 12px;border-radius:20px;">1x</button>
             <div class="dropdown" id="speedMenu"></div>
           </div>
 
@@ -329,7 +461,7 @@
           </div>
 
           <button class="icon-btn" id="fsBtn" aria-label="Tela cheia">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
           </button>
         </div>
       </div>
@@ -362,20 +494,23 @@ function guessLangLabel(code){
   if (!c) return null;
   return LANG_NAMES[c] || LANG_NAMES[c.split(/[-_]/)[0]] || code.toUpperCase();
 }
-// codecs an HTML5 <video> can decode natively without ffmpeg re-encoding
 const NATIVE_AUDIO_CODECS = ['aac','mp3','opus','vorbis'];
 
 const emptyState = document.getElementById('emptyState');
 const mainEl = document.getElementById('main');
 const searchInput = document.getElementById('search');
 const openBtn = document.getElementById('openBtn');
+const addLinkBtn = document.getElementById('addLinkBtn');
+const settingsBtn = document.getElementById('settingsBtn');
 const fallbackInput = document.getElementById('fallbackInput');
 const modal = document.getElementById('modal');
 const modalTitle = document.getElementById('modalTitle');
 const closeBtn = document.getElementById('closeBtn');
 const player = document.getElementById('player');
 
-let library = [];
+let scannedLibrary = [];  // from an opened folder
+let linkLibrary = [];     // from "Adicionar link"
+let library = [];         // scannedLibrary + linkLibrary, recomputed on change
 let currentEntry = null;
 let saveTimer = null;
 
@@ -402,6 +537,15 @@ async function idbSet(key, val){
   return new Promise((resolve, reject) => {
     const tx = db.transaction('handles', 'readwrite');
     tx.objectStore('handles').put(val, key);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+async function idbDelete(key){
+  const db = await idbOpen();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('handles', 'readwrite');
+    tx.objectStore('handles').delete(key);
     tx.oncomplete = () => resolve();
     tx.onerror = () => reject(tx.error);
   });
@@ -455,6 +599,9 @@ async function scanFSHandle(dirHandle){
     folder: v.folder,
     dirPath: v.dirPath,
     title: cleanTitle(v.name),
+    isRemote: false,
+    canDelete: typeof v.handle.remove === 'function',
+    handle: v.handle,
     getFile: () => v.handle.getFile(),
     subtitles: matchSubtitles(v, subsByDir),
     thumb: null,
@@ -484,6 +631,8 @@ function scanFileList(fileList){
     folder: v.folder,
     dirPath: v.dirPath,
     title: cleanTitle(v.name),
+    isRemote: false,
+    canDelete: false, // plain File objects from <input> carry no write access
     getFile: async () => v.file,
     subtitles: matchSubtitles(v, subsByDir),
     thumb: null,
@@ -491,12 +640,59 @@ function scanFileList(fileList){
   }));
 }
 
-// ---------- progress / duration helpers ----------
-function progressKeyFor(entry, size){
-  return 'cinelocal:progress:' + entry.folder + '/' + entry.name + ':' + size;
+// ---------- links (remote entries) ----------
+function loadLinks(){
+  try { return JSON.parse(localStorage.getItem('cinelocal:links') || '[]'); }
+  catch(e){ return []; }
 }
-function readProgress(entry, size){
-  try { return JSON.parse(localStorage.getItem(progressKeyFor(entry, size)) || 'null'); }
+function saveLinks(){
+  const plain = linkLibrary.map(e => ({ url: e.url, title: e.rawTitle || '' }));
+  try { localStorage.setItem('cinelocal:links', JSON.stringify(plain)); } catch(e){}
+}
+function makeLinkEntry(url, rawTitle){
+  let derived;
+  try { derived = decodeURIComponent(new URL(url).pathname.split('/').filter(Boolean).pop() || url); }
+  catch(e){ derived = url; }
+  const name = rawTitle || derived;
+  return {
+    name,
+    rawTitle,
+    folder: 'Links',
+    dirPath: '',
+    title: cleanTitle(rawTitle || derived),
+    isRemote: true,
+    canDelete: true,
+    url,
+    subtitles: [],
+    thumb: null,
+    duration: null
+  };
+}
+function addLinkEntry(url, title){
+  const entry = makeLinkEntry(url, title.trim());
+  linkLibrary.push(entry);
+  saveLinks();
+  combineLibrary();
+}
+function combineLibrary(){
+  library = scannedLibrary.concat(linkLibrary);
+  renderLibrary();
+}
+
+// unified way to get a playable URL for either a local file or a remote link
+async function mediaURLFor(entry){
+  if (entry.isRemote) return { url: entry.url, revoke: null, sizeKey: entry.url };
+  const file = await entry.getFile();
+  const url = URL.createObjectURL(file);
+  return { url, revoke: url, sizeKey: file.size, file };
+}
+
+// ---------- progress / duration helpers ----------
+function progressKeyFor(entry, sizeKey){
+  return 'cinelocal:progress:' + entry.folder + '/' + entry.name + ':' + sizeKey;
+}
+function readProgress(entry, sizeKey){
+  try { return JSON.parse(localStorage.getItem(progressKeyFor(entry, sizeKey)) || 'null'); }
   catch(e){ return null; }
 }
 function formatDuration(sec){
@@ -507,23 +703,48 @@ function formatDuration(sec){
   return `${m}min`;
 }
 
+// ---------- delete ----------
+async function deleteEntry(entry){
+  const ok = window.confirm(`Excluir "${entry.title}"? ${entry.isRemote ? 'Isso só remove o link da sua biblioteca.' : 'Isso apaga o arquivo do seu computador.'}`);
+  if (!ok) return;
+  if (currentEntry === entry) closePlayer();
+
+  if (entry.isRemote){
+    linkLibrary = linkLibrary.filter(e => e !== entry);
+    saveLinks();
+    combineLibrary();
+    return;
+  }
+  if (!entry.canDelete){
+    window.alert('Não é possível excluir este arquivo neste modo. Reabra a pasta pelo botão "Abrir pasta" em Chrome ou Edge para poder excluir.');
+    return;
+  }
+  try {
+    await entry.handle.remove();
+    scannedLibrary = scannedLibrary.filter(e => e !== entry);
+    combineLibrary();
+  } catch(e){
+    window.alert('Não foi possível excluir o arquivo. Ele pode estar aberto em outro programa ou você não tem permissão de escrita nessa pasta.');
+  }
+}
+
 // ---------- cards ----------
 function makeCard(entry){
   const card = document.createElement('div');
   card.className = 'card';
   card.tabIndex = 0;
 
+  const del = document.createElement('button');
+  del.className = 'card-del';
+  del.title = 'Excluir';
+  del.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>';
+  del.addEventListener('click', e => { e.stopPropagation(); deleteEntry(entry); });
+  card.appendChild(del);
+
   const thumb = document.createElement('div');
   thumb.className = 'thumb placeholder';
   thumb.textContent = '🎬';
   card.appendChild(thumb);
-
-  if (entry._badge) {
-    const badge = document.createElement('div');
-    badge.className = 'badge';
-    badge.textContent = entry._badge;
-    card.appendChild(badge);
-  }
 
   const meta = document.createElement('div');
   meta.className = 'meta';
@@ -573,10 +794,10 @@ function makeCard(entry){
 async function ensureThumbnail(entry){
   if (entry.thumb || entry._thumbFailed) return;
   try {
-    const file = await entry.getFile();
-    const url = URL.createObjectURL(file);
+    const { url, revoke } = await mediaURLFor(entry);
     await new Promise((resolve) => {
       const v = document.createElement('video');
+      v.crossOrigin = 'anonymous';
       v.muted = true; v.playsInline = true; v.preload = 'metadata';
       v.src = url;
       let done = false;
@@ -593,10 +814,10 @@ async function ensureThumbnail(entry){
           ctx.drawImage(v, 0, 0, canvas.width, canvas.height);
           entry.thumb = canvas.toDataURL('image/jpeg', 0.7);
         } catch(e){ entry._thumbFailed = true; }
-        URL.revokeObjectURL(url);
+        if (revoke) URL.revokeObjectURL(revoke);
         finish();
       });
-      v.addEventListener('error', () => { entry._thumbFailed = true; URL.revokeObjectURL(url); finish(); });
+      v.addEventListener('error', () => { entry._thumbFailed = true; if (revoke) URL.revokeObjectURL(revoke); finish(); });
       setTimeout(finish, 6000);
     });
   } catch(e){ entry._thumbFailed = true; }
@@ -626,11 +847,12 @@ function pumpThumbQueue(){
 async function ensureFilmstrip(entry){
   if (entry.filmstrip || entry._filmstripBuilding) return;
   entry._filmstripBuilding = true;
-  let url = null;
+  let revokeUrl = null;
   try {
-    const file = await entry.getFile();
-    url = URL.createObjectURL(file);
+    const { url, revoke } = await mediaURLFor(entry);
+    revokeUrl = revoke;
     const v = document.createElement('video');
+    v.crossOrigin = 'anonymous';
     v.muted = true; v.preload = 'auto'; v.src = url;
     await new Promise(res => {
       v.addEventListener('loadedmetadata', res, { once: true });
@@ -664,7 +886,7 @@ async function ensureFilmstrip(entry){
     }
     if (frames.length) entry.filmstrip = frames;
   } catch(e){}
-  if (url) URL.revokeObjectURL(url);
+  if (revokeUrl) URL.revokeObjectURL(revokeUrl);
   entry._filmstripBuilding = false;
 }
 
@@ -757,23 +979,22 @@ const PAUSE_SVG = '<svg viewBox="0 0 24 24" width="18" height="18" fill="current
 const VOL_SVG = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg>';
 const MUTE_SVG = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>';
 const SPEEDS = [0.5, 0.75, 1, 1.25, 1.5, 2];
+let SKIP_SECONDS = 10;
 
-// Subtitle files from torrents are very often saved as Windows-1252/ISO-8859-1,
-// not UTF-8. Decoding those as UTF-8 turns accented letters (ã, ç, é...) into
-// the "missing glyph" mark (a diamond/triangle with a "?"). Try strict UTF-8
-// first; if the bytes aren't valid UTF-8, fall back to Windows-1252, which is
-// what almost all of these files actually use.
+function srtToVtt(text){
+  let out = text.replace(/\r+/g, '');
+  out = out.replace(/(\d{2}:\d{2}:\d{2}),(\d{3})/g, '$1.$2');
+  return 'WEBVTT\n\n' + out;
+}
+// Subtitle files from torrents are very often Windows-1252/ISO-8859-1, not
+// UTF-8. Decoding those as UTF-8 turns accented letters into a broken-glyph
+// mark. Try strict UTF-8 first; fall back to Windows-1252 if that fails.
 function decodeSubtitleBuffer(buf){
   try { return new TextDecoder('utf-8', { fatal: true }).decode(buf); }
   catch(e){
     try { return new TextDecoder('windows-1252').decode(buf); }
     catch(e2){ return new TextDecoder('utf-8').decode(buf); }
   }
-}
-function srtToVtt(text){
-  let out = text.replace(/\r+/g, '');
-  out = out.replace(/(\d{2}:\d{2}:\d{2}),(\d{3})/g, '$1.$2');
-  return 'WEBVTT\n\n' + out;
 }
 function formatTime(t){
   if (!isFinite(t) || t < 0) t = 0;
@@ -784,8 +1005,6 @@ function formatTime(t){
 }
 
 async function openPlayer(entry){
-  // free the previous video's data from ffmpeg's in-memory filesystem before
-  // loading a new one, so memory doesn't pile up across the session
   if (ffmpegInstance && currentEntry && currentEntry !== entry && currentEntry._ffInputName){
     ffmpegInstance.deleteFile(currentEntry._ffInputName).catch(() => {});
     currentEntry._ffInputName = null;
@@ -794,12 +1013,12 @@ async function openPlayer(entry){
   }
 
   currentEntry = entry;
-  const file = await entry.getFile();
-  const url = URL.createObjectURL(file);
+  const media = await mediaURLFor(entry);
   modalTitle.textContent = entry.title;
 
   player.querySelectorAll('track').forEach(t => t.remove());
-  player.src = url;
+  player.crossOrigin = entry.isRemote ? 'anonymous' : null;
+  player.src = media.url;
   player.playbackRate = 1;
   speedBtn.textContent = '1x';
   playedBar.style.width = '0%';
@@ -809,7 +1028,7 @@ async function openPlayer(entry){
   durTimeEl.textContent = '0:00';
   audioMenu.innerHTML = '';
 
-  const progress = readProgress(entry, file.size);
+  const progress = readProgress(entry, media.sizeKey);
   player.addEventListener('loadedmetadata', function onMeta(){
     player.removeEventListener('loadedmetadata', onMeta);
     durTimeEl.textContent = formatTime(player.duration);
@@ -819,7 +1038,6 @@ async function openPlayer(entry){
     player.play().catch(() => {});
   });
 
-  // subtitles: load every matching subtitle file as its own track, default to the first
   if (entry.subtitles && entry.subtitles.length){
     for (const sub of entry.subtitles){
       try {
@@ -851,9 +1069,9 @@ async function openPlayer(entry){
   scheduleHide();
 
   clearInterval(saveTimer);
-  saveTimer = setInterval(() => saveProgress(entry, file.size), 4000);
+  saveTimer = setInterval(() => saveProgress(entry, media.sizeKey), 4000);
 
-  ensureFilmstrip(entry);
+  if (!entry.isRemote) ensureFilmstrip(entry);
 }
 
 function buildSubtitleMenu(entry){
@@ -867,6 +1085,7 @@ function buildSubtitleMenu(entry){
     const tt = player.textTracks;
     for (let i = 0; i < tt.length; i++) tt[i].mode = 'hidden';
     markActiveIn(ccMenu, offBtn);
+    ccBtn.classList.remove('active-cc');
     ccMenu.classList.remove('open');
   });
   ccMenu.appendChild(offBtn);
@@ -878,11 +1097,12 @@ function buildSubtitleMenu(entry){
       const tt = player.textTracks;
       for (let j = 0; j < tt.length; j++) tt[j].mode = j === i ? 'showing' : 'hidden';
       markActiveIn(ccMenu, b);
+      ccBtn.classList.add('active-cc');
       ccMenu.classList.remove('open');
     });
     ccMenu.appendChild(b);
   });
-  if (entry.subtitles.length) markActiveIn(ccMenu, ccMenu.children[1]);
+  if (entry.subtitles.length){ markActiveIn(ccMenu, ccMenu.children[1]); ccBtn.classList.add('active-cc'); }
 }
 function markActiveIn(menu, activeBtn){
   Array.from(menu.children).forEach(b => b.classList.toggle('active', b === activeBtn));
@@ -900,9 +1120,8 @@ function markActiveIn(menu, activeBtn){
 //
 // This is genuinely heavy: the first time you open the audio menu it
 // downloads a ~30 MB WebAssembly build of ffmpeg (once per browser session),
-// and converting a track re-reads the whole video file into memory, so it
-// can take a while and use a lot of RAM on very large (multi-GB) files.
-// Nothing ever leaves your computer — it all happens locally in the tab.
+// and converting a track re-reads the whole video file into memory. Not
+// available for videos added by link. Nothing ever leaves your computer.
 // ==========================================================================
 const FFMPEG_BASE = 'https://unpkg.com/@ffmpeg/ffmpeg@0.12.6/dist/umd';
 const FFMPEG_CORE_BASE = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd';
@@ -922,15 +1141,11 @@ async function toBlobURLPatched(url, mimeType, patcher){
   if (patcher) body = patcher(body);
   return URL.createObjectURL(new Blob([body], { type: mimeType }));
 }
-
 async function loadFFmpeg(onStatus){
   if (ffmpegInstance) return ffmpegInstance;
   if (ffmpegLoadingPromise) return ffmpegLoadingPromise;
   ffmpegLoadingPromise = (async () => {
     onStatus && onStatus('Baixando conversor de áudio (~30 MB, só na primeira vez)...');
-    // the stock UMD bundle tries to build its worker URL relative to its own
-    // script location, which breaks when loaded from a blob: URL — patch that
-    // one line so we can hand it a real worker URL instead
     const patchedUrl = await toBlobURLPatched(
       `${FFMPEG_BASE}/ffmpeg.js`, 'text/javascript',
       js => js.replace('new URL(e.p+e.u(814),e.b)', 'r.workerLoadURL')
@@ -953,10 +1168,7 @@ async function loadFFmpeg(onStatus){
   try { return await ffmpegLoadingPromise; }
   catch(e){ ffmpegLoadingPromise = null; throw e; }
 }
-
-function ffInputNameFor(entry){
-  return 'in_' + entry.name.replace(/[^a-zA-Z0-9.]/g, '_');
-}
+function ffInputNameFor(entry){ return 'in_' + entry.name.replace(/[^a-zA-Z0-9.]/g, '_'); }
 
 async function probeAudioTracks(entry, onStatus){
   if (entry._audioTracks) return entry._audioTracks;
@@ -971,7 +1183,7 @@ async function probeAudioTracks(entry, onStatus){
   }
   onStatus && onStatus('Analisando faixas de áudio...');
   ffmpegLogBuffer = [];
-  try { await ff.exec(['-i', inputName]); } catch(e){ /* -i alone always "fails": no output given */ }
+  try { await ff.exec(['-i', inputName]); } catch(e){}
   const logs = ffmpegLogBuffer.slice();
   const tracks = [];
   logs.forEach(line => {
@@ -990,7 +1202,6 @@ async function probeAudioTracks(entry, onStatus){
   entry._activeAudioTrack = 0;
   return tracks;
 }
-
 async function convertAudioTrack(entry, trackIndex){
   const ff = await loadFFmpeg(msg => { statusLabel.textContent = msg.slice(0, 70); });
   const track = entry._audioTracks[trackIndex];
@@ -999,26 +1210,17 @@ async function convertAudioTrack(entry, trackIndex){
   const baseArgs = ['-i', entry._ffInputName, '-map', '0:v:0', '-map', `0:a:${trackIndex}`];
   ffmpegStatusCb = msg => { statusLabel.textContent = 'Convertendo: ' + msg.slice(0, 55); };
   try {
-    if (canCopy){
-      await ff.exec([...baseArgs, '-c', 'copy', '-movflags', '+faststart', outputName]);
-    } else {
-      await ff.exec([...baseArgs, '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', '-movflags', '+faststart', outputName]);
-    }
+    if (canCopy) await ff.exec([...baseArgs, '-c', 'copy', '-movflags', '+faststart', outputName]);
+    else await ff.exec([...baseArgs, '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', '-movflags', '+faststart', outputName]);
   } catch(e){
-    if (canCopy){
-      // container didn't like a raw copy of this track — fall back to re-encoding it
-      await ff.exec([...baseArgs, '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', '-movflags', '+faststart', outputName]);
-    } else {
-      ffmpegStatusCb = null;
-      throw e;
-    }
+    if (canCopy) await ff.exec([...baseArgs, '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', '-movflags', '+faststart', outputName]);
+    else { ffmpegStatusCb = null; throw e; }
   }
   ffmpegStatusCb = null;
   const data = await ff.readFile(outputName);
   ff.deleteFile(outputName).catch(() => {});
   return new Blob([data.buffer], { type: 'video/mp4' });
 }
-
 function renderAudioMenu(entry){
   const tracks = entry._audioTracks || [];
   audioMenu.innerHTML = '';
@@ -1037,14 +1239,16 @@ function renderAudioMenu(entry){
     audioMenu.appendChild(b);
   });
 }
-
 async function ensureAudioMenu(entry){
+  if (!entry) return;
+  if (entry.isRemote){
+    audioMenu.innerHTML = '<div class="hint">Não disponível para vídeos por link.</div>';
+    return;
+  }
   if (entry._audioTracks){ renderAudioMenu(entry); return; }
   audioMenu.innerHTML = '<div class="hint">Analisando faixas de áudio...</div>';
   try {
-    await probeAudioTracks(entry, msg => {
-      audioMenu.innerHTML = `<div class="hint">${msg.slice(0, 90)}</div>`;
-    });
+    await probeAudioTracks(entry, msg => { audioMenu.innerHTML = `<div class="hint">${msg.slice(0, 90)}</div>`; });
   } catch(e){
     audioMenu.innerHTML = '<div class="hint">Não foi possível analisar o áudio deste vídeo.</div>';
     return;
@@ -1052,7 +1256,6 @@ async function ensureAudioMenu(entry){
   if (currentEntry !== entry) return;
   renderAudioMenu(entry);
 }
-
 async function selectAudioTrack(entry, i){
   if (i === (entry._activeAudioTrack || 0)){ audioMenu.classList.remove('open'); return; }
   audioMenu.classList.remove('open');
@@ -1063,7 +1266,7 @@ async function selectAudioTrack(entry, i){
   statusLabel.classList.add('show');
   try {
     const blob = await convertAudioTrack(entry, i);
-    if (currentEntry !== entry) return; // user closed/changed video mid-conversion
+    if (currentEntry !== entry) return;
     entry._activeAudioTrack = i;
     const oldSrc = player.src;
     const newUrl = URL.createObjectURL(blob);
@@ -1085,16 +1288,16 @@ async function selectAudioTrack(entry, i){
   statusLabel.classList.remove('show');
 }
 
-function saveProgress(entry, size){
+function saveProgress(entry, sizeKey){
   if (!player.duration) return;
   const data = { time: player.currentTime, duration: player.duration, updatedAt: Date.now() };
   entry._lastProgress = data;
-  try { localStorage.setItem(progressKeyFor(entry, size), JSON.stringify(data)); } catch(e){}
+  try { localStorage.setItem(progressKeyFor(entry, sizeKey), JSON.stringify(data)); } catch(e){}
 }
 async function entryFileSizeThenSave(){
   try {
-    const f = await currentEntry.getFile();
-    saveProgress(currentEntry, f.size);
+    if (currentEntry.isRemote) saveProgress(currentEntry, currentEntry.url);
+    else { const f = await currentEntry.getFile(); saveProgress(currentEntry, f.size); }
   } catch(e){}
 }
 function closePlayer(){
@@ -1109,7 +1312,7 @@ function closePlayer(){
   const oldSrc = player.src;
   player.removeAttribute('src');
   player.load();
-  if (oldSrc) URL.revokeObjectURL(oldSrc);
+  if (oldSrc && oldSrc.startsWith('blob:')) URL.revokeObjectURL(oldSrc);
   modal.classList.remove('open');
   document.body.style.overflow = '';
   currentEntry = null;
@@ -1152,19 +1355,15 @@ player.addEventListener('progress', updateBuffered);
 player.addEventListener('durationchange', () => { durTimeEl.textContent = formatTime(player.duration); updateBuffered(); });
 
 playBtn.addEventListener('click', togglePlay);
-
-// click anywhere on the video area (not on a control) toggles play/pause
 function isControlTarget(el){ return el.closest('.icon-btn, .scrub, .dropdown, input, button'); }
 stage.addEventListener('click', e => {
   if (isControlTarget(e.target)) return;
   togglePlay();
   flashCenter(player.paused ? PLAY_SVG : PAUSE_SVG);
 });
+backBtn.addEventListener('click', () => { player.currentTime = Math.max(0, player.currentTime - SKIP_SECONDS); });
+fwdBtn.addEventListener('click', () => { player.currentTime = Math.min(player.duration || 1e9, player.currentTime + SKIP_SECONDS); });
 
-backBtn.addEventListener('click', () => { player.currentTime = Math.max(0, player.currentTime - 10); });
-fwdBtn.addEventListener('click', () => { player.currentTime = Math.min(player.duration || 1e9, player.currentTime + 10); });
-
-// ---- dropdown menus (speed / subtitles / audio) ----
 function toggleMenu(menu){
   const wasOpen = menu.classList.contains('open');
   document.querySelectorAll('.dropdown.open').forEach(d => d.classList.remove('open'));
@@ -1197,7 +1396,6 @@ audioBtn.addEventListener('click', async e => {
 });
 document.addEventListener('click', () => document.querySelectorAll('.dropdown.open').forEach(d => d.classList.remove('open')));
 
-// ---- volume ----
 (() => {
   const savedVol = parseFloat(localStorage.getItem('cinelocal:volume') || '1');
   player.volume = isFinite(savedVol) ? Math.min(1, Math.max(0, savedVol)) : 1;
@@ -1210,14 +1408,11 @@ volSlider.addEventListener('input', () => {
   updateMuteIcon();
 });
 muteBtn.addEventListener('click', () => { player.muted = !player.muted; updateMuteIcon(); });
-
-// ---- fullscreen ----
 fsBtn.addEventListener('click', () => {
   if (!document.fullscreenElement) stage.requestFullscreen?.();
   else document.exitFullscreen?.();
 });
 
-// ---- scrub bar: preview-only while dragging, single real seek on release ----
 let dragging = false;
 let dragTime = 0;
 function timeAtClientX(clientX){
@@ -1290,7 +1485,6 @@ scrub.addEventListener('mousemove', e => {
 });
 scrub.addEventListener('mouseleave', () => { if (!dragging) scrubPreview.style.display = 'none'; });
 
-// ---- autohide controls while playing ----
 let hideTimer = null;
 function showUi(){ stage.classList.remove('idle'); }
 function scheduleHide(){
@@ -1306,14 +1500,15 @@ stage.addEventListener('touchstart', () => { showUi(); scheduleHide(); });
 playerUi.addEventListener('mouseenter', () => clearTimeout(hideTimer));
 playerUi.addEventListener('mouseleave', () => scheduleHide());
 
-// ---- keyboard shortcuts ----
 document.addEventListener('keydown', e => {
+  if (settingsOverlay.classList.contains('open')){ if (e.key === 'Escape') closeDialog(settingsOverlay); return; }
+  if (linkOverlay.classList.contains('open')){ if (e.key === 'Escape') closeDialog(linkOverlay); return; }
   if (!modal.classList.contains('open')) return;
   if (e.key === 'Escape'){ closePlayer(); return; }
   switch (e.key){
     case ' ': case 'k': e.preventDefault(); togglePlay(); flashCenter(player.paused ? PLAY_SVG : PAUSE_SVG); break;
-    case 'ArrowRight': player.currentTime = Math.min(player.duration || 1e9, player.currentTime + 10); break;
-    case 'ArrowLeft': player.currentTime = Math.max(0, player.currentTime - 10); break;
+    case 'ArrowRight': player.currentTime = Math.min(player.duration || 1e9, player.currentTime + SKIP_SECONDS); break;
+    case 'ArrowLeft': player.currentTime = Math.max(0, player.currentTime - SKIP_SECONDS); break;
     case 'ArrowUp': e.preventDefault(); player.volume = Math.min(1, player.volume + 0.1); volSlider.value = player.volume; player.muted = false; updateMuteIcon(); break;
     case 'ArrowDown': e.preventDefault(); player.volume = Math.max(0, player.volume - 0.1); volSlider.value = player.volume; updateMuteIcon(); break;
     case 'f': fsBtn.click(); break;
@@ -1324,20 +1519,107 @@ document.addEventListener('keydown', e => {
 });
 closeBtn.addEventListener('click', closePlayer);
 
-// ---------- opening a folder ----------
-async function scanAndRender(entries){
-  library = entries;
-  renderLibrary();
+// ==========================================================================
+// settings
+// ==========================================================================
+const settingsOverlay = document.getElementById('settingsDialogOverlay');
+const subSizeSelect = document.getElementById('subSizeSelect');
+const subColorSelect = document.getElementById('subColorSelect');
+const subBgToggle = document.getElementById('subBgToggle');
+const skipSelect = document.getElementById('skipSelect');
+const forgetFolderBtn = document.getElementById('forgetFolderBtn');
+const clearLinksBtn = document.getElementById('clearLinksBtn');
+
+function openDialog(el){ el.classList.add('open'); }
+function closeDialog(el){ el.classList.remove('open'); }
+
+function loadSettings(){
+  try { return Object.assign({ subSize: 20, subColor: '#ffffff', subBg: true, skip: 10 }, JSON.parse(localStorage.getItem('cinelocal:settings') || '{}')); }
+  catch(e){ return { subSize: 20, subColor: '#ffffff', subBg: true, skip: 10 }; }
 }
+function saveSettings(s){ try { localStorage.setItem('cinelocal:settings', JSON.stringify(s)); } catch(e){} }
+function applySettings(s){
+  document.documentElement.style.setProperty('--sub-size', s.subSize + 'px');
+  document.documentElement.style.setProperty('--sub-color', s.subColor);
+  document.documentElement.style.setProperty('--sub-bg', s.subBg ? 'rgba(0,0,0,.65)' : 'transparent');
+  SKIP_SECONDS = s.skip;
+  backBtn.title = `Voltar ${s.skip}s`;
+  fwdBtn.title = `Avançar ${s.skip}s`;
+}
+let settings = loadSettings();
+applySettings(settings);
+subSizeSelect.value = settings.subSize;
+subColorSelect.value = settings.subColor;
+subBgToggle.checked = settings.subBg;
+skipSelect.value = settings.skip;
+
+function onSettingsChange(){
+  settings = {
+    subSize: parseInt(subSizeSelect.value, 10),
+    subColor: subColorSelect.value,
+    subBg: subBgToggle.checked,
+    skip: parseInt(skipSelect.value, 10)
+  };
+  saveSettings(settings);
+  applySettings(settings);
+}
+subSizeSelect.addEventListener('change', onSettingsChange);
+subColorSelect.addEventListener('change', onSettingsChange);
+subBgToggle.addEventListener('change', onSettingsChange);
+skipSelect.addEventListener('change', onSettingsChange);
+
+settingsBtn.addEventListener('click', () => openDialog(settingsOverlay));
+document.getElementById('settingsCloseBtn').addEventListener('click', () => closeDialog(settingsOverlay));
+settingsOverlay.addEventListener('click', e => { if (e.target === settingsOverlay) closeDialog(settingsOverlay); });
+
+forgetFolderBtn.addEventListener('click', async () => {
+  if (!window.confirm('Esquecer a pasta salva? Você vai precisar escolher a pasta de novo na próxima vez.')) return;
+  try { await idbDelete('lastDir'); } catch(e){}
+  window.location.reload();
+});
+clearLinksBtn.addEventListener('click', () => {
+  if (!linkLibrary.length){ window.alert('Você não tem links salvos.'); return; }
+  if (!window.confirm('Remover todos os links da sua biblioteca?')) return;
+  linkLibrary = [];
+  saveLinks();
+  combineLibrary();
+});
+
+// ==========================================================================
+// add-link dialog
+// ==========================================================================
+const linkOverlay = document.getElementById('linkDialogOverlay');
+const linkUrlInput = document.getElementById('linkUrlInput');
+const linkTitleInput = document.getElementById('linkTitleInput');
+
+addLinkBtn.addEventListener('click', () => {
+  linkUrlInput.value = '';
+  linkTitleInput.value = '';
+  openDialog(linkOverlay);
+  setTimeout(() => linkUrlInput.focus(), 50);
+});
+document.getElementById('linkCancelBtn').addEventListener('click', () => closeDialog(linkOverlay));
+linkOverlay.addEventListener('click', e => { if (e.target === linkOverlay) closeDialog(linkOverlay); });
+document.getElementById('linkAddBtn').addEventListener('click', () => {
+  let url = linkUrlInput.value.trim();
+  if (!url) return;
+  if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+  try { new URL(url); } catch(e){ window.alert('Esse link não parece válido.'); return; }
+  addLinkEntry(url, linkTitleInput.value);
+  closeDialog(linkOverlay);
+});
+linkUrlInput.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('linkAddBtn').click(); });
+
+// ---------- opening a folder ----------
 openBtn.addEventListener('click', async () => {
   if (hasFS){
     try {
       const dirHandle = await window.showDirectoryPicker();
       idbSet('lastDir', dirHandle).catch(()=>{});
-      openBtn.textContent = 'Lendo pasta...';
-      const entries = await scanFSHandle(dirHandle);
-      openBtn.textContent = 'Abrir pasta';
-      scanAndRender(entries);
+      openBtn.querySelector('.label').textContent = 'Lendo pasta...';
+      scannedLibrary = await scanFSHandle(dirHandle);
+      openBtn.querySelector('.label').textContent = 'Abrir pasta';
+      combineLibrary();
     } catch(e){
       if (e.name !== 'AbortError') console.error(e);
     }
@@ -1347,11 +1629,14 @@ openBtn.addEventListener('click', async () => {
 });
 fallbackInput.addEventListener('change', () => {
   if (!fallbackInput.files.length) return;
-  scanAndRender(scanFileList(fallbackInput.files));
+  scannedLibrary = scanFileList(fallbackInput.files);
+  combineLibrary();
 });
 searchInput.addEventListener('input', () => render());
 
-// try to restore last-used folder (only possible with File System Access API)
+linkLibrary = loadLinks().map(l => makeLinkEntry(l.url, l.title));
+if (linkLibrary.length) combineLibrary();
+
 (async () => {
   if (!hasFS) return;
   try {
@@ -1359,9 +1644,10 @@ searchInput.addEventListener('input', () => render());
     if (!dirHandle) return;
     const perm = await dirHandle.queryPermission({ mode: 'read' });
     if (perm === 'granted'){
-      scanAndRender(await scanFSHandle(dirHandle));
+      scannedLibrary = await scanFSHandle(dirHandle);
+      combineLibrary();
     } else {
-      openBtn.textContent = 'Reabrir "' + dirHandle.name + '"';
+      openBtn.querySelector('.label').textContent = 'Reabrir "' + dirHandle.name + '"';
       openBtn.onclick = async () => {
         const p = await dirHandle.requestPermission({ mode: 'read' });
         if (p === 'granted') location.reload();
