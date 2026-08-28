@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
 <title>Sonora</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23fa233b'/%3E%3Cstop offset='1' stop-color='%23ff6b8b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3Cpath d='M40 30 L68 24 V60' stroke='white' stroke-width='6' fill='none' stroke-linecap='round'/%3E%3Ccircle cx='36' cy='64' r='10' fill='white'/%3E%3Ccircle cx='64' cy='58' r='10' fill='white'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%236e6e73'/%3E%3Cstop offset='1' stop-color='%23aeaeb2'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3Cpath d='M40 30 L68 24 V60' stroke='white' stroke-width='6' fill='none' stroke-linecap='round'/%3E%3Ccircle cx='36' cy='64' r='10' fill='white'/%3E%3Ccircle cx='64' cy='58' r='10' fill='white'/%3E%3C/svg%3E">
 <style>
 /* ============================================================
    SONORA — design inspirado no Apple Music, com tipografia do
@@ -22,10 +22,8 @@
   --text: #f5f5f7;
   --text-secondary: rgba(245,245,247,0.62);
   --text-tertiary: rgba(245,245,247,0.38);
-  --accent-1: #fa233b;
-  --accent-2: #ff6b8b;
-  --accent-grad: linear-gradient(135deg, var(--accent-1), var(--accent-2));
-  --dynamic: 250,35,59; /* r,g,b — atualizado via JS a partir da capa */
+  --dynamic: 142,142,147; /* r,g,b — cinza iOS por padrão; atualizado via JS a partir da capa quando toca */
+  --accent-grad: rgb(var(--dynamic));
   --radius-sm: 8px;
   --radius-md: 14px;
   --radius-lg: 22px;
@@ -92,7 +90,7 @@ a{color:inherit;}
   width:30px;height:30px;border-radius:9px;
   background:var(--accent-grad);
   display:flex;align-items:center;justify-content:center;
-  box-shadow:0 4px 14px rgba(250,35,59,0.35);
+  box-shadow:0 4px 14px rgba(var(--dynamic),0.35);
   flex:none;
 }
 .brand-mark svg{width:16px;height:16px;}
@@ -212,7 +210,7 @@ a{color:inherit;}
   white-space:nowrap;
 }
 .btn:active{transform:scale(0.96);}
-.btn-primary{background:var(--accent-grad);color:#fff;box-shadow:0 6px 16px rgba(250,35,59,0.3);}
+.btn-primary{background:var(--accent-grad);color:#fff;box-shadow:0 6px 16px rgba(var(--dynamic),0.3);}
 .btn-primary:hover{filter:brightness(1.08);}
 .btn-secondary{background:var(--panel-strong);color:var(--text);}
 .btn-secondary:hover{background:rgba(255,255,255,0.14);}
@@ -359,7 +357,7 @@ a{color:inherit;}
 .play-fab{
   width:56px;height:56px;border-radius:50%;background:var(--accent-grad);color:#fff;
   border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;
-  box-shadow:0 10px 24px rgba(250,35,59,0.35);flex:none;
+  box-shadow:0 10px 24px rgba(var(--dynamic),0.35);flex:none;
 }
 .play-fab svg{width:22px;height:22px;margin-left:2px;}
 .play-fab:active{transform:scale(0.95);}
@@ -628,13 +626,6 @@ a{color:inherit;}
       </div>
       <ul id="playlist-list"></ul>
     </div>
-
-    <div class="sidebar-footer">
-      <button class="nav-item" id="btn-settings">
-        <svg class="ic" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 005 15a1.65 1.65 0 00-1.51-1H3.4a2 2 0 110-4h.09A1.65 1.65 0 005 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019 9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor" stroke-width="1.6"/></svg>
-        Configurar Supabase
-      </button>
-    </div>
   </aside>
   <div class="sidebar-scrim" id="sidebar-scrim"></div>
 
@@ -831,24 +822,6 @@ a{color:inherit;}
     </div>
   </div>
 
-  <div class="modal hidden" id="modal-settings">
-    <div class="modal-header"><h3>Conectar ao Supabase</h3><button class="modal-close" data-close id="settings-close-btn"><svg viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></div>
-    <div class="modal-body">
-      <div class="field">
-        <label>Project URL</label>
-        <input type="text" id="input-supabase-url" placeholder="https://xxxxx.supabase.co">
-      </div>
-      <div class="field">
-        <label>Chave anon public</label>
-        <input type="text" id="input-supabase-key" placeholder="eyJhbGciOi...">
-        <div class="field-hint">Em Supabase: Project Settings → API. Rode antes o script SQL fornecido para criar as tabelas. Esses dados ficam salvos só neste navegador (localStorage).</div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-primary" id="btn-save-settings">Salvar e conectar</button>
-    </div>
-  </div>
-
 </div>
 
 <div class="dropdown" id="dropdown-menu"></div>
@@ -912,26 +885,17 @@ function svgNote(){
 }
 
 /* ============================================================
-   SUPABASE — conexão e carregamento
+   SUPABASE — conexão (credenciais fixas do projeto)
    ============================================================ */
-function getStoredCreds(){
-  return {
-    url: localStorage.getItem('sonora_url') || '',
-    key: localStorage.getItem('sonora_key') || ''
-  };
-}
+const SUPABASE_URL = 'https://aelsvgfmijreuhpoccmt.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFlbHN2Z2ZtaWpyZXVocG9jY210Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyNTM4NTksImV4cCI6MjA5MjgyOTg1OX0.exKQufYKsAW-Nh85BHG-3W7V4gli7oK1XYO2igmZ1_g';
+
 function initSupabase(){
-  const { url, key } = getStoredCreds();
-  if(!url || !key){
-    openModal('modal-settings');
-    return false;
-  }
   try{
-    supabase = createClient(url, key);
+    supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     return true;
   }catch(e){
-    showToast('URL do Supabase inválida.', 'error');
-    openModal('modal-settings');
+    showToast('Não foi possível conectar ao Supabase.', 'error');
     return false;
   }
 }
@@ -979,9 +943,10 @@ function renderErrorState(err){
     <div class="es-icon">${svgNote()}</div>
     <h3>Não foi possível conectar</h3>
     <p>${esc(msg)}</p>
-    <button class="btn btn-secondary" id="retry-conn" style="margin-top:6px;">Verificar configuração</button>
+    <p style="font-size:12px;">Confira se rodou o script SQL no seu projeto Supabase.</p>
+    <button class="btn btn-secondary" id="retry-conn" style="margin-top:6px;">Tentar novamente</button>
   </div>`;
-  $('#retry-conn').onclick = ()=> openModal('modal-settings');
+  $('#retry-conn').onclick = ()=> loadAll();
 }
 
 /* ============================================================
@@ -1560,31 +1525,6 @@ document.getElementById('pp-new-inline').addEventListener('click', async ()=>{
   renderPlaylistPickList();
 });
 
-/* --- Configurações Supabase --- */
-document.getElementById('btn-settings').addEventListener('click', ()=>{
-  const { url, key } = getStoredCreds();
-  $('#input-supabase-url').value = url;
-  $('#input-supabase-key').value = key;
-  $('#settings-close-btn').style.display = supabase ? 'flex' : 'none';
-  openModal('modal-settings');
-  closeMobileSidebar();
-});
-document.getElementById('btn-save-settings').addEventListener('click', async ()=>{
-  const url = $('#input-supabase-url').value.trim();
-  const key = $('#input-supabase-key').value.trim();
-  if(!url || !key){ showToast('Preencha URL e chave.','error'); return; }
-  localStorage.setItem('sonora_url', url);
-  localStorage.setItem('sonora_key', key);
-  const btn = $('#btn-save-settings');
-  btn.disabled = true; btn.textContent = 'Conectando…';
-  if(initSupabase()){
-    await loadAll();
-    closeModals();
-    showToast('Conectado ao Supabase.');
-  }
-  btn.disabled = false; btn.textContent = 'Salvar e conectar';
-});
-
 /* ============================================================
    BUSCA
    ============================================================ */
@@ -1673,6 +1613,7 @@ function stopPlayback(){
   audio.removeAttribute('src');
   isPlaying = false;
   queueIndex = -1;
+  document.documentElement.style.setProperty('--dynamic','142,142,147');
   updatePlayButtonState();
 }
 
@@ -1862,7 +1803,7 @@ function renderQueueList(){
    COR DOMINANTE DA CAPA (ambiente dinâmico)
    ============================================================ */
 function applyDominantColor(url){
-  if(!url){ document.documentElement.style.setProperty('--dynamic','250,35,59'); return; }
+  if(!url){ document.documentElement.style.setProperty('--dynamic','142,142,147'); return; }
   if(dominantColorCache[url]){
     document.documentElement.style.setProperty('--dynamic', dominantColorCache[url]);
     return;
@@ -1885,17 +1826,14 @@ function applyDominantColor(url){
       }
       if(!count) throw new Error('empty');
       r=Math.round(r/count); g=Math.round(g/count); b=Math.round(b/count);
-      // realça um pouco a saturação para o glow ficar mais vivo
-      const max=Math.max(r,g,b), min=Math.min(r,g,b);
-      if(max-min < 40){ r=Math.min(255,r+20); }
       const value = `${r},${g},${b}`;
       dominantColorCache[url] = value;
       document.documentElement.style.setProperty('--dynamic', value);
     }catch(e){
-      document.documentElement.style.setProperty('--dynamic','250,35,59');
+      document.documentElement.style.setProperty('--dynamic','142,142,147');
     }
   };
-  img.onerror = ()=>{ document.documentElement.style.setProperty('--dynamic','250,35,59'); };
+  img.onerror = ()=>{ document.documentElement.style.setProperty('--dynamic','142,142,147'); };
   img.src = url;
 }
 
