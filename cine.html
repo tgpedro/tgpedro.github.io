@@ -127,7 +127,8 @@
   .stage.idle .player-ui{opacity:0;pointer-events:none;}
 
   video::cue{
-    background:rgba(0,0,0,.6);color:#fff;font-family:var(--font-sf);font-size:1.05em;
+    background:rgba(0,0,0,.65);color:#fff;font-family:var(--font-sf);font-size:1.05em;
+    font-weight:500;
   }
 
   .player-ui{position:absolute;inset:0;transition:opacity .35s ease;}
@@ -206,6 +207,15 @@
   .spinner.show{display:block;}
   @keyframes spin2{ to{ transform:translate(-50%,-50%) rotate(360deg); } }
 
+  .status-label{
+    position:absolute;top:calc(50% + 34px);left:50%;transform:translateX(-50%);
+    color:var(--text-dim);font-size:12.5px;white-space:nowrap;z-index:1;display:none;
+    max-width:80vw;overflow:hidden;text-overflow:ellipsis;
+  }
+  .status-label.show{display:block;}
+  .dropdown .hint{padding:8px 10px;font-size:12px;color:var(--text-faint);white-space:normal;width:170px;}
+  .dropdown button small{display:block;color:var(--text-faint);font-size:10.5px;font-weight:400;}
+
   .center-flash{
     position:absolute;top:50%;left:50%;width:60px;height:60px;z-index:1;
     transform:translate(-50%,-50%) scale(.7);background:rgba(0,0,0,.55);border-radius:50%;
@@ -257,6 +267,7 @@
   <div class="stage" id="stage">
     <video id="player" playsinline></video>
     <div class="spinner" id="spinner"></div>
+    <div class="status-label" id="statusLabel"></div>
     <div class="center-flash" id="centerFlash"></div>
 
     <div class="player-ui" id="playerUi">
@@ -300,7 +311,7 @@
             <div class="dropdown" id="ccMenu"></div>
           </div>
 
-          <div class="menu-wrap" id="audioWrap" style="display:none;">
+          <div class="menu-wrap" id="audioWrap">
             <button class="icon-btn" id="audioBtn" aria-label="Áudio / idioma">
               <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18"/><path d="M12 3a15 15 0 0 0 0 18"/></svg>
             </button>
@@ -335,11 +346,15 @@ const SUB_EXT = ['vtt','srt'];
 const hasFS = ('showDirectoryPicker' in window) && location.protocol !== 'file:';
 
 const LANG_NAMES = {
-  pt:'Português','pt-br':'Português (BR)','pt-pt':'Português (PT)',
-  en:'Inglês','en-us':'Inglês (EUA)','en-gb':'Inglês (RU)',
-  es:'Espanhol',fr:'Francês',de:'Alemão',it:'Italiano',ja:'Japonês',
-  ko:'Coreano',zh:'Chinês','zh-cn':'Chinês','zh-tw':'Chinês (TW)',
-  ru:'Russo',ar:'Árabe',nl:'Holandês',pl:'Polonês',tr:'Turco',hi:'Hindi',sv:'Sueco'
+  pt:'Português','pt-br':'Português (BR)','pt-pt':'Português (PT)',por:'Português',
+  en:'Inglês','en-us':'Inglês (EUA)','en-gb':'Inglês (RU)',eng:'Inglês',
+  es:'Espanhol',spa:'Espanhol',fr:'Francês',fre:'Francês',fra:'Francês',
+  de:'Alemão',ger:'Alemão',deu:'Alemão',it:'Italiano',ita:'Italiano',
+  ja:'Japonês',jpn:'Japonês',ko:'Coreano',kor:'Coreano',
+  zh:'Chinês','zh-cn':'Chinês','zh-tw':'Chinês (TW)',chi:'Chinês',zho:'Chinês',
+  ru:'Russo',rus:'Russo',ar:'Árabe',ara:'Árabe',nl:'Holandês',dut:'Holandês',
+  pl:'Polonês',pol:'Polonês',tr:'Turco',tur:'Turco',hi:'Hindi',hin:'Hindi',sv:'Sueco',swe:'Sueco',
+  und:'Desconhecido'
 };
 function guessLangLabel(code){
   if (!code) return null;
@@ -347,6 +362,8 @@ function guessLangLabel(code){
   if (!c) return null;
   return LANG_NAMES[c] || LANG_NAMES[c.split(/[-_]/)[0]] || code.toUpperCase();
 }
+// codecs an HTML5 <video> can decode natively without ffmpeg re-encoding
+const NATIVE_AUDIO_CODECS = ['aac','mp3','opus','vorbis'];
 
 const emptyState = document.getElementById('emptyState');
 const mainEl = document.getElementById('main');
@@ -709,6 +726,7 @@ function buildRow(title, entries){
 const stage = document.getElementById('stage');
 const playerUi = document.getElementById('playerUi');
 const spinner = document.getElementById('spinner');
+const statusLabel = document.getElementById('statusLabel');
 const centerFlash = document.getElementById('centerFlash');
 const playBtn = document.getElementById('playBtn');
 const backBtn = document.getElementById('backBtn');
@@ -740,6 +758,18 @@ const VOL_SVG = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" str
 const MUTE_SVG = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>';
 const SPEEDS = [0.5, 0.75, 1, 1.25, 1.5, 2];
 
+// Subtitle files from torrents are very often saved as Windows-1252/ISO-8859-1,
+// not UTF-8. Decoding those as UTF-8 turns accented letters (ã, ç, é...) into
+// the "missing glyph" mark (a diamond/triangle with a "?"). Try strict UTF-8
+// first; if the bytes aren't valid UTF-8, fall back to Windows-1252, which is
+// what almost all of these files actually use.
+function decodeSubtitleBuffer(buf){
+  try { return new TextDecoder('utf-8', { fatal: true }).decode(buf); }
+  catch(e){
+    try { return new TextDecoder('windows-1252').decode(buf); }
+    catch(e2){ return new TextDecoder('utf-8').decode(buf); }
+  }
+}
 function srtToVtt(text){
   let out = text.replace(/\r+/g, '');
   out = out.replace(/(\d{2}:\d{2}:\d{2}),(\d{3})/g, '$1.$2');
@@ -754,6 +784,15 @@ function formatTime(t){
 }
 
 async function openPlayer(entry){
+  // free the previous video's data from ffmpeg's in-memory filesystem before
+  // loading a new one, so memory doesn't pile up across the session
+  if (ffmpegInstance && currentEntry && currentEntry !== entry && currentEntry._ffInputName){
+    ffmpegInstance.deleteFile(currentEntry._ffInputName).catch(() => {});
+    currentEntry._ffInputName = null;
+    currentEntry._audioTracks = null;
+    currentEntry._activeAudioTrack = null;
+  }
+
   currentEntry = entry;
   const file = await entry.getFile();
   const url = URL.createObjectURL(file);
@@ -768,7 +807,7 @@ async function openPlayer(entry){
   scrubHandle.style.left = '0%';
   curTimeEl.textContent = '0:00';
   durTimeEl.textContent = '0:00';
-  audioWrap.style.display = 'none';
+  audioMenu.innerHTML = '';
 
   const progress = readProgress(entry, file.size);
   player.addEventListener('loadedmetadata', function onMeta(){
@@ -778,7 +817,6 @@ async function openPlayer(entry){
       player.currentTime = progress.time;
     }
     player.play().catch(() => {});
-    buildAudioMenu();
   });
 
   // subtitles: load every matching subtitle file as its own track, default to the first
@@ -786,7 +824,8 @@ async function openPlayer(entry){
     for (const sub of entry.subtitles){
       try {
         const subFile = await sub.getFile();
-        const vttText = sub.ext === 'srt' ? srtToVtt(await subFile.text()) : await subFile.text();
+        const raw = decodeSubtitleBuffer(await subFile.arrayBuffer());
+        const vttText = sub.ext === 'srt' ? srtToVtt(raw) : raw;
         const vttUrl = URL.createObjectURL(new Blob([vttText], { type: 'text/vtt' }));
         const track = document.createElement('track');
         track.kind = 'subtitles';
@@ -802,15 +841,6 @@ async function openPlayer(entry){
     });
   }
   buildSubtitleMenu(entry);
-
-  // dual audio: expose a track picker when the file carries more than one audio track
-  if ('audioTracks' in player){
-    player.audioTracks.onaddtrack = () => buildAudioMenu();
-    player.audioTracks.onremovetrack = () => buildAudioMenu();
-  } else {
-    audioWrap.style.display = 'none';
-  }
-  setTimeout(buildAudioMenu, 900);
 
   modal.classList.add('open');
   stage.classList.remove('idle');
@@ -833,7 +863,6 @@ function buildSubtitleMenu(entry){
   ccMenu.innerHTML = '';
   const offBtn = document.createElement('button');
   offBtn.textContent = 'Desligada';
-  offBtn.classList.add('active');
   offBtn.addEventListener('click', () => {
     const tt = player.textTracks;
     for (let i = 0; i < tt.length; i++) tt[i].mode = 'hidden';
@@ -855,27 +884,205 @@ function buildSubtitleMenu(entry){
   });
   if (entry.subtitles.length) markActiveIn(ccMenu, ccMenu.children[1]);
 }
+function markActiveIn(menu, activeBtn){
+  Array.from(menu.children).forEach(b => b.classList.toggle('active', b === activeBtn));
+}
 
-function buildAudioMenu(){
-  const list = ('audioTracks' in player) ? player.audioTracks : null;
-  if (!list || list.length <= 1){ audioWrap.style.display = 'none'; return; }
-  audioWrap.style.display = 'block';
-  audioMenu.innerHTML = '';
-  Array.from(list).forEach((t, i) => {
-    const label = t.label || guessLangLabel(t.language) || `Faixa ${i + 1}`;
-    const b = document.createElement('button');
-    b.textContent = label;
-    if (t.enabled) b.classList.add('active');
-    b.addEventListener('click', () => {
-      for (let j = 0; j < list.length; j++) list[j].enabled = (j === i);
-      audioMenu.classList.remove('open');
-      buildAudioMenu();
+// ==========================================================================
+// dual audio: detection + on-demand conversion via ffmpeg.wasm
+//
+// Browsers only ever decode the FIRST audio stream of a local video file —
+// there is no native way to switch to a second "dual audio" track. To make
+// switching possible at all, we run a real (WebAssembly) copy of ffmpeg
+// entirely inside the browser: it inspects the file for extra audio streams,
+// and when you pick one, it remuxes (or re-encodes just the audio, if the
+// codec isn't something the browser can play) into a new file in memory.
+//
+// This is genuinely heavy: the first time you open the audio menu it
+// downloads a ~30 MB WebAssembly build of ffmpeg (once per browser session),
+// and converting a track re-reads the whole video file into memory, so it
+// can take a while and use a lot of RAM on very large (multi-GB) files.
+// Nothing ever leaves your computer — it all happens locally in the tab.
+// ==========================================================================
+const FFMPEG_BASE = 'https://unpkg.com/@ffmpeg/ffmpeg@0.12.6/dist/umd';
+const FFMPEG_CORE_BASE = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd';
+let ffmpegInstance = null;
+let ffmpegLoadingPromise = null;
+let ffmpegLogBuffer = [];
+let ffmpegStatusCb = null;
+
+async function toBlobURL(url, mimeType){
+  const resp = await fetch(url);
+  const blob = await resp.blob();
+  return URL.createObjectURL(new Blob([await blob.arrayBuffer()], { type: mimeType }));
+}
+async function toBlobURLPatched(url, mimeType, patcher){
+  const resp = await fetch(url);
+  let body = await resp.text();
+  if (patcher) body = patcher(body);
+  return URL.createObjectURL(new Blob([body], { type: mimeType }));
+}
+
+async function loadFFmpeg(onStatus){
+  if (ffmpegInstance) return ffmpegInstance;
+  if (ffmpegLoadingPromise) return ffmpegLoadingPromise;
+  ffmpegLoadingPromise = (async () => {
+    onStatus && onStatus('Baixando conversor de áudio (~30 MB, só na primeira vez)...');
+    // the stock UMD bundle tries to build its worker URL relative to its own
+    // script location, which breaks when loaded from a blob: URL — patch that
+    // one line so we can hand it a real worker URL instead
+    const patchedUrl = await toBlobURLPatched(
+      `${FFMPEG_BASE}/ffmpeg.js`, 'text/javascript',
+      js => js.replace('new URL(e.p+e.u(814),e.b)', 'r.workerLoadURL')
+    );
+    await import(patchedUrl);
+    const ff = new FFmpegWASM.FFmpeg();
+    ff.on('log', ({ message }) => {
+      ffmpegLogBuffer.push(message);
+      if (ffmpegStatusCb) ffmpegStatusCb(message);
     });
+    onStatus && onStatus('Carregando o conversor...');
+    await ff.load({
+      workerLoadURL: await toBlobURL(`${FFMPEG_BASE}/814.ffmpeg.js`, 'text/javascript'),
+      coreURL: await toBlobURL(`${FFMPEG_CORE_BASE}/ffmpeg-core.js`, 'text/javascript'),
+      wasmURL: await toBlobURL(`${FFMPEG_CORE_BASE}/ffmpeg-core.wasm`, 'application/wasm'),
+    });
+    ffmpegInstance = ff;
+    return ff;
+  })();
+  try { return await ffmpegLoadingPromise; }
+  catch(e){ ffmpegLoadingPromise = null; throw e; }
+}
+
+function ffInputNameFor(entry){
+  return 'in_' + entry.name.replace(/[^a-zA-Z0-9.]/g, '_');
+}
+
+async function probeAudioTracks(entry, onStatus){
+  if (entry._audioTracks) return entry._audioTracks;
+  const ff = await loadFFmpeg(onStatus);
+  onStatus && onStatus('Lendo o arquivo...');
+  const inputName = ffInputNameFor(entry);
+  if (entry._ffInputName !== inputName){
+    const file = await entry.getFile();
+    const data = new Uint8Array(await file.arrayBuffer());
+    await ff.writeFile(inputName, data);
+    entry._ffInputName = inputName;
+  }
+  onStatus && onStatus('Analisando faixas de áudio...');
+  ffmpegLogBuffer = [];
+  try { await ff.exec(['-i', inputName]); } catch(e){ /* -i alone always "fails": no output given */ }
+  const logs = ffmpegLogBuffer.slice();
+  const tracks = [];
+  logs.forEach(line => {
+    const m = line.match(/Stream #\d+:\d+(?:\(([a-zA-Z-]+)\))?.*?:\s*Audio:\s*([a-zA-Z0-9_]+)/);
+    if (m){
+      const lang = m[1] || null;
+      const codec = m[2].toLowerCase();
+      tracks.push({
+        index: tracks.length,
+        lang, codec,
+        label: (guessLangLabel(lang) || `Faixa ${tracks.length + 1}`) + ' · ' + codec.toUpperCase()
+      });
+    }
+  });
+  entry._audioTracks = tracks;
+  entry._activeAudioTrack = 0;
+  return tracks;
+}
+
+async function convertAudioTrack(entry, trackIndex){
+  const ff = await loadFFmpeg(msg => { statusLabel.textContent = msg.slice(0, 70); });
+  const track = entry._audioTracks[trackIndex];
+  const canCopy = track.codec && NATIVE_AUDIO_CODECS.includes(track.codec);
+  const outputName = 'out_' + Date.now() + '.mp4';
+  const baseArgs = ['-i', entry._ffInputName, '-map', '0:v:0', '-map', `0:a:${trackIndex}`];
+  ffmpegStatusCb = msg => { statusLabel.textContent = 'Convertendo: ' + msg.slice(0, 55); };
+  try {
+    if (canCopy){
+      await ff.exec([...baseArgs, '-c', 'copy', '-movflags', '+faststart', outputName]);
+    } else {
+      await ff.exec([...baseArgs, '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', '-movflags', '+faststart', outputName]);
+    }
+  } catch(e){
+    if (canCopy){
+      // container didn't like a raw copy of this track — fall back to re-encoding it
+      await ff.exec([...baseArgs, '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', '-movflags', '+faststart', outputName]);
+    } else {
+      ffmpegStatusCb = null;
+      throw e;
+    }
+  }
+  ffmpegStatusCb = null;
+  const data = await ff.readFile(outputName);
+  ff.deleteFile(outputName).catch(() => {});
+  return new Blob([data.buffer], { type: 'video/mp4' });
+}
+
+function renderAudioMenu(entry){
+  const tracks = entry._audioTracks || [];
+  audioMenu.innerHTML = '';
+  if (tracks.length <= 1){
+    const div = document.createElement('div');
+    div.className = 'hint';
+    div.textContent = tracks.length === 1 ? 'Este vídeo só tem uma faixa de áudio.' : 'Não foi possível detectar faixas de áudio.';
+    audioMenu.appendChild(div);
+    return;
+  }
+  tracks.forEach((t, i) => {
+    const b = document.createElement('button');
+    b.textContent = t.label;
+    if (i === (entry._activeAudioTrack || 0)) b.classList.add('active');
+    b.addEventListener('click', () => selectAudioTrack(entry, i));
     audioMenu.appendChild(b);
   });
 }
-function markActiveIn(menu, activeBtn){
-  Array.from(menu.children).forEach(b => b.classList.toggle('active', b === activeBtn));
+
+async function ensureAudioMenu(entry){
+  if (entry._audioTracks){ renderAudioMenu(entry); return; }
+  audioMenu.innerHTML = '<div class="hint">Analisando faixas de áudio...</div>';
+  try {
+    await probeAudioTracks(entry, msg => {
+      audioMenu.innerHTML = `<div class="hint">${msg.slice(0, 90)}</div>`;
+    });
+  } catch(e){
+    audioMenu.innerHTML = '<div class="hint">Não foi possível analisar o áudio deste vídeo.</div>';
+    return;
+  }
+  if (currentEntry !== entry) return;
+  renderAudioMenu(entry);
+}
+
+async function selectAudioTrack(entry, i){
+  if (i === (entry._activeAudioTrack || 0)){ audioMenu.classList.remove('open'); return; }
+  audioMenu.classList.remove('open');
+  const resumeTime = player.currentTime;
+  const wasPaused = player.paused;
+  spinner.classList.add('show');
+  statusLabel.textContent = 'Convertendo áudio, aguarde...';
+  statusLabel.classList.add('show');
+  try {
+    const blob = await convertAudioTrack(entry, i);
+    if (currentEntry !== entry) return; // user closed/changed video mid-conversion
+    entry._activeAudioTrack = i;
+    const oldSrc = player.src;
+    const newUrl = URL.createObjectURL(blob);
+    player.src = newUrl;
+    player.addEventListener('loadedmetadata', function onMeta(){
+      player.removeEventListener('loadedmetadata', onMeta);
+      player.currentTime = resumeTime;
+      if (!wasPaused) player.play().catch(() => {});
+    });
+    if (oldSrc && oldSrc.startsWith('blob:')) URL.revokeObjectURL(oldSrc);
+    renderAudioMenu(entry);
+  } catch(e){
+    statusLabel.textContent = 'Não foi possível converter essa faixa de áudio.';
+    setTimeout(() => { statusLabel.classList.remove('show'); }, 3000);
+    spinner.classList.remove('show');
+    return;
+  }
+  spinner.classList.remove('show');
+  statusLabel.classList.remove('show');
 }
 
 function saveProgress(entry, size){
@@ -895,6 +1102,9 @@ function closePlayer(){
   clearInterval(saveTimer);
   clearTimeout(hideTimer);
   document.querySelectorAll('.dropdown.open').forEach(d => d.classList.remove('open'));
+  spinner.classList.remove('show');
+  statusLabel.classList.remove('show');
+  ffmpegStatusCb = null;
   player.pause();
   const oldSrc = player.src;
   player.removeAttribute('src');
@@ -977,7 +1187,14 @@ function buildSpeedMenu(){
 }
 speedBtn.addEventListener('click', e => { e.stopPropagation(); toggleMenu(speedMenu); });
 ccBtn.addEventListener('click', e => { e.stopPropagation(); toggleMenu(ccMenu); });
-audioBtn.addEventListener('click', e => { e.stopPropagation(); toggleMenu(audioMenu); });
+audioBtn.addEventListener('click', async e => {
+  e.stopPropagation();
+  const wasOpen = audioMenu.classList.contains('open');
+  document.querySelectorAll('.dropdown.open').forEach(d => d.classList.remove('open'));
+  if (wasOpen) return;
+  audioMenu.classList.add('open');
+  await ensureAudioMenu(currentEntry);
+});
 document.addEventListener('click', () => document.querySelectorAll('.dropdown.open').forEach(d => d.classList.remove('open')));
 
 // ---- volume ----
