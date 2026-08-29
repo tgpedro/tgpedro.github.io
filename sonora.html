@@ -445,7 +445,8 @@ a{color:inherit;}
 .player-controls{display:flex;align-items:center;gap:20px;}
 .ctrl-btn{background:none;border:none;color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0.88;}
 .ctrl-btn:hover{opacity:1;}
-.ctrl-btn.small svg{width:17px;height:17px;}
+.ctrl-btn svg{width:18px;height:18px;}
+.ctrl-btn.small svg{width:16px;height:16px;}
 .ctrl-btn.toggle-on{color:rgb(var(--dynamic));opacity:1;}
 .ctrl-play{
   width:34px;height:34px;border-radius:50%;background:#fff;color:#111;
@@ -512,8 +513,9 @@ a{color:inherit;}
 .np-controls{display:flex;align-items:center;justify-content:center;gap:36px;width:100%;max-width:480px;}
 .np-ctrl-btn{background:none;border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0.9;}
 .np-ctrl-btn:hover{opacity:1;}
+.np-ctrl-btn svg{width:24px;height:24px;}
+.np-ctrl-btn.small svg{width:20px;height:20px;}
 .np-ctrl-btn.toggle-on{color:rgb(var(--dynamic));opacity:1;}
-.np-ctrl-btn.small svg{width:22px;height:22px;}
 .np-play{width:64px;height:64px;border-radius:50%;background:#fff;color:#111;display:flex;align-items:center;justify-content:center;}
 .np-play svg{width:26px;height:26px;}
 .np-volume{display:flex;align-items:center;gap:10px;width:100%;max-width:400px;color:rgba(255,255,255,0.6);}
@@ -679,8 +681,17 @@ a{color:inherit;}
   .cover-edit-btn svg{width:12px;height:12px;}
   .np-art{width:min(280px,70vw);}
   .np-controls{gap:28px;}
-  .row-duration{display:none;}
+
+  /* Em telas pequenas o toque (swipe) é quem revela "editar" e "excluir";
+     manter a duração + o botão "⋮" fixos na linha, além disso, fazia a
+     linha colidir/sobrepor visualmente com os botões revelados ao arrastar
+     (era exatamente a bagunça do print). Por isso esses dois elementos
+     saem da linha no mobile — a função também força isso via JS
+     (isMobileView) porque alguns webviews não recalculam @media a tempo. */
+  .row-duration, .row-menu{display:none !important;}
   .row-action-btn{width:56px;}
+  .row-cover{width:38px;height:38px;}
+  .song-row{padding:7px 8px;gap:10px;}
 
   /* botões de ação nos cards menores no mobile, para não parecerem
      desproporcionais em capas pequenas */
@@ -1029,17 +1040,21 @@ function svgNote(){
 }
 
 /* ============================================================
-   VISIBILIDADE DO BOTÃO "ADICIONAR MÚSICA" NO TOPO
-   O CSS já esconde #btn-add-song abaixo de 860px, mas isso reforça
-   via JS (alguns webviews in-app não recalculam a media query a
-   tempo). No mobile, quem adiciona música é sempre o botão flutuante.
+   DETECÇÃO DE MOBILE (usada tanto pelo CSS quanto reforçada em JS,
+   pois alguns webviews in-app não recalculam @media a tempo)
    ============================================================ */
+function isMobileView(){
+  return window.matchMedia('(max-width: 860px)').matches;
+}
 function syncAddButtonVisibility(){
-  const isMobile = window.matchMedia('(max-width: 860px)').matches;
+  const isMobile = isMobileView();
   const btn = document.getElementById('btn-add-song');
   if(btn) btn.style.display = isMobile ? 'none' : '';
 }
-window.addEventListener('resize', debounce(syncAddButtonVisibility, 120));
+window.addEventListener('resize', debounce(()=>{
+  syncAddButtonVisibility();
+  renderView(); // recalcula linhas/menus que dependem do breakpoint (ex: swipe vs. menu fixo)
+}, 150));
 
 /* ============================================================
    SUPABASE — conexão (credenciais fixas do projeto)
@@ -1441,6 +1456,7 @@ function renderSongGrid(container, list, context){
 
 function renderPlaylistRows(container, playlist){
   const list = playlistSongs(playlist);
+  const mobile = isMobileView();
   container.innerHTML = playlist.items.map((item,idx)=>{
     const s = songById(item.song_id);
     if(!s) return '';
@@ -1464,12 +1480,13 @@ function renderPlaylistRows(container, playlist){
           <div class="row-title">${esc(s.title)}</div>
           <div class="row-artist">${esc(s.artist||'Artista desconhecido')}</div>
         </div>
+        ${mobile ? '' : `
         <div class="row-duration" data-duration-for="${esc(s.audio_url)}">--:--</div>
         <div class="row-menu">
           <button class="kebab-btn" data-row-menu="${s.id}" data-link-id="${item.id}">
             <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg>
           </button>
-        </div>
+        </div>`}
       </div>
     </div>`;
   }).join('');
@@ -1482,11 +1499,12 @@ function renderPlaylistRows(container, playlist){
       const idx = parseInt(row.dataset.idx,10);
       playFromList(list, idx, { type:'playlist', id: playlist.id });
     });
-    $('[data-row-menu]', row).addEventListener('click', e=>{
+    const rowMenuBtn = $('[data-row-menu]', row);
+    rowMenuBtn?.addEventListener('click', e=>{
       e.stopPropagation();
-      openPlaylistRowMenu(playlist.id, row.dataset.linkId || row.closest('.row-swipe').dataset.linkId, row.dataset.songId, e.currentTarget);
+      openPlaylistRowMenu(playlist.id, rowMenuBtn.dataset.linkId || row.closest('.row-swipe').dataset.linkId, rowMenuBtn.dataset.rowMenu, e.currentTarget);
     });
-    lazyLoadDuration(row);
+    if(!mobile) lazyLoadDuration(row);
   });
 
   $$('.row-swipe', container).forEach(wrap=>{
