@@ -358,7 +358,7 @@ a{color:inherit;}
 .kebab-btn:hover{background:var(--panel-strong);color:var(--text);}
 .kebab-btn svg{width:16px;height:16px;}
 
-/* linha com ações reveladas ao arrastar (estilo iOS) */
+/* linha com ações reveladas ao arrastar (estilo iOS) — apenas desktop */
 .row-swipe{position:relative;border-radius:10px;overflow:hidden;}
 .row-swipe.dragging{opacity:0.35;}
 .row-swipe.drop-target-above{box-shadow: inset 0 2px 0 0 rgba(var(--dynamic),0.9);}
@@ -405,7 +405,7 @@ a{color:inherit;}
 .play-fab svg{width:22px;height:22px;margin-left:2px;}
 .play-fab:active{transform:scale(0.95);}
 
-/* botão de editar a capa da playlist (canto da arte) */
+/* botão de editar a capa da playlist (canto da arte) — apenas desktop */
 .cover-edit-btn{
   position:absolute;right:6px;bottom:6px;
   width:30px;height:30px;border-radius:50%;
@@ -615,30 +615,24 @@ a{color:inherit;}
 .player-bar-progress-track{position:absolute;top:0;left:0;right:0;height:2.5px;background:rgba(255,255,255,0.1);display:none;}
 .player-bar-progress-fill{height:100%;width:0%;background:rgb(var(--dynamic));transition:background .6s ease;}
 
-/* botão flutuante de adicionar (somente mobile) */
-.fab-add{
-  display:none;position:fixed;right:18px;
-  bottom:calc(var(--player-h) + 18px + var(--safe-bottom));
-  width:54px;height:54px;border-radius:50%;
-  background:var(--accent-grad);color:#fff;border:none;
-  align-items:center;justify-content:center;cursor:pointer;
-  box-shadow:0 10px 26px rgba(0,0,0,0.45);z-index:60;
-}
-.fab-add svg{width:22px;height:22px;}
-.fab-add:active{transform:scale(0.94);}
-
 .mobile-play-btn{
   display:none;width:38px;height:38px;border-radius:50%;background:#fff;color:#111;
   border:none;align-items:center;justify-content:center;cursor:pointer;flex:none;
 }
 .mobile-play-btn svg{width:16px;height:16px;}
 
-/* Botões de ação sempre visíveis em telas sem hover (touch) */
+/* Botões de ação sempre visíveis em telas sem hover (touch) — apenas quando permitido (ver regras mobile abaixo) */
 @media (hover:none){
-  .song-card-play, .song-card-menu{opacity:1;transform:none;}
+  .song-card-play{opacity:1;transform:none;}
 }
 
-/* ---------- Responsivo / mobile ---------- */
+/* ---------- Responsivo / mobile ----------
+   No mobile o app é SOMENTE LEITURA/REPRODUÇÃO: nada de adicionar,
+   editar, excluir, reordenar ou trocar capa. Essas ações ficam
+   reservadas ao desktop. Os elementos abaixo são ocultados por CSS
+   e também deixam de ser renderizados/vinculados via JS (ver
+   isMobileView() no script) como reforço, já que alguns webviews
+   in-app não recalculam @media a tempo. */
 @media (max-width: 860px){
   #app{grid-template-columns:1fr;grid-template-areas:"main" "player";}
   .sidebar{
@@ -654,12 +648,23 @@ a{color:inherit;}
   .search-box{max-width:none;}
   .song-grid{grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:16px 12px;}
 
-  /* botão "Adicionar música" do topo some no mobile — usa o botão flutuante.
-     Reforçado com !important + JS (syncAddButtonVisibility) porque alguns
-     navegadores/pré-visualizadores in-app cacheiam o layout do topbar. */
-  #btn-add-song{display:none !important;}
-  .fab-add{display:flex;width:50px;height:50px;bottom:calc(var(--player-h) + 16px + var(--safe-bottom));}
-  .fab-add svg{width:20px;height:20px;}
+  /* Sem edição no mobile: nada de adicionar música (topo ou flutuante),
+     menu de música, editar capa da playlist, editar nome da playlist,
+     arrastar para reordenar ou ações de swipe. */
+  #btn-add-song,
+  .fab-add,
+  .song-card-menu,
+  .cover-edit-btn,
+  #playlist-add-song-btn,
+  .row-handle,
+  .row-menu,
+  .kebab-btn{
+    display:none !important;
+  }
+  .playlist-hero-title{
+    border-bottom:none !important;
+    pointer-events:none;
+  }
 
   .player-track{width:auto;flex:1;min-width:0;}
   .player-center{display:none;}
@@ -671,34 +676,23 @@ a{color:inherit;}
   .player-bar{gap:8px;padding:0 14px;padding-bottom:var(--safe-bottom);position:relative;}
   .player-bar-progress-track{display:block;}
 
-  .playlist-hero{gap:16px;}
-  .playlist-hero-art{width:120px;height:120px;}
-  .playlist-hero-title{font-size:24px;}
+  .playlist-hero{gap:16px;align-items:center;}
+  .playlist-hero-art{width:104px;height:104px;}
+  .playlist-hero-title{font-size:22px;}
   .view-title{font-size:24px;}
   .play-fab{width:48px;height:48px;}
   .play-fab svg{width:19px;height:19px;}
-  .cover-edit-btn{width:26px;height:26px;}
-  .cover-edit-btn svg{width:12px;height:12px;}
   .np-art{width:min(280px,70vw);}
   .np-controls{gap:28px;}
 
-  /* Em telas pequenas o toque (swipe) é quem revela "editar" e "excluir";
-     manter a duração + o botão "⋮" fixos na linha, além disso, fazia a
-     linha colidir/sobrepor visualmente com os botões revelados ao arrastar
-     (era exatamente a bagunça do print). Por isso esses dois elementos
-     saem da linha no mobile — a função também força isso via JS
-     (isMobileView) porque alguns webviews não recalculam @media a tempo. */
-  .row-duration, .row-menu{display:none !important;}
-  .row-action-btn{width:56px;}
+  .row-duration{display:none !important;}
   .row-cover{width:38px;height:38px;}
   .song-row{padding:7px 8px;gap:10px;}
 
-  /* botões de ação nos cards menores no mobile, para não parecerem
-     desproporcionais em capas pequenas */
+  /* botão de play nos cards um pouco menor no mobile, para não parecer
+     desproporcional em capas pequenas */
   .song-card-play{width:30px;height:30px;}
   .song-card-play svg{width:13px;height:13px;}
-  .song-card-menu{width:22px;height:22px;top:5px;right:5px;}
-  .song-card-menu svg{width:12px;height:12px;}
 
   /* inputs em 16px evitam zoom automático do Safari no iOS */
   .field input, .field textarea{font-size:16px;}
@@ -977,6 +971,7 @@ a{color:inherit;}
 <div class="dropdown" id="dropdown-menu"></div>
 <div id="toast-container"></div>
 <audio id="audio-el" preload="auto" playsinline></audio>
+<audio id="audio-el-next" style="display:none" preload="auto" playsinline></audio>
 
 <script type="module">
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
@@ -1002,7 +997,6 @@ let dominantColorCache = {}; // url -> "r,g,b"
 let editingSongId = null; // quando não-nulo, o modal de música está em modo edição
 let playToken = 0; // evita condição de corrida ao trocar de música rapidamente
 let currentLoadToken = 0; // token do carregamento de áudio em curso
-let prefetchAudio = null; // pré-carrega a próxima faixa da fila em segundo plano
 let pendingPlaylistIdForCover = null; // playlist sendo editada no modal de capa
 
 const audio = document.getElementById('audio-el');
@@ -1040,8 +1034,10 @@ function svgNote(){
 }
 
 /* ============================================================
-   DETECÇÃO DE MOBILE (usada tanto pelo CSS quanto reforçada em JS,
-   pois alguns webviews in-app não recalculam @media a tempo)
+   DETECÇÃO DE MOBILE — usada pelo CSS e reforçada em JS: no
+   mobile o app é apenas para reproduzir. Todas as funções de
+   edição (adicionar, editar, excluir, reordenar, trocar capa,
+   renomear playlist) checam isMobileView() e são bloqueadas.
    ============================================================ */
 function isMobileView(){
   return window.matchMedia('(max-width: 860px)').matches;
@@ -1050,10 +1046,12 @@ function syncAddButtonVisibility(){
   const isMobile = isMobileView();
   const btn = document.getElementById('btn-add-song');
   if(btn) btn.style.display = isMobile ? 'none' : '';
+  const fab = document.getElementById('fab-add-song');
+  if(fab) fab.style.display = 'none'; // adicionar é restrito ao desktop
 }
 window.addEventListener('resize', debounce(()=>{
   syncAddButtonVisibility();
-  renderView(); // recalcula linhas/menus que dependem do breakpoint (ex: swipe vs. menu fixo)
+  renderView(); // recalcula a view conforme o breakpoint (mobile = somente leitura)
 }, 150));
 
 /* ============================================================
@@ -1121,9 +1119,10 @@ function renderErrorState(err){
 }
 
 /* ============================================================
-   CRUD — músicas
+   CRUD — músicas (restrito ao desktop)
    ============================================================ */
 async function addSong({title, artist, cover_url, audio_url}){
+  if(isMobileView()) return;
   const { data, error } = await supabase.from('songs').insert({
     title: title.trim(),
     artist: artist ? artist.trim() : null,
@@ -1138,6 +1137,7 @@ async function addSong({title, artist, cover_url, audio_url}){
 }
 
 async function updateSong(id, {title, artist, cover_url, audio_url}){
+  if(isMobileView()) return;
   const payload = {
     title: title.trim(),
     artist: artist ? artist.trim() : null,
@@ -1160,6 +1160,7 @@ async function updateSong(id, {title, artist, cover_url, audio_url}){
 }
 
 async function deleteSong(songId){
+  if(isMobileView()) return;
   const { error } = await supabase.from('songs').delete().eq('id', songId);
   if(error){ showToast('Erro ao remover: '+error.message,'error'); return; }
   songs = songs.filter(s=>s.id!==songId);
@@ -1174,9 +1175,10 @@ async function deleteSong(songId){
 }
 
 /* ============================================================
-   CRUD — playlists
+   CRUD — playlists (restrito ao desktop)
    ============================================================ */
 async function createPlaylist(name){
+  if(isMobileView()) return;
   const { data, error } = await supabase.from('playlists').insert({ name: name.trim() }).select().single();
   if(error){ showToast('Erro ao criar playlist: '+error.message,'error'); throw error; }
   data.items = [];
@@ -1187,6 +1189,7 @@ async function createPlaylist(name){
 }
 
 async function renamePlaylist(playlistId, newName){
+  if(isMobileView()) return;
   const name = newName.trim();
   if(!name) return;
   const { error } = await supabase.from('playlists').update({ name }).eq('id', playlistId);
@@ -1197,6 +1200,7 @@ async function renamePlaylist(playlistId, newName){
 }
 
 async function deletePlaylist(playlistId){
+  if(isMobileView()) return;
   const { error } = await supabase.from('playlists').delete().eq('id', playlistId);
   if(error){ showToast('Erro ao excluir playlist: '+error.message,'error'); return; }
   playlists = playlists.filter(p=>p.id!==playlistId);
@@ -1209,6 +1213,7 @@ async function deletePlaylist(playlistId){
 }
 
 async function addSongToPlaylist(playlistId, songId){
+  if(isMobileView()) return;
   const p = playlists.find(p=>p.id===playlistId);
   if(!p) return;
   if(p.items.some(it=>it.song_id===songId)){ showToast('Essa música já está na playlist.'); return; }
@@ -1224,6 +1229,7 @@ async function addSongToPlaylist(playlistId, songId){
 }
 
 async function removeFromPlaylist(playlistId, linkId){
+  if(isMobileView()) return;
   const { error } = await supabase.from('playlist_songs').delete().eq('id', linkId);
   if(error){ showToast('Erro: '+error.message,'error'); return; }
   const p = playlists.find(p=>p.id===playlistId);
@@ -1233,6 +1239,7 @@ async function removeFromPlaylist(playlistId, linkId){
 }
 
 async function persistPlaylistOrder(playlistId){
+  if(isMobileView()) return;
   const p = playlists.find(p=>p.id===playlistId);
   if(!p) return;
   const updates = p.items.map((it,idx)=>({ id: it.id, position: idx }));
@@ -1253,6 +1260,7 @@ async function persistPlaylistOrder(playlistId){
      ALTER TABLE playlists ADD COLUMN cover_url text;
 */
 async function updatePlaylistCover(playlistId, coverUrl){
+  if(isMobileView()) return;
   const value = coverUrl ? coverUrl.trim() : null;
   const { error } = await supabase.from('playlists').update({ cover_url: value || null }).eq('id', playlistId);
   if(error){
@@ -1292,6 +1300,7 @@ function renderSidebarPlaylists(){
     list.innerHTML = `<li class="playlist-empty-hint">Crie sua primeira playlist com o botão "+" acima.</li>`;
     return;
   }
+  const mobile = isMobileView();
   list.innerHTML = playlists.map(p=>{
     const cover = p.cover_url || playlistSongs(p).find(s=>s.cover_url)?.cover_url;
     const active = view.type==='playlist' && view.id===p.id;
@@ -1299,9 +1308,9 @@ function renderSidebarPlaylists(){
       <div class="pl-cover" style="${cover?`background-image:url('${esc(cover)}')`:''}">${cover?'':'<svg viewBox="0 0 24 24" fill="none"><path d="M9 18V6l10-2v12" stroke="currentColor" stroke-width="1.8"/><circle cx="6.5" cy="18" r="2.3" stroke="currentColor" stroke-width="1.8"/><circle cx="16.5" cy="16" r="2.3" stroke="currentColor" stroke-width="1.8"/></svg>'}</div>
       <span class="pl-name">${esc(p.name)}</span>
       <span class="pl-count">${p.items.length}</span>
-      <button class="pl-del" data-del-playlist="${p.id}" title="Excluir playlist">
+      ${mobile ? '' : `<button class="pl-del" data-del-playlist="${p.id}" title="Excluir playlist">
         <svg viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      </button>
+      </button>`}
     </li>`;
   }).join('');
 
@@ -1317,6 +1326,7 @@ function renderSidebarPlaylists(){
   $$('[data-del-playlist]', list).forEach(btn=>{
     btn.addEventListener('click', (e)=>{
       e.stopPropagation();
+      if(isMobileView()) return;
       const id = btn.dataset.delPlaylist;
       const p = playlists.find(p=>p.id===id);
       if(confirm(`Excluir a playlist "${p?.name||''}"? As músicas continuam na biblioteca.`)){
@@ -1335,6 +1345,7 @@ function renderSidebarPlaylists(){
    ============================================================ */
 function renderView(){
   const c = document.getElementById('content');
+  const mobile = isMobileView();
   if(view.type==='library'){
     $$('.nav-item[data-view-btn]').forEach(b=>b.classList.toggle('active', b.dataset.viewBtn==='library'));
     const list = filteredLibrary();
@@ -1365,19 +1376,19 @@ function renderView(){
       <div class="playlist-hero">
         <div class="playlist-hero-art" id="playlist-hero-art">
           ${heroArtHtml}
-          <button class="cover-edit-btn" id="btn-edit-playlist-cover" title="Alterar capa da playlist">
+          ${mobile ? '' : `<button class="cover-edit-btn" id="btn-edit-playlist-cover" title="Alterar capa da playlist">
             <svg viewBox="0 0 24 24" fill="none"><path d="M4 7h3l2-2h6l2 2h3v12H4V7z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.2" stroke="currentColor" stroke-width="1.8"/></svg>
-          </button>
+          </button>`}
         </div>
         <div class="playlist-hero-info">
           <div class="playlist-hero-eyebrow">Playlist</div>
-          <h1 class="playlist-hero-title" id="playlist-title-edit" contenteditable="true" spellcheck="false">${esc(p.name)}</h1>
+          <h1 class="playlist-hero-title" id="playlist-title-edit" ${mobile ? '' : 'contenteditable="true"'} spellcheck="false">${esc(p.name)}</h1>
           <div class="playlist-hero-meta">${sList.length} música${sList.length===1?'':'s'}</div>
           <div class="playlist-hero-actions">
             <button class="play-fab" id="playlist-play-fab" ${sList.length?'':'disabled style="opacity:.4;cursor:default;"'}>
               <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
             </button>
-            <button class="btn btn-secondary" id="playlist-add-song-btn">Adicionar música</button>
+            ${mobile ? '' : `<button class="btn btn-secondary" id="playlist-add-song-btn">Adicionar música</button>`}
           </div>
         </div>
       </div>
@@ -1385,7 +1396,7 @@ function renderView(){
         <div class="empty-state">
           <div class="es-icon">${svgNote()}</div>
           <h3>Playlist vazia</h3>
-          <p>Adicione músicas da sua biblioteca a esta playlist pelo menu "⋯" de cada música.</p>
+          <p>${mobile ? 'Esta playlist ainda não tem músicas.' : 'Adicione músicas da sua biblioteca a esta playlist pelo menu "⋯" de cada música.'}</p>
         </div>`}
     `;
     if(sList.length){
@@ -1395,31 +1406,35 @@ function renderView(){
       const list = playlistSongs(p);
       if(list.length) playFromList(list, 0, { type:'playlist', id:p.id });
     });
-    $('#playlist-add-song-btn').addEventListener('click', ()=>{
+    $('#playlist-add-song-btn')?.addEventListener('click', ()=>{
       view = { type:'library' };
       renderSidebarPlaylists();
       renderView();
     });
     $('#btn-edit-playlist-cover')?.addEventListener('click', ()=> openPlaylistCoverModal(p));
     const titleEl = $('#playlist-title-edit');
-    titleEl.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); titleEl.blur(); } });
-    titleEl.addEventListener('blur', ()=>{
-      const val = titleEl.textContent.trim();
-      if(val && val!==p.name) renamePlaylist(p.id, val);
-      else titleEl.textContent = p.name;
-    });
+    if(!mobile && titleEl){
+      titleEl.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); titleEl.blur(); } });
+      titleEl.addEventListener('blur', ()=>{
+        const val = titleEl.textContent.trim();
+        if(val && val!==p.name) renamePlaylist(p.id, val);
+        else titleEl.textContent = p.name;
+      });
+    }
   }
 }
 
 function renderEmptyLibrary(){
+  const mobile = isMobileView();
   return `<div class="empty-state">
     <div class="es-icon">${svgNote()}</div>
     <h3>Sua biblioteca está vazia</h3>
-    <p>Toque em "Adicionar música" para começar.</p>
+    <p>${mobile ? 'Adicione músicas pelo computador para vê-las aqui.' : 'Toque em "Adicionar música" para começar.'}</p>
   </div>`;
 }
 
 function renderSongGrid(container, list, context){
+  const mobile = isMobileView();
   container.innerHTML = list.map(s=>{
     const playing = queue[queueIndex]?.id === s.id;
     return `<div class="song-card ${playing?'is-playing':''}" data-song-id="${s.id}">
@@ -1428,9 +1443,9 @@ function renderSongGrid(container, list, context){
         <button class="song-card-play" data-play="${s.id}">
           <svg viewBox="0 0 24 24" fill="currentColor">${(playing && isPlaying) ? '<path d="M7 5h4v14H7zM13 5h4v14h-4z"/>' : '<path d="M8 5v14l11-7z"/>'}</svg>
         </button>
-        <button class="song-card-menu" data-menu="${s.id}">
+        ${mobile ? '' : `<button class="song-card-menu" data-menu="${s.id}">
           <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg>
-        </button>
+        </button>`}
       </div>
       <div class="song-card-title">${esc(s.title)}</div>
       <div class="song-card-artist">${esc(s.artist||'Artista desconhecido')}</div>
@@ -1447,7 +1462,7 @@ function renderSongGrid(container, list, context){
       }
       playFromList(list, list.findIndex(x=>x.id===id), context);
     });
-    $('[data-menu]', card).addEventListener('click', (e)=>{
+    $('[data-menu]', card)?.addEventListener('click', (e)=>{
       e.stopPropagation();
       openSongMenu(id, e.currentTarget);
     });
@@ -1461,6 +1476,20 @@ function renderPlaylistRows(container, playlist){
     const s = songById(item.song_id);
     if(!s) return '';
     const playing = queue[queueIndex]?.id === s.id && queueContext?.type==='playlist' && queueContext?.id===playlist.id;
+
+    /* No mobile: linha simples, sem alça de arrastar, sem swipe e sem
+       menu de contexto — apenas capa, título, artista. No desktop mantém
+       o wrapper com ações reveladas ao arrastar (swipe) e reordenação. */
+    if(mobile){
+      return `<div class="song-row ${playing?'is-playing':''}" data-song-id="${s.id}" data-idx="${idx}">
+        <div class="row-cover">${s.cover_url?`<img src="${esc(s.cover_url)}" loading="lazy" alt="" draggable="false">`:svgNote()}</div>
+        <div class="row-main">
+          <div class="row-title">${esc(s.title)}</div>
+          <div class="row-artist">${esc(s.artist||'Artista desconhecido')}</div>
+        </div>
+      </div>`;
+    }
+
     return `<div class="row-swipe" data-link-id="${item.id}">
       <div class="row-actions">
         <button class="row-action-btn" data-swipe-menu="${s.id}" data-link-id="${item.id}">
@@ -1480,13 +1509,12 @@ function renderPlaylistRows(container, playlist){
           <div class="row-title">${esc(s.title)}</div>
           <div class="row-artist">${esc(s.artist||'Artista desconhecido')}</div>
         </div>
-        ${mobile ? '' : `
         <div class="row-duration" data-duration-for="${esc(s.audio_url)}">--:--</div>
         <div class="row-menu">
           <button class="kebab-btn" data-row-menu="${s.id}" data-link-id="${item.id}">
             <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg>
           </button>
-        </div>`}
+        </div>
       </div>
     </div>`;
   }).join('');
@@ -1495,7 +1523,7 @@ function renderPlaylistRows(container, playlist){
     row.addEventListener('click',(e)=>{
       if(e.target.closest('[data-row-menu]') || e.target.closest('.row-handle')) return;
       const wrap = row.closest('.row-swipe');
-      if(wrap.classList.contains('swiped-open')){ closeAllSwipes(container); return; }
+      if(wrap && wrap.classList.contains('swiped-open')){ closeAllSwipes(container); return; }
       const idx = parseInt(row.dataset.idx,10);
       playFromList(list, idx, { type:'playlist', id: playlist.id });
     });
@@ -1507,22 +1535,23 @@ function renderPlaylistRows(container, playlist){
     if(!mobile) lazyLoadDuration(row);
   });
 
-  $$('.row-swipe', container).forEach(wrap=>{
-    const menuBtn = $('[data-swipe-menu]', wrap);
-    const removeBtn = $('[data-swipe-remove]', wrap);
-    menuBtn?.addEventListener('click', (e)=>{
-      e.stopPropagation();
-      closeAllSwipes(container);
-      openPlaylistRowMenu(playlist.id, wrap.dataset.linkId, menuBtn.dataset.swipeMenu, menuBtn);
+  if(!mobile){
+    $$('.row-swipe', container).forEach(wrap=>{
+      const menuBtn = $('[data-swipe-menu]', wrap);
+      const removeBtn = $('[data-swipe-remove]', wrap);
+      menuBtn?.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        closeAllSwipes(container);
+        openPlaylistRowMenu(playlist.id, wrap.dataset.linkId, menuBtn.dataset.swipeMenu, menuBtn);
+      });
+      removeBtn?.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        removeFromPlaylist(playlist.id, wrap.dataset.linkId);
+      });
+      attachRowSwipe(wrap);
     });
-    removeBtn?.addEventListener('click', (e)=>{
-      e.stopPropagation();
-      removeFromPlaylist(playlist.id, wrap.dataset.linkId);
-    });
-    attachRowSwipe(wrap);
-  });
-
-  makeSortable(container, playlist);
+    makeSortable(container, playlist);
+  }
 }
 
 function lazyLoadDuration(row){
@@ -1539,7 +1568,7 @@ function lazyLoadDuration(row){
 }
 
 /* ============================================================
-   SWIPE PARA AÇÕES (estilo iOS) — arrastar linha para revelar ações
+   SWIPE PARA AÇÕES (estilo iOS) — apenas desktop
    ============================================================ */
 const SWIPE_ACTION_WIDTH = 128; // largura total da área de ações revelada
 function closeAllSwipes(scope=document){
@@ -1550,11 +1579,13 @@ function closeAllSwipes(scope=document){
   });
 }
 function attachRowSwipe(wrap){
+  if(isMobileView()) return;
   const row = $('.song-row', wrap);
   if(!row) return;
   let startX=0, startY=0, currentX=0, dragging=false, decided=false, isHorizontal=false;
 
   row.addEventListener('touchstart', (e)=>{
+    if(isMobileView()) return;
     if(e.target.closest('.row-handle')) return;
     const t = e.touches[0];
     startX = t.clientX; startY = t.clientY;
@@ -1601,9 +1632,10 @@ function attachRowSwipe(wrap){
 }
 
 /* ============================================================
-   DRAG & DROP (reordenar playlist) — funciona com mouse e toque
+   DRAG & DROP (reordenar playlist) — apenas desktop
    ============================================================ */
 function makeSortable(container, playlist){
+  if(isMobileView()) return;
   let dragEl = null;
   let startY = 0;
   let rows = [];
@@ -1611,6 +1643,7 @@ function makeSortable(container, playlist){
   function getRows(){ return $$('.row-swipe', container); }
 
   function onPointerDown(e){
+    if(isMobileView()) return;
     const handle = e.target.closest('.row-handle');
     if(!handle) return;
     const wrap = handle.closest('.row-swipe');
@@ -1686,7 +1719,7 @@ function syncQueueIfNeeded(playlist){
 }
 
 /* ============================================================
-   MENUS (dropdown) — música e linha de playlist
+   MENUS (dropdown) — música e linha de playlist (apenas desktop)
    ============================================================ */
 const dropdownEl = document.getElementById('dropdown-menu');
 function closeDropdown(){ dropdownEl.classList.remove('open'); dropdownEl.innerHTML=''; }
@@ -1708,6 +1741,7 @@ function positionDropdown(anchor){
   dd.style.left = left + 'px';
 }
 function openSongMenu(songId, anchor){
+  if(isMobileView()) return;
   dropdownEl.innerHTML = `
     <button class="dropdown-item" data-act="edit">
       <svg viewBox="0 0 24 24" fill="none"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4L16.5 3.5z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -1736,6 +1770,7 @@ function openSongMenu(songId, anchor){
   };
 }
 function openPlaylistRowMenu(playlistId, linkId, songId, anchor){
+  if(isMobileView()) return;
   dropdownEl.innerHTML = `
     <button class="dropdown-item" data-act="edit">
       <svg viewBox="0 0 24 24" fill="none"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4L16.5 3.5z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -1759,10 +1794,11 @@ function openPlaylistRowMenu(playlistId, linkId, songId, anchor){
 }
 
 /* ============================================================
-   MODAIS — genérico
+   MODAIS — genérico (todos de edição, restritos ao desktop)
    ============================================================ */
 const modalBackdrop = document.getElementById('modal-backdrop');
 function openModal(id){
+  if(isMobileView()) return;
   $$('.modal', modalBackdrop).forEach(m=>m.classList.add('hidden'));
   document.getElementById(id).classList.remove('hidden');
   modalBackdrop.classList.add('open');
@@ -1773,6 +1809,7 @@ $$('[data-close]').forEach(b=>b.addEventListener('click', closeModals));
 
 /* --- Adicionar / editar música --- */
 document.getElementById('btn-add-song').addEventListener('click', ()=>{
+  if(isMobileView()) return;
   editingSongId = null;
   $('#add-song-title').textContent = 'Adicionar música';
   $('#btn-save-song').textContent = 'Adicionar';
@@ -1782,6 +1819,7 @@ document.getElementById('btn-add-song').addEventListener('click', ()=>{
   setTimeout(()=>$('#input-song-title').focus(), 60);
 });
 function openEditSongModal(songId){
+  if(isMobileView()) return;
   const s = songById(songId);
   if(!s) return;
   editingSongId = songId;
@@ -1794,6 +1832,7 @@ function openEditSongModal(songId){
   openModal('modal-add-song');
 }
 document.getElementById('btn-save-song').addEventListener('click', async ()=>{
+  if(isMobileView()) return;
   const title = $('#input-song-title').value.trim();
   const audio_url = $('#input-song-audio').value.trim();
   if(!title){ showToast('Digite o nome da música.','error'); return; }
@@ -1818,11 +1857,13 @@ document.getElementById('btn-save-song').addEventListener('click', async ()=>{
 
 /* --- Nova playlist --- */
 document.getElementById('btn-new-playlist').addEventListener('click', ()=>{
+  if(isMobileView()) return;
   $('#input-playlist-name').value='';
   openModal('modal-new-playlist');
   setTimeout(()=>$('#input-playlist-name').focus(), 60);
 });
 async function submitNewPlaylist(){
+  if(isMobileView()) return;
   const name = $('#input-playlist-name').value.trim();
   if(!name){ showToast('Digite um nome para a playlist.','error'); return; }
   await createPlaylist(name);
@@ -1833,13 +1874,14 @@ $('#input-playlist-name').addEventListener('keydown', e=>{ if(e.key==='Enter') s
 
 /* --- Capa da playlist --- */
 function openPlaylistCoverModal(p){
+  if(isMobileView()) return;
   pendingPlaylistIdForCover = p.id;
   $('#input-playlist-cover').value = p.cover_url || '';
   openModal('modal-playlist-cover');
   setTimeout(()=>$('#input-playlist-cover').focus(), 60);
 }
 document.getElementById('btn-save-playlist-cover').addEventListener('click', async ()=>{
-  if(!pendingPlaylistIdForCover) return;
+  if(isMobileView() || !pendingPlaylistIdForCover) return;
   const btn = $('#btn-save-playlist-cover');
   btn.disabled = true;
   await updatePlaylistCover(pendingPlaylistIdForCover, $('#input-playlist-cover').value);
@@ -1847,7 +1889,7 @@ document.getElementById('btn-save-playlist-cover').addEventListener('click', asy
   closeModals();
 });
 document.getElementById('btn-remove-playlist-cover').addEventListener('click', async ()=>{
-  if(!pendingPlaylistIdForCover) return;
+  if(isMobileView() || !pendingPlaylistIdForCover) return;
   await updatePlaylistCover(pendingPlaylistIdForCover, '');
   closeModals();
 });
@@ -1855,6 +1897,7 @@ document.getElementById('btn-remove-playlist-cover').addEventListener('click', a
 /* --- Adicionar a playlist (a partir de uma música) --- */
 let pendingSongIdForPlaylist = null;
 function openAddToPlaylistModal(songId){
+  if(isMobileView()) return;
   pendingSongIdForPlaylist = songId;
   renderPlaylistPickList();
   openModal('modal-add-to-playlist');
@@ -1890,6 +1933,7 @@ function renderPlaylistPickList(){
   });
 }
 document.getElementById('pp-new-inline').addEventListener('click', async ()=>{
+  if(isMobileView()) return;
   const name = prompt('Nome da nova playlist:');
   if(!name || !name.trim()) return;
   const p = await createPlaylist(name.trim());
@@ -1927,13 +1971,6 @@ document.getElementById('content').addEventListener('scroll', function(){
 });
 
 /* ============================================================
-   FAB MOBILE (adicionar música)
-   ============================================================ */
-document.getElementById('fab-add-song')?.addEventListener('click', ()=>{
-  document.getElementById('btn-add-song').click();
-});
-
-/* ============================================================
    PLAYER — engine
    ============================================================ */
 function buildShuffleOrder(){
@@ -1952,6 +1989,28 @@ function playFromList(list, startIndex, context){
   loadAndPlayCurrent();
 }
 
+/* ============================================================
+   BUFFER DUPLO — a próxima faixa da fila é pré-carregada no
+   elemento <audio id="audio-el-next"> oculto. Quando a troca de
+   faixa acontece, se a URL já estiver bufferizada nesse elemento
+   ela é reaproveitada, tornando a transição praticamente instantânea.
+   ============================================================ */
+function prefetchNextTrack(){
+  try{
+    const idx = nextIndex();
+    const song = idx>=0 ? queue[idx] : null;
+    if(!song || !song.audio_url) return;
+    const nextAudio = document.getElementById('audio-el-next');
+    if(!nextAudio) return;
+    // Só recarrega se for uma URL diferente da que já está em buffer
+    if(nextAudio.src !== song.audio_url){
+      nextAudio.src = song.audio_url;
+      nextAudio.preload = 'auto';
+      nextAudio.load();
+    }
+  }catch(e){ /* pré-carregamento é best-effort, ignora falhas */ }
+}
+
 function loadAndPlayCurrent(){
   const song = queue[queueIndex];
   if(!song) return;
@@ -1966,10 +2025,20 @@ function loadAndPlayCurrent(){
   renderView();
   if(document.getElementById('now-playing').classList.contains('open')) renderQueueList();
 
+  const nextAudio = document.getElementById('audio-el-next');
   try{ audio.pause(); }catch(e){}
-  audio.src = song.audio_url;
+
+  // Double buffering: se a próxima faixa já foi pré-carregada no
+  // elemento oculto e é exatamente essa música, reaproveita o buffer
+  // em vez de iniciar uma nova requisição de rede do zero.
+  if(nextAudio && nextAudio.src === song.audio_url && nextAudio.readyState >= 2){
+    audio.src = nextAudio.src;
+  } else {
+    audio.src = song.audio_url;
+    // Sem chamar .load() aqui: setar .src já enfileira o carregamento;
+    // chamar load() de novo forçaria reinício de conexão desnecessário.
+  }
   audio.currentTime = 0;
-  try{ audio.load(); }catch(e){}
 
   const attemptPlay = ()=>{
     const p = audio.play();
@@ -2075,21 +2144,9 @@ function playPrev(){
   loadAndPlayCurrent();
 }
 
-/* Pré-carrega a próxima faixa da fila assim que a atual começa a tocar,
-   para reduzir a espera ao trocar de música. */
-function prefetchNextTrack(){
-  try{
-    const idx = nextIndex();
-    const song = idx>=0 ? queue[idx] : null;
-    if(!song || !song.audio_url) return;
-    if(prefetchAudio){ try{ prefetchAudio.src=''; }catch(e){} prefetchAudio=null; }
-    prefetchAudio = new Audio();
-    prefetchAudio.preload = 'auto';
-    prefetchAudio.src = song.audio_url;
-    prefetchAudio.load();
-  }catch(e){ /* pré-carregamento é best-effort, ignora falhas */ }
-}
-
+/* Disparo imediato de playNext() ao fim da faixa — sem qualquer
+   processamento extra entre o fim de uma música e o início da próxima,
+   para reduzir ao máximo a latência de transição (gapless). */
 audio.addEventListener('ended', ()=>{
   if(repeatMode==='one'){ audio.currentTime=0; audio.play().catch(()=>{}); return; }
   playNext();
