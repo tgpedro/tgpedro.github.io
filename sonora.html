@@ -416,6 +416,28 @@ a{color:inherit;}
 .cover-edit-btn svg{width:14px;height:14px;}
 .cover-edit-btn:hover{background:rgba(0,0,0,0.78);}
 
+/* ---------- Busca: seções de resultados (músicas + playlists) ---------- */
+.search-section{margin-bottom:30px;}
+.search-section-title{
+  font-size:13px;font-weight:800;letter-spacing:-0.01em;
+  color:var(--text-secondary);margin-bottom:12px;
+}
+.search-playlist-list{display:flex;flex-direction:column;gap:2px;margin-bottom:8px;}
+.search-playlist-card{
+  display:flex;align-items:center;gap:12px;padding:8px 6px;border-radius:14px;cursor:pointer;
+  transition:background .15s ease;
+}
+.search-playlist-card:hover{background:var(--panel);}
+.sp-cover{
+  width:52px;height:52px;border-radius:14px;flex:none;overflow:hidden;
+  background:linear-gradient(135deg,#3a3a3d,#1c1c1f);background-size:cover;background-position:center;
+  display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.3);
+}
+.sp-cover svg{width:20px;height:20px;}
+.sp-info{min-width:0;}
+.sp-name{font-size:14.5px;font-weight:700;letter-spacing:-0.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.sp-count{font-size:12px;color:var(--text-tertiary);margin-top:1px;}
+
 /* ---------- Player bar ---------- */
 .player-bar{
   grid-area:player;
@@ -612,7 +634,7 @@ a{color:inherit;}
 .sidebar-scrim.open{display:block;}
 
 /* mini barra de progresso no topo do player (visível apenas no mobile) */
-.player-bar-progress-track{position:absolute;top:0;left:0;right:0;height:2.5px;background:rgba(255,255,255,0.1);display:none;}
+.player-bar-progress-track{position:absolute;top:0;left:0;right:0;height:2.5px;background:rgba(255,255,255,0.1);display:none;overflow:hidden;}
 .player-bar-progress-fill{height:100%;width:0%;background:rgb(var(--dynamic));transition:background .6s ease;}
 
 .mobile-play-btn{
@@ -620,6 +642,27 @@ a{color:inherit;}
   border:none;align-items:center;justify-content:center;cursor:pointer;flex:none;
 }
 .mobile-play-btn svg{width:16px;height:16px;}
+
+/* ---------- Barra de abas estilo iOS (apenas mobile) ---------- */
+.ios-tabbar{
+  display:none;
+  position:fixed;left:0;right:0;bottom:0;
+  padding-bottom:var(--safe-bottom);
+  background:rgba(16,16,19,0.72);
+  backdrop-filter:blur(26px) saturate(180%);
+  -webkit-backdrop-filter:blur(26px) saturate(180%);
+  border-top:1px solid var(--panel-border);
+  z-index:60;
+  align-items:stretch;justify-content:space-around;
+}
+.ios-tab{
+  flex:1;background:none;border:none;color:var(--text-tertiary);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  padding:8px 4px 9px;cursor:pointer;
+}
+.ios-tab svg{width:22px;height:22px;}
+.ios-tab span{font-size:10.5px;font-weight:600;letter-spacing:-0.01em;}
+.ios-tab.active{color:#fff;}
 
 /* Botões de ação sempre visíveis em telas sem hover (touch) — apenas quando permitido (ver regras mobile abaixo) */
 @media (hover:none){
@@ -642,10 +685,11 @@ a{color:inherit;}
     z-index:41;
   }
   .sidebar.open{transform:translateX(0);}
-  .mobile-menu-btn{display:flex;}
+  .mobile-menu-btn{display:none;}
   .topbar{padding:calc(10px + env(safe-area-inset-top,0px)) 16px 10px;}
-  .content{padding:4px 16px 30px;}
+  .content{padding:4px 16px calc(58px + env(safe-area-inset-bottom,0px) + 104px);}
   .search-box{max-width:none;}
+  .search-box input{border-radius:999px;background:rgba(255,255,255,0.08);}
   .song-grid{grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:16px 12px;}
 
   /* Sem edição no mobile: nada de adicionar música (topo ou flutuante),
@@ -673,7 +717,7 @@ a{color:inherit;}
   .expand-btn{display:none;}
   .mobile-play-btn{display:flex;width:36px;height:36px;}
   .player-cover{width:44px;height:44px;}
-  .player-bar{gap:8px;padding:0 14px;padding-bottom:var(--safe-bottom);position:relative;}
+  .player-bar{gap:8px;padding:0 14px;padding-bottom:0;position:relative;}
   .player-bar-progress-track{display:block;}
 
   .playlist-hero{gap:16px;align-items:center;}
@@ -701,6 +745,21 @@ a{color:inherit;}
     animation:modalInMobile .28s cubic-bezier(.32,.72,0,1);}
   .modal-backdrop{align-items:flex-end;padding:0;}
   .modal-body{padding-bottom:calc(16px + var(--safe-bottom));}
+
+  /* barra de abas iOS + player minimizado flutuando acima dela, estilo "vidro" */
+  .ios-tabbar{display:flex;}
+  .player-bar{
+    position:fixed;left:10px;right:10px;
+    bottom:calc(58px + env(safe-area-inset-bottom,0px) + 10px);
+    border-radius:18px;border-top:none;
+    box-shadow:0 16px 38px rgba(0,0,0,0.5),0 0 0 1px rgba(255,255,255,0.08);
+    background:rgba(30,30,34,0.78);
+    backdrop-filter:blur(28px) saturate(190%);
+    -webkit-backdrop-filter:blur(28px) saturate(190%);
+    z-index:55;overflow:hidden;
+  }
+  .player-bar-progress-track{border-radius:18px 18px 0 0;}
+  #toast-container{bottom:calc(58px + env(safe-area-inset-bottom,0px) + var(--player-h) + 30px);}
 }
 @keyframes modalInMobile{from{opacity:0;transform:translateY(100%);}to{opacity:1;transform:translateY(0);}}
 @media (max-width:420px){
@@ -759,7 +818,7 @@ a{color:inherit;}
       </button>
       <div class="search-box">
         <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-        <input type="text" id="search-input" placeholder="Buscar músicas ou artistas">
+        <input type="text" id="search-input" placeholder="Buscar músicas ou playlists">
       </div>
       <div class="topbar-spacer"></div>
       <button class="btn btn-primary" id="btn-add-song">
@@ -895,6 +954,22 @@ a{color:inherit;}
 
 </div>
 
+<!-- ===================== BARRA DE ABAS (MOBILE) ===================== -->
+<nav class="ios-tabbar" id="ios-tabbar">
+  <button class="ios-tab active" id="tab-library" data-tab="library">
+    <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1.8" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="3" width="7" height="7" rx="1.8" stroke="currentColor" stroke-width="1.8"/><rect x="3" y="14" width="7" height="7" rx="1.8" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="14" width="7" height="7" rx="1.8" stroke="currentColor" stroke-width="1.8"/></svg>
+    <span>Biblioteca</span>
+  </button>
+  <button class="ios-tab" id="tab-search" data-tab="search">
+    <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    <span>Buscar</span>
+  </button>
+  <button class="ios-tab" id="tab-playlists" data-tab="playlists">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M4 6h12M4 12h12M4 18h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="19" cy="18" r="2.3" stroke="currentColor" stroke-width="1.8"/><path d="M19 18V7l3-1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span>Playlists</span>
+  </button>
+</nav>
+
 <!-- ===================== MODAIS ===================== -->
 <div class="modal-backdrop" id="modal-backdrop">
 
@@ -996,10 +1071,19 @@ let shuffleOrder = [];
 let dominantColorCache = {}; // url -> "r,g,b"
 let editingSongId = null; // quando não-nulo, o modal de música está em modo edição
 let playToken = 0; // evita condição de corrida ao trocar de música rapidamente
-let currentLoadToken = 0; // token do carregamento de áudio em curso
 let pendingPlaylistIdForCover = null; // playlist sendo editada no modal de capa
 
-const audio = document.getElementById('audio-el');
+/* Buffer duplo para transição instantânea: `audio` é sempre o elemento
+   ATIVO (o que está tocando/deve tocar) e `nextAudio` é o elemento em
+   segundo plano, usado para pré-carregar a próxima faixa da fila. Quando
+   a troca acontece, se a próxima faixa já estiver bufferizada em
+   `nextAudio`, as REFERÊNCIAS são trocadas (swap) em vez de reatribuir
+   `src` — isso elimina a espera de rede e torna a transição instantânea,
+   inclusive no celular. */
+let audio = document.getElementById('audio-el');
+let nextAudio = document.getElementById('audio-el-next');
+let audioUnlocked = false;
+
 const $ = (sel, root=document) => root.querySelector(sel);
 const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
 
@@ -1290,6 +1374,11 @@ function filteredLibrary(){
   const t = searchTerm.toLowerCase();
   return songs.filter(s=> (s.title||'').toLowerCase().includes(t) || (s.artist||'').toLowerCase().includes(t) );
 }
+function filteredPlaylists(){
+  if(!searchTerm) return [];
+  const t = searchTerm.toLowerCase();
+  return playlists.filter(p=> (p.name||'').toLowerCase().includes(t));
+}
 
 /* ============================================================
    RENDER — sidebar
@@ -1317,10 +1406,12 @@ function renderSidebarPlaylists(){
   $$('.playlist-item', list).forEach(el=>{
     el.addEventListener('click',(e)=>{
       if(e.target.closest('[data-del-playlist]')) return;
+      searchTerm=''; const si=$('#search-input'); if(si) si.value='';
       view = { type:'playlist', id: el.dataset.playlistId };
       renderSidebarPlaylists();
       renderView();
       closeMobileSidebar();
+      setActiveTab('playlists');
     });
   });
   $$('[data-del-playlist]', list).forEach(btn=>{
@@ -1348,7 +1439,41 @@ function renderView(){
   const mobile = isMobileView();
   if(view.type==='library'){
     $$('.nav-item[data-view-btn]').forEach(b=>b.classList.toggle('active', b.dataset.viewBtn==='library'));
-    const list = filteredLibrary();
+
+    if(searchTerm){
+      const matchedSongs = filteredLibrary();
+      const matchedPlaylists = filteredPlaylists();
+      c.innerHTML = `
+        <div class="view-header">
+          <div>
+            <h1 class="view-title">Buscar</h1>
+            <div class="view-sub">Resultados para "${esc(searchTerm)}"</div>
+          </div>
+        </div>
+        ${(!matchedSongs.length && !matchedPlaylists.length) ? `
+          <div class="empty-state">
+            <div class="es-icon">${svgNote()}</div>
+            <h3>Nada encontrado</h3>
+            <p>Tente buscar por outro nome de música, artista ou playlist.</p>
+          </div>` : `
+          ${matchedPlaylists.length ? `
+            <div class="search-section">
+              <div class="search-section-title">Playlists encontradas</div>
+              <div class="search-playlist-list" id="search-playlist-list"></div>
+            </div>` : ''}
+          ${matchedSongs.length ? `
+            <div class="search-section">
+              <div class="search-section-title">Músicas encontradas</div>
+              <div class="song-grid" id="search-song-grid"></div>
+            </div>` : ''}
+        `}
+      `;
+      if(matchedPlaylists.length) renderSearchPlaylistList($('#search-playlist-list'), matchedPlaylists);
+      if(matchedSongs.length) renderSongGrid($('#search-song-grid'), matchedSongs, { type:'library' });
+      return;
+    }
+
+    const list = songs;
     c.innerHTML = `
       <div class="view-header">
         <div>
@@ -1431,6 +1556,30 @@ function renderEmptyLibrary(){
     <h3>Sua biblioteca está vazia</h3>
     <p>${mobile ? 'Adicione músicas pelo computador para vê-las aqui.' : 'Toque em "Adicionar música" para começar.'}</p>
   </div>`;
+}
+
+function renderSearchPlaylistList(container, list){
+  if(!container) return;
+  container.innerHTML = list.map(p=>{
+    const cover = p.cover_url || playlistSongs(p).find(s=>s.cover_url)?.cover_url;
+    return `<div class="search-playlist-card" data-playlist-id="${p.id}">
+      <div class="sp-cover" style="${cover?`background-image:url('${esc(cover)}')`:''}">${cover?'':svgNote()}</div>
+      <div class="sp-info">
+        <div class="sp-name">${esc(p.name)}</div>
+        <div class="sp-count">${p.items.length} música${p.items.length===1?'':'s'}</div>
+      </div>
+    </div>`;
+  }).join('');
+  $$('.search-playlist-card', container).forEach(card=>{
+    card.addEventListener('click', ()=>{
+      const id = card.dataset.playlistId;
+      searchTerm = ''; const si=$('#search-input'); if(si) si.value='';
+      view = { type:'playlist', id };
+      renderSidebarPlaylists();
+      renderView();
+      setActiveTab('playlists');
+    });
+  });
 }
 
 function renderSongGrid(container, list, context){
@@ -1715,6 +1864,7 @@ function syncQueueIfNeeded(playlist){
       if(newIdx>=0) queueIndex = newIdx;
     }
     buildShuffleOrder();
+    prefetchNextTrack();
   }
 }
 
@@ -1942,11 +2092,13 @@ document.getElementById('pp-new-inline').addEventListener('click', async ()=>{
 });
 
 /* ============================================================
-   BUSCA
+   BUSCA (músicas + playlists)
    ============================================================ */
 document.getElementById('search-input').addEventListener('input', debounce((e)=>{
   searchTerm = e.target.value.trim();
-  if(view.type==='library') renderView();
+  if(view.type!=='library'){ view = { type:'library' }; renderSidebarPlaylists(); }
+  renderView();
+  setActiveTab(searchTerm ? 'search' : 'library');
 }, 150));
 
 /* ============================================================
@@ -1960,14 +2112,43 @@ document.getElementById('mobile-menu-btn').addEventListener('click', ()=>{
 function closeMobileSidebar(){ sidebarEl.classList.remove('open'); scrimEl.classList.remove('open'); }
 scrimEl.addEventListener('click', closeMobileSidebar);
 document.querySelector('[data-view-btn="library"]').addEventListener('click', ()=>{
+  searchTerm=''; const si=$('#search-input'); if(si) si.value='';
   view = { type:'library' };
   renderSidebarPlaylists();
   renderView();
   closeMobileSidebar();
+  setActiveTab('library');
 });
 
 document.getElementById('content').addEventListener('scroll', function(){
   document.getElementById('topbar').classList.toggle('scrolled', this.scrollTop > 4);
+});
+
+/* ============================================================
+   BARRA DE ABAS ESTILO iOS (mobile) — navegação entre
+   Biblioteca, Buscar (foca a busca do topo) e Playlists
+   (abre a lista lateral em modo slide-over).
+   ============================================================ */
+function setActiveTab(name){
+  $$('.ios-tab').forEach(t=> t.classList.toggle('active', t.dataset.tab===name));
+}
+$('#tab-library')?.addEventListener('click', ()=>{
+  searchTerm=''; const si=$('#search-input'); if(si) si.value='';
+  view = { type:'library' };
+  renderSidebarPlaylists();
+  renderView();
+  closeMobileSidebar();
+  setActiveTab('library');
+});
+$('#tab-search')?.addEventListener('click', ()=>{
+  if(view.type!=='library'){ view = { type:'library' }; renderSidebarPlaylists(); renderView(); }
+  closeMobileSidebar();
+  setActiveTab('search');
+  setTimeout(()=> $('#search-input')?.focus(), 60);
+});
+$('#tab-playlists')?.addEventListener('click', ()=>{
+  setActiveTab('playlists');
+  sidebarEl.classList.add('open'); scrimEl.classList.add('open');
 });
 
 /* ============================================================
@@ -1990,18 +2171,45 @@ function playFromList(list, startIndex, context){
 }
 
 /* ============================================================
+   DESBLOQUEIO DE ÁUDIO NO MOBILE (iOS/Android)
+   Navegadores mobile só permitem play() dentro de um gesto do
+   usuário. Para que a troca automática de faixa (evento "ended",
+   que NÃO é um gesto do usuário) e o buffer duplo funcionem sem
+   bloqueios, "destravamos" os DOIS elementos <audio> assim que o
+   usuário tocar na tela pela primeira vez: tocamos e pausamos
+   ambos silenciosamente, o que os marca como liberados para
+   reprodução programática pelo restante da sessão.
+   ============================================================ */
+function unlockAudio(){
+  if(audioUnlocked) return;
+  audioUnlocked = true;
+  [audio, nextAudio].forEach(el=>{
+    try{
+      const wasMuted = el.muted;
+      el.muted = true;
+      const p = el.play();
+      const finish = ()=>{ try{ el.pause(); el.currentTime = 0; }catch(e){} el.muted = wasMuted; };
+      if(p && typeof p.then === 'function'){ p.then(finish).catch(finish); }
+      else { finish(); }
+    }catch(e){ /* melhor esforço — ignora falhas de destravamento */ }
+  });
+}
+document.addEventListener('touchstart', unlockAudio, { once:true, passive:true });
+document.addEventListener('pointerdown', unlockAudio, { once:true });
+
+/* ============================================================
    BUFFER DUPLO — a próxima faixa da fila é pré-carregada no
-   elemento <audio id="audio-el-next"> oculto. Quando a troca de
-   faixa acontece, se a URL já estiver bufferizada nesse elemento
-   ela é reaproveitada, tornando a transição praticamente instantânea.
+   elemento <audio> ocioso (`nextAudio`). Quando a troca de faixa
+   acontece, se a URL já estiver bufferizada nesse elemento, as
+   REFERÊNCIAS `audio`/`nextAudio` são trocadas entre si (swap) em
+   vez de reatribuir `.src`, tornando a transição instantânea —
+   inclusive em conexões mobile mais lentas.
    ============================================================ */
 function prefetchNextTrack(){
   try{
     const idx = nextIndex();
     const song = idx>=0 ? queue[idx] : null;
     if(!song || !song.audio_url) return;
-    const nextAudio = document.getElementById('audio-el-next');
-    if(!nextAudio) return;
     // Só recarrega se for uma URL diferente da que já está em buffer
     if(nextAudio.src !== song.audio_url){
       nextAudio.src = song.audio_url;
@@ -2015,7 +2223,6 @@ function loadAndPlayCurrent(){
   const song = queue[queueIndex];
   if(!song) return;
   const myToken = ++playToken;
-  currentLoadToken = myToken;
   isLoadingTrack = true;
   isPlaying = false;
   updatePlayButtonState();
@@ -2025,30 +2232,34 @@ function loadAndPlayCurrent(){
   renderView();
   if(document.getElementById('now-playing').classList.contains('open')) renderQueueList();
 
-  const nextAudio = document.getElementById('audio-el-next');
-  try{ audio.pause(); }catch(e){}
+  const previousActive = audio;
 
-  // Double buffering: se a próxima faixa já foi pré-carregada no
-  // elemento oculto e é exatamente essa música, reaproveita o buffer
-  // em vez de iniciar uma nova requisição de rede do zero.
-  if(nextAudio && nextAudio.src === song.audio_url && nextAudio.readyState >= 2){
-    audio.src = nextAudio.src;
+  if(nextAudio.src === song.audio_url && nextAudio.readyState >= 2){
+    // A próxima faixa já está bufferizada: troca instantânea de referências.
+    const tmp = audio;
+    audio = nextAudio;
+    nextAudio = tmp;
+    try{ if(nextAudio !== previousActive) nextAudio.pause(); }catch(e){}
+    if(audio.currentTime > 0.05){ try{ audio.currentTime = 0; }catch(e){} }
   } else {
+    try{ nextAudio.pause(); }catch(e){}
+    try{ audio.pause(); }catch(e){}
     audio.src = song.audio_url;
-    // Sem chamar .load() aqui: setar .src já enfileira o carregamento;
-    // chamar load() de novo forçaria reinício de conexão desnecessário.
+    audio.currentTime = 0;
   }
-  audio.currentTime = 0;
+  audio.dataset.loadToken = String(myToken);
 
   const attemptPlay = ()=>{
     const p = audio.play();
+    // Já dispara o pré-carregamento da faixa seguinte imediatamente,
+    // sem esperar a confirmação de play(), para maximizar o tempo de buffer.
+    prefetchNextTrack();
     if(p && typeof p.then === 'function'){
       p.then(()=>{
         if(myToken!==playToken) return;
         isPlaying = true;
         isLoadingTrack = false;
         updatePlayButtonState();
-        prefetchNextTrack();
       }).catch(err=>{
         if(myToken!==playToken) return;
         isLoadingTrack = false;
@@ -2063,23 +2274,48 @@ function loadAndPlayCurrent(){
   attemptPlay();
 }
 
-audio.addEventListener('error', ()=>{
-  if(currentLoadToken !== playToken) return; // erro de um carregamento antigo/cancelado — ignora
+/* Os dois elementos <audio> compartilham o mesmo conjunto de listeners.
+   Como as referências `audio`/`nextAudio` são trocadas dinamicamente
+   (buffer duplo), cada handler verifica se o elemento que disparou o
+   evento é o elemento ATIVO no momento antes de agir — isso evita que
+   eventos de um elemento em segundo plano (pré-carregando) afetem a UI. */
+function onAudioError(el){
+  if(el!==audio) return;
+  if(String(playToken) !== el.dataset.loadToken) return; // evento de um carregamento antigo/cancelado
   const song = queue[queueIndex];
   if(!song) return;
   isLoadingTrack = false;
   isPlaying = false;
   updatePlayButtonState();
-  const code = audio.error ? audio.error.code : 0;
+  const code = el.error ? el.error.code : 0;
   let msg = 'Não foi possível carregar "'+song.title+'".';
   if(code === 4) msg = 'O link do áudio de "'+song.title+'" é inválido ou o formato não é suportado.';
   else if(code === 2) msg = 'Falha de rede ao carregar "'+song.title+'". Verifique o link.';
   showToast(msg, 'error');
-});
+}
+function onAudioEnded(el){
+  if(el!==audio) return;
+  if(repeatMode==='one'){ el.currentTime=0; el.play().catch(()=>{}); return; }
+  playNext();
+}
+function attachAudioListeners(el){
+  el.addEventListener('error', ()=> onAudioError(el));
+  el.addEventListener('ended', ()=> onAudioEnded(el));
+  el.addEventListener('timeupdate', ()=>{ if(el!==audio) return; updateProgressUI(); updateBufferedUI(); });
+  el.addEventListener('progress', ()=>{ if(el!==audio) return; updateBufferedUI(); });
+  el.addEventListener('loadedmetadata', ()=>{ if(el!==audio) return; updateProgressUI(); });
+  el.addEventListener('waiting', ()=>{ if(el!==audio) return; isLoadingTrack=true; updatePlayButtonState(); });
+  el.addEventListener('playing', ()=>{ if(el!==audio) return; isLoadingTrack=false; isPlaying=true; updatePlayButtonState(); });
+  el.addEventListener('canplay', ()=>{ if(el!==audio) return; if(isPlaying){ isLoadingTrack=false; updatePlayButtonState(); } });
+  el.addEventListener('pause', ()=>{ if(el!==audio) return; if(!isLoadingTrack){ isPlaying=false; updatePlayButtonState(); } });
+}
+attachAudioListeners(audio);
+attachAudioListeners(nextAudio);
 
 function togglePlay(){
   if(!queue[queueIndex]){ return; }
   if(isLoadingTrack) return;
+  unlockAudio();
   if(isPlaying){
     audio.pause();
     isPlaying = false;
@@ -2096,8 +2332,7 @@ function togglePlay(){
 
 function stopPlayback(){
   playToken++;
-  audio.pause();
-  audio.removeAttribute('src');
+  try{ audio.pause(); audio.removeAttribute('src'); }catch(e){}
   isPlaying = false;
   isLoadingTrack = false;
   queueIndex = -1;
@@ -2143,22 +2378,6 @@ function playPrev(){
   queueIndex = idx;
   loadAndPlayCurrent();
 }
-
-/* Disparo imediato de playNext() ao fim da faixa — sem qualquer
-   processamento extra entre o fim de uma música e o início da próxima,
-   para reduzir ao máximo a latência de transição (gapless). */
-audio.addEventListener('ended', ()=>{
-  if(repeatMode==='one'){ audio.currentTime=0; audio.play().catch(()=>{}); return; }
-  playNext();
-});
-audio.addEventListener('timeupdate', updateProgressUI);
-audio.addEventListener('timeupdate', updateBufferedUI);
-audio.addEventListener('progress', updateBufferedUI);
-audio.addEventListener('loadedmetadata', updateProgressUI);
-audio.addEventListener('waiting', ()=>{ isLoadingTrack=true; updatePlayButtonState(); });
-audio.addEventListener('playing', ()=>{ isLoadingTrack=false; isPlaying=true; updatePlayButtonState(); });
-audio.addEventListener('canplay', ()=>{ if(isPlaying) { isLoadingTrack=false; updatePlayButtonState(); } });
-audio.addEventListener('pause', ()=>{ if(!isLoadingTrack){ isPlaying=false; updatePlayButtonState(); } });
 
 let seeking = false;
 function updateProgressUI(){
@@ -2293,9 +2512,10 @@ $('#btn-play').addEventListener('click', togglePlay);
 $('#btn-play-mobile')?.addEventListener('click', togglePlay);
 $('#btn-next').addEventListener('click', playNext);
 $('#btn-prev').addEventListener('click', playPrev);
-$('#btn-shuffle').addEventListener('click', ()=>{ shuffleOn = !shuffleOn; buildShuffleOrder(); updatePlayButtonState(); });
+$('#btn-shuffle').addEventListener('click', ()=>{ shuffleOn = !shuffleOn; buildShuffleOrder(); prefetchNextTrack(); updatePlayButtonState(); });
 $('#btn-repeat').addEventListener('click', ()=>{
   repeatMode = repeatMode==='off' ? 'all' : repeatMode==='all' ? 'one' : 'off';
+  prefetchNextTrack();
   updatePlayButtonState();
   showToast(repeatMode==='off' ? 'Repetir desativado' : repeatMode==='all' ? 'Repetindo playlist' : 'Repetindo música');
 });
@@ -2320,6 +2540,7 @@ function bindVolume(inputId, fillId){
   input.addEventListener('input', ()=>{
     const v = input.value/100;
     audio.volume = v;
+    nextAudio.volume = v;
     document.getElementById(fillId).style.width = (v*100)+'%';
     syncVolumeUI(inputId, v);
   });
@@ -2333,12 +2554,13 @@ function syncVolumeUI(sourceId, v){
 bindVolume('volume-input','volume-fill');
 bindVolume('np-volume-input','np-volume-fill');
 audio.volume = 0.8;
+nextAudio.volume = 0.8;
 
 /* Controles — tela cheia */
 $('#np-btn-play').addEventListener('click', togglePlay);
 $('#np-btn-next').addEventListener('click', playNext);
 $('#np-btn-prev').addEventListener('click', playPrev);
-$('#np-btn-shuffle').addEventListener('click', ()=>{ shuffleOn=!shuffleOn; buildShuffleOrder(); updatePlayButtonState(); });
+$('#np-btn-shuffle').addEventListener('click', ()=>{ shuffleOn=!shuffleOn; buildShuffleOrder(); prefetchNextTrack(); updatePlayButtonState(); });
 $('#np-btn-repeat').addEventListener('click', ()=> $('#btn-repeat').click());
 
 /* Abrir/fechar tela cheia */
