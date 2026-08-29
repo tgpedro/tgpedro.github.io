@@ -297,7 +297,7 @@ a{color:inherit;}
 .song-card-art .no-art svg{width:32%;height:32%;}
 .song-card-play{
   position:absolute;right:8px;bottom:8px;
-  width:38px;height:38px;border-radius:50%;
+  width:36px;height:36px;border-radius:50%;
   background:var(--accent-grad);color:#fff;
   display:flex;align-items:center;justify-content:center;
   opacity:0;transform:translateY(6px) scale(.9);
@@ -306,7 +306,7 @@ a{color:inherit;}
   border:none;cursor:pointer;
 }
 .song-card:hover .song-card-play,.song-card.is-playing .song-card-play{opacity:1;transform:translateY(0) scale(1);}
-.song-card-play svg{width:16px;height:16px;margin-left:1px;}
+.song-card-play svg{width:15px;height:15px;margin-left:1px;}
 .song-card.is-playing .song-card-art{outline:2px solid rgba(var(--dynamic),0.9);}
 .song-card-title{font-size:14px;font-weight:700;letter-spacing:-0.01em;line-height:1.3;
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
@@ -385,6 +385,7 @@ a{color:inherit;}
   background:linear-gradient(135deg,#3a3a3d,#1c1c1f);
   box-shadow:0 16px 40px rgba(0,0,0,0.45);
   display:flex;flex-wrap:wrap;
+  position:relative;
 }
 .playlist-hero-art img{width:100%;height:100%;object-fit:cover;}
 .playlist-hero-art .quad{width:50%;height:50%;background-size:cover;background-position:center;background-color:#232326;}
@@ -403,6 +404,17 @@ a{color:inherit;}
 }
 .play-fab svg{width:22px;height:22px;margin-left:2px;}
 .play-fab:active{transform:scale(0.95);}
+
+/* botão de editar a capa da playlist (canto da arte) */
+.cover-edit-btn{
+  position:absolute;right:6px;bottom:6px;
+  width:30px;height:30px;border-radius:50%;
+  background:rgba(0,0,0,0.55);backdrop-filter:blur(6px);
+  color:#fff;border:none;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;z-index:3;transition:background .15s ease;
+}
+.cover-edit-btn svg{width:14px;height:14px;}
+.cover-edit-btn:hover{background:rgba(0,0,0,0.78);}
 
 /* ---------- Player bar ---------- */
 .player-bar{
@@ -446,6 +458,7 @@ a{color:inherit;}
 .time-label.right{text-align:right;}
 .seek-wrap{flex:1;position:relative;height:14px;display:flex;align-items:center;}
 .seek-track{width:100%;height:4px;border-radius:2px;background:rgba(255,255,255,0.16);position:relative;overflow:hidden;}
+.seek-buffered{position:absolute;left:0;top:0;bottom:0;background:rgba(255,255,255,0.24);border-radius:2px;width:0%;transition:width .25s ease;}
 .seek-fill{position:absolute;left:0;top:0;bottom:0;background:#fff;border-radius:2px;width:0%;}
 .seek-input{
   position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;margin:0;
@@ -588,6 +601,7 @@ a{color:inherit;}
   box-shadow:0 10px 30px rgba(0,0,0,0.4);
   animation:toastIn .25s cubic-bezier(.32,.72,0,1);
   display:flex;align-items:center;gap:8px;
+  max-width:88vw;text-align:center;
 }
 .toast.error{border-color:rgba(255,80,80,0.4);}
 @keyframes toastIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
@@ -638,16 +652,20 @@ a{color:inherit;}
   .search-box{max-width:none;}
   .song-grid{grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:16px 12px;}
 
-  /* botão "Adicionar música" do topo some no mobile — usa o botão flutuante */
-  #btn-add-song{display:none;}
-  .fab-add{display:flex;}
+  /* botão "Adicionar música" do topo some no mobile — usa o botão flutuante.
+     Reforçado com !important + JS (syncAddButtonVisibility) porque alguns
+     navegadores/pré-visualizadores in-app cacheiam o layout do topbar. */
+  #btn-add-song{display:none !important;}
+  .fab-add{display:flex;width:50px;height:50px;bottom:calc(var(--player-h) + 16px + var(--safe-bottom));}
+  .fab-add svg{width:20px;height:20px;}
 
   .player-track{width:auto;flex:1;min-width:0;}
   .player-center{display:none;}
   .player-right{width:auto;gap:10px;}
   .volume-wrap{display:none;}
   .expand-btn{display:none;}
-  .mobile-play-btn{display:flex;}
+  .mobile-play-btn{display:flex;width:36px;height:36px;}
+  .player-cover{width:44px;height:44px;}
   .player-bar{gap:8px;padding:0 14px;padding-bottom:var(--safe-bottom);position:relative;}
   .player-bar-progress-track{display:block;}
 
@@ -655,10 +673,21 @@ a{color:inherit;}
   .playlist-hero-art{width:120px;height:120px;}
   .playlist-hero-title{font-size:24px;}
   .view-title{font-size:24px;}
+  .play-fab{width:48px;height:48px;}
+  .play-fab svg{width:19px;height:19px;}
+  .cover-edit-btn{width:26px;height:26px;}
+  .cover-edit-btn svg{width:12px;height:12px;}
   .np-art{width:min(280px,70vw);}
   .np-controls{gap:28px;}
   .row-duration{display:none;}
   .row-action-btn{width:56px;}
+
+  /* botões de ação nos cards menores no mobile, para não parecerem
+     desproporcionais em capas pequenas */
+  .song-card-play{width:30px;height:30px;}
+  .song-card-play svg{width:13px;height:13px;}
+  .song-card-menu{width:22px;height:22px;top:5px;right:5px;}
+  .song-card-menu svg{width:12px;height:12px;}
 
   /* inputs em 16px evitam zoom automático do Safari no iOS */
   .field input, .field textarea{font-size:16px;}
@@ -771,7 +800,7 @@ a{color:inherit;}
       <div class="progress-row">
         <span class="time-label" id="time-current">0:00</span>
         <div class="seek-wrap">
-          <div class="seek-track"><div class="seek-fill" id="seek-fill"></div></div>
+          <div class="seek-track"><div class="seek-buffered" id="seek-buffered"></div><div class="seek-fill" id="seek-fill"></div></div>
           <input type="range" class="seek-input" id="seek-input" min="0" max="1000" value="0">
         </div>
         <span class="time-label right" id="time-duration">0:00</span>
@@ -821,7 +850,7 @@ a{color:inherit;}
         <div class="progress-row">
           <span class="time-label" id="np-time-current" style="color:rgba(255,255,255,0.6)">0:00</span>
           <div class="seek-wrap">
-            <div class="seek-track" style="background:rgba(255,255,255,0.22)"><div class="seek-fill" id="np-seek-fill"></div></div>
+            <div class="seek-track" style="background:rgba(255,255,255,0.22)"><div class="seek-buffered" id="np-seek-buffered"></div><div class="seek-fill" id="np-seek-fill"></div></div>
             <input type="range" class="seek-input" id="np-seek-input" min="0" max="1000" value="0">
           </div>
           <span class="time-label right" id="np-time-duration" style="color:rgba(255,255,255,0.6)">0:00</span>
@@ -918,11 +947,25 @@ a{color:inherit;}
     </div>
   </div>
 
+  <div class="modal hidden" id="modal-playlist-cover">
+    <div class="modal-header"><h3>Capa da playlist</h3><button class="modal-close" data-close><svg viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></div>
+    <div class="modal-body">
+      <div class="field">
+        <label>Link da imagem</label>
+        <input type="url" id="input-playlist-cover" placeholder="Link da capa da playlist">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="btn-remove-playlist-cover">Remover capa</button>
+      <button class="btn btn-primary" id="btn-save-playlist-cover">Salvar</button>
+    </div>
+  </div>
+
 </div>
 
 <div class="dropdown" id="dropdown-menu"></div>
 <div id="toast-container"></div>
-<audio id="audio-el" preload="metadata" playsinline></audio>
+<audio id="audio-el" preload="auto" playsinline></audio>
 
 <script type="module">
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
@@ -932,7 +975,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
    ============================================================ */
 let supabase = null;
 let songs = [];        // {id,title,artist,cover_url,audio_url,created_at}
-let playlists = [];    // {id,name,created_at,items:[{id,song_id,position}]}
+let playlists = [];    // {id,name,cover_url,created_at,items:[{id,song_id,position}]}
 let view = { type: 'library' };  // {type:'library'} | {type:'playlist', id}
 let searchTerm = '';
 
@@ -948,6 +991,8 @@ let dominantColorCache = {}; // url -> "r,g,b"
 let editingSongId = null; // quando não-nulo, o modal de música está em modo edição
 let playToken = 0; // evita condição de corrida ao trocar de música rapidamente
 let currentLoadToken = 0; // token do carregamento de áudio em curso
+let prefetchAudio = null; // pré-carrega a próxima faixa da fila em segundo plano
+let pendingPlaylistIdForCover = null; // playlist sendo editada no modal de capa
 
 const audio = document.getElementById('audio-el');
 const $ = (sel, root=document) => root.querySelector(sel);
@@ -982,6 +1027,19 @@ function showToast(message, type='ok'){
 function svgNote(){
   return '<svg viewBox="0 0 24 24" fill="none"><path d="M9 18V6l10-2v12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.5" stroke="currentColor" stroke-width="1.8"/><circle cx="16.5" cy="16" r="2.5" stroke="currentColor" stroke-width="1.8"/></svg>';
 }
+
+/* ============================================================
+   VISIBILIDADE DO BOTÃO "ADICIONAR MÚSICA" NO TOPO
+   O CSS já esconde #btn-add-song abaixo de 860px, mas isso reforça
+   via JS (alguns webviews in-app não recalculam a media query a
+   tempo). No mobile, quem adiciona música é sempre o botão flutuante.
+   ============================================================ */
+function syncAddButtonVisibility(){
+  const isMobile = window.matchMedia('(max-width: 860px)').matches;
+  const btn = document.getElementById('btn-add-song');
+  if(btn) btn.style.display = isMobile ? 'none' : '';
+}
+window.addEventListener('resize', debounce(syncAddButtonVisibility, 120));
 
 /* ============================================================
    SUPABASE — conexão (credenciais fixas do projeto)
@@ -1174,6 +1232,29 @@ async function persistPlaylistOrder(playlistId){
   }
 }
 
+/* Capa personalizada da playlist.
+   Requer a coluna "cover_url" (text, opcional) na tabela "playlists".
+   Se a coluna ainda não existir no Supabase, rode uma vez:
+     ALTER TABLE playlists ADD COLUMN cover_url text;
+*/
+async function updatePlaylistCover(playlistId, coverUrl){
+  const value = coverUrl ? coverUrl.trim() : null;
+  const { error } = await supabase.from('playlists').update({ cover_url: value || null }).eq('id', playlistId);
+  if(error){
+    if(error.code === '42703' || /cover_url/i.test(error.message||'')){
+      showToast('Para usar capa de playlist, adicione a coluna "cover_url" (texto) na tabela playlists do Supabase.', 'error');
+    } else {
+      showToast('Erro ao salvar capa: '+error.message, 'error');
+    }
+    return;
+  }
+  const p = playlists.find(p=>p.id===playlistId);
+  if(p) p.cover_url = value || null;
+  renderSidebarPlaylists();
+  renderView();
+  showToast(value ? 'Capa da playlist atualizada.' : 'Capa da playlist removida.');
+}
+
 /* ============================================================
    HELPERS DE DADOS
    ============================================================ */
@@ -1197,7 +1278,7 @@ function renderSidebarPlaylists(){
     return;
   }
   list.innerHTML = playlists.map(p=>{
-    const cover = playlistSongs(p).find(s=>s.cover_url)?.cover_url;
+    const cover = p.cover_url || playlistSongs(p).find(s=>s.cover_url)?.cover_url;
     const active = view.type==='playlist' && view.id===p.id;
     return `<li class="playlist-item ${active?'active':''}" data-playlist-id="${p.id}">
       <div class="pl-cover" style="${cover?`background-image:url('${esc(cover)}')`:''}">${cover?'':'<svg viewBox="0 0 24 24" fill="none"><path d="M9 18V6l10-2v12" stroke="currentColor" stroke-width="1.8"/><circle cx="6.5" cy="18" r="2.3" stroke="currentColor" stroke-width="1.8"/><circle cx="16.5" cy="16" r="2.3" stroke="currentColor" stroke-width="1.8"/></svg>'}</div>
@@ -1260,10 +1341,18 @@ function renderView(){
     $$('.nav-item[data-view-btn]').forEach(b=>b.classList.remove('active'));
     const sList = playlistSongs(p);
     const covers = sList.slice(0,4).map(s=>s.cover_url).filter(Boolean);
+    const heroArtHtml = p.cover_url
+      ? `<img src="${esc(p.cover_url)}" alt="" draggable="false" style="width:100%;height:100%;object-fit:cover;">`
+      : (covers.length
+          ? covers.map(cv=>`<div class="quad" style="background-image:url('${esc(cv)}')"></div>`).join('') + (covers.length<4?`<div class="quad" style="background:#1c1c1f"></div>`.repeat(4-covers.length):'')
+          : `<div class="empty-icon">${svgNote()}</div>`);
     c.innerHTML = `
       <div class="playlist-hero">
-        <div class="playlist-hero-art">
-          ${covers.length ? covers.map(cv=>`<div class="quad" style="background-image:url('${esc(cv)}')"></div>`).join('') + (covers.length<4?`<div class="quad" style="background:#1c1c1f"></div>`.repeat(4-covers.length):'') : `<div class="empty-icon">${svgNote()}</div>`}
+        <div class="playlist-hero-art" id="playlist-hero-art">
+          ${heroArtHtml}
+          <button class="cover-edit-btn" id="btn-edit-playlist-cover" title="Alterar capa da playlist">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M4 7h3l2-2h6l2 2h3v12H4V7z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.2" stroke="currentColor" stroke-width="1.8"/></svg>
+          </button>
         </div>
         <div class="playlist-hero-info">
           <div class="playlist-hero-eyebrow">Playlist</div>
@@ -1296,6 +1385,7 @@ function renderView(){
       renderSidebarPlaylists();
       renderView();
     });
+    $('#btn-edit-playlist-cover')?.addEventListener('click', ()=> openPlaylistCoverModal(p));
     const titleEl = $('#playlist-title-edit');
     titleEl.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); titleEl.blur(); } });
     titleEl.addEventListener('blur', ()=>{
@@ -1723,6 +1813,27 @@ async function submitNewPlaylist(){
 document.getElementById('btn-save-playlist').addEventListener('click', submitNewPlaylist);
 $('#input-playlist-name').addEventListener('keydown', e=>{ if(e.key==='Enter') submitNewPlaylist(); });
 
+/* --- Capa da playlist --- */
+function openPlaylistCoverModal(p){
+  pendingPlaylistIdForCover = p.id;
+  $('#input-playlist-cover').value = p.cover_url || '';
+  openModal('modal-playlist-cover');
+  setTimeout(()=>$('#input-playlist-cover').focus(), 60);
+}
+document.getElementById('btn-save-playlist-cover').addEventListener('click', async ()=>{
+  if(!pendingPlaylistIdForCover) return;
+  const btn = $('#btn-save-playlist-cover');
+  btn.disabled = true;
+  await updatePlaylistCover(pendingPlaylistIdForCover, $('#input-playlist-cover').value);
+  btn.disabled = false;
+  closeModals();
+});
+document.getElementById('btn-remove-playlist-cover').addEventListener('click', async ()=>{
+  if(!pendingPlaylistIdForCover) return;
+  await updatePlaylistCover(pendingPlaylistIdForCover, '');
+  closeModals();
+});
+
 /* --- Adicionar a playlist (a partir de uma música) --- */
 let pendingSongIdForPlaylist = null;
 function openAddToPlaylistModal(songId){
@@ -1833,6 +1944,7 @@ function loadAndPlayCurrent(){
   updatePlayButtonState();
   updateNowPlayingUI(song);
   applyDominantColor(song.cover_url);
+  resetBufferedUI();
   renderView();
   if(document.getElementById('now-playing').classList.contains('open')) renderQueueList();
 
@@ -1849,6 +1961,7 @@ function loadAndPlayCurrent(){
         isPlaying = true;
         isLoadingTrack = false;
         updatePlayButtonState();
+        prefetchNextTrack();
       }).catch(err=>{
         if(myToken!==playToken) return;
         isLoadingTrack = false;
@@ -1902,6 +2015,10 @@ function stopPlayback(){
   isLoadingTrack = false;
   queueIndex = -1;
   document.documentElement.style.setProperty('--dynamic','142,142,147');
+  if('mediaSession' in navigator){
+    navigator.mediaSession.metadata = null;
+    navigator.mediaSession.playbackState = 'none';
+  }
   updatePlayButtonState();
 }
 
@@ -1940,11 +2057,28 @@ function playPrev(){
   loadAndPlayCurrent();
 }
 
+/* Pré-carrega a próxima faixa da fila assim que a atual começa a tocar,
+   para reduzir a espera ao trocar de música. */
+function prefetchNextTrack(){
+  try{
+    const idx = nextIndex();
+    const song = idx>=0 ? queue[idx] : null;
+    if(!song || !song.audio_url) return;
+    if(prefetchAudio){ try{ prefetchAudio.src=''; }catch(e){} prefetchAudio=null; }
+    prefetchAudio = new Audio();
+    prefetchAudio.preload = 'auto';
+    prefetchAudio.src = song.audio_url;
+    prefetchAudio.load();
+  }catch(e){ /* pré-carregamento é best-effort, ignora falhas */ }
+}
+
 audio.addEventListener('ended', ()=>{
   if(repeatMode==='one'){ audio.currentTime=0; audio.play().catch(()=>{}); return; }
   playNext();
 });
 audio.addEventListener('timeupdate', updateProgressUI);
+audio.addEventListener('timeupdate', updateBufferedUI);
+audio.addEventListener('progress', updateBufferedUI);
 audio.addEventListener('loadedmetadata', updateProgressUI);
 audio.addEventListener('waiting', ()=>{ isLoadingTrack=true; updatePlayButtonState(); });
 audio.addEventListener('playing', ()=>{ isLoadingTrack=false; isPlaying=true; updatePlayButtonState(); });
@@ -1967,6 +2101,30 @@ function updateProgressUI(){
   $('#np-time-duration').textContent = formatTime(dur);
   const barPct = document.getElementById('player-bar-progress');
   if(barPct) barPct.style.width = pct+'%';
+  updateMediaSessionPosition();
+}
+
+/* Indicador de quanto já foi baixado (buffer) na barra de progresso,
+   estilo Apple Music/Spotify — ajuda a perceber que a música está
+   carregando mesmo antes de tocar. */
+function resetBufferedUI(){
+  const a = $('#seek-buffered'); if(a) a.style.width='0%';
+  const b = $('#np-seek-buffered'); if(b) b.style.width='0%';
+}
+function updateBufferedUI(){
+  try{
+    const dur = audio.duration;
+    if(!dur || !isFinite(dur) || !audio.buffered || !audio.buffered.length) return;
+    let end = 0;
+    for(let i=0;i<audio.buffered.length;i++){
+      if(audio.buffered.start(i) <= audio.currentTime + 0.25){
+        end = Math.max(end, audio.buffered.end(i));
+      }
+    }
+    const pct = Math.min(100, (end/dur)*100);
+    const a = $('#seek-buffered'); if(a) a.style.width = pct+'%';
+    const b = $('#np-seek-buffered'); if(b) b.style.width = pct+'%';
+  }catch(e){}
 }
 
 function updatePlayButtonState(){
@@ -1990,6 +2148,7 @@ function updatePlayButtonState(){
     const icon = $('.song-card-play svg', card);
     if(icon) icon.innerHTML = (playing && isPlaying) ? '<path d="M7 5h4v14H7zM13 5h4v14h-4z"/>' : '<path d="M8 5v14l11-7z"/>';
   });
+  updateMediaSessionPlaybackState();
 }
 
 function updateNowPlayingUI(song){
@@ -2002,6 +2161,56 @@ function updateNowPlayingUI(song){
   $('#np-art-img').src = cover;
   $('#np-bg-img').src = cover;
   document.title = `${song.title} — Sonora`;
+  updateMediaSessionMetadata(song);
+}
+
+/* ============================================================
+   MEDIA SESSION — mostra capa, título e controles na tela de
+   bloqueio / central de controle do iOS e nas notificações de
+   mídia do Android/desktop, mesmo com o site em segundo plano.
+   ============================================================ */
+function setupMediaSession(){
+  if(!('mediaSession' in navigator)) return;
+  try{
+    navigator.mediaSession.setActionHandler('play', ()=>{ if(!isPlaying) togglePlay(); });
+    navigator.mediaSession.setActionHandler('pause', ()=>{ if(isPlaying) togglePlay(); });
+    navigator.mediaSession.setActionHandler('previoustrack', playPrev);
+    navigator.mediaSession.setActionHandler('nexttrack', playNext);
+    navigator.mediaSession.setActionHandler('stop', stopPlayback);
+    navigator.mediaSession.setActionHandler('seekto', (details)=>{
+      if(details.fastSeek && 'fastSeek' in audio){ audio.fastSeek(details.seekTime); return; }
+      if(isFinite(details.seekTime)) audio.currentTime = details.seekTime;
+    });
+  }catch(e){ /* alguns navegadores não suportam todos os handlers */ }
+}
+function updateMediaSessionMetadata(song){
+  if(!('mediaSession' in navigator) || !song) return;
+  const artwork = song.cover_url ? [96,128,192,256,384,512].map(size=>({
+    src: song.cover_url, sizes: `${size}x${size}`, type: 'image/png'
+  })) : [];
+  try{
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: song.title || 'Música',
+      artist: song.artist || 'Artista desconhecido',
+      album: 'Sonora',
+      artwork
+    });
+  }catch(e){}
+}
+function updateMediaSessionPlaybackState(){
+  if(!('mediaSession' in navigator)) return;
+  navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused';
+}
+function updateMediaSessionPosition(){
+  if(!('mediaSession' in navigator) || !('setPositionState' in navigator.mediaSession)) return;
+  if(!isFinite(audio.duration) || audio.duration<=0) return;
+  try{
+    navigator.mediaSession.setPositionState({
+      duration: audio.duration,
+      playbackRate: audio.playbackRate || 1,
+      position: Math.min(audio.currentTime, audio.duration)
+    });
+  }catch(e){}
 }
 
 /* Controles — barra inferior */
@@ -2157,6 +2366,8 @@ function applyDominantColor(url){
    INICIALIZAÇÃO
    ============================================================ */
 (function init(){
+  syncAddButtonVisibility();
+  setupMediaSession();
   if(initSupabase()){
     loadAll();
   }
