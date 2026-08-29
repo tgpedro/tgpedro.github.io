@@ -28,8 +28,8 @@
   --text-secondary: rgba(245,245,247,0.58);
   --text-tertiary: rgba(245,245,247,0.34);
   --dynamic: 60,60,64; /* usado só no plano de fundo do "Tocando agora" */
-  --accent: #fc3c44;
-  --accent-2: #fa2c53;
+  --accent: #9b6bff;
+  --accent-2: #7c3aed;
   --accent-grad: linear-gradient(135deg, var(--accent), var(--accent-2));
   --radius-sm: 8px;
   --radius-md: 14px;
@@ -802,6 +802,7 @@ a{color:inherit;}
     <div class="modal-body">
       <div class="field">
         <label>Senha</label>
+        <input type="text" id="input-username-decoy" name="username" autocomplete="username" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;" tabindex="-1" aria-hidden="true">
         <input type="password" id="input-password" placeholder="Digite a senha" autocomplete="off">
       </div>
       <div class="field-hint">Desbloqueia adicionar, editar e organizar músicas, playlists e álbuns neste computador. Pressione <b>Ctrl+Shift+X</b> de novo para bloquear.</div>
