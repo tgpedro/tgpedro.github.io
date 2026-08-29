@@ -543,32 +543,34 @@ a{color:inherit;}
 .np-title{font-size:23px;font-weight:800;letter-spacing:-0.02em;line-height:1.25;}
 .np-artist{font-size:15px;color:rgba(255,255,255,0.68);margin-top:4px;font-weight:600;}
 .np-progress{width:100%;max-width:480px;}
-.np-controls{display:flex;align-items:center;justify-content:center;gap:0;width:100%;max-width:460px;}
+.np-controls{display:flex;align-items:center;justify-content:center;gap:16px;width:100%;max-width:460px;}
 .np-ctrl-btn{
-  background:none;border:none;color:rgba(255,255,255,0.92);cursor:pointer;
+  background:rgba(255,255,255,0.10);
+  border:1px solid rgba(255,255,255,0.10);
+  color:#fff;cursor:pointer;
+  width:54px;height:54px;border-radius:50%;flex:none;
   display:flex;align-items:center;justify-content:center;
-  padding:14px;flex:1;
-  transition:transform .12s ease,color .15s ease,opacity .15s ease;
+  transition:transform .12s ease,background .15s ease;
 }
-.np-ctrl-btn:active{transform:scale(0.88);}
-.np-ctrl-btn svg{width:30px;height:30px;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.35));}
-.np-ctrl-btn.small{color:rgba(255,255,255,0.55);flex:0 0 auto;}
-.np-ctrl-btn.small svg{width:19px;height:19px;filter:none;}
+.np-ctrl-btn:active{transform:scale(0.9);background:rgba(255,255,255,0.18);}
+.np-ctrl-btn svg{width:22px;height:22px;}
+.np-ctrl-btn.small{
+  width:40px;height:40px;background:none;border:none;color:rgba(255,255,255,0.55);
+}
+.np-ctrl-btn.small:active{background:rgba(255,255,255,0.1);}
+.np-ctrl-btn.small svg{width:19px;height:19px;}
 .np-ctrl-btn.toggle-on{color:#fff;}
-.np-ctrl-btn.toggle-on.small{position:relative;}
-.np-ctrl-btn.toggle-on.small::after{
-  content:"";position:absolute;bottom:6px;left:50%;transform:translateX(-50%);
-  width:3.5px;height:3.5px;border-radius:50%;background:currentColor;
-}
+.np-ctrl-btn.small.toggle-on{background:rgba(255,255,255,0.18);}
 .np-play{
-  width:auto;height:auto;flex:0 0 auto;margin:0 6px;
-  background:none;color:#fff;
+  width:80px;height:80px;border-radius:50%;flex:none;
+  background:#fff;color:#0b0b0d;
   display:flex;align-items:center;justify-content:center;
-  border:none;cursor:pointer;padding:6px;
+  border:none;cursor:pointer;
+  box-shadow:0 12px 28px rgba(0,0,0,0.45),0 0 0 1px rgba(0,0,0,0.04) inset;
   transition:transform .12s ease;
 }
-.np-play:active{transform:scale(0.9);}
-.np-play svg{width:62px;height:62px;filter:drop-shadow(0 4px 14px rgba(0,0,0,0.45));}
+.np-play:active{transform:scale(0.93);}
+.np-play svg{width:31px;height:31px;margin-left:2.5px;}
 .np-volume{display:flex;align-items:center;gap:10px;width:100%;max-width:400px;color:rgba(255,255,255,0.6);}
 .np-volume svg{width:16px;height:16px;flex:none;}
 .np-queue{width:100%;max-width:520px;margin-top:6px;}
@@ -667,12 +669,13 @@ a{color:inherit;}
 .player-bar-progress-fill{height:100%;width:0%;background:rgb(var(--dynamic));transition:background .6s ease;}
 
 .mobile-play-btn{
-  display:none;width:34px;height:34px;border-radius:0;background:none;color:#fff;
+  display:none;width:36px;height:36px;border-radius:50%;background:#fff;color:#0b0b0d;
   border:none;align-items:center;justify-content:center;cursor:pointer;flex:none;
-  padding:0;transition:transform .12s ease;
+  box-shadow:0 4px 12px rgba(0,0,0,0.35);
+  transition:transform .12s ease;
 }
-.mobile-play-btn:active{transform:scale(0.88);}
-.mobile-play-btn svg{width:27px;height:27px;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.35));}
+.mobile-play-btn:active{transform:scale(0.9);}
+.mobile-play-btn svg{width:15px;height:15px;margin-left:1.5px;}
 
 /* ---------- Barra de abas estilo iOS (apenas mobile) ---------- */
 .ios-tabbar{
@@ -764,7 +767,7 @@ a{color:inherit;}
   .player-right{width:auto;gap:10px;}
   .volume-wrap{display:none;}
   .expand-btn{display:none;}
-  .mobile-play-btn{display:flex;width:34px;height:34px;}
+  .mobile-play-btn{display:flex;width:36px;height:36px;}
   .player-cover{width:44px;height:44px;}
   .player-bar{gap:8px;padding:0 14px;padding-bottom:0;position:relative;}
   .player-bar-progress-track{display:block;}
@@ -935,7 +938,7 @@ a{color:inherit;}
       <button class="mobile-play-btn" id="btn-play-mobile" title="Reproduzir">
         <svg id="icon-play-m" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
         <svg id="icon-pause-m" class="hidden" viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>
-        <div id="icon-loading-m" class="spinner hidden"></div>
+        <div id="icon-loading-m" class="spinner hidden" style="border-top-color:#111;border-color:rgba(17,17,17,0.25);border-top-color:#111;"></div>
       </button>
       <button class="expand-btn" id="btn-expand" title="Tela cheia">
         <svg viewBox="0 0 24 24" fill="none"><path d="M8 3H5a2 2 0 00-2 2v3M21 8V5a2 2 0 00-2-2h-3M16 21h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
