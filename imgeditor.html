@@ -1321,10 +1321,6 @@
 
     const blurSurfaceCache = { key: '', sourceCanvas: null, outputCanvas: null, sourceContext: null, outputContext: null, sourceStamp: '' };
 
-    // Box blur manual em duas passagens. Diferente de ctx.filter e do downscaling
-    // agressivo, este caminho funciona também em Safari/iOS e navegadores móveis
-    // que ignoram filtros de Canvas. A resolução de trabalho é baixa de propósito,
-    // mantendo o efeito suave sem travar o preview ou o vídeo.
     function applyBoxBlur(imageData, radius, passes = 2) {
       const width = imageData.width;
       const height = imageData.height;
@@ -2220,11 +2216,8 @@
       recorder.onstop = async () => {
         const blob = new Blob(chunks, { type: mime });
         const extension = mime.includes('mp4') ? 'mp4' : 'webm';
-        const link = document.createElement('a');
-        link.download = `${imageBaseName}_${width}x${height}.${extension}`;
-        link.href = URL.createObjectURL(blob);
-        link.click();
-        setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+        const filename = `${imageBaseName}_${width}x${height}.${extension}`;
+        await deliverBlob(blob, filename, mime);
         await seekVideo(Math.min(previousTime, Number(videoSource.duration) || previousTime));
         if (wasPlaying) videoSource.play().catch(() => {});
         updateVideoUI();
@@ -2240,9 +2233,56 @@
       drawFrame();
     }
 
-    downloadButton.addEventListener('click', () => {
-      if (!image) return;
-      if (isVideo()) { exportVideo(); return; }
+    // Entrega um Blob ao usuário de forma robusta em mobile:
+    // 1) tenta a Web Share API (melhor caminho no iOS/Android para salvar na galeria);
+    // 2) senão, cria um link com Object URL (mais confiável que data URL em toDataURL)
+    //    e o insere no DOM antes do clique, pois alguns navegadores mobile ignoram
+    //    cliques em elementos fora da árvore do documento.
+    async function deliverBlob(blob, filename, mimeType) {
+      try {
+        const file = new File([blob], filename, { type: mimeType });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file] });
+          return true;
+        }
+      } catch (err) {
+        if (err && err.name === 'AbortError') return false;
+        // segue para o fallback de download por link
+      }
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      link.rel = 'noopener';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+      return true;
+    }
+
+    function canvasToBlob(sourceCanvas, mimeType, quality) {
+      return new Promise((resolve) => {
+        if (sourceCanvas.toBlob) {
+          sourceCanvas.toBlob((blob) => resolve(blob), mimeType, quality);
+        } else {
+          try {
+            const dataUrl = sourceCanvas.toDataURL(mimeType, quality);
+            const parts = dataUrl.split(',');
+            const byteString = atob(parts[1]);
+            const mimeMatch = parts[0].match(/:(.*?);/);
+            const resolvedType = mimeMatch ? mimeMatch[1] : mimeType;
+            const bytes = new Uint8Array(byteString.length);
+            for (let i = 0; i < byteString.length; i += 1) bytes[i] = byteString.charCodeAt(i);
+            resolve(new Blob([bytes], { type: resolvedType }));
+          } catch (_) {
+            resolve(null);
+          }
+        }
+      });
+    }
+
+    async function downloadImage() {
       const { width, height } = getOutputDimensions();
       const exportCanvas = isLayoutMode()
         ? drawLayout(width, height, sharpenCheck.checked)
@@ -2250,11 +2290,23 @@
       const quality = Number(qualityRange.value) / 100;
       const format = formatSelect.value;
       const extension = format === 'image/png' ? 'png' : format === 'image/webp' ? 'webp' : 'jpg';
-      const link = document.createElement('a');
-      link.download = `${imageBaseName}_${width}x${height}.${extension}`;
-      link.href = exportCanvas.toDataURL(format, quality);
-      link.click();
+      const filename = `${imageBaseName}_${width}x${height}.${extension}`;
+      statusText.textContent = 'Preparando download…';
+      const blob = await canvasToBlob(exportCanvas, format, quality);
+      if (!blob) {
+        showToast('Não foi possível gerar a imagem para download.', true);
+        statusText.textContent = isLayoutMode() ? 'Layout editável' : 'Editável';
+        return;
+      }
+      await deliverBlob(blob, filename, format);
+      statusText.textContent = isLayoutMode() ? 'Layout editável' : 'Editável';
       showToast('Download iniciado.');
+    }
+
+    downloadButton.addEventListener('click', () => {
+      if (!image) return;
+      if (isVideo()) { exportVideo(); return; }
+      downloadImage();
     });
 
     setQualityUI(qualityRange.value);
@@ -2268,4 +2320,3 @@
 
 </body>
 </html>
-
