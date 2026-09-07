@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Recorte — Cropador por dimensão do Roblox Studio</title>
+<style>
+  :root{
+    --bg: #0a0a0b;
+    --panel: #141416;
+    --panel-2: #1c1c1f;
+    --border: #2a2a2e;
+    --text: #f2f2f3;
+    --text-dim: #9a9aa0;
+    --accent: #6c8cff;
+    --accent-2: #8f6cff;
+    --danger: #ff5c5c;
+    --ok: #4ade80;
+    --radius: 14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background: radial-gradient(1200px 800px at 20% -10%, #14141a 0%, var(--bg) 55%);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Helvetica, Arial, sans-serif;
+    min-height:100vh;
+    padding: 28px 16px 80px;
+  }
+  .wrap{
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  header{
+    margin-bottom: 28px;
+    text-align:center;
+  }
+  header h1{
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0 0 6px;
+    letter-spacing: -0.02em;
+    background: linear-gradient(90deg, #fff, #b9b9ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  header p{
+    margin:0;
+    color: var(--text-dim);
+    font-size: 13.5px;
+    line-height:1.5;
+  }
+  .card{
+    background: linear-gradient(180deg, var(--panel), var(--panel-2));
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.02) inset, 0 10px 30px -18px rgba(0,0,0,0.6);
+  }
+  .card h2{
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    margin: 0 0 14px;
+    font-weight: 600;
+  }
+  .dims{
+    display:grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+  }
+  .field label{
+    display:block;
+    font-size: 11.5px;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+  .field small{
+    display:block;
+    color:#66666c;
+    font-size: 10px;
+    margin-top:4px;
+  }
+  input[type=number], input[type=text]{
+    width:100%;
+    background: #0e0e10;
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 11px;
+    border-radius: 10px;
+    font-size: 14px;
+    outline:none;
+    transition: border-color .15s;
+    -moz-appearance: textfield;
+  }
+  input[type=number]::-webkit-outer-spin-button,
+  input[type=number]::-webkit-inner-spin-button{
+    -webkit-appearance:none; margin:0;
+  }
+  input:focus{ border-color: var(--accent); }
+  input:disabled{
+    color: #5c5c62;
+    background: #0b0b0c;
+    cursor: not-allowed;
+  }
+  .ratio-line{
+    margin-top: 14px;
+    font-size: 12.5px;
+    color: var(--text-dim);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:6px;
+  }
+  .ratio-line b{ color: var(--text); font-weight:600; }
+
+  .dropzone{
+    border: 1.5px dashed var(--border);
+    border-radius: 12px;
+    padding: 26px 16px;
+    text-align:center;
+    cursor:pointer;
+    transition: border-color .15s, background .15s;
+    color: var(--text-dim);
+    font-size: 13.5px;
+  }
+  .dropzone.drag{
+    border-color: var(--accent);
+    background: rgba(108,140,255,0.06);
+    color: var(--text);
+  }
+  .dropzone b{ color: var(--text); }
+  #fileInput{ display:none; }
+
+  .stage-outer{
+    display:flex;
+    justify-content:center;
+    margin-top: 6px;
+  }
+  .stage{
+    position:relative;
+    overflow:hidden;
+    border-radius: 10px;
+    background:
+      linear-gradient(45deg, #1a1a1d 25%, transparent 25%),
+      linear-gradient(-45deg, #1a1a1d 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, #1a1a1d 75%),
+      linear-gradient(-45deg, transparent 75%, #1a1a1d 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    background-color: #0c0c0d;
+    border: 1px solid var(--border);
+    touch-action: none;
+    cursor: grab;
+  }
+  .stage.dragging{ cursor: grabbing; }
+  .stage-media{
+    position:absolute;
+    top:0; left:0;
+    -webkit-user-drag: none;
+    user-select:none;
+    pointer-events:none;
+  }
+  .stage-empty{
+    color: var(--text-dim);
+    font-size: 13px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    height: 220px;
+  }
+
+  .controls-row{
+    display:flex;
+    align-items:center;
+    gap: 12px;
+    margin-top: 14px;
+    flex-wrap:wrap;
+  }
+  .zoom-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex:1;
+    min-width: 180px;
+  }
+  .zoom-row span{ font-size:12px; color:var(--text-dim); white-space:nowrap; }
+  input[type=range]{
+    -webkit-appearance:none;
+    width:100%;
+    height: 4px;
+    background: var(--border);
+    border-radius: 999px;
+    outline:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:16px; height:16px;
+    border-radius:50%;
+    background: var(--accent);
+    cursor:pointer;
+    border: 2px solid #fff;
+  }
+  .btn{
+    border:none;
+    border-radius: 10px;
+    padding: 10px 16px;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor:pointer;
+    transition: transform .1s, opacity .15s, filter .15s;
+    white-space:nowrap;
+  }
+  .btn:active{ transform: scale(0.97); }
+  .btn:disabled{ opacity:0.4; cursor:not-allowed; }
+  .btn-ghost{
+    background: var(--panel-2);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover:not(:disabled){ border-color:#3a3a40; }
+  .btn-accent{
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #fff;
+  }
+  .btn-accent:hover:not(:disabled){ filter: brightness(1.08); }
+  .btn-block{ width:100%; }
+
+  .out-grid{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    align-items:end;
+  }
+  .scale-row{
+    display:flex;
+    align-items:center;
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .scale-row span{ font-size:12px; color:var(--text-dim); white-space:nowrap; }
+  .scale-row input[type=range]{ flex:1; }
+  .scale-val{
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--text);
+    min-width: 44px;
+    text-align:right;
+  }
+  .format-row{
+    margin-top: 14px;
+  }
+  .format-row label{
+    display:block;
+    font-size: 11.5px;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+  .format-chips{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+  .chip{
+    border: 1px solid var(--border);
+    background: var(--panel-2);
+    color: var(--text-dim);
+    padding: 8px 13px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor:pointer;
+    transition: all .15s;
+  }
+  .chip:hover:not(:disabled){ border-color:#3a3a40; color: var(--text); }
+  .chip.active{
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    border-color: transparent;
+    color: #fff;
+  }
+  .chip:disabled{ opacity:0.35; cursor:not-allowed; }
+  .format-hint{
+    font-size: 11px;
+    color: #66666c;
+    margin-top: 8px;
+    line-height:1.5;
+  }
+  .out-actions{
+    display:flex;
+    gap:8px;
+    margin-top: 12px;
+  }
+
+  .status{
+    margin-top: 12px;
+    font-size: 12.5px;
+    color: var(--text-dim);
+    min-height: 16px;
+  }
+  .progress{
+    margin-top: 8px;
+    height: 6px;
+    width:100%;
+    background: var(--border);
+    border-radius: 999px;
+    overflow:hidden;
+    display:none;
+  }
+  .progress.show{ display:block; }
+  .progress-bar{
+    height:100%;
+    width:0%;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    transition: width .15s;
+  }
+  .result{
+    margin-top: 14px;
+    display:none;
+    align-items:center;
+    gap:12px;
+    padding: 12px;
+    border-radius: 10px;
+    background: rgba(74,222,128,0.06);
+    border: 1px solid rgba(74,222,128,0.25);
+  }
+  .result.show{ display:flex; }
+  .result-thumb{
+    width:44px; height:44px;
+    border-radius:8px;
+    background:#000;
+    object-fit:cover;
+    flex-shrink:0;
+    border: 1px solid var(--border);
+  }
+  .result-info{ flex:1; font-size:12.5px; }
+  .result-info b{ color: var(--ok); display:block; margin-bottom:2px; }
+  a.dl-link{
+    color: var(--text);
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    text-decoration:none;
+    font-weight:600;
+  }
+  a.dl-link:hover{ border-color: var(--accent); }
+
+  footer{
+    text-align:center;
+    color:#55555c;
+    font-size: 11px;
+    margin-top: 24px;
+    line-height:1.6;
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <h1>Recorte</h1>
+    <p>Cole as dimensões X, Y, Z do Roblox Studio (a profundidade Z é ignorada), envie uma imagem, GIF ou vídeo, posicione e exporte já cortado na proporção certa — em qualquer formato de saída.</p>
+  </header>
+
+  <div class="card">
+    <h2>Dimensão do Roblox Studio</h2>
+    <div class="dims">
+      <div class="field">
+        <label>X (largura)</label>
+        <input type="number" id="dimX" value="1" step="any">
+      </div>
+      <div class="field">
+        <label>Y (altura)</label>
+        <input type="number" id="dimY" value="1" step="any">
+      </div>
+      <div class="field">
+        <label>Z (profundidade)</label>
+        <input type="number" id="dimZ" value="1" step="any" disabled>
+        <small>ignorado no corte</small>
+      </div>
+    </div>
+    <div class="ratio-line">
+      <span>Proporção usada: <b id="ratioLabel">1 : 1</b></span>
+      <span>Saída padrão: <b id="autoResLabel">—</b></span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Mídia</h2>
+    <div class="dropzone" id="dropzone">
+      <div><b>Clique para enviar</b> ou arraste aqui</div>
+      <div style="margin-top:4px;">imagem, GIF animado ou vídeo</div>
+    </div>
+    <input type="file" id="fileInput" accept="image/*,video/*">
+
+    <div class="stage-outer" style="margin-top:16px;">
+      <div class="stage" id="stage">
+        <div class="stage-empty" id="stageEmpty">nenhuma mídia carregada ainda</div>
+      </div>
+    </div>
+
+    <div class="controls-row">
+      <div class="zoom-row">
+        <span>Zoom</span>
+        <input type="range" id="zoomSlider" min="1" max="4" step="0.01" value="1" disabled>
+      </div>
+      <button class="btn btn-ghost" id="resetBtn" disabled>Recentralizar</button>
+    </div>
+    <div class="status" id="editStatus">arraste a mídia para posicionar dentro do quadro</div>
+  </div>
+
+  <div class="card">
+    <h2>Saída</h2>
+
+    <div class="format-row">
+      <label>Formato do arquivo exportado</label>
+      <div class="format-chips" id="formatChips"></div>
+      <div class="format-hint" id="formatHint"></div>
+    </div>
+
+    <div class="out-grid" style="margin-top:16px;">
+      <div class="field">
+        <label>Largura (px)</label>
+        <input type="number" id="outW" min="1" step="1">
+      </div>
+      <div class="field">
+        <label>Altura (px)</label>
+        <input type="number" id="outH" min="1" step="1">
+      </div>
+    </div>
+
+    <div class="scale-row">
+      <span>Escala</span>
+      <input type="range" id="scaleSlider" min="0.1" max="4" step="0.05" value="1">
+      <span class="scale-val" id="scaleVal">1.00×</span>
+    </div>
+
+    <div class="out-actions">
+      <button class="btn btn-ghost" id="autoResBtn">Automático</button>
+      <button class="btn btn-accent btn-block" id="exportBtn" disabled>Cortar e baixar</button>
+    </div>
+    <div class="progress" id="progressWrap"><div class="progress-bar" id="progressBar"></div></div>
+    <div class="status" id="exportStatus"></div>
+
+    <div class="result" id="resultBox">
+      <img class="result-thumb" id="resultThumb">
+      <div class="result-info">
+        <b>Pronto!</b>
+        <span id="resultText"></span>
+      </div>
+      <a class="dl-link" id="resultLink" download>Baixar de novo</a>
+    </div>
+  </div>
+
+  <footer>
+    Tudo roda localmente no seu navegador — nada é enviado para nenhum servidor.<br>
+    GIF, vídeo e conversões entre formatos usam bibliotecas externas carregadas sob demanda.
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- elements ----------
+  const dimX = document.getElementById('dimX');
+  const dimY = document.getElementById('dimY');
+  const ratioLabel = document.getElementById('ratioLabel');
+  const autoResLabel = document.getElementById('autoResLabel');
+
+  const dropzone = document.getElementById('dropzone');
+  const fileInput = document.getElementById('fileInput');
+  const stage = document.getElementById('stage');
+  const stageEmpty = document.getElementById('stageEmpty');
+
+  const zoomSlider = document.getElementById('zoomSlider');
+  const resetBtn = document.getElementById('resetBtn');
+  const editStatus = document.getElementById('editStatus');
+
+  const outWInput = document.getElementById('outW');
+  const outHInput = document.getElementById('outH');
+  const autoResBtn = document.getElementById('autoResBtn');
+  const exportBtn = document.getElementById('exportBtn');
+  const scaleSlider = document.getElementById('scaleSlider');
+  const scaleVal = document.getElementById('scaleVal');
+  const formatChips = document.getElementById('formatChips');
+  const formatHint = document.getElementById('formatHint');
+
+  const progressWrap = document.getElementById('progressWrap');
+  const progressBar = document.getElementById('progressBar');
+  const exportStatus = document.getElementById('exportStatus');
+
+  const resultBox = document.getElementById('resultBox');
+  const resultThumb = document.getElementById('resultThumb');
+  const resultText = document.getElementById('resultText');
+  const resultLink = document.getElementById('resultLink');
+
+  // ---------- state ----------
+  let ratioX = 1, ratioY = 1;
+  let media = null; // {el, type:'image'|'gif'|'video', naturalW, naturalH, isAnimatedGif, gifData:{frames,width,height}}
+  let frameW = 0, frameH = 0;
+  let coverScale = 1, zoom = 1, offsetX = 0, offsetY = 0;
+  let isDragging = false, dragStartX = 0, dragStartY = 0, dragStartOffX = 0, dragStartOffY = 0;
+  let outputManuallyEdited = false;
+  let lastObjectUrl = null;
+  let lastResultUrl = null;
+
+  // base output size (before the scale multiplier is applied)
+  let baseOutW = 512, baseOutH = 512;
+  let scaleFactor = 1;
+
+  let selectedFormat = null; // 'png' | 'jpeg' | 'webp' | 'gif' | 'webm' | 'mp4-ish'
+
+  // formats available depending on the kind of media loaded
+  // note: real .mp4 encoding isn't available in-browser without heavy wasm libs,
+  // so video export offers webm (native, reliable) — mp4 containers from MediaRecorder
+  // are not broadly supported, so we stick to formats that actually work everywhere.
+  const FORMATS = {
+    image: [
+      { id: 'png',  label: 'PNG',  hint: 'sem perda, com transparência.' },
+      { id: 'jpeg', label: 'JPG',  hint: 'menor tamanho, sem transparência.' },
+      { id: 'webp', label: 'WebP', hint: 'leve, com transparência.' }
+    ],
+    animatedGif: [
+      { id: 'gif',  label: 'GIF',  hint: 'animado, compatível universalmente.' },
+      { id: 'webm', label: 'WebM (vídeo)', hint: 'converte a animação em vídeo, arquivo bem menor.' },
+      { id: 'png',  label: 'PNG (1º frame)', hint: 'congela apenas o primeiro quadro.' }
+    ],
+    video: [
+      { id: 'webm', label: 'WebM',  hint: 'vídeo nativo do navegador, gravação direta.' },
+      { id: 'gif',  label: 'GIF',   hint: 'converte o vídeo em GIF animado (arquivo pode ficar grande).' },
+      { id: 'png',  label: 'PNG (quadro atual)', hint: 'congela o frame exibido no momento da exportação.' }
+    ]
+  };
+
+  const loadedScripts = {};
+  function loadScript(url){
+    if(loadedScripts[url]) return loadedScripts[url];
+    loadedScripts[url] = new Promise((resolve, reject)=>{
+      const s = document.createElement('script');
+      s.src = url;
+      s.onload = ()=> resolve();
+      s.onerror = ()=> reject(new Error('Falha ao carregar ' + url));
+      document.head.appendChild(s);
+    });
+    return loadedScripts[url];
+  }
+
+  function fmtNum(n){
+    if(!isFinite(n)) return '0';
+    return (Math.round(n*1000)/1000).toString();
+  }
+
+  // ---------- dimension handling ----------
+  function readDims(){
+    let x = parseFloat(dimX.value);
+    let y = parseFloat(dimY.value);
+    if(!isFinite(x) || x<=0) x = 1;
+    if(!isFinite(y) || y<=0) y = 1;
+    ratioX = x; ratioY = y;
+    ratioLabel.textContent = fmtNum(x) + ' : ' + fmtNum(y);
+    updateAutoResLabel();
+  }
+
+  function computeAutoRes(maxDim){
+    let w, h;
+    if(ratioX >= ratioY){
+      w = maxDim;
+      h = Math.max(1, Math.round(maxDim * ratioY / ratioX));
+    } else {
+      h = maxDim;
+      w = Math.max(1, Math.round(maxDim * ratioX / ratioY));
+    }
+    return {w, h};
+  }
+
+  function updateAutoResLabel(){
+    const r = computeAutoRes(1024);
+    autoResLabel.textContent = r.w + ' × ' + r.h + ' px';
+  }
+
+  function applyAutoRes(){
+    const r = computeAutoRes(1024);
+    baseOutW = r.w;
+    baseOutH = r.h;
+    outputManuallyEdited = false;
+    renderOutFields();
+  }
+
+  // fields always show base size × scale; editing the fields edits the BASE
+  // size directly (so "increase proportions without changing base W/H" works
+  // via the scale slider, while typing in the fields still works as before).
+  function renderOutFields(){
+    outWInput.value = Math.max(1, Math.round(baseOutW * scaleFactor));
+    outHInput.value = Math.max(1, Math.round(baseOutH * scaleFactor));
+  }
+
+  outWInput.addEventListener('input', ()=>{
+    outputManuallyEdited = true;
+    const w = parseInt(outWInput.value, 10);
+    if(isFinite(w) && w>0){
+      const h = Math.max(1, Math.round(w * ratioY / ratioX));
+      outHInput.value = h;
+      // typing directly sets the base size and resets scale to 1x
+      baseOutW = w; baseOutH = h; scaleFactor = 1;
+      scaleSlider.value = 1; scaleVal.textContent = '1.00×';
+    }
+  });
+  outHInput.addEventListener('input', ()=>{
+    outputManuallyEdited = true;
+    const h = parseInt(outHInput.value, 10);
+    if(isFinite(h) && h>0){
+      const w = Math.max(1, Math.round(h * ratioX / ratioY));
+      outWInput.value = w;
+      baseOutW = w; baseOutH = h; scaleFactor = 1;
+      scaleSlider.value = 1; scaleVal.textContent = '1.00×';
+    }
+  });
+  autoResBtn.addEventListener('click', applyAutoRes);
+
+  scaleSlider.addEventListener('input', ()=>{
+    scaleFactor = parseFloat(scaleSlider.value) || 1;
+    scaleVal.textContent = scaleFactor.toFixed(2) + '×';
+    renderOutFields();
+  });
+
+  [dimX, dimY].forEach(inp=>{
+    inp.addEventListener('input', ()=>{
+      readDims();
+      layoutFrame();
+      if(media) resetCropFit();
+      if(!outputManuallyEdited) applyAutoRes();
+      else renderOutFields();
+    });
+  });
+
+  // ---------- format selection ----------
+  function formatSetFor(m){
+    if(!m) return FORMATS.image;
+    if(m.type === 'video') return FORMATS.video;
+    if(m.type === 'gif' && m.isAnimatedGif) return FORMATS.animatedGif;
+    return FORMATS.image;
+  }
+
+  function renderFormatChips(){
+    const set = formatSetFor(media);
+    formatChips.innerHTML = '';
+    if(!selectedFormat || !set.find(f=>f.id===selectedFormat)){
+      selectedFormat = set[0].id;
+    }
+    set.forEach(f=>{
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'chip' + (f.id === selectedFormat ? ' active' : '');
+      chip.textContent = f.label;
+      chip.disabled = !media;
+      chip.addEventListener('click', ()=>{
+        selectedFormat = f.id;
+        renderFormatChips();
+      });
+      formatChips.appendChild(chip);
+    });
+    const active = set.find(f=>f.id===selectedFormat);
+    formatHint.textContent = active ? active.hint : '';
+    updateExportButtonLabel();
+  }
+
+  function updateExportButtonLabel(){
+    const set = formatSetFor(media);
+    const active = set.find(f=>f.id===selectedFormat);
+    const label = active ? active.label : '';
+    exportBtn.textContent = media ? ('Cortar e baixar (' + label + ')') : 'Cortar e baixar';
+  }
+
+  // ---------- frame layout ----------
+  function layoutFrame(){
+    const containerW = stage.parentElement.clientWidth;
+    const maxW = Math.min(containerW, 560);
+    const maxH = Math.min(window.innerHeight * 0.55, 560);
+    const ratio = ratioX / ratioY;
+    let w = maxW, h = w / ratio;
+    if(h > maxH){ h = maxH; w = h * ratio; }
+    if(w < 60) w = 60;
+    if(h < 60) h = 60;
+    frameW = w; frameH = h;
+    stage.style.width = w + 'px';
+    stage.style.height = h + 'px';
+  }
+  window.addEventListener('resize', ()=>{
+    layoutFrame();
+    if(media) fitAndClamp();
+  });
+
+  // ---------- drop zone / file input ----------
+  dropzone.addEventListener('click', ()=> fileInput.click());
+  dropzone.addEventListener('dragover', e=>{ e.preventDefault(); dropzone.classList.add('drag'); });
+  dropzone.addEventListener('dragleave', ()=> dropzone.classList.remove('drag'));
+  dropzone.addEventListener('drop', e=>{
+    e.preventDefault();
+    dropzone.classList.remove('drag');
+    if(e.dataTransfer.files && e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+  });
+  fileInput.addEventListener('change', ()=>{
+    if(fileInput.files && fileInput.files[0]) handleFile(fileInput.files[0]);
+  });
+
+  async function handleFile(file){
+    resultBox.classList.remove('show');
+    exportStatus.textContent = '';
+    editStatus.textContent = 'carregando mídia...';
+
+    if(lastObjectUrl){ URL.revokeObjectURL(lastObjectUrl); lastObjectUrl = null; }
+    stage.querySelectorAll('.stage-media').forEach(el=> el.remove());
+    stageEmpty.style.display = 'none';
+
+    const isVideo = file.type.startsWith('video/');
+    const isGif = file.type === 'image/gif';
+    const url = URL.createObjectURL(file);
+    lastObjectUrl = url;
+
+    try{
+      if(isVideo){
+        const videoEl = document.createElement('video');
+        videoEl.src = url;
+        videoEl.muted = true;
+        videoEl.loop = true;
+        videoEl.autoplay = true;
+        videoEl.playsInline = true;
+        videoEl.className = 'stage-media';
+        await new Promise((res, rej)=>{
+          videoEl.onloadedmetadata = res;
+          videoEl.onerror = ()=> rej(new Error('não foi possível ler o vídeo'));
+        });
+        stage.appendChild(videoEl);
+        videoEl.play().catch(()=>{});
+        media = { el: videoEl, type: 'video', naturalW: videoEl.videoWidth, naturalH: videoEl.videoHeight, isAnimatedGif:false };
+      } else if(isGif){
+        editStatus.textContent = 'decodificando GIF...';
+        await loadScript('https://cdn.jsdelivr.net/npm/gifuct-js@2.1.2/dist/gifuct.js');
+        const buf = await file.arrayBuffer();
+        const gifuct = window.gifuct;
+        const parsed = gifuct.parseGIF(buf);
+        const rawFrames = gifuct.decompressFrames(parsed, true);
+        const gW = parsed.lsd.width, gH = parsed.lsd.height;
+
+        const imgEl = document.createElement('img');
+        imgEl.src = url;
+        imgEl.className = 'stage-media';
+        await new Promise((res, rej)=>{
+          imgEl.onload = res;
+          imgEl.onerror = ()=> rej(new Error('não foi possível ler a imagem'));
+        });
+        stage.appendChild(imgEl);
+
+        const isAnimated = rawFrames.length > 1;
+        let gifData = null;
+        if(isAnimated){
+          gifData = { frames: buildGifFullFrames(rawFrames, gW, gH), width: gW, height: gH };
+        }
+        media = { el: imgEl, type: 'gif', naturalW: gW, naturalH: gH, isAnimatedGif: isAnimated, gifData };
+      } else {
+        const imgEl = document.createElement('img');
+        imgEl.src = url;
+        imgEl.className = 'stage-media';
+        await new Promise((res, rej)=>{
+          imgEl.onload = res;
+          imgEl.onerror = ()=> rej(new Error('não foi possível ler a imagem'));
+        });
+        stage.appendChild(imgEl);
+        media = { el: imgEl, type: 'image', naturalW: imgEl.naturalWidth, naturalH: imgEl.naturalHeight, isAnimatedGif:false };
+      }
+
+      layoutFrame();
+      resetCropFit();
+      zoomSlider.disabled = false;
+      resetBtn.disabled = false;
+      exportBtn.disabled = false;
+      selectedFormat = null; // reset so it picks the first sensible default for this media
+      renderFormatChips();
+      const kindLabel = media.type === 'video' ? 'vídeo' : (media.isAnimatedGif ? 'GIF animado' : 'imagem');
+      editStatus.textContent = kindLabel + ' carregado — arraste para posicionar, use o zoom se quiser.';
+    } catch(err){
+      console.error(err);
+      editStatus.textContent = 'Erro: ' + err.message;
+      stageEmpty.style.display = 'flex';
+    }
+  }
+
+  // composite gifuct-js frame patches into full RGBA frames
+  function buildGifFullFrames(rawFrames, gW, gH){
+    const canvas = document.createElement('canvas');
+    canvas.width = gW; canvas.height = gH;
+    const ctx = canvas.getContext('2d');
+    const out = [];
+    rawFrames.forEach(frame=>{
+      const { left, top, width, height } = frame.dims;
+      const frameImageData = new ImageData(new Uint8ClampedArray(frame.patch), width, height);
+      ctx.putImageData(frameImageData, left, top);
+      const fullImageData = ctx.getImageData(0, 0, gW, gH);
+      const delayMs = (frame.delay || 8) * 10;
+      out.push({ imageData: fullImageData, delay: delayMs });
+      if(frame.disposalType === 2){
+        ctx.clearRect(left, top, width, height);
+      }
+    });
+    return out;
+  }
+
+  // ---------- crop fit / pan / zoom ----------
+  function resetCropFit(){
+    zoom = 1;
+    zoomSlider.value = 1;
+    fitAndClamp();
+  }
+
+  function fitAndClamp(){
+    if(!media) return;
+    coverScale = Math.max(frameW / media.naturalW, frameH / media.naturalH);
+    const dispW = media.naturalW * coverScale * zoom;
+    const dispH = media.naturalH * coverScale * zoom;
+    offsetX = (frameW - dispW) / 2;
+    offsetY = (frameH - dispH) / 2;
+    clampOffsets(dispW, dispH);
+    applyMediaStyle(dispW, dispH);
+  }
+
+  function clampOffsets(dispW, dispH){
+    const minX = frameW - dispW, maxX = 0;
+    const minY = frameH - dispH, maxY = 0;
+    offsetX = Math.min(maxX, Math.max(minX, offsetX));
+    offsetY = Math.min(maxY, Math.max(minY, offsetY));
+  }
+
+  function applyMediaStyle(dispW, dispH){
+    media.el.style.width = dispW + 'px';
+    media.el.style.height = dispH + 'px';
+    media.el.style.left = offsetX + 'px';
+    media.el.style.top = offsetY + 'px';
+  }
+
+  zoomSlider.addEventListener('input', ()=>{
+    if(!media) return;
+    const newZoom = parseFloat(zoomSlider.value);
+    const oldDispW = media.naturalW * coverScale * zoom;
+    const oldDispH = media.naturalH * coverScale * zoom;
+    // relative focal point at frame center, in media-display space
+    const relX = (frameW/2 - offsetX) / oldDispW;
+    const relY = (frameH/2 - offsetY) / oldDispH;
+    zoom = newZoom;
+    const newDispW = media.naturalW * coverScale * zoom;
+    const newDispH = media.naturalH * coverScale * zoom;
+    offsetX = frameW/2 - relX * newDispW;
+    offsetY = frameH/2 - relY * newDispH;
+    clampOffsets(newDispW, newDispH);
+    applyMediaStyle(newDispW, newDispH);
+  });
+
+  resetBtn.addEventListener('click', resetCropFit);
+
+  stage.addEventListener('pointerdown', e=>{
+    if(!media) return;
+    isDragging = true;
+    stage.classList.add('dragging');
+    dragStartX = e.clientX; dragStartY = e.clientY;
+    dragStartOffX = offsetX; dragStartOffY = offsetY;
+    stage.setPointerCapture(e.pointerId);
+  });
+  stage.addEventListener('pointermove', e=>{
+    if(!isDragging || !media) return;
+    const dx = e.clientX - dragStartX;
+    const dy = e.clientY - dragStartY;
+    offsetX = dragStartOffX + dx;
+    offsetY = dragStartOffY + dy;
+    const dispW = media.naturalW * coverScale * zoom;
+    const dispH = media.naturalH * coverScale * zoom;
+    clampOffsets(dispW, dispH);
+    applyMediaStyle(dispW, dispH);
+  });
+  function endDrag(e){
+    if(!isDragging) return;
+    isDragging = false;
+    stage.classList.remove('dragging');
+  }
+  stage.addEventListener('pointerup', endDrag);
+  stage.addEventListener('pointercancel', endDrag);
+
+  // ---------- export ----------
+  function getOutSize(){
+    let w = parseInt(outWInput.value, 10);
+    let h = parseInt(outHInput.value, 10);
+    if(!isFinite(w) || w<=0) w = 512;
+    if(!isFinite(h) || h<=0) h = 512;
+    w = Math.min(w, 6000); h = Math.min(h, 6000);
+    return { w, h };
+  }
+
+  function getCropRectInMediaSpace(){
+    const dispScale = coverScale * zoom;
+    const sx = -offsetX / dispScale;
+    const sy = -offsetY / dispScale;
+    const sW = frameW / dispScale;
+    const sH = frameH / dispScale;
+    return { sx, sy, sW, sH };
+  }
+
+  function setBusy(busy, msg){
+    exportBtn.disabled = busy || !media;
+    exportStatus.textContent = msg || '';
+    if(!busy){ progressWrap.classList.remove('show'); progressBar.style.width='0%'; }
+  }
+  function setProgress(pct){
+    progressWrap.classList.add('show');
+    progressBar.style.width = Math.max(0, Math.min(100, pct)) + '%';
+  }
+
+  function sanitizeNum(n){
+    return fmtNum(n).replace('.', '-').replace('-', '_');
+  }
+  function fileBaseName(){
+    return 'corte_' + sanitizeNum(ratioX) + 'x' + sanitizeNum(ratioY);
+  }
+
+  function showResult(url, ext, previewIsImage){
+    if(lastResultUrl) URL.revokeObjectURL(lastResultUrl);
+    lastResultUrl = url;
+    const { w, h } = getOutSize();
+    const name = fileBaseName() + '.' + ext;
+    resultLink.href = url;
+    resultLink.download = name;
+    resultText.textContent = name + ' — ' + w + '×' + h + ' px';
+    if(previewIsImage){
+      resultThumb.src = url;
+      resultThumb.style.display = '';
+    } else {
+      resultThumb.style.display = 'none';
+    }
+    resultBox.classList.add('show');
+    // trigger the actual download
+    const a = document.createElement('a');
+    a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+  }
+
+  function mimeForImageFormat(fmt){
+    if(fmt === 'jpeg') return 'image/jpeg';
+    if(fmt === 'webp') return 'image/webp';
+    return 'image/png';
+  }
+  function extForImageFormat(fmt){
+    if(fmt === 'jpeg') return 'jpg';
+    return fmt; // png / webp
+  }
+
+  exportBtn.addEventListener('click', async ()=>{
+    if(!media) return;
+    try{
+      const fmt = selectedFormat;
+      if(fmt === 'gif'){
+        await exportAsGif();
+      } else if(fmt === 'webm'){
+        await exportAsWebm();
+      } else {
+        // png / jpeg / webp — single still frame regardless of source type
+        exportAsStillImage(fmt);
+      }
+    } catch(err){
+      console.error(err);
+      setBusy(false, 'Erro: ' + err.message);
+    }
+  });
+
+  // draws whatever "current visible frame" of the source element (image, gif <img>, or video)
+  // into a canvas at the target crop/output size. works for any media type as a still export.
+  function exportAsStillImage(fmt){
+    setBusy(true, 'gerando imagem...');
+    const { w, h } = getOutSize();
+    const { sx, sy, sW, sH } = getCropRectInMediaSpace();
+    const canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    if(fmt !== 'png'){
+      // jpeg/webp have no alpha channel by default in most viewers; paint a white backdrop
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0,0,w,h);
+    }
+    ctx.drawImage(media.el, sx, sy, sW, sH, 0, 0, w, h);
+    const mime = mimeForImageFormat(fmt);
+    canvas.toBlob(blob=>{
+      if(!blob){ setBusy(false, 'Erro: formato de imagem não suportado neste navegador.'); return; }
+      const url = URL.createObjectURL(blob);
+      showResult(url, extForImageFormat(fmt), true);
+      setBusy(false, 'pronto.');
+    }, mime, 0.92);
+  }
+
+  // Builds a list of {imageData, delay} frames for GIF encoding regardless of source:
+  // - animated GIF source -> its decoded frames, cropped/scaled
+  // - video source -> frames sampled by playing the video and drawing at intervals
+  // - static image source -> a single frame
+  async function collectFramesForGifExport(){
+    const { w, h } = getOutSize();
+    const { sx, sy, sW, sH } = getCropRectInMediaSpace();
+    const outCanvas = document.createElement('canvas');
+    outCanvas.width = w; outCanvas.height = h;
+    const outCtx = outCanvas.getContext('2d');
+
+    if(media.type === 'gif' && media.isAnimatedGif){
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = media.gifData.width;
+      tempCanvas.height = media.gifData.height;
+      const tempCtx = tempCanvas.getContext('2d');
+      const frames = media.gifData.frames;
+      const out = [];
+      for(let i=0;i<frames.length;i++){
+        tempCtx.putImageData(frames[i].imageData, 0, 0);
+        outCtx.clearRect(0,0,w,h);
+        outCtx.drawImage(tempCanvas, sx, sy, sW, sH, 0, 0, w, h);
+        out.push({ canvasSnapshot: outCtx.getImageData(0,0,w,h), delay: frames[i].delay });
+        setProgress((i/frames.length) * 40);
+        setBusy(true, 'preparando frames... ' + (i+1) + '/' + frames.length);
+      }
+      return out;
+    }
+
+    if(media.type === 'video'){
+      const videoEl = media.el;
+      const fps = 12; // reasonable balance of smoothness vs file size for gif export
+      const delay = Math.round(1000/fps);
+      const out = [];
+      await new Promise((resolve)=>{
+        videoEl.currentTime = 0;
+        videoEl.loop = false;
+        const onSeeked = async ()=>{
+          const duration = videoEl.duration || 0;
+          const totalFrames = Math.max(1, Math.round(duration * fps));
+          for(let i=0;i<totalFrames;i++){
+            const t = i / fps;
+            await seekVideo(videoEl, Math.min(t, duration));
+            outCtx.clearRect(0,0,w,h);
+            outCtx.drawImage(videoEl, sx, sy, sW, sH, 0, 0, w, h);
+            out.push({ canvasSnapshot: outCtx.getImageData(0,0,w,h), delay });
+            setProgress((i/totalFrames) * 40);
+            setBusy(true, 'amostrando quadros do vídeo... ' + (i+1) + '/' + totalFrames);
+          }
+          videoEl.removeEventListener('seeked', onSeeked);
+          resolve();
+        };
+        videoEl.addEventListener('seeked', onSeeked);
+        // trigger initial seek in case currentTime=0 doesn't fire seeked
+        videoEl.currentTime = 0.0001;
+      });
+      videoEl.loop = true;
+      videoEl.currentTime = 0;
+      videoEl.play().catch(()=>{});
+      return out;
+    }
+
+    // static image -> single frame
+    outCtx.clearRect(0,0,w,h);
+    outCtx.drawImage(media.el, sx, sy, sW, sH, 0, 0, w, h);
+    return [{ canvasSnapshot: outCtx.getImageData(0,0,w,h), delay: 1000 }];
+  }
+
+  function seekVideo(videoEl, t){
+    return new Promise(resolve=>{
+      const onSeeked = ()=>{ videoEl.removeEventListener('seeked', onSeeked); resolve(); };
+      videoEl.addEventListener('seeked', onSeeked);
+      videoEl.currentTime = t;
+    });
+  }
+
+  async function exportAsGif(){
+    setBusy(true, 'preparando codificador de GIF...');
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js');
+    const { w, h } = getOutSize();
+
+    const frames = await collectFramesForGifExport();
+
+    const gif = new window.GIF({
+      workers: 2,
+      quality: 10,
+      width: w,
+      height: h,
+      workerScript: 'https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js'
+    });
+
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = w; tempCanvas.height = h;
+    const tempCtx = tempCanvas.getContext('2d');
+
+    frames.forEach(f=>{
+      tempCtx.putImageData(f.canvasSnapshot, 0, 0);
+      gif.addFrame(tempCtx, { copy: true, delay: f.delay });
+    });
+
+    gif.on('progress', p=>{
+      setProgress(40 + p*60);
+      setBusy(true, 'codificando GIF... ' + Math.round(p*100) + '%');
+    });
+    gif.on('finished', blob=>{
+      const url = URL.createObjectURL(blob);
+      showResult(url, 'gif', true);
+      setBusy(false, 'pronto.');
+    });
+    gif.render();
+  }
+
+  // exports as WebM. If source is a video, records it in real time (so audio can
+  // be preserved). If source is an animated GIF or static image, renders frames
+  // onto a canvas stream and records that instead (no audio in those cases).
+  async function exportAsWebm(){
+    const { w, h } = getOutSize();
+    const outCanvas = document.createElement('canvas');
+    outCanvas.width = w; outCanvas.height = h;
+    outCanvas.style.position = 'absolute';
+    outCanvas.style.left = '-99999px';
+    document.body.appendChild(outCanvas);
+    const outCtx = outCanvas.getContext('2d');
+
+    const canvasStream = outCanvas.captureStream(30);
+    let finalStream = canvasStream;
+    if(media.type === 'video'){
+      try{
+        if(typeof media.el.captureStream === 'function'){
+          const mediaStream = media.el.captureStream();
+          const audioTracks = mediaStream.getAudioTracks();
+          if(audioTracks.length){
+            finalStream = new MediaStream([...canvasStream.getVideoTracks(), ...audioTracks]);
+          }
+        }
+      } catch(e){ /* sem áudio, sem problema */ }
+    }
+
+    const mimeCandidates = ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'];
+    const mimeType = mimeCandidates.find(t=> window.MediaRecorder && MediaRecorder.isTypeSupported(t)) || '';
+    if(!mimeType){
+      document.body.removeChild(outCanvas);
+      throw new Error('gravação de vídeo não é suportada neste navegador');
+    }
+
+    const recorder = new MediaRecorder(finalStream, { mimeType, videoBitsPerSecond: 6_000_000 });
+    const chunks = [];
+    recorder.ondataavailable = e=>{ if(e.data && e.data.size) chunks.push(e.data); };
+
+    const { sx, sy, sW, sH } = getCropRectInMediaSpace();
+    setBusy(true, 'gravando vídeo... 0%');
+
+    if(media.type === 'video'){
+      const videoEl = media.el;
+      let rafId = null;
+      function drawLoop(){
+        outCtx.clearRect(0,0,w,h);
+        outCtx.drawImage(videoEl, sx, sy, sW, sH, 0, 0, w, h);
+        const pct = videoEl.duration ? (videoEl.currentTime / videoEl.duration) * 100 : 0;
+        setProgress(pct);
+        setBusy(true, 'gravando vídeo... ' + Math.round(pct) + '%');
+        rafId = requestAnimationFrame(drawLoop);
+      }
+      await new Promise((resolve)=>{
+        videoEl.currentTime = 0;
+        const onEnded = ()=>{
+          cancelAnimationFrame(rafId);
+          recorder.stop();
+          videoEl.removeEventListener('ended', onEnded);
+          resolve();
+        };
+        videoEl.addEventListener('ended', onEnded);
+        videoEl.loop = false;
+        recorder.start();
+        drawLoop();
+        videoEl.play().catch(()=>{});
+      });
+      videoEl.loop = true;
+      videoEl.play().catch(()=>{});
+    } else if(media.type === 'gif' && media.isAnimatedGif){
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = media.gifData.width;
+      tempCanvas.height = media.gifData.height;
+      const tempCtx = tempCanvas.getContext('2d');
+      const frames = media.gifData.frames;
+      const loops = 1; // one pass through the gif animation
+      recorder.start();
+      for(let loop=0; loop<loops; loop++){
+        for(let i=0;i<frames.length;i++){
+          tempCtx.putImageData(frames[i].imageData, 0, 0);
+          outCtx.clearRect(0,0,w,h);
+          outCtx.drawImage(tempCanvas, sx, sy, sW, sH, 0, 0, w, h);
+          const pct = ((loop*frames.length + i) / (loops*frames.length)) * 100;
+          setProgress(pct);
+          setBusy(true, 'gravando... ' + Math.round(pct) + '%');
+          await new Promise(r=> setTimeout(r, Math.max(16, frames[i].delay)));
+        }
+      }
+      recorder.stop();
+      await new Promise(resolve=>{ recorder.onstop = resolve; });
+    } else {
+      // static image -> short still clip
+      outCtx.clearRect(0,0,w,h);
+      outCtx.drawImage(media.el, sx, sy, sW, sH, 0, 0, w, h);
+      recorder.start();
+      await new Promise(r=> setTimeout(r, 1200));
+      recorder.stop();
+      await new Promise(resolve=>{ recorder.onstop = resolve; });
+    }
+
+    await new Promise(resolve=>{
+      if(recorder.state === 'inactive') resolve();
+      else recorder.onstop = resolve;
+    });
+    document.body.removeChild(outCanvas);
+
+    const blob = new Blob(chunks, { type: mimeType.split(';')[0] });
+    const url = URL.createObjectURL(blob);
+    showResult(url, 'webm', false);
+    setBusy(false, 'pronto.');
+  }
+
+  // ---------- init ----------
+  readDims();
+  layoutFrame();
+  applyAutoRes();
+  renderFormatChips();
+})();
+</script>
+</body>
+</html>
