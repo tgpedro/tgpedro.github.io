@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Meu Glossário ENEM 2027</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<style>
+:root{
+  --bg:#f6f5f2;--surface:#ffffff;--ink:#1d1d1f;--muted:#6e6e73;--line:#e3e1db;
+  --accent:#2f4a3f;--accent-soft:#e6ede8;--danger:#9b3b32;--danger-soft:#f6e7e5;--ok:#2f6b47;--ok-soft:#e3f0e7;
+  --radius:12px;--serif:Georgia,"Iowan Old Style","Times New Roman",serif;--sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5}
+h1,h2,h3{font-family:var(--serif);font-weight:600;margin:0 0 .4em}
+h1{font-size:1.9rem}h2{font-size:1.4rem}h3{font-size:1.1rem}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:.45rem 1rem;transition:background .15s}
+button:hover{background:#f0efeb}
+button:disabled{opacity:.5;cursor:not-allowed}
+button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+button.primary:hover{background:#243a31}
+button.danger{color:var(--danger)}
+button.icon{border:none;background:none;padding:.2rem .4rem;font-size:1.1rem;border-radius:8px}
+input,select,textarea{width:100%;padding:.6rem .8rem;border:1px solid var(--line);border-radius:10px;background:var(--surface);outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+textarea{min-height:90px;resize:vertical}
+label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:.8rem}
+label input,label select,label textarea{margin-top:.3rem;color:var(--ink)}
+.hidden{display:none!important}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:1.1rem 1.2rem}
+.muted{color:var(--muted)}
+.row{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap}
+.grid{display:grid;gap:1rem}
+.grid.cards{grid-template-columns:repeat(auto-fill,minmax(290px,1fr))}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin:1.2rem 0}
+.stat strong{display:block;font-family:var(--serif);font-size:1.9rem}
+.badge{display:inline-block;font-size:.75rem;padding:.15rem .6rem;border-radius:999px;background:var(--accent-soft);color:var(--accent);margin:0 .3rem .3rem 0}
+.badge.type{background:#efeee9;color:var(--muted)}
+.topbar{position:sticky;top:0;z-index:5;background:rgba(246,245,242,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.topbar .inner{max-width:1100px;margin:auto;padding:.8rem 1.2rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+.brand{font-family:var(--serif);font-weight:600;font-size:1.1rem;margin-right:auto}
+.nav button{border:none;background:none;padding:.4rem .7rem;color:var(--muted)}
+.nav button.active{color:var(--accent);background:var(--accent-soft)}
+main{max-width:1100px;margin:auto;padding:1.5rem 1.2rem 4rem}
+.section-head{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:1rem}
+.chips{display:flex;flex-wrap:wrap;gap:.5rem}
+.chips button{font-size:.85rem;padding:.35rem .8rem}
+.chips button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.entry-body p{margin:.35rem 0}
+.entry-body .label{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.entry-actions{display:flex;justify-content:flex-end;gap:.2rem;margin-top:.8rem;border-top:1px solid var(--line);padding-top:.6rem}
+.fav{color:#b8860b}
+.screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1.5rem}
+.screen .card{width:100%;max-width:420px}
+.msg{font-size:.9rem;margin-top:.5rem;min-height:1.2em}
+.msg.erro{color:var(--danger)}.msg.ok{color:var(--ok)}
+.preview{background:var(--accent-soft);border-radius:10px;padding:.9rem 1rem;margin-bottom:1rem;font-size:.9rem}
+.toast{position:fixed;bottom:1.2rem;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:.7rem 1.1rem;border-radius:10px;z-index:99;max-width:90vw;box-shadow:0 6px 24px rgba(0,0,0,.2)}
+.toast.erro{background:var(--danger)}.toast.ok{background:var(--ok)}
+.loading{color:var(--muted);padding:1rem 0}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;vertical-align:-2px;margin-right:.4rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:flex-start;justify-content:center;padding:2rem 1rem;z-index:50;overflow:auto}
+.modal{background:var(--surface);border-radius:var(--radius);padding:1.4rem;width:100%;max-width:600px}
+.exercise .opts{display:grid;gap:.5rem;margin:1rem 0}
+.exercise .opts button{text-align:left;border-radius:10px;padding:.7rem .9rem}
+.exercise .opts button.right{background:var(--ok-soft);border-color:var(--ok)}
+.exercise .opts button.wrong{background:var(--danger-soft);border-color:var(--danger)}
+.quote{font-family:var(--serif);font-size:1.15rem;margin:.6rem 0}
+@media (max-width:640px){
+  .stats{grid-template-columns:1fr 1fr 1fr;gap:.6rem}
+  .stat strong{font-size:1.4rem}
+  h1{font-size:1.5rem}
+  .topbar .inner{gap:.5rem}
+  .brand{width:100%}
+}
+</style>
+</head>
+<body>
+
+<!-- Tela de configuração do Supabase -->
+<section id="screen-config" class="screen hidden">
+  <div class="card">
+    <h2>Conectar ao Supabase</h2>
+    <p class="muted">Informe a URL do projeto e a chave pública (anon / publishable). Elas ficam salvas apenas neste navegador.</p>
+    <form id="form-config">
+      <label>URL do projeto
+        <input id="cfg-url" type="url" placeholder="https://xxxx.supabase.co" required>
+      </label>
+      <label>Chave pública (anon ou publishable)
+        <input id="cfg-key" type="text" placeholder="eyJ... ou sb_publishable_..." required autocomplete="off">
+      </label>
+      <button class="primary" type="submit">Salvar e continuar</button>
+      <div id="msg-config" class="msg erro"></div>
+    </form>
+  </div>
+</section>
+
+<!-- Tela de autenticação -->
+<section id="screen-auth" class="screen hidden">
+  <div class="card">
+    <h2>Meu Glossário ENEM 2027</h2>
+    <p class="muted" id="auth-subtitle">Entre para acessar seu glossário.</p>
+    <form id="form-auth">
+      <label>E-mail <input id="auth-email" type="email" required autocomplete="email"></label>
+      <label>Senha <input id="auth-pass" type="password" required minlength="6" autocomplete="current-password"></label>
+      <button class="primary" type="submit" id="auth-submit" style="width:100%">Entrar</button>
+    </form>
+    <p class="row" style="justify-content:center;margin-top:1rem">
+      <span class="muted" id="auth-switch-text">Não tem conta?</span>
+      <button class="icon" id="auth-switch" type="button" style="color:var(--accent)">Criar conta</button>
+    </p>
+    <div id="msg-auth" class="msg"></div>
+    <p class="muted" style="font-size:.8rem;margin-top:.6rem">
+      <button class="icon" id="cfg-reset" type="button" style="font-size:.8rem">Trocar projeto Supabase</button>
+    </p>
+  </div>
+</section>
+
+<!-- Aplicativo -->
+<div id="app" class="hidden">
+  <header class="topbar">
+    <div class="inner">
+      <div class="brand">Meu Glossário ENEM 2027</div>
+      <nav class="nav row">
+        <button data-view="home" class="active">Início</button>
+        <button data-view="add">Adicionar</button>
+        <button data-view="library">Biblioteca</button>
+        <button data-view="practice">Praticar</button>
+        <button id="btn-logout" class="danger">Sair</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- INÍCIO -->
+    <section id="view-home">
+      <div class="section-head">
+        <div>
+          <h1>Seu vocabulário para a redação</h1>
+          <p class="muted">Organize expressões formais, conceitos e conectivos em um só lugar.</p>
+        </div>
+        <button class="primary" data-view="add">+ Adicionar conteúdo</button>
+      </div>
+      <form id="form-global-search" class="row" style="margin-bottom:1rem">
+        <input id="global-search" type="search" placeholder="Pesquisar em todo o glossário…" style="flex:1">
+        <button class="primary" type="submit">Pesquisar</button>
+      </form>
+      <div class="stats">
+        <div class="card stat"><strong id="stat-total">0</strong><span class="muted">conteúdos salvos</span></div>
+        <div class="card stat"><strong id="stat-cats">0</strong><span class="muted">categorias em uso</span></div>
+        <div class="card stat"><strong id="stat-fav">0</strong><span class="muted">favoritos</span></div>
+      </div>
+      <h3>Acesso rápido às categorias</h3>
+      <div class="chips" id="home-cats" style="margin-bottom:1.5rem"></div>
+      <h3>Adicionados recentemente</h3>
+      <div id="home-recent" class="grid cards"></div>
+    </section>
+
+    <!-- ADICIONAR -->
+    <section id="view-add" class="hidden">
+      <h2>Adicionar conteúdo</h2>
+      <p class="muted">Digite uma expressão, uma substituição (ex.: <em>Recebe pouco dinheiro → Possui baixa renda</em>) ou uma definição (ex.: <em>Termo: explicação</em>).</p>
+      <div class="card" style="max-width:720px">
+        <form id="form-add">
+          <label>Conteúdo
+            <textarea id="f-texto" required placeholder="Digite aqui..."></textarea>
+          </label>
+          <label>Título (opcional)
+            <input id="f-titulo" type="text" placeholder="Se vazio, o sistema define automaticamente">
+          </label>
+          <div id="preview" class="preview hidden"></div>
+          <label>Categoria (identificada automaticamente; você pode alterar)
+            <input id="f-cat" list="cat-list" type="text" required>
+          </label>
+          <div class="row" style="justify-content:flex-end;margin-top:.5rem">
+            <button type="button" id="btn-reset-add">Limpar</button>
+            <button class="primary" type="submit" id="btn-save-add">Salvar no glossário</button>
+          </div>
+          <div id="msg-add" class="msg"></div>
+        </form>
+      </div>
+    </section>
+
+    <!-- BIBLIOTECA -->
+    <section id="view-library" class="hidden">
+      <div class="section-head">
+        <h2>Biblioteca</h2>
+        <div class="row">
+          <input id="lib-search" type="search" placeholder="Pesquisar…" style="width:220px">
+          <select id="lib-cat" style="width:auto"></select>
+          <label style="margin:0;display:flex;align-items:center;gap:.3rem"><input type="checkbox" id="lib-fav" style="width:auto"> Só favoritos</label>
+        </div>
+      </div>
+      <div id="lib-list" class="grid cards"></div>
+    </section>
+
+    <!-- PRATICAR -->
+    <section id="view-practice" class="hidden">
+      <div class="section-head">
+        <div>
+          <h2>Praticar</h2>
+          <p class="muted" id="practice-stats">Acertos: 0 de 0</p>
+        </div>
+        <button class="primary" id="btn-next-ex">Próximo exercício</button>
+      </div>
+      <div class="card exercise" id="practice-area"></div>
+    </section>
+  </main>
+</div>
+
+<!-- Datalist de categorias -->
+<datalist id="cat-list"></datalist>
+
+<!-- Modal de edição -->
+<div id="modal" class="modal-bg hidden">
+  <div class="modal">
+    <div class="section-head"><h3>Editar conteúdo</h3><button class="icon" id="modal-close" aria-label="Fechar">✕</button></div>
+    <form id="form-edit">
+      <label>Título <input id="e-titulo" required></label>
+      <label>Texto original <textarea id="e-original"></textarea></label>
+      <label>Versão formal <textarea id="e-formal" style="min-height:60px"></textarea></label>
+      <label>Explicação <textarea id="e-expl"></textarea></label>
+      <label>Exemplo de utilização <textarea id="e-exemplo"></textarea></label>
+      <div class="grid" style="grid-template-columns:1fr 1fr;gap:.8rem">
+        <label>Categoria <input id="e-cat" list="cat-list" required></label>
+        <label>Subcategoria <input id="e-sub"></label>
+      </div>
+      <label>Tipo de conteúdo <input id="e-tipo"></label>
+      <label class="row" style="gap:.5rem"><input type="checkbox" id="e-fav" style="width:auto"> Favorito</label>
+      <div class="row" style="justify-content:flex-end">
+        <button type="button" id="modal-cancel">Cancelar</button>
+        <button class="primary" type="submit">Salvar alterações</button>
+      </div>
+      <div id="msg-edit" class="msg"></div>
+    </form>
+  </div>
+</div>
+
+<script>
+/* ===================== Configuração e estado ===================== */
+const CATEGORIAS_BASE = [
+  'Condições financeiras e desigualdade social','Educação','Saúde pública','Meio ambiente',
+  'Tecnologia e sociedade','Direitos humanos','Política e cidadania','Segurança pública',
+  'Cultura e sociedade','Repertórios socioculturais','Conectivos e coesão','Argumentação',
+  'Estruturas de introdução','Estruturas de desenvolvimento','Estruturas de conclusão','Vocabulário geral'
+];
+
+// Palavras-chave para a categorização automática básica (sem IA).
+// Use nomes de categoria idênticos aos de CATEGORIAS_BASE.
+const PALAVRAS_CHAVE = {
+  'Condições financeiras e desigualdade social': ['renda','pobreza','pobre','desigualdade','financeir','dinheiro','salario','economic','miseria','vulnerab'],
+  'Educação': ['escola','ensino','educacao','aluno','professor','alfabetiz','universidade','evasao'],
+  'Saúde pública': ['saude','sus ','hospital','doenca','vacina','epidemi','atendimento medico','sistema de saude'],
+  'Meio ambiente': ['ambiental','desmatamento','poluicao','clima','sustentavel','ecossistema','carbono','aquecimento'],
+  'Tecnologia e sociedade': ['tecnolog','digital','internet','inteligencia artificial','redes sociais','algoritmo','desinformacao'],
+  'Direitos humanos': ['direitos humanos','dignidade','discriminac','preconceito','minorias','racismo','igualdade de'],
+  'Política e cidadania': ['politic','governo','eleitor','democracia','cidadania','institui','estado '],
+  'Segurança pública': ['violencia','crime','seguranca','policia','criminal'],
+  'Cultura e sociedade': ['cultura','tradicao','identidade','costume','patrimonio'],
+  'Repertórios socioculturais': ['repertorio','filosofo','livro','filme','autor','obra','segundo '],
+  'Conectivos e coesão': ['portanto','entretanto','contudo','todavia','ademais','por conseguinte','outrossim','logo ','assim '],
+  'Argumentação': ['argumento','tese','premissa','evidencia','porque','pois ','uma vez que'],
+  'Estruturas de introdução': ['inicialmente','nos dias de hoje','e inegavel','e fato que','em primeiro lugar','introducao'],
+  'Estruturas de desenvolvimento': ['em segundo lugar','nesse sentido','sob essa otica','desenvolvimento','por um lado','por outro lado'],
+  'Estruturas de conclusão': ['diante do exposto','em suma','conclusao','assim sendo','em sintese','portanto,']
+};
+
+const TIPO_NOMES = {
+  substituicao: 'Substituição de expressão',
+  conceito: 'Conceito ou definição',
+  palavra: 'Palavra ou expressão',
+  frase: 'Frase ou construção'
+};
+
+/* ===== CONEXÃO COM O SUPABASE =====
+   Substitua pelos dados do seu projeto (Project Settings → API).
+   A chave pública (anon/publishable) pode ficar no código, porque a segurança
+   é garantida pelas políticas RLS. NUNCA coloque a chave service_role aqui. */
+const SUPABASE_URL = 'https://lgkeaxaaflscjcxtohbu.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxna2VheGFhZmxzY2pjeHRvaGJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM1NjU1MjcsImV4cCI6MjEwOTE0MTUyN30.iqbVdJi2wu2VtKX_C7B9L6QiAeMXul40CyJ5Ilq2KK0';
+
+let sb = null;
+let user = null;
+let entries = [];
+let authMode = 'login';
+let currentView = 'home';
+let practiceEntry = null;
+
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const norm = s => String(s ?? '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim();
+const dataBR = iso => iso ? new Date(iso).toLocaleDateString('pt-BR', {day:'2-digit', month:'short', year:'numeric'}) : '';
+
+function toast(texto, tipo = 'ok') {
+  const t = document.createElement('div');
+  t.className = 'toast ' + tipo;
+  t.textContent = texto;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3200);
+}
+
+function mostrarTela(id) {
+  ['screen-config', 'screen-auth', 'app'].forEach(s => $('#' + s).classList.toggle('hidden', s !== id));
+}
+
+function traduzirErro(err) {
+  const m = (err && err.message) || '';
+  if (/Invalid login/i.test(m)) return 'E-mail ou senha incorretos.';
+  if (/already registered/i.test(m)) return 'Este e-mail já possui conta.';
+  if (/Email not confirmed/i.test(m)) return 'Confirme seu e-mail antes de entrar (verifique sua caixa de entrada).';
+  if (/Failed to fetch|NetworkError/i.test(m)) return 'Não foi possível conectar ao Supabase. Verifique a URL e sua internet.';
+  if (/row-level security/i.test(m)) return 'Permissão negada pelo banco (RLS). Confira se as políticas foram criadas.';
+  if (/relation .* does not exist/i.test(m)) return 'Tabela não encontrada. Execute o SQL de criação no Supabase.';
+  return m || 'Erro inesperado.';
+}
+
+/* ===================== Categorização automática ===================== */
+// Ponto de extensão: se você criar uma Edge Function com a chave de IA no servidor,
+// substitua o retorno desta função por uma chamada a sb.functions.invoke(...).
+function analisarTexto(textoBruto, tituloManual = '') {
+  const texto = textoBruto.trim();
+  const resultado = {
+    titulo: tituloManual.trim(), categoria: 'Vocabulário geral', subcategoria: '', tipo: TIPO_NOMES.frase,
+    original: texto, formal: '', explicacao: '', exemplo: ''
+  };
+
+  const subst = texto.match(/^(.+?)\s*(?:→|->|=>)\s*(.+)$/s);
+  const defin = !subst && texto.match(/^([^:\n]{2,80}):\s*(.+)$/s);
+
+  if (subst) {
+    resultado.tipo = TIPO_NOMES.substituicao;
+    resultado.original = subst[1].trim();
+    resultado.formal = subst[2].trim();
+    resultado.titulo = resultado.titulo || resultado.original;
+  } else if (defin) {
+    resultado.tipo = TIPO_NOMES.conceito;
+    resultado.explicacao = defin[2].trim();
+    resultado.titulo = resultado.titulo || defin[1].trim();
+  } else if (texto.split(/\s+/).length <= 4) {
+    resultado.tipo = TIPO_NOMES.palavra;
+    resultado.titulo = resultado.titulo || texto;
+  } else {
+    resultado.titulo = resultado.titulo || texto.slice(0, 60) + (texto.length > 60 ? '…' : '');
+  }
+
+  // Pontuação por palavras-chave sobre o texto completo
+  const alvo = ' ' + norm(texto) + ' ';
+  let melhor = null, melhorScore = 0;
+  for (const [cat, palavras] of Object.entries(PALAVRAS_CHAVE)) {
+    let score = 0, termo = '';
+    for (const p of palavras) {
+      if (alvo.includes(p)) { score++; termo = termo || p.trim(); }
+    }
+    if (score > melhorScore) { melhor = cat; melhorScore = score; resultado.subcategoria = 'Termo-chave: ' + termo; }
+  }
+  if (melhor) resultado.categoria = melhor;
+  else resultado.subcategoria = '';
+
+  return resultado;
+}
+
+/* ===================== Supabase ===================== */
+function carregarConfig() {
+  try { return JSON.parse(localStorage.getItem('mge_cfg') || 'null'); } catch { return null; }
+}
+
+function chaveEhServiceRole(chave) {
+  try {
+    const payload = chave.split('.')[1];
+    if (!payload) return false;
+    const json = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
+    return json.role === 'service_role';
+  } catch { return false; }
+}
+
+function iniciarSupabase() {
+  const codigoConfigurado = SUPABASE_URL && SUPABASE_ANON_KEY &&
+    !SUPABASE_URL.includes('SEU-PROJETO') && !SUPABASE_ANON_KEY.includes('SUA-CHAVE');
+  const cfg = codigoConfigurado ? { url: SUPABASE_URL, key: SUPABASE_ANON_KEY } : carregarConfig();
+  if (!cfg) {
+    if (!codigoConfigurado) {
+      $('#msg-config').textContent = 'Os dados ainda não foram colocados no código. Troque SEU-PROJETO e SUA-CHAVE, no início do <script>, pelos valores do Supabase, salve o arquivo e abra novamente.';
+    }
+    return mostrarTela('screen-config');
+  }
+  if (chaveEhServiceRole(cfg.key)) {
+    $('#msg-config').textContent = 'A chave configurada é a service_role. Use somente a chave pública (anon ou publishable).';
+    return mostrarTela('screen-config');
+  }
+  if (!window.supabase) {
+    $('#msg-config').textContent = 'Não foi possível carregar a biblioteca do Supabase. Verifique sua conexão e recarregue a página.';
+    return mostrarTela('screen-config');
+  }
+  sb = window.supabase.createClient(cfg.url, cfg.key);
+  sb.auth.onAuthStateChange((_evento, sessao) => {
+    user = sessao?.user || null;
+    if (user) entrarNoApp(); else { entries = []; mostrarTela('screen-auth'); }
+  });
+}
+
+async function entrarNoApp() {
+  mostrarTela('app');
+  await carregarEntradas();
+  mostrarView(currentView);
+}
+
+async function carregarEntradas() {
+  $('#home-recent').innerHTML = '<p class="loading"><span class="spinner"></span>Carregando seu glossário…</p>';
+  $('#lib-list').innerHTML = '<p class="loading"><span class="spinner"></span>Carregando…</p>';
+  const { data, error } = await sb.from('glossary_entries').select('*').order('created_at', { ascending: false });
+  if (error) {
+    toast('Erro ao carregar: ' + traduzirErro(error), 'erro');
+    $('#home-recent').innerHTML = '<p class="muted">Não foi possível carregar os conteúdos.</p>';
+    $('#lib-list').innerHTML = '<p class="muted">Não foi possível carregar os conteúdos.</p>';
+    return;
+  }
+  entries = data || [];
+  renderTudo();
+}
+
+/* ===================== Renderização ===================== */
+function categoriasEmUso() {
+  return [...new Set([...CATEGORIAS_BASE, ...entries.map(e => e.category).filter(Boolean)])];
+}
+
+function renderTudo() {
+  const cats = categoriasEmUso();
+  $('#cat-list').innerHTML = cats.map(c => `<option value="${esc(c)}">`).join('');
+  const usadas = new Set(entries.map(e => e.category));
+  $('#stat-total').textContent = entries.length;
+  $('#stat-cats').textContent = usadas.size;
+  $('#stat-fav').textContent = entries.filter(e => e.favorite).length;
+
+  $('#home-cats').innerHTML = cats.map(c => {
+    const n = entries.filter(e => e.category === c).length;
+    return `<button data-goto-cat="${esc(c)}">${esc(c)} <span class="muted">(${n})</span></button>`;
+  }).join('');
+
+  const sel = $('#lib-cat');
+  const atual = sel.value;
+  sel.innerHTML = '<option value="">Todas as categorias</option>' + cats.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+  sel.value = atual;
+
+  $('#home-recent').innerHTML = entries.slice(0, 6).map(cardHTML).join('') ||
+    '<p class="muted">Nenhum conteúdo salvo ainda. Clique em “Adicionar conteúdo” para começar.</p>';
+
+  renderBiblioteca();
+}
+
+function renderBiblioteca() {
+  const q = norm($('#lib-search').value);
+  const cat = $('#lib-cat').value;
+  const soFav = $('#lib-fav').checked;
+  const lista = entries.filter(e => {
+    if (cat && e.category !== cat) return false;
+    if (soFav && !e.favorite) return false;
+    if (!q) return true;
+    return norm([e.title, e.original_text, e.formal_text, e.explanation, e.example, e.category].join(' ')).includes(q);
+  });
+  $('#lib-list').innerHTML = lista.map(cardHTML).join('') ||
+    '<p class="muted">Nenhum conteúdo encontrado com estes filtros.</p>';
+}
+
+function cardHTML(e) {
+  const bloco = (rotulo, valor) => valor ? `<p><span class="label">${rotulo}</span><br>${esc(valor)}</p>` : '';
+  return `
+  <article class="card">
+    <div class="row" style="justify-content:space-between;align-items:flex-start;flex-wrap:nowrap">
+      <h3 style="margin:0">${esc(e.title)}</h3>
+      ${e.favorite ? '<span class="fav" title="Favorito">★</span>' : ''}
+    </div>
+    <div style="margin:.5rem 0">
+      <span class="badge">${esc(e.category)}</span>
+      ${e.subcategory ? `<span class="badge">${esc(e.subcategory)}</span>` : ''}
+      ${e.content_type ? `<span class="badge type">${esc(e.content_type)}</span>` : ''}
+    </div>
+    <div class="entry-body">
+      ${bloco('Texto original', e.original_text)}
+      ${bloco('Versão formal', e.formal_text)}
+      ${bloco('Explicação', e.explanation)}
+      ${bloco('Exemplo de utilização', e.example)}
+    </div>
+    <div class="muted" style="font-size:.8rem;margin-top:.5rem">Adicionado em ${dataBR(e.created_at)}</div>
+    <div class="entry-actions">
+      <button class="icon" data-fav="${e.id}" title="Favoritar" aria-label="Favoritar">${e.favorite ? '★' : '☆'}</button>
+      <button class="icon" data-edit="${e.id}" title="Editar" aria-label="Editar">✎</button>
+      <button class="icon danger" data-del="${e.id}" title="Excluir" aria-label="Excluir">🗑</button>
+    </div>
+  </article>`;
+}
+
+/* ===================== Navegação ===================== */
+function mostrarView(nome) {
+  currentView = nome;
+  ['home', 'add', 'library', 'practice'].forEach(v => $('#view-' + v).classList.toggle('hidden', v !== nome));
+  $$('.nav button[data-view]').forEach(b => b.classList.toggle('active', b.dataset.view === nome));
+  if (nome === 'practice') { atualizarEstatisticas(); proximoExercicio(); }
+  if (nome === 'add') atualizarPreview();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ===================== Adicionar ===================== */
+let categoriaManual = false;
+
+function atualizarPreview() {
+  const texto = $('#f-texto').value;
+  const prev = $('#preview');
+  if (!texto.trim()) { prev.classList.add('hidden'); return; }
+  const a = analisarTexto(texto, $('#f-titulo').value);
+  prev.classList.remove('hidden');
+  prev.innerHTML = `<strong>Análise automática</strong><br>
+    Tipo: ${esc(a.tipo)}<br>
+    Título: ${esc(a.titulo)}<br>
+    ${a.formal ? `Expressão original: ${esc(a.original)}<br>Expressão formal: ${esc(a.formal)}<br>` : ''}
+    ${a.explicacao ? `Explicação: ${esc(a.explicacao)}<br>` : ''}
+    ${a.subcategoria ? `${esc(a.subcategoria)}<br>` : ''}
+    <span class="muted">Campos sem contexto no texto ficam vazios.</span>`;
+  if (!categoriaManual) $('#f-cat').value = a.categoria;
+}
+
+async function salvarNovo(ev) {
+  ev.preventDefault();
+  if (!sb || !user) return toast('Você precisa estar conectado.', 'erro');
+  const texto = $('#f-texto').value.trim();
+  if (!texto) return toast('Digite um conteúdo.', 'erro');
+  const a = analisarTexto(texto, $('#f-titulo').value);
+  const btn = $('#btn-save-add');
+  btn.disabled = true; btn.textContent = 'Salvando…';
+
+  const linha = {
+    title: a.titulo,
+    original_text: a.original || null,
+    formal_text: a.formal || null,
+    explanation: a.explicacao || null,
+    example: null,
+    category: $('#f-cat').value.trim() || a.categoria,
+    subcategory: a.subcategoria || null,
+    content_type: a.tipo,
+    favorite: false,
+    updated_at: new Date().toISOString()
+  };
+  const { data, error } = await sb.from('glossary_entries').insert(linha).select().single();
+  btn.disabled = false; btn.textContent = 'Salvar no glossário';
+  if (error) {
+    $('#msg-add').className = 'msg erro';
+    $('#msg-add').textContent = 'Não foi possível salvar: ' + traduzirErro(error);
+    return;
+  }
+  entries.unshift(data);
+  renderTudo();
+  $('#msg-add').className = 'msg ok';
+  $('#msg-add').textContent = `“${data.title}” salvo em ${data.category}.`;
+  toast('Conteúdo salvo no glossário.');
+  limparFormulario();
+}
+
+function limparFormulario() {
+  $('#form-add').reset();
+  categoriaManual = false;
+  $('#preview').classList.add('hidden');
+}
+
+/* ===================== Edição, favorito e exclusão ===================== */
+let editandoId = null;
+
+function abrirEdicao(id) {
+  const e = entries.find(x => x.id === id);
+  if (!e) return;
+  editandoId = id;
+  $('#e-titulo').value = e.title || '';
+  $('#e-original').value = e.original_text || '';
+  $('#e-formal').value = e.formal_text || '';
+  $('#e-expl').value = e.explanation || '';
+  $('#e-exemplo').value = e.example || '';
+  $('#e-cat').value = e.category || '';
+  $('#e-sub').value = e.subcategory || '';
+  $('#e-tipo').value = e.content_type || '';
+  $('#e-fav').checked = !!e.favorite;
+  $('#msg-edit').textContent = '';
+  $('#modal').classList.remove('hidden');
+}
+
+function fecharEdicao() { $('#modal').classList.add('hidden'); editandoId = null; }
+
+async function salvarEdicao(ev) {
+  ev.preventDefault();
+  const campos = {
+    title: $('#e-titulo').value.trim(),
+    original_text: $('#e-original').value.trim() || null,
+    formal_text: $('#e-formal').value.trim() || null,
+    explanation: $('#e-expl').value.trim() || null,
+    example: $('#e-exemplo').value.trim() || null,
+    category: $('#e-cat').value.trim(),
+    subcategory: $('#e-sub').value.trim() || null,
+    content_type: $('#e-tipo').value.trim() || null,
+    favorite: $('#e-fav').checked,
+    updated_at: new Date().toISOString()
+  };
+  const { data, error } = await sb.from('glossary_entries').update(campos).eq('id', editandoId).select().single();
+  if (error) { $('#msg-edit').className = 'msg erro'; $('#msg-edit').textContent = traduzirErro(error); return; }
+  entries = entries.map(x => x.id === data.id ? data : x);
+  renderTudo();
+  fecharEdicao();
+  toast('Alterações salvas.');
+}
+
+async function alternarFavorito(id) {
+  const e = entries.find(x => x.id === id);
+  if (!e) return;
+  const { data, error } = await sb.from('glossary_entries')
+    .update({ favorite: !e.favorite, updated_at: new Date().toISOString() }).eq('id', id).select().single();
+  if (error) return toast('Não foi possível atualizar: ' + traduzirErro(error), 'erro');
+  entries = entries.map(x => x.id === id ? data : x);
+  renderTudo();
+}
+
+async function excluirEntrada(id) {
+  const e = entries.find(x => x.id === id);
+  if (!e || !confirm(`Excluir “${e.title}”? Esta ação não pode ser desfeita.`)) return;
+  const { error } = await sb.from('glossary_entries').delete().eq('id', id);
+  if (error) return toast('Não foi possível excluir: ' + traduzirErro(error), 'erro');
+  entries = entries.filter(x => x.id !== id);
+  renderTudo();
+  toast('Conteúdo excluído.');
+}
+
+/* ===================== Praticar ===================== */
+let estatisticas = { ok: 0, total: 0 };
+
+async function atualizarEstatisticas() {
+  const { data, error } = await sb.from('practice_results').select('correct');
+  if (error) { $('#practice-stats').textContent = 'Acertos: indisponível (' + traduzirErro(error) + ')'; return; }
+  estatisticas = { ok: data.filter(r => r.correct).length, total: data.length };
+  $('#practice-stats').textContent = `Acertos: ${estatisticas.ok} de ${estatisticas.total}` +
+    (estatisticas.total ? ` (${Math.round(estatisticas.ok / estatisticas.total * 100)}%)` : '');
+}
+
+async function registrarResultado(entryId, modo, correto) {
+  const { error } = await sb.from('practice_results').insert({ entry_id: entryId, mode: modo, correct: correto });
+  if (error) toast('Resultado não registrado: ' + traduzirErro(error), 'erro');
+  else atualizarEstatisticas();
+}
+
+function embaralhar(arr) { return [...arr].sort(() => Math.random() - 0.5); }
+
+function gerarExercicio() {
+  const modos = [];
+  const comFormal = entries.filter(e => e.original_text && e.formal_text);
+  const comExpl = entries.filter(e => e.explanation && e.title);
+  const comLacuna = entries.filter(e => e.example && e.title && norm(e.example).includes(norm(e.title)));
+  const qualquer = entries.filter(e => e.title);
+  if (comFormal.length >= 2) modos.push('substituicao');
+  if (comExpl.length >= 2) modos.push('definicao');
+  if (comLacuna.length >= 1) modos.push('lacuna');
+  if (qualquer.length >= 1) modos.push('escrita');
+  if (!modos.length) return null;
+  const modo = modos[Math.floor(Math.random() * modos.length)];
+
+  if (modo === 'substituicao') {
+    const alvo = comFormal[Math.floor(Math.random() * comFormal.length)];
+    const outras = [...new Set(comFormal.filter(e => e.id !== alvo.id).map(e => e.formal_text))];
+    const opcoes = embaralhar([alvo.formal_text, ...embaralhar(outras).slice(0, 3)]);
+    return { modo, entry: alvo, enunciado: 'Qual é a versão formal de:', destaque: alvo.original_text, opcoes, correta: alvo.formal_text };
+  }
+  if (modo === 'definicao') {
+    const alvo = comExpl[Math.floor(Math.random() * comExpl.length)];
+    const outras = [...new Set(comExpl.filter(e => e.id !== alvo.id).map(e => e.explanation))];
+    const opcoes = embaralhar([alvo.explanation, ...embaralhar(outras).slice(0, 3)]);
+    return { modo, entry: alvo, enunciado: 'Qual é o significado de:', destaque: alvo.title, opcoes, correta: alvo.explanation };
+  }
+  if (modo === 'lacuna') {
+    const alvo = comLacuna[Math.floor(Math.random() * comLacuna.length)];
+    const re = new RegExp(alvo.title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+    return { modo, entry: alvo, enunciado: 'Complete a lacuna com a expressão correta:', frase: alvo.example.replace(re, '_______') , correta: alvo.title };
+  }
+  const alvo = qualquer[Math.floor(Math.random() * qualquer.length)];
+  return { modo, entry: alvo, enunciado: 'Escreva uma frase de sua autoria usando:', destaque: alvo.title };
+}
+
+const ROTULO_MODO = { substituicao: 'Substituição', definicao: 'Significado', lacuna: 'Completar lacuna', escrita: 'Produção escrita' };
+
+function proximoExercicio() {
+  const area = $('#practice-area');
+  if (!entries.length) {
+    area.innerHTML = '<p class="muted">Adicione conteúdos ao glossário para começar a praticar.</p>';
+    return;
+  }
+  const ex = gerarExercicio();
+  if (!ex) {
+    area.innerHTML = '<p class="muted">Ainda não há conteúdo suficiente para este tipo de exercício. Adicione pelo menos duas substituições ou duas definições, ou um exemplo que contenha o termo.</p>';
+    return;
+  }
+  practiceEntry = ex;
+  const cabecalho = `<span class="badge">${ROTULO_MODO[ex.modo]}</span><span class="badge type">${esc(ex.entry.category)}</span>`;
+
+  if (ex.modo === 'substituicao' || ex.modo === 'definicao') {
+    area.innerHTML = `${cabecalho}
+      <p class="muted" style="margin-top:.8rem">${esc(ex.enunciado)}</p>
+      <div class="quote">${esc(ex.destaque)}</div>
+      <div class="opts">${ex.opcoes.map((o, i) => `<button data-opt="${i}">${esc(o)}</button>`).join('')}</div>
+      <div id="feedback" class="msg"></div>`;
+    $$('#practice-area [data-opt]').forEach(b => b.addEventListener('click', () => responderMultipla(b)));
+  } else if (ex.modo === 'lacuna') {
+    area.innerHTML = `${cabecalho}
+      <p class="muted" style="margin-top:.8rem">${esc(ex.enunciado)}</p>
+      <div class="quote">${esc(ex.frase)}</div>
+      <div class="row"><input id="ans" type="text" placeholder="Digite a expressão" style="flex:1"><button class="primary" id="btn-check">Verificar</button></div>
+      <div id="feedback" class="msg"></div>`;
+    $('#btn-check').addEventListener('click', responderLacuna);
+    $('#ans').addEventListener('keydown', e => { if (e.key === 'Enter') responderLacuna(); });
+  } else {
+    area.innerHTML = `${cabecalho}
+      <p class="muted" style="margin-top:.8rem">${esc(ex.enunciado)}</p>
+      <div class="quote">${esc(ex.destaque)}</div>
+      <textarea id="ans" placeholder="Escreva sua frase aqui"></textarea>
+      <div class="row" style="margin-top:.6rem">
+        <button id="btn-show">Ver exemplo do glossário</button>
+      </div>
+      <div id="feedback" class="msg"></div>
+      <div id="self" class="hidden row" style="margin-top:.6rem">
+        <span class="muted">Sua frase ficou adequada?</span>
+        <button class="primary" data-self="1">Sim</button>
+        <button data-self="0">Não</button>
+      </div>`;
+    $('#btn-show').addEventListener('click', () => {
+      $('#feedback').innerHTML = ex.entry.example
+        ? `<span class="muted">Exemplo cadastrado:</span><br>${esc(ex.entry.example)}`
+        : '<span class="muted">Este conteúdo ainda não tem exemplo cadastrado. Avalie sua frase pelo significado.</span>';
+      $('#self').classList.remove('hidden');
+    });
+    $$('#self [data-self]').forEach(b => b.addEventListener('click', () => {
+      registrarResultado(ex.entry.id, ex.modo, b.dataset.self === '1');
+      $('#self').innerHTML = '<span class="muted">Resultado registrado.</span>';
+    }));
+  }
+}
+
+function responderMultipla(botao) {
+  const ex = practiceEntry;
+  const escolhida = ex.opcoes[+botao.dataset.opt];
+  const correto = escolhida === ex.correta;
+  $$('#practice-area [data-opt]').forEach(b => {
+    b.disabled = true;
+    if (b.textContent === ex.correta) b.classList.add('right');
+  });
+  if (!correto) botao.classList.add('wrong');
+  $('#feedback').className = 'msg ' + (correto ? 'ok' : 'erro');
+  $('#feedback').textContent = correto ? 'Correto!' : 'Não foi dessa vez. A resposta está destacada em verde.';
+  registrarResultado(ex.entry.id, ex.modo, correto);
+}
+
+function responderLacuna() {
+  const ex = practiceEntry;
+  const resp = $('#ans').value;
+  if (!resp.trim()) return;
+  const correto = norm(resp) === norm(ex.correta);
+  $('#feedback').className = 'msg ' + (correto ? 'ok' : 'erro');
+  $('#feedback').textContent = correto ? 'Correto!' : `Resposta esperada: ${ex.correta}`;
+  $('#btn-check').disabled = true;
+  registrarResultado(ex.entry.id, ex.modo, correto);
+}
+
+/* ===================== Autenticação ===================== */
+function alternarModoAuth() {
+  authMode = authMode === 'login' ? 'signup' : 'login';
+  const cadastro = authMode === 'signup';
+  $('#auth-submit').textContent = cadastro ? 'Criar conta' : 'Entrar';
+  $('#auth-switch-text').textContent = cadastro ? 'Já tem conta?' : 'Não tem conta?';
+  $('#auth-switch').textContent = cadastro ? 'Entrar' : 'Criar conta';
+  $('#auth-subtitle').textContent = cadastro ? 'Crie uma conta para manter seus conteúdos privados.' : 'Entre para acessar seu glossário.';
+  $('#msg-auth').textContent = '';
+}
+
+async function enviarAuth(ev) {
+  ev.preventDefault();
+  const email = $('#auth-email').value.trim();
+  const password = $('#auth-pass').value;
+  const btn = $('#auth-submit');
+  btn.disabled = true; btn.textContent = 'Aguarde…';
+  const { data, error } = authMode === 'login'
+    ? await sb.auth.signInWithPassword({ email, password })
+    : await sb.auth.signUp({ email, password });
+  btn.disabled = false; btn.textContent = authMode === 'login' ? 'Entrar' : 'Criar conta';
+  if (error) { $('#msg-auth').className = 'msg erro'; $('#msg-auth').textContent = traduzirErro(error); return; }
+  if (authMode === 'signup' && !data.session) {
+    $('#msg-auth').className = 'msg ok';
+    $('#msg-auth').textContent = 'Conta criada. Confirme o e-mail recebido e depois entre.';
+    alternarModoAuth();
+  }
+}
+
+/* ===================== Eventos ===================== */
+$('#form-config').addEventListener('submit', ev => {
+  ev.preventDefault();
+  const url = $('#cfg-url').value.trim().replace(/\/$/, '');
+  const key = $('#cfg-key').value.trim();
+  if (!/^https:\/\/.+/.test(url)) { $('#msg-config').textContent = 'Informe uma URL que comece com https://'; return; }
+  if (chaveEhServiceRole(key)) {
+    $('#msg-config').textContent = 'Esta é a chave service_role. Use somente a chave pública (anon ou publishable).';
+    return;
+  }
+  localStorage.setItem('mge_cfg', JSON.stringify({ url, key }));
+  $('#msg-config').textContent = '';
+  iniciarSupabase();
+});
+
+$('#form-auth').addEventListener('submit', enviarAuth);
+$('#auth-switch').addEventListener('click', alternarModoAuth);
+$('#cfg-reset').addEventListener('click', () => {
+  if (!confirm('Trocar o projeto Supabase? Você precisará informar a URL e a chave novamente.')) return;
+  localStorage.removeItem('mge_cfg');
+  location.reload();
+});
+$('#btn-logout').addEventListener('click', async () => { if (sb) await sb.auth.signOut(); toast('Você saiu da conta.'); });
+
+$$('[data-view]').forEach(b => b.addEventListener('click', () => mostrarView(b.dataset.view)));
+$('#home-cats').addEventListener('click', ev => {
+  const b = ev.target.closest('[data-goto-cat]');
+  if (!b) return;
+  $('#lib-cat').value = b.dataset.gotoCat;
+  mostrarView('library');
+  renderBiblioteca();
+});
+
+$('#form-global-search').addEventListener('submit', ev => {
+  ev.preventDefault();
+  $('#lib-search').value = $('#global-search').value;
+  $('#lib-cat').value = '';
+  $('#lib-fav').checked = false;
+  mostrarView('library');
+  renderBiblioteca();
+});
+
+$('#f-texto').addEventListener('input', atualizarPreview);
+$('#f-titulo').addEventListener('input', atualizarPreview);
+$('#f-cat').addEventListener('input', () => { categoriaManual = true; });
+$('#form-add').addEventListener('submit', salvarNovo);
+$('#btn-reset-add').addEventListener('click', limparFormulario);
+
+$('#lib-search').addEventListener('input', renderBiblioteca);
+$('#lib-cat').addEventListener('change', renderBiblioteca);
+$('#lib-fav').addEventListener('change', renderBiblioteca);
+
+$('#lib-list').addEventListener('click', acaoCard);
+$('#home-recent').addEventListener('click', acaoCard);
+function acaoCard(ev) {
+  const b = ev.target.closest('button[data-fav],button[data-edit],button[data-del]');
+  if (!b) return;
+  if (b.dataset.fav) alternarFavorito(b.dataset.fav);
+  else if (b.dataset.edit) abrirEdicao(b.dataset.edit);
+  else if (b.dataset.del) excluirEntrada(b.dataset.del);
+}
+
+$('#form-edit').addEventListener('submit', salvarEdicao);
+$('#modal-close').addEventListener('click', fecharEdicao);
+$('#modal-cancel').addEventListener('click', fecharEdicao);
+$('#modal').addEventListener('click', ev => { if (ev.target.id === 'modal') fecharEdicao(); });
+
+$('#btn-next-ex').addEventListener('click', proximoExercicio);
+
+/* ===================== Início ===================== */
+iniciarSupabase();
+</script>
+</body>
+</html>
