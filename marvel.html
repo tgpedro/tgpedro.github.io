@@ -111,6 +111,10 @@ button:active{transform:scale(.97)}
 .switch input:checked+span::after{transform:translateX(20px)}
 .switch input:focus-visible+span{outline:3px solid rgba(0,122,255,.45);outline-offset:2px}
 
+.lvl{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;margin-left:8px;vertical-align:2px;letter-spacing:0}
+.lvl-3{background:rgba(255,69,58,.18);color:#ff453a}
+.lvl-2{background:rgba(255,214,10,.15);color:#ffd60a}
+.lvl-1{background:var(--fill);color:var(--muted)}
 .empty{padding:40px 20px;text-align:center;color:var(--muted);background:var(--card-solid);border-radius:var(--r);font-size:15px}
 .loading{padding:40px;text-align:center;color:var(--muted)}
 .footer{color:var(--muted);text-align:center;font-size:12px;line-height:1.6;margin-top:30px}
@@ -200,8 +204,23 @@ button:active{transform:scale(.97)}
    Cole aqui a URL e a chave "anon public" do seu projeto
    (Project Settings → API). Nunca use a service_role aqui. */
 const SUPABASE_URL = 'https://uhjftilgtebjrbwozoro.supabase.co'; 
-  const SUPABASE_KEY = 'sb_publishable_2cf_SU3wqUzULGJ2emE2pQ_hq9HapaK';
+const SUPABASE_KEY = 'sb_publishable_2cf_SU3wqUzULGJ2emE2pQ_hq9HapaK';
 const TABLE = 'marvel_progress';
+
+/* Importância para entender Avengers: Doomsday
+   3 = essencial · 2 = recomendado · 1 = contexto */
+const DOOMSDAY = {
+  3: ["Os Vingadores","Vingadores: Guerra Infinita","Vingadores: Ultimato","Avengers: Endgame Encore","Loki — Temporada 1","Loki — Temporada 2","Homem-Aranha: Sem Volta Para Casa","Doutor Estranho no Multiverso da Loucura","Deadpool & Wolverine","Thunderbolts*","Quarteto Fantástico: Primeiros Passos","Homem-Aranha: Um Novo Dia","X-Men"],
+  2: ["Capitão América: O Primeiro Vingador","Capitão América: Guerra Civil","Capitão América: Admirável Mundo Novo","Shang-Chi e a Lenda dos Dez Anéis","Pantera Negra: Wakanda Para Sempre","Homem-Formiga e a Vespa: Quantumania","X-Men 2","X-Men: Dias de um Futuro Esquecido"],
+  1: ["Doutor Estranho","As Marvels","Viúva Negra","VisionQuest","Thor: Amor e Trovão","Agatha All Along","X-Men: O Confronto Final"]
+};
+const lvlOf = t => [3,2,1].find(k => DOOMSDAY[k].includes(t)) || 0;
+const lvlBadge = t => {
+  const l = lvlOf(t);
+  if (!l) return '';
+  const txt = {3:'Essencial',2:'Recomendado',1:'Contexto'}[l];
+  return `<span class="lvl lvl-${l}">${txt}</span>`;
+};
 
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -426,7 +445,8 @@ const sections = [
   ["Motoqueiro Fantasma: Espírito de Vingança","Filme — 2011"],
   ["O Justiceiro: Em Zona de Guerra","Filme — 2008"],
   ["Quarteto Fantástico","Filme — 2015"],
-  ["Man-Thing: O Monstro do Pântano","Filme — 2005"]
+  ["Man-Thing: O Monstro do Pântano","Filme — 2005"],
+  ["Capitão América (1990)","Filme — 1990"]
  ]
 },
 {
@@ -451,7 +471,12 @@ const sections = [
   ["Marvel's Spider-Man","Animação"],
   ["Marvel's Avengers","Animação"],
   ["Guardians of the Galaxy","Animação"],
-  ["Marvel Rising","Animação"]
+  ["Marvel Rising","Animação"],
+  ["Avengers Assemble","Animação"],
+  ["Ultimate Spider-Man","Animação"],
+  ["Hulk e os Agentes do S.M.A.S.H.","Animação"],
+  ["Helstrom","Série"],
+  ["I Am Groot","Curtas — Animação"]
  ]
 },
 {
@@ -461,7 +486,9 @@ const sections = [
   ["Revisão: Loki — Temporadas 1 e 2","Revisão opcional — multiverso"],
   ["Revisão: Homem-Aranha: Sem Volta Para Casa","Revisão opcional — multiverso"],
   ["Revisão: Deadpool & Wolverine","Revisão opcional — multiverso"],
-  ["Avengers: Doomsday","PRÓXIMO GRANDE EVENTO — assistir por último"]
+  ["VisionQuest","Série — Disney+, 14/10/2026"],
+  ["Avengers: Endgame Encore","Re-lançamento 2026 com cenas novas"],
+  ["Avengers: Doomsday","PRÓXIMO GRANDE EVENTO — 18/12/2026"]
  ]
 }
 ];
@@ -569,7 +596,7 @@ function render() {
           <div class="row${isWatched(x.id) ? ' watched' : ''}" data-row="${x.id}">
             <div class="num">${x.ii + 1}</div>
             <div class="row-body">
-              <div class="row-title">${esc(x.title)}</div>
+              <div class="row-title">${esc(x.title)}${lvlBadge(x.title)}</div>
               <div class="row-meta">${esc(x.meta)}</div>
             </div>
             <button class="fav${isFav(x.id) ? ' on' : ''}" data-fav="${x.id}" aria-label="${isFav(x.id) ? 'Remover dos favoritos' : 'Favoritar'}">
