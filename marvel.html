@@ -2,30 +2,212 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#0b0d12">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#f2f2f7">
 <title>Marvel — Maratona Definitiva</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <style>
-:root{--bg:#f5f5f7;--panel:rgba(255,255,255,.72);--panel-solid:#fff;--panel-2:#e9e9ed;--text:#1d1d1f;--muted:#6e6e73;--line:rgba(0,0,0,.09);--red:#0071e3;--red-2:#0077ed;--blue:#0071e3;--green:#248a3d;--shadow:0 14px 40px rgba(0,0,0,.08);--ease:cubic-bezier(.23,1,.32,1)}
-[data-theme="dark"]{--bg:#000;--panel:rgba(28,28,30,.82);--panel-solid:#1c1c1e;--panel-2:#2c2c2e;--text:#f5f5f7;--muted:#98989d;--line:rgba(255,255,255,.13);--red:#2997ff;--red-2:#2997ff;--blue:#2997ff;--green:#30d158;--shadow:0 14px 40px rgba(0,0,0,.35)}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-height:100vh;color:var(--text);background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}.wrap{width:min(980px,100%);margin:auto;padding:28px 24px 72px}.topbar{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:72px}.brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:-.03em}.brand-mark{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:var(--text);color:var(--bg);box-shadow:none;font-size:18px}.top-actions{display:flex;gap:8px}.icon-btn,.btn{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:13px;padding:10px 13px;font:inherit;cursor:pointer;transition:transform .16s var(--ease),background .2s,border-color .2s,box-shadow .2s}.icon-btn{width:42px;height:42px;padding:0;font-size:18px}.btn:hover,.icon-btn:hover{background:var(--panel-2);border-color:rgba(255,255,255,.22);box-shadow:0 8px 25px rgba(0,0,0,.12)}button:active{transform:scale(.97)}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid rgba(110,168,254,.45);outline-offset:2px}.hero{display:grid;grid-template-columns:1.25fr .75fr;align-items:end;gap:30px;margin-bottom:34px}.eyebrow{color:var(--muted);font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}.hero h1{font-size:clamp(46px,8vw,86px);letter-spacing:-.065em;line-height:.96;margin:14px 0 20px;max-width:700px}.hero h1 span{color:var(--red-2)}.subtitle{max-width:620px;color:var(--muted);font-size:17px;line-height:1.6;margin:0}.hero-card{position:relative;padding:24px;border:1px solid var(--line);border-radius:25px;background:var(--panel);box-shadow:var(--shadow);overflow:hidden}.hero-card:after{content:"";position:absolute;width:130px;height:130px;right:-38px;top:-45px;border:18px solid rgba(255,255,255,.08);border-radius:50%}.hero-card strong{display:block;font-size:36px;letter-spacing:-.06em}.hero-card small{color:var(--muted)}.progress-box{padding:22px;border:1px solid var(--line);border-radius:25px;background:var(--panel);backdrop-filter:blur(18px);box-shadow:var(--shadow);margin-bottom:18px}.progress-top{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:14px}.progress-top strong{font-size:19px}.progress-top span{color:var(--muted);font-size:13px}.bar{height:10px;background:var(--panel-2);border-radius:99px;overflow:hidden}.bar-fill{height:100%;width:0;border-radius:99px;background:var(--red-2);transition:width .55s var(--ease);position:relative}.bar-fill:after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent,rgba(255,255,255,.35),transparent);animation:shine 2.2s infinite}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0 28px}.stat{padding:16px 18px;border:1px solid var(--line);border-radius:18px;background:var(--panel);transition:transform .2s var(--ease)}.stat:hover{transform:translateY(-3px)}.stat-label{display:block;color:var(--muted);font-size:12px;margin-bottom:8px}.stat-value{font-size:24px;font-weight:800;letter-spacing:-.04em}.tools{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:18px 0 26px}.search{flex:1;min-width:220px;position:relative}.search input{width:100%;padding:13px 16px 13px 42px;border:1px solid var(--line);border-radius:14px;background:var(--panel);color:var(--text);font:inherit}.search-icon{position:absolute;left:15px;top:12px;color:var(--muted)}.btn.active{background:rgba(240,68,93,.14);border-color:rgba(240,68,93,.55);color:var(--red-2)}.select{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:13px;padding:12px 13px;font:inherit}.section{margin:52px 0 18px;animation:rise .4s var(--ease) both}.section-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:20px 0 14px;border-top:1px solid var(--line);cursor:pointer}.section h2{font-size:23px;letter-spacing:-.04em;margin:0 0 6px}.section p{color:var(--muted);margin:0;font-size:13px}.section-toggle{flex:0 0 auto;border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:10px;width:34px;height:34px;cursor:pointer;transition:transform .2s var(--ease)}.section.collapsed .section-toggle{transform:rotate(-90deg)}.section.collapsed .items{display:none}.item{display:grid;grid-template-columns:48px 1fr auto;gap:14px;align-items:center;padding:14px 12px;border:1px solid transparent;border-bottom-color:var(--line);border-radius:14px;transition:background .2s,transform .2s var(--ease),border-color .2s}.item:hover{background:var(--panel);border-color:var(--line);transform:none}.num{color:var(--muted);font-size:12px;text-align:center;font-variant-numeric:tabular-nums}.title{font-size:15px;font-weight:700;line-height:1.35}.meta{font-size:12px;color:var(--muted);margin-top:4px}.item.watched .title{text-decoration:line-through;color:var(--muted)}.item.watched .num{color:var(--green)}.item-controls{display:flex;align-items:center;gap:8px}.status{min-width:118px;border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:11px;padding:9px 8px;font:inherit;font-size:12px}.fav{width:34px;height:34px;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:10px;cursor:pointer;font-size:16px;transition:transform .16s var(--ease),color .2s,background .2s}.fav.active{color:#ffcc66;background:rgba(255,204,102,.1);border-color:rgba(255,204,102,.35)}.empty{padding:45px 20px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:20px}.footer{color:var(--muted);text-align:center;font-size:12px;line-height:1.7;margin-top:55px}.toast{position:fixed;left:50%;bottom:24px;z-index:5;transform:translate(-50%,20px);opacity:0;pointer-events:none;padding:13px 17px;border:1px solid var(--line);border-radius:14px;background:var(--panel-solid);box-shadow:var(--shadow);transition:opacity .2s,transform .2s var(--ease);font-size:13px}.toast.show{opacity:1;transform:translate(-50%,0)}.backtop{position:fixed;right:20px;bottom:20px;opacity:0;pointer-events:none;transform:translateY(12px);transition:.2s var(--ease)}.backtop.show{opacity:1;pointer-events:auto;transform:none}.confetti{position:fixed;z-index:9;width:8px;height:14px;top:-20px;animation:fall 1.2s linear forwards}@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}@keyframes shine{0%,35%{transform:translateX(-100%)}70%,100%{transform:translateX(100%)}}@keyframes fall{to{transform:translateY(105vh) rotate(720deg);opacity:0}}@media(max-width:760px){.hero{grid-template-columns:1fr}.hero-card{display:none}.topbar{margin-bottom:42px}.stats{grid-template-columns:1fr 1fr}.stats .stat:last-child{grid-column:span 2}.item{grid-template-columns:32px 1fr}.item-controls{grid-column:2}.status{flex:1}.item-controls{width:100%}}@media(max-width:520px){.wrap{padding:20px 14px 55px}.hero h1{font-size:54px}.tools .btn{flex:1}.search{min-width:100%}.section h2{font-size:19px}.item{padding:13px 5px}.stats{gap:8px}.stat{padding:14px}.stat-value{font-size:20px}}@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
+:root{
+  --bg:#f2f2f7;--card:rgba(255,255,255,.78);--card-solid:#fff;--fill:rgba(120,120,128,.12);
+  --text:#000;--muted:#8e8e93;--sep:rgba(60,60,67,.18);--blue:#007aff;--green:#34c759;--gold:#ffcc00;--red:#ff3b30;
+  --shadow:0 10px 30px rgba(0,0,0,.06);--r:26px;
+}
+:root[data-theme="dark"]{
+  --bg:#000;--card:rgba(28,28,30,.72);--card-solid:#1c1c1e;--fill:rgba(120,120,128,.24);
+  --text:#fff;--muted:#8e8e93;--sep:rgba(84,84,88,.6);--blue:#0a84ff;--green:#30d158;--gold:#ffd60a;--red:#ff453a;
+  --shadow:0 10px 30px rgba(0,0,0,.4);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;min-height:100vh;background:var(--bg);color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue",Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;padding-bottom:env(safe-area-inset-bottom,0px);
+  background-image:radial-gradient(900px 500px at 10% -10%,rgba(0,122,255,.12),transparent 60%),radial-gradient(700px 420px at 100% 0%,rgba(255,59,48,.10),transparent 60%);
+  background-attachment:fixed;
+}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:active{transform:scale(.97)}
+:focus-visible{outline:3px solid rgba(0,122,255,.45);outline-offset:2px}
 
-svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px}.icon-btn svg{width:18px;height:18px}.btn svg{margin-right:5px}.utility-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:54px}.next-panel{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:24px 26px;margin:0 0 28px;border:1px solid var(--line);border-radius:22px;background:var(--panel);box-shadow:var(--shadow);animation:appleIn .7s var(--ease) both}.next-panel strong{display:block;max-width:620px;font-size:clamp(25px,4vw,42px);line-height:1.04;letter-spacing:-.055em;margin:7px 0}.next-panel small{display:block;color:var(--muted);font-size:12px}.next-panel .btn{white-space:nowrap}.top-actions{gap:6px}.icon-btn,.btn{transition:transform .32s var(--ease),background .25s,border-color .25s,box-shadow .32s var(--ease)}.icon-btn:hover,.btn:hover{transform:translateY(-2px)}.progress-box{animation:appleIn .7s .08s var(--ease) both}.stats{animation:appleIn .7s .14s var(--ease) both}.tools{animation:appleIn .7s .2s var(--ease) both}.search-icon{top:11px}.search-icon svg{width:18px;height:18px}.section-head{transition:opacity .25s,transform .32s var(--ease)}.section-head:hover{transform:translateX(4px)}.section-toggle svg{transition:transform .35s var(--ease)}.section.collapsed .section-toggle svg{transform:rotate(-90deg)}.item{animation:itemIn .5s var(--ease) both}.item:nth-child(2){animation-delay:35ms}.item:nth-child(3){animation-delay:70ms}.item:nth-child(4){animation-delay:105ms}.item:nth-child(5){animation-delay:140ms}.item:nth-child(6){animation-delay:175ms}.item:nth-child(7){animation-delay:210ms}.item:nth-child(8){animation-delay:245ms}.item:nth-child(9){animation-delay:280ms}.item:nth-child(10){animation-delay:315ms}.item:nth-child(n+11){animation-delay:350ms}.bar-fill{transition:width .8s var(--ease)}@keyframes appleIn{from{opacity:0;transform:translateY(18px) scale(.985)}to{opacity:1;transform:none}}@keyframes itemIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}@media(max-width:600px){.utility-bar{margin-bottom:34px}.next-panel{align-items:flex-start;flex-direction:column;padding:21px}.next-panel .btn{width:100%}.next-panel strong{font-size:30px}}
+/* nav translúcida */
+.nav{position:sticky;top:0;z-index:10;padding-top:env(safe-area-inset-top,0px);backdrop-filter:saturate(180%) blur(22px);-webkit-backdrop-filter:saturate(180%) blur(22px);background:color-mix(in srgb,var(--bg) 70%,transparent);border-bottom:.5px solid var(--sep)}
+.nav-in{max-width:860px;margin:auto;height:52px;padding:0 20px;display:flex;align-items:center;justify-content:space-between}
+.nav-title{font-weight:600;font-size:17px;opacity:0;transition:opacity .25s}
+.nav.scrolled .nav-title{opacity:1}
+.nav-actions{display:flex;gap:10px;margin-left:auto}
+.circle{width:36px;height:36px;border-radius:50%;border:0;background:var(--fill);display:grid;place-items:center;font-size:16px;color:var(--text);transition:transform .2s}
+.circle svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 
-.next-panel{position:relative;overflow:hidden}.next-copy{position:relative;z-index:1;flex:1}.multiverse-mark{width:102px;height:102px;flex:0 0 102px;display:grid;place-items:center;border-radius:50%;background:linear-gradient(145deg,rgba(0,113,227,.12),rgba(255,59,48,.08));color:var(--red-2);animation:orbitFloat 5s ease-in-out infinite}.multiverse-mark svg{width:86px;height:86px;fill:none;stroke:currentColor;stroke-width:1.15;stroke-linecap:round}.multiverse-mark .energy-dot{fill:currentColor;stroke:none;filter:drop-shadow(0 0 8px currentColor);animation:energyPulse 2.4s ease-in-out infinite}.star-icon{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linejoin:round;vertical-align:-3px}.star-icon.filled{fill:currentColor}.fav{display:grid;place-items:center}.fav.active{color:#d99b19}.section h2{font-weight:650}.section h2:first-letter{color:var(--red-2)}@keyframes orbitFloat{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-5px) rotate(3deg)}}@keyframes energyPulse{0%,100%{transform:scale(.85);opacity:.7}50%{transform:scale(1.12);opacity:1}}@media(max-width:600px){.multiverse-mark{width:74px;height:74px;flex-basis:74px;position:absolute;right:-8px;top:-8px;opacity:.22}.multiverse-mark svg{width:70px;height:70px}.next-copy{padding-right:24px}}
+.wrap{max-width:860px;margin:auto;padding:12px 18px 60px}
+.large{font-size:34px;font-weight:700;letter-spacing:-.4px;margin:10px 4px 2px}
+.sub{margin:0 4px 22px;color:var(--muted);font-size:15px}
+
+.card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);backdrop-filter:blur(24px) saturate(160%);-webkit-backdrop-filter:blur(24px) saturate(160%);border:.5px solid var(--sep);overflow:hidden}
+
+/* próximo capítulo */
+.next{padding:20px 20px 20px;display:flex;align-items:center;gap:16px;margin-bottom:16px;animation:rise .6s cubic-bezier(.2,.8,.2,1) both}
+.next-icon{flex:0 0 56px;height:56px;border-radius:16px;display:grid;place-items:center;background:linear-gradient(135deg,#ff453a,#ff9f0a);color:#fff;font-size:26px;font-weight:700;box-shadow:0 6px 16px rgba(255,69,58,.35)}
+.next-copy{flex:1;min-width:0}
+.label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;font-weight:600}
+.next-title{font-size:19px;font-weight:650;margin:3px 0 2px;letter-spacing:-.2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.next-meta{font-size:13px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pill{flex:0 0 auto;border:0;border-radius:999px;background:var(--blue);color:#fff;padding:10px 16px;font-weight:600;font-size:15px}
+
+/* progresso */
+.progress{padding:18px 20px;margin-bottom:16px}
+.progress-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px}
+.progress-top strong{font-size:22px;font-weight:700;letter-spacing:-.3px}
+.progress-top span{font-size:13px;color:var(--muted)}
+.bar{height:8px;border-radius:99px;background:var(--fill);overflow:hidden}
+.bar-fill{height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--blue),#5ac8fa);transition:width .8s cubic-bezier(.2,.8,.2,1)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);margin-top:16px;text-align:center}
+.stat-v{font-size:22px;font-weight:700;letter-spacing:-.3px;font-variant-numeric:tabular-nums}
+.stat-l{font-size:12px;color:var(--muted);margin-top:2px}
+
+/* busca e segmentos */
+.search{position:relative;margin:4px 0 12px}
+.search input{width:100%;border:0;border-radius:12px;background:var(--fill);padding:11px 14px 11px 38px;font-size:17px;outline:none}
+.search input::placeholder{color:var(--muted)}
+.search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:17px;height:17px;stroke:var(--muted);fill:none;stroke-width:2.2;stroke-linecap:round}
+.segmented{display:flex;background:var(--fill);border-radius:10px;padding:2px;margin-bottom:12px;overflow-x:auto;scrollbar-width:none}
+.segmented::-webkit-scrollbar{display:none}
+.segmented button{flex:1 0 auto;border:0;background:transparent;padding:7px 10px;border-radius:8px;font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;transition:background .2s,box-shadow .2s}
+.segmented button.on{background:var(--card-solid);box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.tools{display:flex;gap:8px;margin-bottom:22px}
+.select{flex:1;border:0;border-radius:12px;background:var(--fill);padding:10px 12px;font-size:15px;outline:none;-webkit-appearance:none;appearance:none}
+.ghost{border:0;border-radius:12px;background:var(--fill);padding:10px 14px;font-size:15px;font-weight:600;color:var(--blue);white-space:nowrap}
+
+/* listas agrupadas */
+.group{margin-bottom:26px;animation:rise .5s cubic-bezier(.2,.8,.2,1) both}
+.group-head{padding:0 6px 8px;cursor:pointer;display:flex;justify-content:space-between;align-items:flex-end;gap:12px;user-select:none}
+.group-head h2{margin:0;font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.02em}
+.group-head p{margin:3px 0 0;font-size:12px;color:var(--muted)}
+.chev{flex:0 0 auto;width:14px;height:14px;stroke:var(--muted);fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+.group.collapsed .chev{transform:rotate(-90deg)}
+.group.collapsed .rows{display:none}
+.rows{background:var(--card-solid);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);border:.5px solid var(--sep)}
+.row{display:flex;align-items:center;gap:12px;padding:12px 14px 12px 12px;position:relative;transition:background .25s}
+.row+.row::before{content:"";position:absolute;left:58px;right:0;top:0;height:.5px;background:var(--sep)}
+.row.hit{background:rgba(0,122,255,.12)}
+.num{flex:0 0 32px;height:32px;border-radius:50%;background:var(--fill);display:grid;place-items:center;font-size:13px;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums}
+.row.watched .num{background:var(--green);color:#fff}
+.row-body{flex:1;min-width:0}
+.row-title{font-size:16px;font-weight:500;line-height:1.3;transition:color .25s}
+.row.watched .row-title{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--sep)}
+.row-meta{font-size:13px;color:var(--muted);margin-top:2px;line-height:1.3}
+.fav{flex:0 0 auto;width:34px;height:34px;border:0;background:transparent;display:grid;place-items:center;color:var(--muted);border-radius:50%}
+.fav svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round}
+.fav.on{color:var(--gold)}
+.fav.on svg{fill:currentColor}
+/* switch estilo iOS */
+.switch{position:relative;flex:0 0 51px;width:51px;height:31px}
+.switch input{opacity:0;width:0;height:0;position:absolute}
+.switch span{position:absolute;inset:0;border-radius:99px;background:var(--fill);transition:background .3s cubic-bezier(.2,.8,.2,1);cursor:pointer}
+.switch span::after{content:"";position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 3px 8px rgba(0,0,0,.15),0 1px 1px rgba(0,0,0,.1);transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+.switch input:checked+span{background:var(--green)}
+.switch input:checked+span::after{transform:translateX(20px)}
+.switch input:focus-visible+span{outline:3px solid rgba(0,122,255,.45);outline-offset:2px}
+
+.empty{padding:40px 20px;text-align:center;color:var(--muted);background:var(--card-solid);border-radius:var(--r);font-size:15px}
+.loading{padding:40px;text-align:center;color:var(--muted)}
+.footer{color:var(--muted);text-align:center;font-size:12px;line-height:1.6;margin-top:30px}
+
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;pointer-events:none;padding:12px 18px;border-radius:999px;background:rgba(40,40,44,.9);color:#fff;font-size:14px;backdrop-filter:blur(20px);transition:opacity .25s,transform .35s cubic-bezier(.2,.8,.2,1);z-index:20;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.confetti{position:fixed;z-index:19;width:8px;height:14px;top:-20px;border-radius:2px;animation:fall 1.4s linear forwards;pointer-events:none}
+
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes fall{to{transform:translateY(105vh) rotate(720deg);opacity:0}}
+@media(max-width:600px){
+  .large{font-size:30px}
+  .next{flex-wrap:wrap}
+  .pill{width:100%;text-align:center}
+  .next-icon{flex-basis:48px;height:48px;font-size:22px}
+  .row+.row::before{left:58px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
+<header class="nav" id="nav">
+  <div class="nav-in">
+    <span class="nav-title">Marvel — Maratona</span>
+    <div class="nav-actions">
+      <button class="circle" id="themeBtn" aria-label="Alternar tema" title="Alternar tema"></button>
+      <button class="circle" id="resetBtn" aria-label="Resetar progresso" title="Resetar progresso"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></button>
+    </div>
+  </div>
+</header>
+
 <div class="wrap">
-  <div class="utility-bar"><div></div><div class="top-actions"><button class="icon-btn" id="themeBtn" title="Alternar tema" aria-label="Alternar tema"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v2m0 14v2M3 12h2m14 0h2m-3.36-6.64-1.41 1.41M7.77 16.23l-1.41 1.41m0-12.28 1.41 1.41m8.46 8.46 1.41 1.41M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/></svg></button><button class="icon-btn" id="exportBtn" title="Exportar progresso" aria-label="Exportar progresso"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0-12 4 4m-4-4L8 7M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg></button><button class="icon-btn" id="importBtn" title="Importar progresso" aria-label="Importar progresso"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3m0 12-4-4m4 4 4-4M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg></button><input id="importFile" type="file" accept="application/json" hidden></div></div>
-  <section class="next-panel"><div class="multiverse-mark" aria-hidden="true"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="39"/><ellipse cx="60" cy="60" rx="52" ry="20"/><ellipse cx="60" cy="60" rx="20" ry="52"/><circle class="energy-dot" cx="60" cy="60" r="7"/></svg></div><div class="next-copy"><small>Próximo capítulo</small><strong id="nextTitle">—</strong><small id="nextMeta">Escolha uma produção para começar</small></div><button class="btn" id="nextBtn">Continuar <span aria-hidden="true">→</span></button></section>
-  <section class="progress-box"><div class="progress-top"><strong id="progressText">0% concluído</strong><span id="count">0 de 0 vistos</span></div><div class="bar"><div class="bar-fill" id="barFill"></div></div></section>
-  <section class="stats"><div class="stat"><span class="stat-label">Vistos</span><span class="stat-value" id="watchedStat">0</span></div><div class="stat"><span class="stat-label">Restantes</span><span class="stat-value" id="remainingStat">0</span></div><div class="stat"><span class="stat-label">Favoritos</span><span class="stat-value" id="favoriteStat">0</span></div></section>
-  <div class="tools"><div class="search"><span class="search-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg></span><input id="search" type="search" placeholder="Buscar filme, série ou universo…" autocomplete="off"></div><button class="btn active" data-filter="all">Todos</button><button class="btn" data-filter="unwatched">Não vistos</button><button class="btn" data-filter="watched">Vistos</button><button class="btn" data-filter="favorites">Favoritos</button><select class="select" id="typeFilter" aria-label="Filtrar por tipo"><option value="all">Todos os tipos</option><option value="Filme">Filmes</option><option value="Série">Séries</option><option value="Animação">Animações</option><option value="Especial">Especiais</option></select><button class="btn" id="randomBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 1.7 5.3L19 10l-5.3 1.7L12 17l-1.7-5.3L5 10l5.3-1.7L12 3Zm6 12 .8 2.2L21 18l-2.2.8L18 21l-.8-2.2L15 18l2.2-.8L18 15Z"/></svg> Surpreenda-me</button><button class="btn" id="resetBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.34-5.66L4 8.68M4 4v4.68h4.68"/></svg> Resetar</button></div>
-  <main id="list"></main>
-  <footer class="footer">Seu progresso e favoritos ficam salvos neste navegador.<br>Use <strong>/</strong> para buscar, <strong>Enter</strong> para selecionar e <strong>Esc</strong> para limpar a busca.</footer>
-</div><button class="icon-btn backtop" id="backtop" aria-label="Voltar ao topo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 14 6-6 6 6"/></svg></button><div class="toast" id="toast"></div>
+  <h1 class="large">Marvel</h1>
+  <p class="sub">Maratona definitiva · sincronizada na nuvem</p>
+
+  <section class="card next">
+    <div class="next-icon" aria-hidden="true">✦</div>
+    <div class="next-copy">
+      <div class="label">Próximo capítulo</div>
+      <div class="next-title" id="nextTitle">Carregando…</div>
+      <div class="next-meta" id="nextMeta"> </div>
+    </div>
+    <button class="pill" id="nextBtn">Continuar</button>
+  </section>
+
+  <section class="card progress">
+    <div class="progress-top">
+      <strong id="progressText">0%</strong>
+      <span id="count">0 de 0 vistos</span>
+    </div>
+    <div class="bar"><div class="bar-fill" id="barFill"></div></div>
+    <div class="stats">
+      <div><div class="stat-v" id="watchedStat">0</div><div class="stat-l">Vistos</div></div>
+      <div><div class="stat-v" id="remainingStat">0</div><div class="stat-l">Restantes</div></div>
+      <div><div class="stat-v" id="favoriteStat">0</div><div class="stat-l">Favoritos</div></div>
+    </div>
+  </section>
+
+  <div class="search">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input id="search" type="search" placeholder="Buscar filme, série ou universo" autocomplete="off">
+  </div>
+
+  <div class="segmented" id="seg" role="tablist">
+    <button class="on" data-filter="all">Todos</button>
+    <button data-filter="unwatched">Não vistos</button>
+    <button data-filter="watched">Vistos</button>
+    <button data-filter="favorites">Favoritos</button>
+  </div>
+
+  <div class="tools">
+    <select class="select" id="typeFilter" aria-label="Filtrar por tipo">
+      <option value="all">Todos os tipos</option>
+      <option value="Filme">Filmes</option>
+      <option value="Série">Séries</option>
+      <option value="Animação">Animações</option>
+      <option value="Especial">Especiais</option>
+    </select>
+    <button class="ghost" id="randomBtn">Surpreenda-me</button>
+  </div>
+
+  <main id="list"><div class="loading">Carregando progresso…</div></main>
+
+  <footer class="footer">Progresso e favoritos salvos no Supabase.<br>Atalhos: <strong>/</strong> busca · <strong>Esc</strong> limpa.</footer>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
 <script>
+/* ===== CONFIGURAÇÃO SUPABASE =====
+   Cole aqui a URL e a chave "anon public" do seu projeto
+   (Project Settings → API). Nunca use a service_role aqui. */
+const SUPABASE_URL = 'https://uhjftilgtebjrbwozoro.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_2cf_SU3wqUzULGJ2emE2pQ_hq9HapaK';
+const TABLE = 'marvel_progress';
+
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 const sections = [
 {
  title:"PARTE 1 — MCU: COMEÇO DA HISTÓRIA",
@@ -286,17 +468,254 @@ const sections = [
  ]
 }
 ];
-const KEY='marvel-marathon-v2';
-let saved={};try{saved=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){}
-let state={watched:saved.watched||{},favorites:saved.favorites||{},collapsed:saved.collapsed||{},theme:saved.theme||'light'};let filter='all';
-const $=id=>document.getElementById(id), allItems=()=>sections.flatMap((s,si)=>s.items.map((x,ii)=>({si,ii,title:x[0],meta:x[1],id:`${si}-${ii}`})));
-function persist(){localStorage.setItem(KEY,JSON.stringify(state))}function toast(msg){$('toast').textContent=msg;$('toast').classList.add('show');clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>$('toast').classList.remove('show'),2200)}
-function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
-function updateProgress(){let all=allItems(),watched=all.filter(x=>state.watched[x.id]).length,pct=all.length?Math.round(watched/all.length*100):0;$('progressText').textContent=`${pct}% concluído`;$('count').textContent=`${watched} de ${all.length} vistos`;$('barFill').style.width=pct+'%';$('watchedStat').textContent=watched;$('remainingStat').textContent=all.length-watched;$('favoriteStat').textContent=all.filter(x=>state.favorites[x.id]).length;let next=all.find(x=>!state.watched[x.id]);$('nextTitle').textContent=next?next.title:'Maratona concluída!';$('nextMeta').textContent=next?next.meta:'Você desbloqueou todos os capítulos.';$('nextBtn').textContent=next?'Continuar maratona →':'Recomeçar jornada';if(pct===100&&!state.celebrated){state.celebrated=true;persist();celebrate()}}
-function matches(x){let q=$('search').value.trim().toLowerCase(),type=$('typeFilter').value;return(!q||(x.title+' '+x.meta).toLowerCase().includes(q))&&(!type||type==='all'||x.meta.includes(type))&&(filter==='all'||(filter==='watched'&&state.watched[x.id])||(filter==='unwatched'&&!state.watched[x.id])||(filter==='favorites'&&state.favorites[x.id]))}
-function render(){let root=$('list');root.innerHTML='';let global=0,shown=0;sections.forEach((sec,si)=>{let visible=sec.items.map((x,ii)=>({title:x[0],meta:x[1],id:`${si}-${ii}`,ii})).filter(matches);sec.items.forEach(()=>global++);if(!visible.length)return;shown+=visible.length;let el=document.createElement('section');el.className='section'+(state.collapsed[si]?' collapsed':'');el.style.animationDelay=Math.min(si*35,400)+'ms';el.innerHTML=`<div class="section-head" data-section="${si}"><div><h2>${sec.title}</h2><p>${sec.desc} · ${visible.length} resultado${visible.length===1?'':'s'}</p></div><button class="section-toggle" aria-label="Recolher seção"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></div><div class="items"></div>`;let items=el.querySelector('.items');visible.forEach(x=>{let watched=!!state.watched[x.id],fav=!!state.favorites[x.id],item=document.createElement('div');item.className='item'+(watched?' watched':'');item.innerHTML=`<div class="num">${x.ii+1}</div><div><div class="title">${escapeHtml(x.title)}</div><div class="meta">${escapeHtml(x.meta)}</div></div><div class="item-controls"><button class="fav ${fav?'active':''}" data-fav="${x.id}" aria-label="${fav?'Remover dos favoritos':'Adicionar aos favoritos'}">${fav?'<svg viewBox="0 0 24 24" aria-hidden="true" class="star-icon filled"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9L12 3Z"/></svg>':'<svg viewBox="0 0 24 24" aria-hidden="true" class="star-icon"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9L12 3Z"/></svg>'}</button><select class="status" data-id="${x.id}" aria-label="Status de ${escapeHtml(x.title)}"><option value="unwatched" ${!watched?'selected':''}>Não vi</option><option value="watched" ${watched?'selected':''}>✓ Já vi</option></select></div>`;items.appendChild(item)});root.appendChild(el)});if(!shown)root.innerHTML='<div class="empty"><strong>Nenhum capítulo encontrado.</strong><br>Tente outro termo ou limpe os filtros.</div>';bind();updateProgress()}
-function bind(){$$('.status').forEach(s=>s.onchange=e=>{let id=e.target.dataset.id;state.watched[id]=e.target.value==='watched';persist();render();toast(state.watched[id]?'Capítulo marcado como visto.':'Capítulo voltou para a lista.')});$$('.fav').forEach(b=>b.onclick=e=>{let id=e.currentTarget.dataset.fav;state.favorites[id]=!state.favorites[id];if(!state.favorites[id])delete state.favorites[id];persist();render();toast(state.favorites[id]?'Adicionado aos favoritos.':'Removido dos favoritos.')});$$('.section-head').forEach(h=>h.onclick=e=>{if(e.target.closest('button')||e.currentTarget){let i=h.dataset.section;state.collapsed[i]=!state.collapsed[i];persist();render()}})}
-function $$(sel){return Array.from(document.querySelectorAll(sel))}function celebrate(){for(let i=0;i<34;i++){let c=document.createElement('i');c.className='confetti';c.style.left=Math.random()*100+'vw';c.style.background=['#f0445d','#ffcc66','#6ea8fe','#44d483'][i%4];c.style.animationDelay=Math.random()*.6+'s';document.body.appendChild(c);setTimeout(()=>c.remove(),1900)}toast('Parabéns! Você completou a maratona.')}
-function exportData(){let blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='marvel-progresso.json';a.click();URL.revokeObjectURL(a.href);toast('Progresso exportado.')}
-$('search').oninput=render;$('typeFilter').onchange=render;$$('[data-filter]').forEach(b=>b.onclick=()=>{filter=b.dataset.filter;$$('[data-filter]').forEach(x=>x.classList.toggle('active',x===b));render()});$('resetBtn').onclick=()=>{if(confirm('Apagar todo o seu progresso e favoritos?')){state.watched={};state.favorites={};state.celebrated=false;persist();render();toast('Progresso resetado.')}};$('randomBtn').onclick=()=>{let options=allItems().filter(x=>!state.watched[x.id]),pick=options[Math.floor(Math.random()*options.length)]||allItems()[0];$('search').value=pick.title;filter='all';$$('[data-filter]').forEach(x=>x.classList.toggle('active',x.dataset.filter==='all'));render();setTimeout(()=>document.querySelector('.item')?.scrollIntoView({behavior:'smooth',block:'center'}),80);toast('Que tal este capítulo?')};$('nextBtn').onclick=()=>{let next=allItems().find(x=>!state.watched[x.id]);if(next){$('search').value=next.title;filter='all';render();setTimeout(()=>document.querySelector('.item')?.scrollIntoView({behavior:'smooth',block:'center'}),80)}else{state.watched={};state.celebrated=false;persist();render()}};$('themeBtn').onclick=()=>{state.theme=state.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=state.theme;$('themeBtn').textContent=state.theme==='dark'?'☀':'☾';persist()};$('exportBtn').onclick=exportData;$('importBtn').onclick=()=>$('importFile').click();$('importFile').onchange=e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let d=JSON.parse(r.result);state={...state,...d};persist();render();toast('Progresso importado.')}catch(err){toast('Arquivo inválido.')}};r.readAsText(f)};document.addEventListener('keydown',e=>{if(e.key==='/'&&document.activeElement.tagName!=='INPUT'){e.preventDefault();$('search').focus()}if(e.key==='Escape'){$('search').value='';render()}});window.addEventListener('scroll',()=>$('backtop').classList.toggle('show',scrollY>500));$('backtop').onclick=()=>scrollTo({top:0,behavior:'smooth'});document.documentElement.dataset.theme=state.theme;$('themeBtn').textContent=state.theme==='dark'?'☀':'☾';render();
-</script></body></html>
+
+/* ===== ESTADO ===== */
+const $ = id => document.getElementById(id);
+const $$ = sel => Array.from(document.querySelectorAll(sel));
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+const allItems = () => sections.flatMap((s, si) => s.items.map((x, ii) => ({ id: si + '-' + ii, si, ii, title: x[0], meta: x[1] })));
+
+let progress = {};            // { 'id': { watched, favorite } }
+let filter = 'all';
+let loaded = false;
+let ui = JSON.parse(localStorage.getItem('marvel-ui') || '{}'); // só preferências visuais
+const saveUI = () => localStorage.setItem('marvel-ui', JSON.stringify(ui));
+
+const isWatched = id => !!progress[id]?.watched;
+const isFav = id => !!progress[id]?.favorite;
+
+function toast(msg) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(window._tt);
+  window._tt = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+/* ===== SUPABASE ===== */
+async function loadProgress() {
+  const { data, error } = await sb.from(TABLE).select('item_id, watched, favorite');
+  if (error) {
+    console.error(error);
+    $('list').innerHTML = `<div class="empty"><strong>Não foi possível carregar.</strong><br>Verifique a URL e a chave do Supabase no código.</div>`;
+    return;
+  }
+  progress = {};
+  data.forEach(r => progress[r.item_id] = { watched: r.watched, favorite: r.favorite });
+  loaded = true;
+  render();
+}
+
+async function setField(id, field, value) {
+  // atualização otimista: a tela muda na hora e o banco sincroniza depois
+  const prev = progress[id] ? { ...progress[id] } : null;
+  progress[id] = { watched: false, favorite: false, ...progress[id], [field]: value };
+  render();
+  const p = progress[id];
+  const { error } = await sb.from(TABLE).upsert({
+    item_id: id, watched: p.watched, favorite: p.favorite, updated_at: new Date().toISOString()
+  });
+  if (error) {
+    console.error(error);
+    if (prev) progress[id] = prev; else delete progress[id];
+    render();
+    toast('Erro ao salvar. Tente de novo.');
+  }
+}
+
+async function resetAll() {
+  const { error } = await sb.from(TABLE).delete().neq('item_id', '');
+  if (error) { toast('Erro ao resetar.'); return; }
+  progress = {};
+  ui.celebrated = false; saveUI();
+  render();
+  toast('Progresso resetado.');
+}
+
+/* ===== FILTROS ===== */
+function matches(x) {
+  const q = $('search').value.trim().toLowerCase();
+  const type = $('typeFilter').value;
+  const textOk = !q || (x.title + ' ' + x.meta).toLowerCase().includes(q);
+  const typeOk = type === 'all' || x.meta.includes(type);
+  const segOk =
+    filter === 'all' ||
+    (filter === 'watched' && isWatched(x.id)) ||
+    (filter === 'unwatched' && !isWatched(x.id)) ||
+    (filter === 'favorites' && isFav(x.id));
+  return textOk && typeOk && segOk;
+}
+
+/* ===== RENDER ===== */
+function render() {
+  if (!loaded) return;
+  const root = $('list');
+  let shown = 0;
+  const html = sections.map((sec, si) => {
+    const rows = sec.items
+      .map((x, ii) => ({ title: x[0], meta: x[1], id: si + '-' + ii, ii }))
+      .filter(matches);
+    if (!rows.length) return '';
+    shown += rows.length;
+    const collapsed = ui.collapsed?.[si] ? ' collapsed' : '';
+    return `
+    <section class="group${collapsed}" style="animation-delay:${Math.min(si * 30, 360)}ms">
+      <div class="group-head" data-section="${si}">
+        <div>
+          <h2>${esc(sec.title)}</h2>
+          <p>${esc(sec.desc)} · ${rows.length} ${rows.length === 1 ? 'item' : 'itens'}</p>
+        </div>
+        <svg class="chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+      <div class="rows">
+        ${rows.map(x => `
+          <div class="row${isWatched(x.id) ? ' watched' : ''}" data-row="${x.id}">
+            <div class="num">${x.ii + 1}</div>
+            <div class="row-body">
+              <div class="row-title">${esc(x.title)}</div>
+              <div class="row-meta">${esc(x.meta)}</div>
+            </div>
+            <button class="fav${isFav(x.id) ? ' on' : ''}" data-fav="${x.id}" aria-label="${isFav(x.id) ? 'Remover dos favoritos' : 'Favoritar'}">
+              <svg viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3 6.4 20.2l1.1-6.2L3 9.6l6.2-.9L12 3Z"/></svg>
+            </button>
+            <label class="switch" aria-label="Marcar ${esc(x.title)} como visto">
+              <input type="checkbox" data-watch="${x.id}" ${isWatched(x.id) ? 'checked' : ''}>
+              <span></span>
+            </label>
+          </div>`).join('')}
+      </div>
+    </section>`;
+  }).join('');
+
+  root.innerHTML = shown ? html : `<div class="empty"><strong>Nenhum capítulo encontrado.</strong><br>Tente outro termo ou limpe os filtros.</div>`;
+  updateProgress();
+}
+
+function updateProgress() {
+  const all = allItems();
+  const watched = all.filter(x => isWatched(x.id)).length;
+  const favs = all.filter(x => isFav(x.id)).length;
+  const pct = all.length ? Math.round(watched / all.length * 100) : 0;
+
+  $('progressText').textContent = `${pct}%`;
+  $('count').textContent = `${watched} de ${all.length} vistos`;
+  $('barFill').style.width = pct + '%';
+  $('watchedStat').textContent = watched;
+  $('remainingStat').textContent = all.length - watched;
+  $('favoriteStat').textContent = favs;
+
+  const next = all.find(x => !isWatched(x.id));
+  $('nextTitle').textContent = next ? next.title : 'Maratona concluída!';
+  $('nextMeta').textContent = next ? next.meta : 'Você assistiu tudo.';
+  $('nextBtn').textContent = next ? 'Continuar' : 'Recomeçar';
+
+  if (pct === 100 && !ui.celebrated) { ui.celebrated = true; saveUI(); celebrate(); }
+}
+
+/* ===== AÇÕES ===== */
+function revealRow(id) {
+  // limpa filtros para garantir que a linha exista na lista
+  $('search').value = ''; $('typeFilter').value = 'all'; filter = 'all';
+  $$('#seg button').forEach(b => b.classList.toggle('on', b.dataset.filter === 'all'));
+  render();
+  const el = document.querySelector(`[data-row="${id}"]`);
+  if (!el) return;
+  const group = el.closest('.group');
+  if (group?.classList.contains('collapsed')) { delete ui.collapsed[group.querySelector('.group-head').dataset.section]; saveUI(); render(); }
+  const target = document.querySelector(`[data-row="${id}"]`);
+  target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  target.classList.add('hit');
+  setTimeout(() => target.classList.remove('hit'), 1600);
+}
+
+function celebrate() {
+  const colors = ['#ff453a', '#ffd60a', '#0a84ff', '#30d158'];
+  for (let i = 0; i < 36; i++) {
+    const c = document.createElement('i');
+    c.className = 'confetti';
+    c.style.left = Math.random() * 100 + 'vw';
+    c.style.background = colors[i % 4];
+    c.style.animationDelay = Math.random() * .6 + 's';
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 2000);
+  }
+  toast('Parabéns! Você completou a maratona.');
+}
+
+/* ===== EVENTOS ===== */
+$('list').addEventListener('change', e => {
+  const id = e.target.dataset.watch;
+  if (id !== undefined) {
+    setField(id, 'watched', e.target.checked);
+    toast(e.target.checked ? 'Marcado como visto' : 'Voltou para a lista');
+  }
+});
+$('list').addEventListener('click', e => {
+  const fav = e.target.closest('[data-fav]');
+  if (fav) {
+    const id = fav.dataset.fav;
+    setField(id, 'favorite', !isFav(id));
+    return;
+  }
+  const head = e.target.closest('.group-head');
+  if (head) {
+    const si = head.dataset.section;
+    ui.collapsed = ui.collapsed || {};
+    ui.collapsed[si] = !ui.collapsed[si];
+    saveUI();
+    head.closest('.group').classList.toggle('collapsed', !!ui.collapsed[si]);
+  }
+});
+
+$('search').addEventListener('input', render);
+$('typeFilter').addEventListener('change', render);
+$$('#seg button').forEach(b => b.addEventListener('click', () => {
+  filter = b.dataset.filter;
+  $$('#seg button').forEach(x => x.classList.toggle('on', x === b));
+  render();
+}));
+
+$('nextBtn').addEventListener('click', () => {
+  const next = allItems().find(x => !isWatched(x.id));
+  if (next) revealRow(next.id);
+  else if (confirm('Recomeçar a maratona do zero?')) resetAll();
+});
+
+$('randomBtn').addEventListener('click', () => {
+  const pool = allItems().filter(x => !isWatched(x.id));
+  const pick = pool[Math.floor(Math.random() * pool.length)] || allItems()[0];
+  revealRow(pick.id);
+  toast('Que tal este?');
+});
+
+$('resetBtn').addEventListener('click', () => {
+  if (confirm('Apagar todo o seu progresso e favoritos?')) resetAll();
+});
+
+function applyTheme(t) {
+  document.documentElement.dataset.theme = t;
+  $('themeBtn').innerHTML = t === 'dark'
+    ? '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>'
+    : '<svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>';
+}
+$('themeBtn').addEventListener('click', () => {
+  ui.theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+  saveUI(); applyTheme(ui.theme);
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === '/' && document.activeElement.tagName !== 'INPUT') { e.preventDefault(); $('search').focus(); }
+  if (e.key === 'Escape') { $('search').value = ''; render(); }
+});
+window.addEventListener('scroll', () => $('nav').classList.toggle('scrolled', scrollY > 60));
+
+/* ===== INÍCIO ===== */
+applyTheme(ui.theme || 'light');
+if (SUPABASE_URL.includes('SEU-PROJETO')) {
+  $('list').innerHTML = `<div class="empty"><strong>Supabase não configurado.</strong><br>Cole a URL e a anon key no topo do script.</div>`;
+} else {
+  loadProgress();
+}
+</script>
+</body>
+</html>
