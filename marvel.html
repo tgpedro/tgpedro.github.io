@@ -188,6 +188,7 @@ button:active{transform:scale(.97)}
         <button type="button" data-v="Série">Séries</button>
         <button type="button" data-v="Animação">Animações</button>
         <button type="button" data-v="Especial">Especiais</button>
+        <button type="button" data-v="labeled">Com etiqueta</button>
       </div>
     </div>
     <button class="ghost" id="randomBtn">Surpreenda-me</button>
@@ -562,7 +563,14 @@ function matches(x) {
   const q = $('search').value.trim().toLowerCase();
   const type = typeVal;
   const textOk = !q || (x.title + ' ' + x.meta).toLowerCase().includes(q);
-  const typeOk = type === 'all' || x.meta.includes(type);
+  const lv = lvlOf(x.title);
+  const typeOk =
+    type === 'all' ||
+    (type === 'lvl3' && lv === 3) ||
+    (type === 'lvl2' && lv === 2) ||
+    (type === 'lvl1' && lv === 1) ||
+    (type === 'labeled' && lv > 0) ||
+    x.meta.includes(type);
   const segOk =
     filter === 'all' ||
     (filter === 'watched' && isWatched(x.id)) ||
@@ -572,11 +580,48 @@ function matches(x) {
 }
 
 /* ===== RENDER ===== */
+function buildTop() {
+  if (typeVal !== 'all' || filter !== 'all' || $('search').value.trim()) return '';
+  const rows = [];
+  sections.forEach((sec, si) => sec.items.forEach((x, ii) => {
+    const l = lvlOf(x[0]);
+    if (l) rows.push({ title: x[0], meta: x[1], id: si + '-' + ii, ii, l });
+  }));
+  if (!rows.length) return '';
+  rows.sort((a, b) => b.l - a.l);
+  const collapsed = ui.collapsed?.top ? ' collapsed' : '';
+  return `
+  <section class="group${collapsed}">
+    <div class="group-head" data-section="top">
+      <div><h2>Importância para Doomsday</h2></div>
+      <svg class="chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
+    </div>
+    <div class="rows">
+      ${rows.map(x => `
+        <div class="row${isWatched(x.id) ? ' watched' : ''}" data-row="${x.id}">
+          <div class="num">${x.ii + 1}</div>
+          <div class="row-body">
+            <div class="row-title">${esc(x.title)}${lvlBadge(x.title)}</div>
+            <div class="row-meta">${esc(x.meta)}</div>
+          </div>
+          <button class="fav${isFav(x.id) ? ' on' : ''}" data-fav="${x.id}" aria-label="Favoritar">
+            <svg viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3 6.4 20.2l1.1-6.2L3 9.6l6.2-.9L12 3Z"/></svg>
+          </button>
+          <label class="switch" aria-label="Marcar ${esc(x.title)} como visto">
+            <input type="checkbox" data-watch="${x.id}" ${isWatched(x.id) ? 'checked' : ''}>
+            <span></span>
+          </label>
+        </div>`).join('')}
+    </div>
+  </section>`;
+}
+
 function render() {
   if (!loaded) return;
   const root = $('list');
   let shown = 0;
-  const html = sections.map((sec, si) => {
+  const top = ''; // bloco separado desativado: usar a opção "Com etiqueta" no menu
+  const html = top + sections.map((sec, si) => {
     const rows = sec.items
       .map((x, ii) => ({ title: x[0], meta: x[1], id: si + '-' + ii, ii }))
       .filter(matches);
