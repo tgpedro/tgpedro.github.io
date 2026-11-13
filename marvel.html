@@ -5,11 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#000000">
 <title>Marvel — Maratona Definitiva</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <style>
 :root{
   --bg:#000;--card:rgba(20,20,20,.8);--card-solid:#111;--fill:rgba(120,120,128,.22);
-  --text:#fff;--muted:#8e8e93;--sep:rgba(84,84,88,.5);--blue:#0a84ff;--green:#30d158;--gold:#ffd60a;--red:#ff453a;
+  --text:#fff;--muted:#8e8e93;--sep:rgba(84,84,88,.5);--blue:#e62429;--green:#30d158;--gold:#ffd60a;--red:#e62429;
   --shadow:0 10px 30px rgba(0,0,0,.5);--r:26px;
 }
 *{box-sizing:border-box}
@@ -127,6 +129,20 @@ button:active{transform:scale(.97)}
 .pw input{width:100%;padding-right:50px}
 .pw-eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);border:0;background:none;color:var(--muted);width:38px;height:38px;display:grid;place-items:center;border-radius:50%}
 .pw-eye svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+body{background-image:radial-gradient(rgba(230,36,41,.14) 1px,transparent 1.4px);background-size:16px 16px}
+.large{font-family:"Bebas Neue",Impact,sans-serif;font-size:76px;font-weight:400;letter-spacing:2px;color:#e62429;line-height:1;text-transform:uppercase;margin:14px 4px 22px}
+.next{background:linear-gradient(120deg,#e62429 0%,#7a0a0d 100%);border-color:transparent;color:#fff;position:relative;overflow:hidden}
+.next::after{content:"";position:absolute;right:-30px;top:-30px;width:200px;height:200px;background:radial-gradient(circle,rgba(255,255,255,.22) 1.6px,transparent 2px) 0 0/12px 12px;transform:rotate(-12deg);pointer-events:none}
+.next .label{color:rgba(255,255,255,.75)}
+.next .pill{background:#fff;color:#e62429}
+.next-title{font-family:"Bebas Neue",Impact,sans-serif;font-size:34px;font-weight:400;letter-spacing:1px;text-transform:uppercase}
+.progress-top strong{font-family:"Bebas Neue",Impact,sans-serif;font-size:40px;font-weight:400;color:#e62429}
+.stat-v{font-family:"Bebas Neue",Impact,sans-serif;font-size:36px;font-weight:400;letter-spacing:1px}
+.group-head h2{font-family:"Bebas Neue",Impact,sans-serif;font-size:24px;font-weight:400;letter-spacing:1.5px;color:#fff}
+.bar-fill{background:linear-gradient(90deg,#e62429,#ff6b3d)}
+.row.watched .num{background:#e62429;color:#fff}
+.lvl-3{background:#e62429;color:#fff}
+.card,.rows{border:1px solid rgba(230,36,41,.22)}
 .empty{padding:40px 20px;text-align:center;color:var(--muted);background:var(--card-solid);border-radius:var(--r);font-size:15px}
 .loading{padding:40px;text-align:center;color:var(--muted)}
 .footer{color:var(--muted);text-align:center;font-size:12px;line-height:1.6;margin-top:30px}
