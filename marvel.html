@@ -3,19 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#f2f2f7">
+<meta name="theme-color" content="#000000">
 <title>Marvel — Maratona Definitiva</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <style>
 :root{
-  --bg:#f2f2f7;--card:rgba(255,255,255,.78);--card-solid:#fff;--fill:rgba(120,120,128,.12);
-  --text:#000;--muted:#8e8e93;--sep:rgba(60,60,67,.18);--blue:#007aff;--green:#34c759;--gold:#ffcc00;--red:#ff3b30;
-  --shadow:0 10px 30px rgba(0,0,0,.06);--r:26px;
-}
-:root[data-theme="dark"]{
-  --bg:#000;--card:rgba(28,28,30,.72);--card-solid:#1c1c1e;--fill:rgba(120,120,128,.24);
-  --text:#fff;--muted:#8e8e93;--sep:rgba(84,84,88,.6);--blue:#0a84ff;--green:#30d158;--gold:#ffd60a;--red:#ff453a;
-  --shadow:0 10px 30px rgba(0,0,0,.4);
+  --bg:#000;--card:rgba(20,20,20,.8);--card-solid:#111;--fill:rgba(120,120,128,.22);
+  --text:#fff;--muted:#8e8e93;--sep:rgba(84,84,88,.5);--blue:#0a84ff;--green:#30d158;--gold:#ffd60a;--red:#ff453a;
+  --shadow:0 10px 30px rgba(0,0,0,.5);--r:26px;
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
@@ -23,8 +18,6 @@ body{
   margin:0;min-height:100vh;background:var(--bg);color:var(--text);
   font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue",Arial,sans-serif;
   -webkit-font-smoothing:antialiased;padding-bottom:env(safe-area-inset-bottom,0px);
-  background-image:radial-gradient(900px 500px at 10% -10%,rgba(0,122,255,.12),transparent 60%),radial-gradient(700px 420px at 100% 0%,rgba(255,59,48,.10),transparent 60%);
-  background-attachment:fixed;
 }
 button,input,select{font:inherit;color:inherit}
 button{cursor:pointer;-webkit-tap-highlight-color:transparent}
@@ -77,6 +70,14 @@ button:active{transform:scale(.97)}
 .segmented button.on{background:var(--card-solid);box-shadow:0 2px 8px rgba(0,0,0,.12)}
 .tools{display:flex;gap:8px;margin-bottom:22px}
 .select{flex:1;border:0;border-radius:12px;background:var(--fill);padding:10px 12px;font-size:15px;outline:none;-webkit-appearance:none;appearance:none}
+.dd{position:relative;flex:1;min-width:0}
+.dd-btn{width:100%;border:0;border-radius:12px;background:var(--fill);padding:11px 14px;font-size:15px;text-align:left;display:flex;justify-content:space-between;align-items:center;color:var(--text)}
+.dd-btn::after{content:"";width:7px;height:7px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg) translateY(-2px);margin-left:8px;flex:0 0 auto}
+.dd-menu{position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:15;background:var(--card-solid);border:.5px solid var(--sep);border-radius:14px;padding:6px;box-shadow:0 14px 40px rgba(0,0,0,.7);opacity:0;transform:translateY(-6px) scale(.98);pointer-events:none;transition:opacity .18s,transform .22s cubic-bezier(.2,.8,.2,1)}
+.dd.open .dd-menu{opacity:1;transform:none;pointer-events:auto}
+.dd-menu button{display:block;width:100%;border:0;background:transparent;text-align:left;padding:10px 12px;border-radius:9px;font-size:15px;color:var(--text)}
+.dd-menu button:hover{background:var(--fill)}
+.dd-menu button.on{color:var(--blue);font-weight:600}
 .ghost{border:0;border-radius:12px;background:var(--fill);padding:10px 14px;font-size:15px;font-weight:600;color:var(--blue);white-space:nowrap}
 
 /* listas agrupadas */
@@ -133,9 +134,8 @@ button:active{transform:scale(.97)}
 <body>
 <header class="nav" id="nav">
   <div class="nav-in">
-    <span class="nav-title">Marvel — Maratona</span>
+    <span class="nav-title">Marvel</span>
     <div class="nav-actions">
-      <button class="circle" id="themeBtn" aria-label="Alternar tema" title="Alternar tema"></button>
       <button class="circle" id="resetBtn" aria-label="Resetar progresso" title="Resetar progresso"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></button>
     </div>
   </div>
@@ -143,14 +143,10 @@ button:active{transform:scale(.97)}
 
 <div class="wrap">
   <h1 class="large">Marvel</h1>
-  <p class="sub">Maratona definitiva · sincronizada na nuvem</p>
 
   <section class="card next">
-    <div class="next-icon" aria-hidden="true">✦</div>
     <div class="next-copy">
-      <div class="label">Próximo capítulo</div>
       <div class="next-title" id="nextTitle">Carregando…</div>
-      <div class="next-meta" id="nextMeta"> </div>
     </div>
     <button class="pill" id="nextBtn">Continuar</button>
   </section>
@@ -158,7 +154,6 @@ button:active{transform:scale(.97)}
   <section class="card progress">
     <div class="progress-top">
       <strong id="progressText">0%</strong>
-      <span id="count">0 de 0 vistos</span>
     </div>
     <div class="bar"><div class="bar-fill" id="barFill"></div></div>
     <div class="stats">
@@ -181,19 +176,21 @@ button:active{transform:scale(.97)}
   </div>
 
   <div class="tools">
-    <select class="select" id="typeFilter" aria-label="Filtrar por tipo">
-      <option value="all">Todos os tipos</option>
-      <option value="Filme">Filmes</option>
-      <option value="Série">Séries</option>
-      <option value="Animação">Animações</option>
-      <option value="Especial">Especiais</option>
-    </select>
+    <div class="dd" id="typeDD">
+      <button class="dd-btn" id="typeBtn" type="button">Todos os tipos</button>
+      <div class="dd-menu">
+        <button type="button" data-v="all" class="on">Todos os tipos</button>
+        <button type="button" data-v="Filme">Filmes</button>
+        <button type="button" data-v="Série">Séries</button>
+        <button type="button" data-v="Animação">Animações</button>
+        <button type="button" data-v="Especial">Especiais</button>
+      </div>
+    </div>
     <button class="ghost" id="randomBtn">Surpreenda-me</button>
   </div>
 
   <main id="list"><div class="loading">Carregando progresso…</div></main>
 
-  <footer class="footer">Progresso e favoritos salvos no Supabase.<br>Atalhos: <strong>/</strong> busca · <strong>Esc</strong> limpa.</footer>
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -202,8 +199,8 @@ button:active{transform:scale(.97)}
 /* ===== CONFIGURAÇÃO SUPABASE =====
    Cole aqui a URL e a chave "anon public" do seu projeto
    (Project Settings → API). Nunca use a service_role aqui. */
-const SUPABASE_URL = 'https://uhjftilgtebjrbwozoro.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_2cf_SU3wqUzULGJ2emE2pQ_hq9HapaK';
+const SUPABASE_URL = 'https://uhjftilgtebjrbwozoro.supabase.co'; 
+  const SUPABASE_KEY = 'sb_publishable_2cf_SU3wqUzULGJ2emE2pQ_hq9HapaK';
 const TABLE = 'marvel_progress';
 
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -477,6 +474,7 @@ const allItems = () => sections.flatMap((s, si) => s.items.map((x, ii) => ({ id:
 
 let progress = {};            // { 'id': { watched, favorite } }
 let filter = 'all';
+let typeVal = 'all';
 let loaded = false;
 let ui = JSON.parse(localStorage.getItem('marvel-ui') || '{}'); // só preferências visuais
 const saveUI = () => localStorage.setItem('marvel-ui', JSON.stringify(ui));
@@ -535,7 +533,7 @@ async function resetAll() {
 /* ===== FILTROS ===== */
 function matches(x) {
   const q = $('search').value.trim().toLowerCase();
-  const type = $('typeFilter').value;
+  const type = typeVal;
   const textOk = !q || (x.title + ' ' + x.meta).toLowerCase().includes(q);
   const typeOk = type === 'all' || x.meta.includes(type);
   const segOk =
@@ -563,7 +561,6 @@ function render() {
       <div class="group-head" data-section="${si}">
         <div>
           <h2>${esc(sec.title)}</h2>
-          <p>${esc(sec.desc)} · ${rows.length} ${rows.length === 1 ? 'item' : 'itens'}</p>
         </div>
         <svg class="chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
       </div>
@@ -598,7 +595,6 @@ function updateProgress() {
   const pct = all.length ? Math.round(watched / all.length * 100) : 0;
 
   $('progressText').textContent = `${pct}%`;
-  $('count').textContent = `${watched} de ${all.length} vistos`;
   $('barFill').style.width = pct + '%';
   $('watchedStat').textContent = watched;
   $('remainingStat').textContent = all.length - watched;
@@ -606,7 +602,6 @@ function updateProgress() {
 
   const next = all.find(x => !isWatched(x.id));
   $('nextTitle').textContent = next ? next.title : 'Maratona concluída!';
-  $('nextMeta').textContent = next ? next.meta : 'Você assistiu tudo.';
   $('nextBtn').textContent = next ? 'Continuar' : 'Recomeçar';
 
   if (pct === 100 && !ui.celebrated) { ui.celebrated = true; saveUI(); celebrate(); }
@@ -615,7 +610,7 @@ function updateProgress() {
 /* ===== AÇÕES ===== */
 function revealRow(id) {
   // limpa filtros para garantir que a linha exista na lista
-  $('search').value = ''; $('typeFilter').value = 'all'; filter = 'all';
+  $('search').value = ''; typeVal = 'all'; $('typeBtn').textContent = 'Todos os tipos'; filter = 'all';
   $$('#seg button').forEach(b => b.classList.toggle('on', b.dataset.filter === 'all'));
   render();
   const el = document.querySelector(`[data-row="${id}"]`);
@@ -668,7 +663,15 @@ $('list').addEventListener('click', e => {
 });
 
 $('search').addEventListener('input', render);
-$('typeFilter').addEventListener('change', render);
+$('typeBtn').addEventListener('click', e => { e.stopPropagation(); $('typeDD').classList.toggle('open'); });
+$$('#typeDD .dd-menu button').forEach(b => b.addEventListener('click', () => {
+  typeVal = b.dataset.v;
+  $('typeBtn').textContent = b.textContent;
+  $$('#typeDD .dd-menu button').forEach(x => x.classList.toggle('on', x === b));
+  $('typeDD').classList.remove('open');
+  render();
+}));
+document.addEventListener('click', () => $('typeDD').classList.remove('open'));
 $$('#seg button').forEach(b => b.addEventListener('click', () => {
   filter = b.dataset.filter;
   $$('#seg button').forEach(x => x.classList.toggle('on', x === b));
@@ -692,16 +695,6 @@ $('resetBtn').addEventListener('click', () => {
   if (confirm('Apagar todo o seu progresso e favoritos?')) resetAll();
 });
 
-function applyTheme(t) {
-  document.documentElement.dataset.theme = t;
-  $('themeBtn').innerHTML = t === 'dark'
-    ? '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>'
-    : '<svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>';
-}
-$('themeBtn').addEventListener('click', () => {
-  ui.theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-  saveUI(); applyTheme(ui.theme);
-});
 
 document.addEventListener('keydown', e => {
   if (e.key === '/' && document.activeElement.tagName !== 'INPUT') { e.preventDefault(); $('search').focus(); }
@@ -710,7 +703,6 @@ document.addEventListener('keydown', e => {
 window.addEventListener('scroll', () => $('nav').classList.toggle('scrolled', scrollY > 60));
 
 /* ===== INÍCIO ===== */
-applyTheme(ui.theme || 'light');
 if (SUPABASE_URL.includes('SEU-PROJETO')) {
   $('list').innerHTML = `<div class="empty"><strong>Supabase não configurado.</strong><br>Cole a URL e a anon key no topo do script.</div>`;
 } else {
