@@ -299,7 +299,7 @@ function albumAct(a){
 }
 
 /* ===== Página do artista ===== */
-async function artistView(id){
+async function artistViewOld(id){
   const a=await mb(`/artist/${id}`);
   const rgs=(await mb(`/release-group?artist=${id}&limit=100`))["release-groups"]||[];
   setAmb(cores(id)[0]);
@@ -310,6 +310,48 @@ async function artistView(id){
   return `<span class="pill">Artista</span>
   <h1 style="font-size:clamp(56px,12vw,120px);line-height:.92;letter-spacing:-.05em;margin:12px 0">${esc(a.name)}</h1>
   <div class="mut" style="font-weight:700">${esc([a.type,a.country,a.disambiguation].filter(Boolean).join(" · ")||"Artista")} · ${rgs.length} lançamento${rgs.length===1?"":"s"}</div>
+  ${secoes||`<div class="empty" style="margin-top:30px">Nenhum lançamento encontrado.</div>`}`;
+}
+
+/* ===== TheAudioDB: foto, banner e bio do artista (rápido, sem fila) ===== */
+const adbCache=new Map();
+async function adbArtista(nome,mbid){
+  const chave=mbid||nome;
+  if(adbCache.has(chave))return adbCache.get(chave);
+  try{
+    const r=await fetch(`https://www.theaudiodb.com/api/v1/json/2/search.php?s=${encodeURIComponent(nome)}`);
+    const j=await r.json();
+    const lista=j.artists||[];
+    const x=lista.find(z=>z.strMusicBrainzID===mbid)||lista[0]||null;
+    adbCache.set(chave,x);
+    return x;
+  }catch(e){return null}
+}
+
+/* ===== Página do artista: foto, banner, bio e discografia ===== */
+async function artistView(id){
+  const a=await mb(`/artist/${id}`);
+  const rgs=(await mb(`/release-group?artist=${id}&limit=100`))["release-groups"]||[];
+  const adb=await adbArtista(a.name,id);
+  const [c1,c2]=cores(id);
+  setAmb(c1);
+  const fundo=adb?.strArtistBanner||adb?.strArtistFanart||"";
+  const banner=fundo?`<div class="pban"><div class="art img" style="background-image:url(${fundo})"></div></div>`:`<div class="pban"><div class="art" style="background:linear-gradient(135deg,${c1},${c2})"></div></div>`;
+  const avatar=adb?.strArtistThumb?`<img src="${adb.strArtistThumb}" alt="${esc(a.name)}">`:`<div style="width:100%;height:100%;background:linear-gradient(145deg,${c1},${c2});display:grid;place-items:center;font-size:44px;font-weight:900">${esc(ini(a.name))}</div>`;
+  const bioCompleta=adb?.strBiographyPT||adb?.strBiographyEN||"";
+  const bio=bioCompleta.slice(0,320)+(bioCompleta.length>320?"…":"");
+  const info=[a.type,a.country||adb?.strCountry,a.disambiguation].filter(Boolean).join(" · ");
+  const secoes=[["Álbuns","Album"],["EPs","EP"],["Singles","Single"]].map(([nome,tipo])=>{
+    const l=rgs.filter(r=>r["primary-type"]===tipo).sort((x,y)=>(y["first-release-date"]||"").localeCompare(x["first-release-date"]||""));
+    return l.length?`<h2>${nome}</h2><div class="grid">${l.map(albumCard).join("")}</div>`:"";
+  }).join("");
+  return `${banner}
+  <div class="phead"><div class="pav">${avatar}</div>
+    <div class="pinfo"><span class="pill">Artista</span>
+      <h1 style="font-size:clamp(48px,8vw,84px);letter-spacing:-.05em;line-height:.95;margin:10px 0 8px">${esc(a.name)}</h1>
+      <div class="phandle">${esc(info||"Artista")} · ${rgs.length} lançamento${rgs.length===1?"":"s"}</div>
+      ${bio?`<p class="pbio">${esc(bio)}</p>`:""}
+    </div></div>
   ${secoes||`<div class="empty" style="margin-top:30px">Nenhum lançamento encontrado.</div>`}`;
 }
 
