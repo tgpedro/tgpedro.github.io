@@ -115,6 +115,14 @@ button:active{transform:scale(.97)}
 .lvl-3{background:rgba(255,69,58,.18);color:#ff453a}
 .lvl-2{background:rgba(255,214,10,.15);color:#ffd60a}
 .lvl-1{background:var(--fill);color:var(--muted)}
+.auth{position:fixed;inset:0;z-index:30;background:var(--bg);display:grid;place-items:center;padding:20px}
+.auth[hidden]{display:none}
+.auth-card{width:min(360px,100%);display:flex;flex-direction:column;gap:12px}
+.auth-card h2{margin:0 0 8px;font-size:30px;font-weight:700;letter-spacing:-.4px}
+.auth-card input{border:0;border-radius:12px;background:var(--fill);padding:14px;font-size:16px;color:var(--text);outline:none}
+.auth-btn{border:0;border-radius:12px;background:var(--blue);color:#fff;padding:14px;font-size:16px;font-weight:600}
+.auth-link{border:0;background:none;color:var(--blue);font-size:15px;padding:6px;text-align:center}
+.auth-err{color:var(--red);font-size:14px;min-height:18px;text-align:center}
 .empty{padding:40px 20px;text-align:center;color:var(--muted);background:var(--card-solid);border-radius:var(--r);font-size:15px}
 .loading{padding:40px;text-align:center;color:var(--muted)}
 .footer{color:var(--muted);text-align:center;font-size:12px;line-height:1.6;margin-top:30px}
@@ -140,6 +148,7 @@ button:active{transform:scale(.97)}
   <div class="nav-in">
     <span class="nav-title">Marvel</span>
     <div class="nav-actions">
+      <button class="circle" id="logoutBtn" aria-label="Sair" title="Sair"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg></button>
       <button class="circle" id="resetBtn" aria-label="Resetar progresso" title="Resetar progresso"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></button>
     </div>
   </div>
@@ -200,12 +209,23 @@ button:active{transform:scale(.97)}
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<div class="auth" id="auth" hidden>
+  <form class="auth-card" id="authForm">
+    <h2 id="authTitle">Entrar</h2>
+    <input id="authEmail" type="email" placeholder="E-mail" required autocomplete="email">
+    <input id="authPass" type="password" placeholder="Senha (mín. 6)" required minlength="6" autocomplete="current-password">
+    <button class="auth-btn" type="submit" id="authSubmit">Entrar</button>
+    <button class="auth-link" type="button" id="authSwitch">Criar conta</button>
+    <div class="auth-err" id="authErr"></div>
+  </form>
+</div>
+
 <script>
 /* ===== CONFIGURAÇÃO SUPABASE =====
    Cole aqui a URL e a chave "anon public" do seu projeto
    (Project Settings → API). Nunca use a service_role aqui. */
 const SUPABASE_URL = 'https://uhjftilgtebjrbwozoro.supabase.co'; 
-const SUPABASE_KEY = 'sb_publishable_2cf_SU3wqUzULGJ2emE2pQ_hq9HapaK';
+  const SUPABASE_KEY = 'sb_publishable_2cf_SU3wqUzULGJ2emE2pQ_hq9HapaK';
 const TABLE = 'marvel_progress';
 
 /* Importância para entender Avengers: Doomsday
@@ -533,13 +553,14 @@ async function loadProgress() {
 }
 
 async function setField(id, field, value) {
+  if (!currentUser) return;
   // atualização otimista: a tela muda na hora e o banco sincroniza depois
   const prev = progress[id] ? { ...progress[id] } : null;
   progress[id] = { watched: false, favorite: false, ...progress[id], [field]: value };
   render();
   const p = progress[id];
   const { error } = await sb.from(TABLE).upsert({
-    item_id: id, watched: p.watched, favorite: p.favorite, updated_at: new Date().toISOString()
+    user_id: currentUser.id, item_id: id, watched: p.watched, favorite: p.favorite, updated_at: new Date().toISOString()
   });
   if (error) {
     console.error(error);
@@ -550,7 +571,8 @@ async function setField(id, field, value) {
 }
 
 async function resetAll() {
-  const { error } = await sb.from(TABLE).delete().neq('item_id', '');
+  if (!currentUser) return;
+  const { error } = await sb.from(TABLE).delete().eq('user_id', currentUser.id);
   if (error) { toast('Erro ao resetar.'); return; }
   progress = {};
   ui.celebrated = false; saveUI();
@@ -775,10 +797,50 @@ document.addEventListener('keydown', e => {
 window.addEventListener('scroll', () => $('nav').classList.toggle('scrolled', scrollY > 60));
 
 /* ===== INÍCIO ===== */
+let currentUser = null;
+let authMode = 'login';
+
+$('authSwitch').addEventListener('click', () => {
+  authMode = authMode === 'login' ? 'signup' : 'login';
+  $('authTitle').textContent = authMode === 'login' ? 'Entrar' : 'Criar conta';
+  $('authSubmit').textContent = authMode === 'login' ? 'Entrar' : 'Criar conta';
+  $('authSwitch').textContent = authMode === 'login' ? 'Criar conta' : 'Já tenho conta';
+  $('authPass').autocomplete = authMode === 'login' ? 'current-password' : 'new-password';
+  $('authErr').textContent = '';
+});
+
+$('authForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  $('authErr').textContent = '';
+  const email = $('authEmail').value.trim();
+  const password = $('authPass').value;
+  const { data, error } = authMode === 'login'
+    ? await sb.auth.signInWithPassword({ email, password })
+    : await sb.auth.signUp({ email, password });
+  if (error) { $('authErr').textContent = error.message; return; }
+  if (authMode === 'signup' && !data.session) {
+    $('authSwitch').click();
+    $('authErr').textContent = 'Conta criada. Confirme o e-mail e depois entre.';
+  }
+});
+
+$('logoutBtn').addEventListener('click', () => sb.auth.signOut());
+
 if (SUPABASE_URL.includes('SEU-PROJETO')) {
   $('list').innerHTML = `<div class="empty"><strong>Supabase não configurado.</strong><br>Cole a URL e a anon key no topo do script.</div>`;
 } else {
-  loadProgress();
+  sb.auth.onAuthStateChange((_event, session) => {
+    currentUser = session?.user || null;
+    if (currentUser) {
+      $('auth').hidden = true;
+      loadProgress();
+    } else {
+      $('auth').hidden = false;
+      progress = {};
+      loaded = false;
+      $('list').innerHTML = '';
+    }
+  });
 }
 </script>
 </body>
