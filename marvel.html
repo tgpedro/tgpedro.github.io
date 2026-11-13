@@ -123,6 +123,10 @@ button:active{transform:scale(.97)}
 .auth-btn{border:0;border-radius:12px;background:var(--blue);color:#fff;padding:14px;font-size:16px;font-weight:600}
 .auth-link{border:0;background:none;color:var(--blue);font-size:15px;padding:6px;text-align:center}
 .auth-err{color:var(--red);font-size:14px;min-height:18px;text-align:center}
+.pw{position:relative}
+.pw input{width:100%;padding-right:50px}
+.pw-eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);border:0;background:none;color:var(--muted);width:38px;height:38px;display:grid;place-items:center;border-radius:50%}
+.pw-eye svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .empty{padding:40px 20px;text-align:center;color:var(--muted);background:var(--card-solid);border-radius:var(--r);font-size:15px}
 .loading{padding:40px;text-align:center;color:var(--muted)}
 .footer{color:var(--muted);text-align:center;font-size:12px;line-height:1.6;margin-top:30px}
@@ -213,8 +217,12 @@ button:active{transform:scale(.97)}
   <form class="auth-card" id="authForm">
     <h2 id="authTitle">Entrar</h2>
     <input id="authEmail" type="email" placeholder="E-mail" required autocomplete="email">
-    <input id="authPass" type="password" placeholder="Senha (mín. 6)" required minlength="6" autocomplete="current-password">
+    <div class="pw" id="pwWrap">
+      <input id="authPass" type="password" placeholder="Senha (mín. 6)" required minlength="6" autocomplete="current-password">
+      <button class="pw-eye" type="button" id="pwToggle" aria-label="Mostrar senha" title="Mostrar senha"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+    </div>
     <button class="auth-btn" type="submit" id="authSubmit">Entrar</button>
+    <button class="auth-link" type="button" id="authForgot">Esqueci a senha</button>
     <button class="auth-link" type="button" id="authSwitch">Criar conta</button>
     <div class="auth-err" id="authErr"></div>
   </form>
@@ -225,7 +233,7 @@ button:active{transform:scale(.97)}
    Cole aqui a URL e a chave "anon public" do seu projeto
    (Project Settings → API). Nunca use a service_role aqui. */
 const SUPABASE_URL = 'https://uhjftilgtebjrbwozoro.supabase.co'; 
-  const SUPABASE_KEY = 'sb_publishable_2cf_SU3wqUzULGJ2emE2pQ_hq9HapaK';
+const SUPABASE_KEY = 'sb_publishable_2cf_SU3wqUzULGJ2emE2pQ_hq9HapaK';
 const TABLE = 'marvel_progress';
 
 /* Importância para entender Avengers: Doomsday
@@ -799,14 +807,31 @@ window.addEventListener('scroll', () => $('nav').classList.toggle('scrolled', sc
 /* ===== INÍCIO ===== */
 let currentUser = null;
 let authMode = 'login';
+let recovering = false;
 
-$('authSwitch').addEventListener('click', () => {
-  authMode = authMode === 'login' ? 'signup' : 'login';
-  $('authTitle').textContent = authMode === 'login' ? 'Entrar' : 'Criar conta';
-  $('authSubmit').textContent = authMode === 'login' ? 'Entrar' : 'Criar conta';
-  $('authSwitch').textContent = authMode === 'login' ? 'Criar conta' : 'Já tenho conta';
-  $('authPass').autocomplete = authMode === 'login' ? 'current-password' : 'new-password';
+function setMode(mode) {
+  authMode = mode;
+  $('authTitle').textContent = { login: 'Entrar', signup: 'Criar conta', forgot: 'Recuperar senha', reset: 'Nova senha' }[mode];
+  $('authSubmit').textContent = { login: 'Entrar', signup: 'Criar conta', forgot: 'Enviar link', reset: 'Salvar senha' }[mode];
+  $('authEmail').hidden = mode === 'reset';
+  $('authEmail').required = mode !== 'reset';
+  $('pwWrap').hidden = mode === 'forgot';
+  $('authPass').required = mode !== 'forgot';
+  $('authPass').autocomplete = mode === 'signup' || mode === 'reset' ? 'new-password' : 'current-password';
+  $('authSwitch').hidden = mode === 'reset';
+  $('authSwitch').textContent = { login: 'Criar conta', signup: 'Já tenho conta', forgot: 'Voltar ao login' }[mode] || '';
+  $('authForgot').hidden = mode !== 'login';
   $('authErr').textContent = '';
+}
+
+$('authSwitch').addEventListener('click', () => setMode(authMode === 'login' ? 'signup' : 'login'));
+$('authForgot').addEventListener('click', () => setMode('forgot'));
+
+$('pwToggle').addEventListener('click', () => {
+  const show = $('authPass').type === 'password';
+  $('authPass').type = show ? 'text' : 'password';
+  $('pwToggle').setAttribute('aria-label', show ? 'Ocultar senha' : 'Mostrar senha');
+  $('pwToggle').title = show ? 'Ocultar senha' : 'Mostrar senha';
 });
 
 $('authForm').addEventListener('submit', async e => {
@@ -814,6 +839,23 @@ $('authForm').addEventListener('submit', async e => {
   $('authErr').textContent = '';
   const email = $('authEmail').value.trim();
   const password = $('authPass').value;
+
+  if (authMode === 'forgot') {
+    const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: window.location.href.split('#')[0] });
+    $('authErr').textContent = error ? error.message : 'Link de recuperação enviado para o seu e-mail.';
+    return;
+  }
+
+  if (authMode === 'reset') {
+    const { error } = await sb.auth.updateUser({ password });
+    if (error) { $('authErr').textContent = error.message; return; }
+    recovering = false;
+    setMode('login');
+    $('auth').hidden = true;
+    loadProgress();
+    return;
+  }
+
   const { data, error } = authMode === 'login'
     ? await sb.auth.signInWithPassword({ email, password })
     : await sb.auth.signUp({ email, password });
@@ -829,8 +871,15 @@ $('logoutBtn').addEventListener('click', () => sb.auth.signOut());
 if (SUPABASE_URL.includes('SEU-PROJETO')) {
   $('list').innerHTML = `<div class="empty"><strong>Supabase não configurado.</strong><br>Cole a URL e a anon key no topo do script.</div>`;
 } else {
-  sb.auth.onAuthStateChange((_event, session) => {
+  sb.auth.onAuthStateChange((event, session) => {
     currentUser = session?.user || null;
+    if (event === 'PASSWORD_RECOVERY') {
+      recovering = true;
+      setMode('reset');
+      $('auth').hidden = false;
+      return;
+    }
+    if (recovering) { $('auth').hidden = false; return; }
     if (currentUser) {
       $('auth').hidden = true;
       loadProgress();
