@@ -194,6 +194,32 @@ textarea.field{min-height:100px;resize:vertical;font-weight:500}
   .edav{width:76px;height:76px}
 }
 .abg{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}.abg div{position:absolute;inset:-80px;background-size:cover;background-position:center;filter:blur(90px) saturate(150%);opacity:.75}.abg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.2) 0%,#000 85%)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes pop{0%{transform:scale(.4)}100%{transform:scale(1)}}
+@keyframes shim{to{background-position:-200% 0}}
+#app>*{animation:fadeUp .5s cubic-bezier(.2,.8,.2,1) both}
+.grid>*{animation:fadeUp .55s cubic-bezier(.2,.8,.2,1) both}
+.grid>:nth-child(2){animation-delay:.04s}.grid>:nth-child(3){animation-delay:.08s}.grid>:nth-child(4){animation-delay:.12s}.grid>:nth-child(5){animation-delay:.16s}.grid>:nth-child(6){animation-delay:.2s}.grid>:nth-child(7){animation-delay:.24s}.grid>:nth-child(8){animation-delay:.28s}.grid>:nth-child(9){animation-delay:.32s}.grid>:nth-child(10){animation-delay:.36s}.grid>:nth-child(n+11){animation-delay:.4s}
+.load{background:linear-gradient(90deg,rgba(255,255,255,.04),rgba(255,255,255,.14),rgba(255,255,255,.04));background-size:200% 100%;border-radius:18px;animation:shim 1.4s infinite linear;color:transparent;min-height:110px}
+.btn,.chip,.fab,.nav a{transition:transform .15s,background .2s,color .2s}
+.btn:active,.chip:active,.fab:active{transform:scale(.95)}
+.btn.p{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff}
+.rbtn i.on{animation:pop .35s cubic-bezier(.3,1.6,.5,1)}
+a.row{transition:background .2s,transform .25s}a.row:hover{transform:translateX(3px)}
+.cover img{transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+.card:hover .cover img{transform:scale(1.05)}
+.search:focus{box-shadow:0 0 0 3px rgba(250,45,72,.45)}
+.flash{animation:fl 2.4s cubic-bezier(.2,.8,.2,1) forwards}
+.hero-home{position:relative;height:340px;border-radius:28px;overflow:hidden;background-size:cover;background-position:center;margin:4px 0 22px;box-shadow:0 30px 60px rgba(0,0,0,.5);animation:fadeUp .7s cubic-bezier(.2,.8,.2,1) both}
+.hh-shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.88) 0%,rgba(0,0,0,.35) 60%,rgba(0,0,0,.1) 100%)}
+.hh-body{position:absolute;left:28px;bottom:26px;right:28px;display:grid;gap:6px}
+.hh-t{font-size:clamp(28px,5vw,46px);font-weight:900;letter-spacing:-1px;line-height:1;margin:6px 0 2px}
+.hist2{padding:18px;border-radius:22px;background:#111}
+.hrow{display:grid;grid-template-columns:30px 1fr 28px;gap:12px;align-items:center;font-size:13px;font-weight:700;margin-bottom:8px}
+.hbar{height:9px;border-radius:5px;background:rgba(255,255,255,.1);overflow:hidden}
+.hbar i{display:block;height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));border-radius:5px}
+@media(max-width:640px){.hero-home{height:280px;border-radius:22px}.hh-body{left:18px;right:18px;bottom:18px}}
 </style>
 </head>
 <body>
@@ -325,6 +351,9 @@ async function homeView(){
   const cardsDe=lista=>unirAlbuns(lista.map(mapDz)).map(u=>{guardarAlbum(u);return cardAlbum(u)}).join("");
   const chart=await dz(`/chart/${homeGenero}/albums?limit=12`).catch(()=>({data:[]}));
   const emAlta=cardsDe(chart.data||[]);
+  window.__chart=chart.data||[];
+  const topo=window.__chart[0];
+  const heroi=topo?`<div class="hero-home" style="background-image:url(${topo.cover_xl||topo.cover_big||""})"><div class="hh-shade"></div><div class="hh-body"><span class="pill">Mais ouvido agora</span><h2 class="hh-t">${esc(topo.title)}</h2><div class="mut" style="font-size:17px;font-weight:700">${esc(topo.artist?.name||"")}</div><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px"><a class="btn p" href="#album-${albumKey(topo.title,topo.artist?.name||"")}">Abrir</a><button class="btn" data-rnd>🎲 Aleatório</button></div></div></div>`:"";
   const avaliados=Object.entries(S.u).filter(([k,v])=>v.r&&S.meta[k]).sort((a,b)=>b[1].r-a[1].r);
   const jaAvaliados=new Set(Object.keys(S.u));
   const artistasConhecidos=new Set(avaliados.map(([k])=>norm(S.meta[k].a)));
@@ -342,7 +371,7 @@ async function homeView(){
     }catch(e){}
   }
   const diario=Object.entries(S.u).filter(([,v])=>v.d).sort((a,b)=>b[1].d.localeCompare(a[1].d)).slice(0,6);
-  return `<h1>Início</h1><input class="search" id="hq" placeholder="Procure álbuns, EPs, músicas ou artistas" autocomplete="off">
+  return `${heroi}<h1>Início</h1><input class="search" id="hq" placeholder="Procure álbuns, EPs, músicas ou artistas" autocomplete="off">
   <h2>Em alta</h2>
   <div class="chips" style="padding-top:0">${GENEROS_HOME.map(([id,l])=>`<button class="chip ${homeGenero===id?"on":""}" data-hg="${id}">${l}</button>`).join("")}</div>
   ${emAlta?`<div class="grid">${emAlta}</div>`:`<div class="empty">Não foi possível carregar as tendências agora.</div>`}
@@ -534,7 +563,7 @@ function perfilView(){
   return `${banner}<div class="phead"><div class="pav">${avatar}</div>
     <div class="pinfo"><h1>${esc(p.nome)}</h1><div class="phandle">@${esc(p.handle)}${p.local?" · "+esc(p.local):""}</div>${p.bio?`<p class="pbio">${esc(p.bio)}</p>`:""}</div>
     <div class="pright"><div class="pstats">${stats}</div><button class="shbtn" data-pact="compartilhar" aria-label="Compartilhar" title="Compartilhar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M8 11H6.5A1.5 1.5 0 0 0 5 12.5v7A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5v-7A1.5 1.5 0 0 0 17.5 11H16"/></svg></button></div></div>
-  <nav class="ptabs">${tabs.map(([k,l])=>`<button class="${aba===k?"on":""}" data-aba="${k}">${l}</button>`).join("")}</nav>${corpo}`;
+  <nav class="ptabs">${tabs.map(([k,l])=>`<button class="${aba===k?"on":""}" data-aba="${k}">${l}</button>`).join("")}</nav>${corpo}${extraPerfil()}`;
 }
 function compartilhar(){
   const p=P();
@@ -751,6 +780,61 @@ document.addEventListener("click",e=>{
   if(l){listAct(l);return}
 });
 rota();
+</script>
+<script>
+function extraPerfil(){
+  const av=Object.entries(S.u).filter(([k,v])=>v.r&&S.meta[k]);
+  const dist=[.5,1,1.5,2,2.5,3,3.5,4,4.5,5].map(n=>{const c=av.filter(([,v])=>v.r===n).length;return `<div class="hrow"><span>${String(n).replace(".",",")}</span><div class="hbar"><i style="width:${av.length?c/av.length*100:0}%"></i></div><span class="mut">${c}</span></div>`}).join("");
+  const cont={};av.forEach(([k])=>{const a=S.meta[k].a;cont[a]=(cont[a]||0)+1});
+  const topA=Object.entries(cont).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const faixas=Object.entries(S.tracks||{}).filter(([k])=>S.u[k]?.r).sort((a,b)=>S.u[b[0]].r-S.u[a[0]].r).slice(0,8);
+  return `<h2>Top artistas</h2>${topA.length?`<div class="mlist">${topA.map(([n,c],i)=>`<a class="row" href="#artist-${artistKey(n)}"><span class="num">${i+1}</span><div class="grow"><div class="ttl">${esc(n)}</div><div class="sm mut" style="font-weight:700">${c} álbum${c>1?"ns":""} avaliado${c>1?"s":""}</div></div><span class="mut">›</span></a>`).join("")}</div>`:`<div class="empty">Avalie álbuns para ver seus artistas favoritos.</div>`}
+  <h2>Distribuição de notas</h2><div class="hist2">${dist}</div>
+  <h2>Músicas avaliadas</h2>${faixas.length?`<div class="mlist">${faixas.map(([k,v])=>`<div class="row"><div class="grow"><div class="ttl">${esc(v.t)}</div><div class="sm mut" style="font-weight:700">${esc(v.a)}</div></div>${estrelas(S.u[k].r)}</div>`).join("")}</div>`:`<div class="empty">Avalie faixas na página de um álbum.</div>`}
+  <h2>Compartilhar</h2><button class="btn p" data-pact="cartao">Gerar imagem do perfil</button>`;
+}
+function rr(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
+function gerarCartao(){
+  const p=P(),fav=p.fav||[];
+  const c=document.createElement("canvas");c.width=1080;c.height=1350;
+  const g=c.getContext("2d");
+  const [c1,c2]=fav[0]?cores(fav[0]):cores(p.handle||"acetato");
+  const fundo=g.createLinearGradient(0,0,0,1350);fundo.addColorStop(0,c1);fundo.addColorStop(.55,c2);fundo.addColorStop(1,"#000");
+  g.fillStyle=fundo;g.fillRect(0,0,1080,1350);
+  g.fillStyle="#fff";g.font="900 104px -apple-system, Helvetica, Arial, sans-serif";g.fillText(p.nome.slice(0,16),80,260);
+  g.font="700 44px -apple-system, Helvetica, Arial, sans-serif";g.fillStyle="rgba(255,255,255,.8)";g.fillText("@"+p.handle,84,330);
+  const ouv=Object.values(S.u).filter(v=>v.d).length;
+  const av=Object.values(S.u).filter(v=>v.r);
+  const media=av.length?(av.reduce((s,v)=>s+v.r,0)/av.length).toFixed(1).replace(".",","):"—";
+  g.font="600 38px -apple-system, Helvetica, Arial, sans-serif";g.fillText(`${ouv} ouvidos · ${av.length} avaliações · média ${media}`,84,410);
+  fav.slice(0,4).forEach((k,i)=>{
+    const x=80+i*236,y=500,[a,b]=cores(k);
+    const t=g.createLinearGradient(x,y,x+200,y+200);t.addColorStop(0,a);t.addColorStop(1,b);
+    g.fillStyle=t;rr(g,x,y,200,200,26);g.fill();
+    g.fillStyle="#fff";g.font="800 26px -apple-system, Helvetica, Arial, sans-serif";
+    const nome=(S.meta[k]||{}).t||"";
+    g.fillText(nome.slice(0,14),x,y+240);
+  });
+  g.font="800 40px -apple-system, Helvetica, Arial, sans-serif";g.fillStyle="#fff";g.fillText("Músicas favoritas",84,880);
+  g.font="600 36px -apple-system, Helvetica, Arial, sans-serif";
+  (p.musicas||[]).slice(0,5).forEach((m,i)=>{g.fillStyle="rgba(255,255,255,.9)";g.fillText(`${i+1}. ${m.slice(0,40)}`,84,950+i*62)});
+  g.font="900 46px -apple-system, Helvetica, Arial, sans-serif";g.fillStyle="#fff";g.fillText("Acetato.",84,1250);
+  c.toBlob(blob=>{
+    const file=new File([blob],"acetato-perfil.png",{type:"image/png"});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){navigator.share({files:[file],title:"Acetato"}).catch(()=>{});return}
+    const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="acetato-perfil.png";document.body.appendChild(a);a.click();a.remove();
+    flash("Imagem gerada");
+  },"image/png");
+}
+document.addEventListener("click",e=>{
+  if(e.target.closest("[data-pact='cartao']")){gerarCartao();return}
+  if(e.target.closest("[data-rnd]")){
+    const lista=window.__chart||[];
+    if(!lista.length){flash("Ainda não há tendências carregadas");return}
+    const x=lista[Math.floor(Math.random()*lista.length)];
+    location.hash="album-"+albumKey(x.title,x.artist?.name||"");
+  }
+});
 </script>
 </body>
 </html>
