@@ -318,29 +318,35 @@ function estrelas(r){let h="";for(let i=1;i<=5;i++){const c=r>=i?"on":r>=i-.5?"h
 const erroHTML=()=>`<div class="empty">Não foi possível carregar agora. Tente de novo em alguns segundos.</div>`;
 
 /* ===== Início ===== */
+let homeGenero=0;
+const GENEROS_HOME=[[0,"Mundial"],[132,"Pop"],[116,"Hip-hop"],[85,"Alternativo"],[106,"Eletrônica"],[165,"R&B"]];
 async function homeView(){
   const mapDz=x=>({src:"dz",id:x.id,t:x.title,a:x.artist?.name||"",y:(x.release_date||"").slice(0,4),tipo:x.record_type||"album",cover:x.cover_xl||x.cover_big||x.cover_medium||""});
   const cardsDe=lista=>unirAlbuns(lista.map(mapDz)).map(u=>{guardarAlbum(u);return cardAlbum(u)}).join("");
-  const chart=await dz("/chart/0/albums?limit=12").catch(()=>({data:[]}));
+  const chart=await dz(`/chart/${homeGenero}/albums?limit=12`).catch(()=>({data:[]}));
   const emAlta=cardsDe(chart.data||[]);
-  let rec="",tituloRec="";
-  const melhor=Object.entries(S.u).filter(([k,v])=>v.r&&S.meta[k]).sort((a,b)=>b[1].r-a[1].r)[0];
-  if(melhor){
-    const m=S.meta[melhor[0]];
-    const did=S.artists[artistKey(m.a)]?.ids?.dz;
-    if(did){
-      try{
-        const rel=((await dz(`/artist/${did}/related?limit=6`)).data||[]).slice(0,4);
-        const listas=await Promise.all(rel.map(o=>dz(`/artist/${o.id}/albums?limit=2`).then(j=>(j.data||[]).map(x=>({...x,artist:{name:o.name}}))).catch(()=>[])));
-        rec=cardsDe(listas.flat().slice(0,12));
-        if(rec)tituloRec=`Porque você avaliou ${esc(m.t)}`;
-      }catch(e){}
-    }
+  const avaliados=Object.entries(S.u).filter(([k,v])=>v.r&&S.meta[k]).sort((a,b)=>b[1].r-a[1].r);
+  const jaAvaliados=new Set(Object.keys(S.u));
+  const artistasConhecidos=new Set(avaliados.map(([k])=>norm(S.meta[k].a)));
+  const sementes=avaliados.slice(0,3).map(([k])=>S.artists[artistKey(S.meta[k].a)]?.ids?.dz).filter(Boolean);
+  let rec="";
+  if(sementes.length){
+    try{
+      const rels=await Promise.all(sementes.map(id=>dz(`/artist/${id}/related?limit=8`).then(j=>j.data||[]).catch(()=>[])));
+      const cont=new Map();
+      rels.flat().forEach(a=>{if(artistasConhecidos.has(norm(a.name)))return;const c=cont.get(a.id)||{a,n:0};c.n++;cont.set(a.id,c)});
+      const top=[...cont.values()].sort((x,y)=>y.n-x.n).slice(0,6);
+      const listas=await Promise.all(top.map(c=>dz(`/artist/${c.a.id}/albums?limit=2`).then(j=>(j.data||[]).map(x=>({...x,artist:{name:c.a.name}}))).catch(()=>[])));
+      const lista=listas.flat().filter(x=>!jaAvaliados.has(albumKey(x.title,x.artist.name)));
+      rec=cardsDe(lista.slice(0,12));
+    }catch(e){}
   }
   const diario=Object.entries(S.u).filter(([,v])=>v.d).sort((a,b)=>b[1].d.localeCompare(a[1].d)).slice(0,6);
   return `<h1>Início</h1><input class="search" id="hq" placeholder="Procure álbuns, EPs, músicas ou artistas" autocomplete="off">
-  ${rec?`<h2>Recomendados</h2><div class="sub mut sm" style="font-weight:700;margin:-6px 0 14px">${tituloRec}</div><div class="grid">${rec}</div>`:""}
-  ${emAlta?`<h2>Em alta</h2><div class="grid">${emAlta}</div>`:`<div class="empty" style="margin-top:24px">Não foi possível carregar as tendências agora.</div>`}
+  <h2>Em alta</h2>
+  <div class="chips" style="padding-top:0">${GENEROS_HOME.map(([id,l])=>`<button class="chip ${homeGenero===id?"on":""}" data-hg="${id}">${l}</button>`).join("")}</div>
+  ${emAlta?`<div class="grid">${emAlta}</div>`:`<div class="empty">Não foi possível carregar as tendências agora.</div>`}
+  ${rec?`<h2>Recomendados para você</h2><div class="mut sm" style="font-weight:700;margin:-6px 0 14px">Com base nos artistas que você mais avaliou</div><div class="grid">${rec}</div>`:""}
   ${diario.length?`<h2>Recentes do seu diário</h2><div class="grid">${diario.map(([k])=>cardMeta(k)).join("")}</div>`:""}`;
 }
 
@@ -699,6 +705,8 @@ document.addEventListener("click",e=>{
   const t=e.target;
   const tv=t.closest("[data-tv]");
   if(tv){e.preventDefault();const box=tv.closest(".trate");const k=box.dataset.tk;const d=dd(k);const val=+tv.dataset.tv;d.r=d.r===val?0:val;if(!d.r)delete d.r;S.tracks=S.tracks||{};S.tracks[k]={t:box.dataset.tt,a:box.dataset.ta};salvar();box.innerHTML=rateHTML(d.r).replace(/data-v=/g,'data-tv=');flash(d.r?`Nota ${String(val).replace(".",",")} para a música`:"Nota removida");return}
+  const hg=t.closest("[data-hg]");
+  if(hg){homeGenero=+hg.dataset.hg;rota();return}
   const edt=t.closest("[data-edt]");
   if(edt){EDTAB=edt.dataset.edt;renderEditor();return}
   const edf=t.closest("[data-edf]");
