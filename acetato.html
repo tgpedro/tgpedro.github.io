@@ -342,6 +342,15 @@ textarea.gr-in{resize:none;min-height:56px;line-height:1.4}
 }
 </style>
 
+<style>
+.carw::before,.carw::after{display:none!important}
+.card{border:0!important}
+.carbtn{width:36px;height:36px;top:calc(50% - 22px);background:rgba(255,255,255,.16);border:0;color:#fff;box-shadow:0 6px 18px rgba(0,0,0,.35);backdrop-filter:blur(18px) saturate(160%);-webkit-backdrop-filter:blur(18px) saturate(160%);transition:opacity .25s ease,background .2s ease,transform .2s ease}
+.carbtn:hover{background:rgba(255,255,255,.28);transform:translateY(-50%) scale(1.06)}
+.carbtn:active{transform:translateY(-50%) scale(.94)}
+.carbtn svg{width:15px;height:15px}
+.carbtn.l{left:12px}.carbtn.r{right:12px}
+</style>
 </head>
 <body>
 <div class="amb" id="amb"></div>
@@ -1043,7 +1052,7 @@ function melhorarCarrosseis(){
     c.dataset.m='1';
     const w=document.createElement('div');w.className='carw';
     c.parentNode.insertBefore(w,c);w.appendChild(c);
-    const bot=(d)=>{const b=document.createElement('button');b.className='carbtn '+(d<0?'l':'r');b.textContent=d<0?'‹':'›';b.setAttribute('aria-label',d<0?'Anterior':'Próximo');b.onclick=()=>c.scrollBy({left:d*c.clientWidth*.8,behavior:'smooth'});return b};
+    const bot=(d)=>{const b=document.createElement('button');b.className='carbtn '+(d<0?'l':'r');b.innerHTML=d<0?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>';b.setAttribute('aria-label',d<0?'Anterior':'Próximo');b.onclick=()=>c.scrollBy({left:d*c.clientWidth*.8,behavior:'smooth'});return b};
     w.append(bot(-1),bot(1));
   });
 }
