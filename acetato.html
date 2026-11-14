@@ -240,7 +240,7 @@ header.rolou::before{opacity:1}
 
 <script>
 /* ===== Configuração e dados locais ===== */
-const DZ="https://api.deezer.com",IT="https://itunes.apple.com",MB="https://musicbrainz.org/ws/2",CAA="https://coverartarchive.org";
+const PROXY="",DZ="https://api.deezer.com",IT="https://itunes.apple.com",MB="https://musicbrainz.org/ws/2",CAA="https://coverartarchive.org";
 const KEY="acetato-multi-v1";
 let S=null;
 try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
@@ -270,7 +270,7 @@ const RANK={dz:0,it:1,mb:2};
 /* ===== Chamadas às fontes ===== */
 async function getJSON(url){const r=await fetch(url);if(!r.ok)throw new Error(r.status);return r.json()}
 function jsonp(url){return new Promise((ok,err)=>{const cb="dz"+Math.random().toString(36).slice(2,9);const s=document.createElement("script");const t=setTimeout(()=>{limpa();err(new Error("tempo"))},9000);function limpa(){clearTimeout(t);delete window[cb];s.remove()}window[cb]=j=>{limpa();ok(j)};s.onerror=()=>{limpa();err(new Error("falha"))};s.src=url+(url.includes("?")?"&":"?")+`output=jsonp&callback=${cb}`;document.head.appendChild(s)})}
-async function dz(p){const url=DZ+p;let j;try{j=await getJSON(url)}catch(e){j=await jsonp(url)}if(j.error)throw new Error(j.error.message);return j}
+async function dz(p){const url=DZ+p;let j;try{j=await getJSON(PROXY?PROXY+encodeURIComponent(url):url)}catch(e){j=await jsonp(url)}if(j.error)throw new Error(j.error.message);return j}
 let mbFila=Promise.resolve();
 function mb(c){const p=mbFila.then(async()=>{await new Promise(r=>setTimeout(r,1100));const j=await getJSON(`${MB}${c}${c.includes("?")?"&":"?"}fmt=json`);return j});mbFila=p.catch(()=>{});return p}
 const acMB=x=>(x["artist-credit"]||[]).map(c=>c.name).join(", ")||"Desconhecido";
@@ -346,30 +346,34 @@ function estrelas(r){let h="";for(let i=1;i<=5;i++){const c=r>=i?"on":r>=i-.5?"h
 const erroHTML=()=>`<div class="empty">Não foi possível carregar agora. Tente de novo em alguns segundos.</div>`;
 
 async function tendencias(){
-  const paises=["us","gb","de","fr","jp","mx","kr","au","ca"];
-  const res=await Promise.all(paises.map(p=>getJSON(`https://rss.applemarketingtools.com/api/v2/${p}/music/most-played/25/albums.json`).then(j=>j.feed?.results||[]).catch(()=>[])));
-  const cont=new Map();
-  res.forEach(lista=>lista.forEach((r,i)=>{const k=albumKey(r.name,r.artistName);const c=cont.get(k)||{r,n:0,s:0};c.n++;c.s+=25-i;cont.set(k,c)}));
-  return [...cont.values()].sort((a,b)=>b.n-a.n||b.s-a.s).slice(0,24).map(c=>c.r);
+  const paises=["us","gb","de","fr","jp","mx","kr","au","ca","it","es"];
+  const ap=await Promise.allSettled(paises.map(p=>getJSON(`https://rss.applemarketingtools.com/api/v2/${p}/music/most-played/25/albums.json`).then(j=>j.feed?.results||[])));
+  const generos=[0,132,116,85,106,165];
+  const dzc=await Promise.allSettled(generos.map(g=>dz(`/chart/${g}/albums?limit=25`).then(j=>j.data||[])));
+  const okAp=ap.filter(x=>x.status==="fulfilled").length;
+  const okDz=dzc.filter(x=>x.status==="fulfilled").length;
+  const itens=[];
+  ap.forEach(x=>{if(x.status==="fulfilled")x.value.forEach(r=>itens.push({src:"it",id:r.id,t:r.name,a:r.artistName,y:"",tipo:"album",cover:capaIT(r.artworkUrl100)}))});
+  dzc.forEach(x=>{if(x.status==="fulfilled")x.value.forEach(r=>itens.push({src:"dz",id:r.id,t:r.title,a:r.artist?.name||"",y:(r.release_date||"").slice(0,4),tipo:"album",cover:r.cover_xl||r.cover_big||""}))});
+  return {lista:unirAlbuns(itens),status:`Fontes: Apple ${okAp}/${paises.length} países · Deezer ${okDz}/${generos.length} listas`};
 }
 let homeGenero=0;
 const GENEROS_HOME=[[0,"Mundial"],[132,"Pop"],[116,"Hip-hop"],[85,"Alternativo"],[106,"Eletrônica"],[165,"R&B"]];
 async function homeView(){
   const mapDz=x=>({src:"dz",id:x.id,t:x.title,a:x.artist?.name||"",y:(x.release_date||"").slice(0,4),tipo:x.record_type||"album",cover:x.cover_xl||x.cover_big||x.cover_medium||""});
   const cardsDe=lista=>unirAlbuns(lista.map(mapDz)).map(u=>{guardarAlbum(u);return cardAlbum(u)}).join("");
-  let emAlta="";
-  if(homeGenero===0){
-    const ap=await tendencias();
-    if(ap.length){
-      emAlta=unirAlbuns(ap.map(r=>({src:"it",id:r.id,t:r.name,a:r.artistName,y:"",tipo:"album",cover:capaIT(r.artworkUrl100)}))).map(u=>{guardarAlbum(u);return cardAlbum(u)}).join("");
-      window.__chart=ap.map(r=>({title:r.name,artist:{name:r.artistName},cover_xl:capaIT(r.artworkUrl100)}));
-    }
+  let lista=[],status="";
+  if(homeGenero===0){const r=await tendencias();lista=r.lista;status=r.status}
+  else{
+    const ch=await dz(`/chart/${homeGenero}/albums?limit=24`).then(j=>j.data||[]).catch(()=>[]);
+    lista=unirAlbuns(ch.map(x=>({src:"dz",id:x.id,t:x.title,a:x.artist?.name||"",y:(x.release_date||"").slice(0,4),tipo:"album",cover:x.cover_xl||x.cover_big||""})));
+    status=`Fonte: Deezer (gênero ${homeGenero})`;
   }
-  if(!emAlta){
-    const chart=await dz(`/chart/${homeGenero}/albums?limit=12`).catch(()=>({data:[]}));
-    emAlta=cardsDe(chart.data||[]);
-    window.__chart=chart.data||[];
-  }
+  lista.forEach(guardarAlbum);
+  const top=lista.slice(0,24);
+  const emAlta=top.map(u=>cardAlbum(u)).join("");
+  const fontesStatus=status||"Não foi possível carregar as tendências agora";
+  window.__chart=top.map(u=>({title:u.t,artist:{name:u.a},cover_xl:u.cover}));
   const topo=(window.__chart||[])[0];
   const heroi=topo?`<div class="hero-home" style="background-image:url(${topo.cover_xl||topo.cover_big||""})"><div class="hh-shade"></div><div class="hh-body"><span class="pill">Mais ouvido agora</span><h2 class="hh-t">${esc(topo.title)}</h2><div class="mut" style="font-size:17px;font-weight:700">${esc(topo.artist?.name||"")}</div><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px"><a class="btn p" href="#album-${albumKey(topo.title,topo.artist?.name||"")}">Abrir</a><button class="btn" data-rnd>🎲 Aleatório</button></div></div></div>`:"";
   const avaliados=Object.entries(S.u).filter(([k,v])=>v.r&&S.meta[k]).sort((a,b)=>b[1].r-a[1].r);
@@ -398,12 +402,14 @@ async function homeView(){
       if(cards)popRec=`<h2>Porque você pesquisou ${esc(ult.n)}</h2><div class="mut sm" style="font-weight:700;margin:-6px 0 14px">Artistas parecidos, do mais popular ao menos popular</div><div class="grid">${cards}</div>`;
     }catch(e){}
   }
+  if(!popRec&&!(ult&&ult.id))popRec=`<h2>Porque você pesquisou…</h2><div class="empty">Abra a página de um artista para ver recomendações por popularidade aqui.</div>`;
   const generosHit=[132,116,85,106,165];
   const hitsRes=await Promise.all(generosHit.map(g=>dz(`/chart/${g}/albums?limit=4`).then(j=>j.data||[]).catch(()=>[])));
   const hits=cardsDe(hitsRes.flat().filter(x=>!jaAvaliados.has(albumKey(x.title,x.artist?.name||""))).slice(0,12));
   const diario=Object.entries(S.u).filter(([,v])=>v.d).sort((a,b)=>b[1].d.localeCompare(a[1].d)).slice(0,6);
   return `${heroi}<h1>Início</h1><input class="search" id="hq" placeholder="Procure álbuns, EPs, músicas ou artistas" autocomplete="off">
-  <h2>Em alta</h2>
+  <h2>Em alta</h2><div class="mut sm" style="font-weight:700;margin:-6px 0 10px">${fontesStatus}</div>
+  <div class="mut sm" style="font-weight:700;margin:-8px 0 12px">${esc(window.__fonteEmAlta||"")}</div>
   <div class="chips" style="padding-top:0">${GENEROS_HOME.map(([id,l])=>`<button class="chip ${homeGenero===id?"on":""}" data-hg="${id}">${l}</button>`).join("")}</div>
   ${emAlta?`<div class="grid">${emAlta}</div>`:`<div class="empty">Não foi possível carregar as tendências agora.</div>`}
   ${rec?`<h2>Recomendados para você</h2><div class="mut sm" style="font-weight:700;margin:-6px 0 14px">Com base nos artistas que você mais avaliou</div><div class="grid">${rec}</div>`:""}
