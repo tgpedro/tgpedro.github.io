@@ -1176,28 +1176,36 @@ function desenharEstrelas(g,cx,y,r,size){
   }
 }
 
-/* ---- Desenho: resenha (capa, álbum, artista, estrelas, nome) ---- */
-function desenharResenha(g,W,H,k,A,v){
-  const m=S.meta[k],d=S.u[k]||{},pal=paletaDaImagem(A.capa,k);
-  fundoStory(g,W,H,pal,A.capa,v);
-  const tam=760,x=(W-tam)/2,y=200;
+/* ---- Desenho: resenha (centralizado; fundo e estrelas opcionais) ---- */
+function desenharResenha(c,k,A,v,o){
+  const m=S.meta[k],d=S.u[k]||{},W=1080,pal=paletaDaImagem(A.capa,k);
+  const tam=620;
+  const gm=c.getContext("2d");
+  let fs=64;gm.font=`900 ${fs}px ${FNT}`;
+  let ls=quebrarLinhas(gm,m.t,860);
+  if(ls.length>2){fs=52;gm.font=`900 ${fs}px ${FNT}`;ls=quebrarLinhas(gm,m.t,860)}
+  ls=ls.slice(0,2);
+  const lh=fs*1.15,estrelas=!!(o.estrelas&&d.r);
+  let h=tam+56+ls.length*lh+46+(estrelas?104:0)+94;
+  const pad=o.fundo?0:50,H=o.fundo?1920:Math.round(h+pad*2);
+  c.width=W;c.height=H;
+  const g=c.getContext("2d");
+  if(o.fundo)fundoStory(g,W,H,pal,A.capa,v);
+  const x=(W-tam)/2;let y=o.fundo?(H-h)/2:pad;
   if(A.capa){
-    g.save();g.shadowColor="rgba(0,0,0,.6)";g.shadowBlur=70;g.shadowOffsetY=28;rrect(g,x,y,tam,tam,40);g.fillStyle="#000";g.fill();g.restore();
-    desenharCapa(g,A.capa,x,y,tam,tam,40);
+    if(o.fundo){g.save();g.shadowColor="rgba(0,0,0,.55)";g.shadowBlur=60;g.shadowOffsetY=24;rrect(g,x,y,tam,tam,36);g.fillStyle="#000";g.fill();g.restore()}
+    desenharCapa(g,A.capa,x,y,tam,tam,36);
   }else{
     const t=g.createLinearGradient(x,y,x+tam,y+tam);t.addColorStop(0,rgba(pal[0]));t.addColorStop(1,rgba(escurece(pal[1],.2)));
-    g.fillStyle=t;rrect(g,x,y,tam,tam,40);g.fill();
-    texto(g,ini(m.t),W/2,y+tam/2+70,`900 220px ${FNT}`,"rgba(255,255,255,.92)");
+    g.fillStyle=t;rrect(g,x,y,tam,tam,36);g.fill();
+    texto(g,ini(m.t),W/2,y+tam/2+60,`900 180px ${FNT}`,"rgba(255,255,255,.92)");
   }
-  let fs=78;g.font=`900 ${fs}px ${FNT}`;
-  let ls=quebrarLinhas(g,m.t,900);
-  if(ls.length>2){fs=62;g.font=`900 ${fs}px ${FNT}`;ls=quebrarLinhas(g,m.t,900)}
-  ls=ls.slice(0,2);
-  let ty=1110;
-  ls.forEach(l=>{texto(g,l,W/2,ty,`900 ${fs}px ${FNT}`,"#fff");ty+=fs*1.12});
-  texto(g,(m.a||"").slice(0,40),W/2,ty+14,`600 46px ${FNT}`,"rgba(255,255,255,.78)");
-  if(d.r)desenharEstrelas(g,W/2,1500,d.r,96);
-  texto(g,(P().nome||"").slice(0,30),W/2,1810,`700 40px ${FNT}`,"rgba(255,255,255,.85)");
+  let cy=y+tam+56;
+  ls.forEach(l=>{texto(g,l,W/2,cy+fs*.85,`900 ${fs}px ${FNT}`,"#fff");cy+=lh});
+  texto(g,(m.a||"").slice(0,44),W/2,cy+30,`600 38px ${FNT}`,"rgba(255,255,255,.78)");cy+=46;
+  if(estrelas){cy+=34;desenharEstrelas(g,W/2,cy+58,d.r,70);cy+=70}
+  cy+=64;
+  g.letterSpacing="8px";texto(g,"ACETATO",W/2+4,cy+26,`800 30px ${FNT}`,"rgba(255,255,255,.75)");g.letterSpacing="0px";
 }
 
 /* ---- Desenho: perfil ---- */
@@ -1243,6 +1251,7 @@ function compartilharCanvas(c,nome){
 }
 (function(){const s=document.createElement("style");s.textContent=`#stv{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.95);display:flex;flex-direction:column;align-items:center;gap:14px;padding:calc(14px + env(safe-area-inset-top,0px)) 16px calc(16px + env(safe-area-inset-bottom,0px));overflow:auto}
 #stv canvas{height:min(64vh,680px);width:auto;max-width:100%;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.6);flex-shrink:0}
+#stv canvas.xp{background:repeating-conic-gradient(#2a2a2e 0 25%,#1c1c1f 0 50%) 0 0/24px 24px}
 #stv .stbar{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
 #stv .stld{color:#8e8e93;font-weight:700;padding:80px 0}`;document.head.appendChild(s)})();
 async function abrirStory(tipo,k){
@@ -1261,22 +1270,33 @@ async function abrirStory(tipo,k){
     const banner=await carregarImg(p.banner);
     A.fonte=A.capas.find(Boolean)||banner||A.avatar||null;
   }
-  const W=1080,H=1920,c=document.createElement("canvas");c.width=W;c.height=H;const g=c.getContext("2d");
-  let v=0;
-  const desenhar=()=>{g.clearRect(0,0,W,H);if(tipo==="resenha")desenharResenha(g,W,H,k,A,v);else desenharPerfil(g,W,H,A,v)};
+  const W=1080,H=1920,c=document.createElement("canvas");
+  const temNota=tipo==="resenha"&&!!(S.u[k]||{}).r;
+  let v=0;const o={fundo:true,estrelas:true};
+  const desenhar=()=>{
+    if(tipo==="resenha"){desenharResenha(c,k,A,v,o);c.classList.toggle("xp",!o.fundo)}
+    else{c.width=W;c.height=H;desenharPerfil(c.getContext("2d"),W,H,A,v)}
+  };
   desenhar();
   ov.innerHTML="";
   ov.appendChild(c);
   const bar=document.createElement("div");bar.className="stbar chips";
-  bar.innerHTML=VARIACOES.map((n,i)=>`<button class="chip ${i===v?"on":""}" data-sv="${i}">${n}</button>`).join("");
-  ov.appendChild(bar);
+  const opc=document.createElement("div");opc.className="stbar chips";
+  const pintar=()=>{
+    bar.style.display=o.fundo?"":"none";
+    bar.innerHTML=VARIACOES.map((n,i)=>`<button class="chip ${i===v?"on":""}" data-sv="${i}">${n}</button>`).join("");
+    opc.innerHTML=tipo==="resenha"?`<button class="chip ${o.fundo?"on":""}" data-so="fundo">Fundo</button>${temNota?`<button class="chip ${o.estrelas?"on":""}" data-so="estrelas">Estrelas</button>`:""}`:"";
+  };
+  pintar();
+  ov.appendChild(opc);ov.appendChild(bar);
   const acoes=document.createElement("div");acoes.className="stbar";
   acoes.innerHTML=`<button class="btn" data-sf>Fechar</button><button class="btn p" data-ss>Compartilhar</button>`;
   ov.appendChild(acoes);
-  bar.onclick=e=>{const b=e.target.closest("[data-sv]");if(!b)return;v=+b.dataset.sv;bar.querySelectorAll(".chip").forEach(x=>x.classList.toggle("on",x===b));desenhar()};
+  bar.onclick=e=>{const b=e.target.closest("[data-sv]");if(!b)return;v=+b.dataset.sv;pintar();desenhar()};
+  opc.onclick=e=>{const b=e.target.closest("[data-so]");if(!b)return;o[b.dataset.so]=!o[b.dataset.so];pintar();desenhar()};
   acoes.onclick=e=>{
     if(e.target.closest("[data-sf]"))fechar();
-    if(e.target.closest("[data-ss]"))compartilharCanvas(c,tipo==="resenha"?"acetato-resenha-story.png":"acetato-perfil-story.png");
+    if(e.target.closest("[data-ss]"))compartilharCanvas(c,tipo==="resenha"?(o.fundo?"acetato-resenha-story.png":"acetato-resenha-sem-fundo.png"):"acetato-perfil-story.png");
   };
 }
 function gerarStoryPerfil(){abrirStory("perfil")}
