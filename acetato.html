@@ -1092,9 +1092,27 @@ function fundoStory(g,W,H,c1,c2){
 }
 function rrect(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
 function texto(g,t,x,y,font,cor,align){g.font=font;g.fillStyle=cor;g.textAlign=align||"center";g.fillText(t,x,y)}
-function carregarImg(src){return new Promise(res=>{if(!src)return res(null);const im=new Image();im.onload=()=>res(im);im.onerror=()=>res(null);im.src=src})}
+
+/* Carregamento de imagem com CORS (necessário para o canvas poder ser exportado) */
+function tentarImg(src,cors){return new Promise(res=>{const im=new Image();if(cors)im.crossOrigin="anonymous";im.onload=()=>res(im);im.onerror=()=>res(null);im.src=src})}
+async function carregarImg(src){
+  if(!src)return null;
+  if(src.startsWith("data:"))return tentarImg(src,false);
+  const bust=src+(src.includes("?")?"&":"?")+"cb="+Date.now();
+  return (await tentarImg(src,true))
+      || (await tentarImg(bust,true))
+      || (PROXY?await tentarImg(`${PROXY}/img?u=${encodeURIComponent(src)}`,true):null);
+}
+function desenharCapa(g,im,x,y,w,h,r){
+  g.save();rrect(g,x,y,w,h,r);g.clip();
+  const s=Math.max(w/im.width,h/im.height),dw=im.width*s,dh=im.height*s;
+  g.drawImage(im,x+(w-dw)/2,y+(h-dh)/2,dw,dh);
+  g.restore();
+}
+
 function compartilharCanvas(c,nome){
   c.toBlob(async blob=>{
+    if(!blob){flash("Não foi possível gerar a imagem");return}
     const file=new File([blob],nome,{type:"image/png"});
     try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:"Acetato"});return}}
     catch(e){if(e.name==="AbortError")return}
@@ -1107,6 +1125,7 @@ async function gerarStoryPerfil(){
   const W=1080,H=1920,c=document.createElement("canvas");c.width=W;c.height=H;const g=c.getContext("2d");
   const [c1,c2]=fav[0]?cores(fav[0]):cores(p.handle||"acetato");
   fundoStory(g,W,H,c1,c2);
+  const capas=await Promise.all(fav.slice(0,4).map(k=>carregarImg((S.meta[k]||{}).cover)));
   g.letterSpacing="10px";texto(g,"ACETATO",W/2,150,"800 34px -apple-system, Helvetica, Arial, sans-serif","rgba(255,255,255,.8)");g.letterSpacing="0px";
   const av=await carregarImg(p.avatar);
   g.save();g.beginPath();g.arc(W/2,400,150,0,Math.PI*2);g.closePath();g.clip();
@@ -1122,8 +1141,12 @@ async function gerarStoryPerfil(){
   texto(g,"Álbuns favoritos",W/2,1150,"800 40px -apple-system, Helvetica, Arial, sans-serif","#fff");
   const tam=200,gap=26,x0=(W-(4*tam+3*gap))/2;
   for(let i=0;i<4;i++){const x=x0+i*(tam+gap),y=1190;const k=fav[i];
-    if(k){const [a,b]=cores(k);const t=g.createLinearGradient(x,y,x+tam,y+tam);t.addColorStop(0,a);t.addColorStop(1,b);g.fillStyle=t;rrect(g,x,y,tam,tam,26);g.fill();
-      const nome=((S.meta[k]||{}).t||"").slice(0,16);texto(g,nome,x+tam/2,y+tam+42,"700 26px -apple-system, Helvetica, Arial, sans-serif","rgba(255,255,255,.9)")}
+    if(k){
+      if(capas[i]){desenharCapa(g,capas[i],x,y,tam,tam,26)}
+      else{const [a,b]=cores(k);const t=g.createLinearGradient(x,y,x+tam,y+tam);t.addColorStop(0,a);t.addColorStop(1,b);g.fillStyle=t;rrect(g,x,y,tam,tam,26);g.fill()}
+      const nome=((S.meta[k]||{}).t||"").slice(0,16);
+      texto(g,nome,x+tam/2,y+tam+42,"700 26px -apple-system, Helvetica, Arial, sans-serif","rgba(255,255,255,.9)")
+    }
     else{g.strokeStyle="rgba(255,255,255,.25)";g.setLineDash([12,10]);g.lineWidth=3;rrect(g,x,y,tam,tam,26);g.stroke();g.setLineDash([])}
   }
   texto(g,"Músicas favoritas",W/2,1560,"800 40px -apple-system, Helvetica, Arial, sans-serif","#fff");
@@ -1131,16 +1154,23 @@ async function gerarStoryPerfil(){
   texto(g,"@"+p.handle+" · Acetato",W/2,1850,"600 32px -apple-system, Helvetica, Arial, sans-serif","rgba(255,255,255,.55)");
   compartilharCanvas(c,"acetato-perfil-story.png");
 }
-function gerarStoryResenha(k){
+async function gerarStoryResenha(k){
   const m=S.meta[k],d=S.u[k]||{};
   if(!m){flash("Abra o álbum pela busca antes");return}
   const W=1080,H=1920,c=document.createElement("canvas");c.width=W;c.height=H;const g=c.getContext("2d");
   const [c1,c2]=cores(k);
+  const capa=await carregarImg(m.cover);
   fundoStory(g,W,H,c1,c2);
   g.letterSpacing="10px";texto(g,"MINHA RESENHA",W/2,150,"800 34px -apple-system, Helvetica, Arial, sans-serif","rgba(255,255,255,.8)");g.letterSpacing="0px";
   const tam=520,x=(W-tam)/2,y=260;
-  const t=g.createLinearGradient(x,y,x+tam,y+tam);t.addColorStop(0,c1);t.addColorStop(1,c2);g.fillStyle=t;rrect(g,x,y,tam,tam,36);g.fill();
-  texto(g,ini(m.t),W/2,y+tam/2+60,"900 170px -apple-system, Helvetica, Arial, sans-serif","rgba(255,255,255,.92)");
+  if(capa){
+    g.save();g.shadowColor="rgba(0,0,0,.55)";g.shadowBlur=60;g.shadowOffsetY=24;
+    rrect(g,x,y,tam,tam,36);g.fillStyle="#000";g.fill();g.restore();
+    desenharCapa(g,capa,x,y,tam,tam,36);
+  }else{
+    const t=g.createLinearGradient(x,y,x+tam,y+tam);t.addColorStop(0,c1);t.addColorStop(1,c2);g.fillStyle=t;rrect(g,x,y,tam,tam,36);g.fill();
+    texto(g,ini(m.t),W/2,y+tam/2+60,"900 170px -apple-system, Helvetica, Arial, sans-serif","rgba(255,255,255,.92)");
+  }
   g.font="900 74px -apple-system, Helvetica, Arial, sans-serif";
   let y2=880;quebrarLinhas(g,m.t,900).slice(0,2).forEach(l=>{texto(g,l,W/2,y2,"900 74px -apple-system, Helvetica, Arial, sans-serif","#fff");y2+=84});
   texto(g,m.a||"",W/2,y2+10,"600 40px -apple-system, Helvetica, Arial, sans-serif","rgba(255,255,255,.7)");
