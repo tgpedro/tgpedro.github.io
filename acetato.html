@@ -648,7 +648,7 @@ async function albumView(k){
     <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap"><div style="display:flex" id="rate" data-id="${k}">${rateHTML(x.r)}</div><span class="mut" style="font-weight:700" id="rlab">${x.r?String(x.r).replace(".",",")+" de 5":"Sua nota"}</span></div>
   </div></div>
   ${faixas.length?`<h2>Faixas</h2><div class="mlist">${faixas.map((t,i)=>`<div class="row"><span class="num">${String(i+1).padStart(2,"0")}</span><div class="ttl grow">${esc(t.t)}</div>${trateHTML(t.t,m.a)}<span class="mut sm">${tempo(t.ms)}</span></div>`).join("")}</div>`:`<div class="empty" style="margin-top:30px">Sem faixas disponíveis para este álbum.</div>`}
-  <h2>Sua resenha</h2><div class="mlist" style="padding:16px;background:#111"><textarea class="field" id="rev" placeholder="O que você achou deste álbum?">${esc(x.rev||"")}</textarea><div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="fab" data-act="rev">Salvar resenha</button></div></div>
+  <h2>Sua resenha</h2><div class="mlist" style="padding:16px;background:#111"><textarea class="field" id="rev" placeholder="O que você achou deste álbum?">${esc(x.rev||"")}</textarea><div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="fab" data-act="rev">Salvar resenha</button><button class="btn" data-story="album" style="margin-left:8px">Compartilhar no Story</button></div></div>
   ${S.listas.length?`<h2>Adicionar a uma lista</h2><div style="display:flex;gap:10px;flex-wrap:wrap"><select class="field" id="lsel" style="width:auto">${listas}</select><button class="btn" data-act="addLista">Adicionar</button></div>`:`<h2>Listas</h2><div class="empty">Crie uma lista na aba Listas do Perfil para adicionar álbuns.</div>`}`;
 }
 function albumAct(a){
@@ -1000,7 +1000,7 @@ function extraPerfil(){
   <h2>Top artistas</h2>${topA.length?`<div class="mlist">${topA.map(([n,c],i)=>`<a class="row" href="#artist-${artistKey(n)}"><span class="num">${i+1}</span><div class="grow"><div class="ttl">${esc(n)}</div><div class="sm mut" style="font-weight:700">${c} álbum${c>1?"ns":""} avaliado${c>1?"s":""}</div></div><span class="mut">›</span></a>`).join("")}</div>`:`<div class="empty">Avalie álbuns para ver seus artistas favoritos.</div>`}
   <h2>Distribuição de notas</h2><div class="hist2">${dist}</div>
   <h2>Músicas avaliadas</h2>${faixas.length?`<div class="mlist">${faixas.map(([k,v])=>`<div class="row"><div class="grow"><div class="ttl">${esc(v.t)}</div><div class="sm mut" style="font-weight:700">${esc(v.a)}</div></div>${estrelas(S.u[k].r)}</div>`).join("")}</div>`:`<div class="empty">Avalie faixas na página de um álbum.</div>`}
-  <h2>Compartilhar</h2><button class="btn p" data-pact="cartao">Gerar imagem do perfil</button>`;
+  <h2>Compartilhar</h2><button class="btn p" data-pact="cartao">Compartilhar no Story</button>`;
 }
 function rr(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
 function gerarCartao(){
@@ -1036,7 +1036,7 @@ function gerarCartao(){
   },"image/png");
 }
 document.addEventListener("click",e=>{
-  if(e.target.closest("[data-pact='cartao']")){gerarCartao();return}
+  if(e.target.closest("[data-pact='cartao']")){gerarStoryPerfil();return}
   if(e.target.closest("[data-rnd]")){
     const lista=window.__chart||[];
     if(!lista.length){flash("Ainda não há tendências carregadas");return}
@@ -1076,6 +1076,88 @@ melhorarCarrosseis();
   });
   box.querySelector('input').addEventListener('keydown',e=>{if(e.key==='Enter'){busca.q=e.target.value;location.hash='search';if(location.hash==='#search')runSearch()}});
 })();
+</script>
+<script>
+/* ===== Stories: imagens 1080x1920 para compartilhar ===== */
+function quebrarLinhas(g,texto,maxW){
+  const palavras=String(texto||"").split(/\s+/).filter(Boolean);const out=[];let l="";
+  for(const p of palavras){const t=l?l+" "+p:p;if(g.measureText(t).width>maxW&&l){out.push(l);l=p}else l=t}
+  if(l)out.push(l);return out;
+}
+function fundoStory(g,W,H,c1,c2){
+  const f=g.createLinearGradient(0,0,0,H);f.addColorStop(0,c1);f.addColorStop(.6,c2);f.addColorStop(1,"#000");
+  g.fillStyle=f;g.fillRect(0,0,W,H);
+  const v=g.createRadialGradient(W/2,H*.35,120,W/2,H*.35,W);v.addColorStop(0,"rgba(255,255,255,.12)");v.addColorStop(1,"rgba(0,0,0,.45)");
+  g.fillStyle=v;g.fillRect(0,0,W,H);
+}
+function rrect(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
+function texto(g,t,x,y,font,cor,align){g.font=font;g.fillStyle=cor;g.textAlign=align||"center";g.fillText(t,x,y)}
+function carregarImg(src){return new Promise(res=>{if(!src)return res(null);const im=new Image();im.onload=()=>res(im);im.onerror=()=>res(null);im.src=src})}
+function compartilharCanvas(c,nome){
+  c.toBlob(async blob=>{
+    const file=new File([blob],nome,{type:"image/png"});
+    try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:"Acetato"});return}}
+    catch(e){if(e.name==="AbortError")return}
+    const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=nome;document.body.appendChild(a);a.click();a.remove();
+    flash("Imagem salva. Poste no Story pelo app do Instagram.");
+  },"image/png");
+}
+async function gerarStoryPerfil(){
+  const p=P(),fav=p.fav||[];
+  const W=1080,H=1920,c=document.createElement("canvas");c.width=W;c.height=H;const g=c.getContext("2d");
+  const [c1,c2]=fav[0]?cores(fav[0]):cores(p.handle||"acetato");
+  fundoStory(g,W,H,c1,c2);
+  g.letterSpacing="10px";texto(g,"ACETATO",W/2,150,"800 34px -apple-system, Helvetica, Arial, sans-serif","rgba(255,255,255,.8)");g.letterSpacing="0px";
+  const av=await carregarImg(p.avatar);
+  g.save();g.beginPath();g.arc(W/2,400,150,0,Math.PI*2);g.closePath();g.clip();
+  if(av){g.drawImage(av,W/2-150,250,300,300)}else{const f=g.createLinearGradient(W/2-150,250,W/2+150,550);f.addColorStop(0,"#8B5CF6");f.addColorStop(1,"#B794F6");g.fillStyle=f;g.fillRect(W/2-150,250,300,300);texto(g,ini(p.nome),W/2,430,"900 120px -apple-system, Helvetica, Arial, sans-serif","#fff")}
+  g.restore();
+  g.lineWidth=8;g.strokeStyle="rgba(255,255,255,.25)";g.beginPath();g.arc(W/2,400,150,0,Math.PI*2);g.stroke();
+  texto(g,p.nome.slice(0,20),W/2,640,"900 92px -apple-system, Helvetica, Arial, sans-serif","#fff");
+  texto(g,"@"+p.handle,W/2,710,"600 42px -apple-system, Helvetica, Arial, sans-serif","rgba(255,255,255,.7)");
+  if(p.bio){g.font="500 38px -apple-system, Helvetica, Arial, sans-serif";const ls=quebrarLinhas(g,p.bio,840).slice(0,3);ls.forEach((l,i)=>texto(g,l,W/2,790+i*54,"500 38px -apple-system, Helvetica, Arial, sans-serif","rgba(255,255,255,.9)"))}
+  const ouv=Object.values(S.u).filter(v=>v.d).length;const av2=Object.values(S.u).filter(v=>v.r);
+  const media=av2.length?(av2.reduce((s,v)=>s+v.r,0)/av2.length).toFixed(1).replace(".",","):"—";
+  [[ouv,"ouvidos"],[av2.length,"avaliações"],[media,"média"]].forEach(([n,l],i)=>{const x=W/2+(i-1)*290;texto(g,String(n),x,1000,"900 84px -apple-system, Helvetica, Arial, sans-serif","#fff");texto(g,l,x,1050,"700 30px -apple-system, Helvetica, Arial, sans-serif","rgba(255,255,255,.6)")});
+  texto(g,"Álbuns favoritos",W/2,1150,"800 40px -apple-system, Helvetica, Arial, sans-serif","#fff");
+  const tam=200,gap=26,x0=(W-(4*tam+3*gap))/2;
+  for(let i=0;i<4;i++){const x=x0+i*(tam+gap),y=1190;const k=fav[i];
+    if(k){const [a,b]=cores(k);const t=g.createLinearGradient(x,y,x+tam,y+tam);t.addColorStop(0,a);t.addColorStop(1,b);g.fillStyle=t;rrect(g,x,y,tam,tam,26);g.fill();
+      const nome=((S.meta[k]||{}).t||"").slice(0,16);texto(g,nome,x+tam/2,y+tam+42,"700 26px -apple-system, Helvetica, Arial, sans-serif","rgba(255,255,255,.9)")}
+    else{g.strokeStyle="rgba(255,255,255,.25)";g.setLineDash([12,10]);g.lineWidth=3;rrect(g,x,y,tam,tam,26);g.stroke();g.setLineDash([])}
+  }
+  texto(g,"Músicas favoritas",W/2,1560,"800 40px -apple-system, Helvetica, Arial, sans-serif","#fff");
+  (p.musicas||[]).slice(0,4).forEach((m,i)=>texto(g,(i+1)+". "+m.slice(0,38),W/2,1625+i*64,"600 38px -apple-system, Helvetica, Arial, sans-serif","rgba(255,255,255,.92)"));
+  texto(g,"@"+p.handle+" · Acetato",W/2,1850,"600 32px -apple-system, Helvetica, Arial, sans-serif","rgba(255,255,255,.55)");
+  compartilharCanvas(c,"acetato-perfil-story.png");
+}
+function gerarStoryResenha(k){
+  const m=S.meta[k],d=S.u[k]||{};
+  if(!m){flash("Abra o álbum pela busca antes");return}
+  const W=1080,H=1920,c=document.createElement("canvas");c.width=W;c.height=H;const g=c.getContext("2d");
+  const [c1,c2]=cores(k);
+  fundoStory(g,W,H,c1,c2);
+  g.letterSpacing="10px";texto(g,"MINHA RESENHA",W/2,150,"800 34px -apple-system, Helvetica, Arial, sans-serif","rgba(255,255,255,.8)");g.letterSpacing="0px";
+  const tam=520,x=(W-tam)/2,y=260;
+  const t=g.createLinearGradient(x,y,x+tam,y+tam);t.addColorStop(0,c1);t.addColorStop(1,c2);g.fillStyle=t;rrect(g,x,y,tam,tam,36);g.fill();
+  texto(g,ini(m.t),W/2,y+tam/2+60,"900 170px -apple-system, Helvetica, Arial, sans-serif","rgba(255,255,255,.92)");
+  g.font="900 74px -apple-system, Helvetica, Arial, sans-serif";
+  let y2=880;quebrarLinhas(g,m.t,900).slice(0,2).forEach(l=>{texto(g,l,W/2,y2,"900 74px -apple-system, Helvetica, Arial, sans-serif","#fff");y2+=84});
+  texto(g,m.a||"",W/2,y2+10,"600 40px -apple-system, Helvetica, Arial, sans-serif","rgba(255,255,255,.7)");
+  const r=d.r||0;
+  const estrelas="★".repeat(Math.floor(r))+(r%1?"½":"");
+  texto(g,estrelas||"Sem nota",W/2,1200,"700 110px -apple-system, Helvetica, Arial, sans-serif","#C4B5FD");
+  if(r)texto(g,String(r).replace(".",",")+" de 5",W/2,1262,"700 36px -apple-system, Helvetica, Arial, sans-serif","rgba(255,255,255,.7)");
+  g.font="500 48px -apple-system, Helvetica, Arial, sans-serif";
+  const linhas=quebrarLinhas(g,d.rev||"Sem resenha escrita.",860).slice(0,8);
+  linhas.forEach((l,i)=>texto(g,l,W/2,1370+i*70,"500 46px -apple-system, Helvetica, Arial, sans-serif","rgba(255,255,255,.95)"));
+  texto(g,"@"+(P().handle||"acetato")+" · Acetato",W/2,1850,"600 32px -apple-system, Helvetica, Arial, sans-serif","rgba(255,255,255,.55)");
+  compartilharCanvas(c,"acetato-resenha-story.png");
+}
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-story]");
+  if(b&&b.dataset.story==="album"){gerarStoryResenha(location.hash.slice(7));}
+});
 </script>
 </body>
 </html>
