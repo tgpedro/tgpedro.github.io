@@ -107,7 +107,7 @@ textarea.field{min-height:100px;resize:vertical;font-weight:500}
 .ehead .sv{font-weight:900;color:var(--acc);font-size:16px}
 .ebody{max-width:640px;margin:0 auto;padding:26px 22px 80px;display:grid;gap:30px}
 .esec{display:grid;gap:12px}
-.flash{position:fixed;left:50%;top:86px;transform:translateX(-50%);background:var(--txt);color:#000;padding:12px 20px;border-radius:999px;font-size:14px;font-weight:800;z-index:60;box-shadow:0 10px 30px rgba(0,0,0,.5);animation:fl 2.4s forwards;pointer-events:none;max-width:90vw;text-align:center}
+.flash{position:fixed;left:50%;top:86px;transform:translateX(-50%);background:var(--txt);color:#000;padding:12px 20px;border-radius:999px;font-size:14px;font-weight:800;z-index:120;box-shadow:0 10px 30px rgba(0,0,0,.5);animation:fl 2.4s forwards;pointer-events:none;max-width:90vw;text-align:center}
 @keyframes fl{0%{opacity:0;transform:translate(-50%,-8px)}8%,80%{opacity:1;transform:translate(-50%,0)}100%{opacity:0}}
 @media(max-width:760px){
   .phead{grid-template-columns:1fr;justify-items:center;text-align:center;gap:18px}
@@ -376,7 +376,9 @@ const KEY="acetato-multi-v1";
 let S=null;
 try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
 if(!S)S={u:{},meta:{},artists:{},listas:[],perfil:null};
-S.meta=S.meta||{};S.artists=S.artists||{};
+S.meta=S.meta||{};S.artists=S.artists||{};S.covers=S.covers||{};
+/* Capa personalizada (se existir) tem prioridade sobre a capa vinda das fontes */
+const coverDe=k=>(S.covers&&S.covers[k])||(S.meta[k]||{}).cover||"";
 const salvar=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){flash("Não foi possível salvar no navegador")}};
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -465,9 +467,10 @@ function guardarArtista(u){S.artists[u.key]={n:u.n,foto:u.foto||"",fas:u.fas||0,
 /* ===== Componentes visuais ===== */
 function capaAlbum(k,t,px){
   const m=S.meta[k]||{};
+  const cv=coverDe(k);
   const [a,b]=cores(k);
   const sz=px?`width:${px}px;height:${px}px;font-size:${Math.round(px*.34)}px`:`width:100%;aspect-ratio:1;font-size:40px`;
-  const img=m.cover?`<img src="${m.cover}" alt="" loading="lazy" onerror="this.remove()">`:"";
+  const img=cv?`<img src="${cv}" alt="" loading="lazy" onerror="this.remove()">`:"";
   return `<div class="cover" style="${sz};background:linear-gradient(145deg,${a},${b})">${img}<span>${esc(ini(t))}</span></div>`;
 }
 function capaFoto(url,t,px,redonda){
@@ -513,7 +516,7 @@ async function homeView(){
   window.__chart=top.map(u=>({title:u.t,artist:{name:u.a},cover_xl:u.cover}));
   const emAlta=top.map(u=>cardAlbum(u)).join("");
   const t0=top[0];
-  const heroi=t0?`<div class="hero-home" style="background-image:url(${t0.cover})"><div class="hh-shade"></div><div class="hh-body"><span class="pill">Mais ouvido agora</span><h2 class="hh-t">${esc(t0.t)}</h2><div class="mut" style="font-size:17px;font-weight:700">${esc(t0.a)}</div><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px"><a class="btn p" href="#album-${t0.key}">Abrir</a><button class="btn" data-rnd>🎲 Aleatório</button></div></div></div>`:"";
+  const heroi=t0?`<div class="hero-home" style="background-image:url(${coverDe(t0.key)||t0.cover})"><div class="hh-shade"></div><div class="hh-body"><span class="pill">Mais ouvido agora</span><h2 class="hh-t">${esc(t0.t)}</h2><div class="mut" style="font-size:17px;font-weight:700">${esc(t0.a)}</div><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px"><a class="btn p" href="#album-${t0.key}">Abrir</a><button class="btn" data-rnd>🎲 Aleatório</button></div></div></div>`:"";
   let popRec="",rec="";
   const ult=S.ultimoArtista;
   if(ult&&ult.id){
@@ -637,21 +640,23 @@ async function albumView(k){
   const listas=S.listas.map((l,i)=>`<option value="${i}">${esc(l.nome)}</option>`).join("");
   const fav=(P().fav||[]).includes(k);
   const fontesTxt=(m.fontes||[]).map(f=>f==="dz"?"Deezer":f==="it"?"iTunes":"MusicBrainz").join(" · ");
-  return `${m.cover?`<div class="abg" aria-hidden="true"><div style="background-image:url(${m.cover})"></div></div>`:""}<div class="hero">${capaAlbum(k,m.t,230)}<div class="info">
+  const cv=coverDe(k),capaCustom=!!S.covers[k];
+  return `${cv?`<div class="abg" aria-hidden="true"><div style="background-image:url(${cv})"></div></div>`:""}<div class="hero">${capaAlbum(k,m.t,230)}<div class="info">
     <span class="pill">${esc([(m.tipo||"álbum").toUpperCase(),m.genre].filter(Boolean).join(" · "))}</span>
     <h1>${esc(m.t)}</h1>
     <div style="font-size:18px;font-weight:700" class="mut"><a href="#artist-${ak}" style="border-bottom:2px solid currentColor">${esc(m.a)}</a>${m.y?` · ${m.y}`:""}${faixas.length?` · ${faixas.length} faixas`:""}</div>
-    <div class="mut sm" style="font-weight:700;margin-top:6px">Dados de: ${esc(fontesTxt)}</div>
+    <div class="mut sm" style="font-weight:700;margin-top:6px">Dados de: ${esc(fontesTxt)}${capaCustom?" · capa personalizada":""}</div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin:20px 0">
       <button class="btn ${x.d?"on":""}" data-act="ouvi">${x.d?"✓ Ouvido":"Marcar como ouvido"}</button>
       <button class="btn ${x.w?"on":""}" data-act="quero">${x.w?"✓ Na fila":"+ Quero ouvir"}</button>
       <button class="btn ${x.l?"on":""}" data-act="curtir">${x.l?"♥ Curtido":"♡ Curtir"}</button>
       <button class="btn ${fav?"on":""}" data-act="fav">${fav?"★ Favorito":"☆ Favoritar"}</button>
     </div>
-    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap"><div style="display:flex" id="rate" data-id="${k}">${rateHTML(x.r)}</div><span class="mut" style="font-weight:700" id="rlab">${x.r?String(x.r).replace(".",",")+" de 5":"Sua nota"}</span></div>
+    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;justify-content:inherit"><div style="display:flex" id="rate" data-id="${k}">${rateHTML(x.r)}</div><span class="mut" style="font-weight:700" id="rlab">${x.r?String(x.r).replace(".",",")+" de 5":"Sua nota"}</span></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px"><label class="btn" style="cursor:pointer">🖼 Trocar capa<input id="capaup" type="file" accept="image/*" hidden></label>${capaCustom?`<button class="btn" data-act="capaRm">Voltar à capa original</button>`:""}</div>
   </div></div>
   ${faixas.length?`<h2>Faixas</h2><div class="mlist">${faixas.map((t,i)=>`<div class="row"><span class="num">${String(i+1).padStart(2,"0")}</span><div class="ttl grow">${esc(t.t)}</div>${trateHTML(t.t,m.a)}<button class="shbtn" data-story="musica" data-tt="${esc(t.t)}" data-ms="${t.ms||0}" aria-label="Compartilhar música" title="Compartilhar música" style="width:30px;height:30px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M8 11H6.5A1.5 1.5 0 0 0 5 12.5v7A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5v-7A1.5 1.5 0 0 0 17.5 11H16"/></svg></button><span class="mut sm">${tempo(t.ms)}</span></div>`).join("")}</div>`:`<div class="empty" style="margin-top:30px">Sem faixas disponíveis para este álbum.</div>`}
-  <h2>Sua resenha</h2><div class="mlist" style="padding:16px;background:#111"><textarea class="field" id="rev" placeholder="O que você achou deste álbum?">${esc(x.rev||"")}</textarea><div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="fab" data-act="rev">Salvar resenha</button><button class="btn" data-story="album" style="margin-left:8px">Compartilhar no Story</button></div></div>
+  <h2>Sua resenha</h2><div class="mlist" style="padding:16px;background:#111"><textarea class="field" id="rev" placeholder="O que você achou deste álbum?">${esc(x.rev||"")}</textarea><div style="display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px;margin-top:12px"><button class="fab" data-act="rev">Salvar resenha</button><button class="btn" data-story="album">Compartilhar no Story</button></div></div>
   ${S.listas.length?`<h2>Adicionar a uma lista</h2><div style="display:flex;gap:10px;flex-wrap:wrap"><select class="field" id="lsel" style="width:auto">${listas}</select><button class="btn" data-act="addLista">Adicionar</button></div>`:`<h2>Listas</h2><div class="empty">Crie uma lista na aba Listas do Perfil para adicionar álbuns.</div>`}`;
 }
 function albumAct(a){
@@ -662,6 +667,7 @@ function albumAct(a){
   if(a==="curtir"){d.l=!d.l;flash(d.l?"Curtido":"Descurtido")}
   if(a==="fav"){const p=P();const i=p.fav.indexOf(k);if(i>=0)p.fav.splice(i,1);else if(p.fav.length<4)p.fav.push(k);else{flash("Até 4 álbuns favoritos");return}}
   if(a==="rev"){d.rev=($("#rev").value||"").trim();flash("Resenha salva")}
+  if(a==="capaRm"){delete S.covers[k];flash("Capa original restaurada")}
   if(a==="addLista"){const l=S.listas[+$("#lsel").value];if(l&&!l.ids.includes(k)){l.ids.push(k);flash(`Adicionado a "${l.nome}"`)}else flash("Já está nessa lista")}
   salvar();rota();
 }
@@ -816,7 +822,7 @@ function lerImg(f,max,quadrado,cb){
     if(quadrado){c.width=c.height=max;const s=Math.min(im.width,im.height);c.getContext("2d").drawImage(im,(im.width-s)/2,(im.height-s)/2,s,s,0,0,max,max)}
     else{const k=Math.min(1,max/im.width);c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext("2d").drawImage(im,0,0,c.width,c.height)}
     cb(c.toDataURL("image/jpeg",.85));
-  };im.src=r.result};
+  };im.onerror=()=>flash("Não foi possível ler essa imagem");im.src=r.result};
   r.readAsDataURL(f);
 }
 
@@ -929,6 +935,13 @@ document.addEventListener("keydown",e=>{
 });
 document.addEventListener("change",e=>{
   const t=e.target;
+  /* Trocar a capa de um álbum, EP ou single */
+  if(t.id==="capaup"&&t.files&&t.files[0]){
+    const k=location.hash.slice(7);
+    if(!S.meta[k])return;
+    lerImg(t.files[0],700,true,u=>{S.covers[k]=u;salvar();rota();flash("Capa trocada")});
+    return;
+  }
   if(!t.files||!t.files[0]||!EDIT)return;
   if(t.id==="edfoto")lerImg(t.files[0],256,true,u=>{EDIT.avatar=u;renderEditor()});
   if(t.id==="edbanner")lerImg(t.files[0],1400,false,u=>{EDIT.banner=u;renderEditor()});
@@ -1190,6 +1203,7 @@ function desenharResenha(c,k,A,v,o){
   if(o.lay===1)return desenharPoster(c,I,v,o);
   if(o.lay===2)return desenharVinil(c,I,v,o);
   if(o.lay===3)return desenharPolaroid(c,I,v,o);
+  if(o.lay===5)return desenharLetra(c,I,v,o);
   const gm=c.getContext("2d");
   let fs=64;gm.font=`900 ${fs}px ${FNT}`;
   let ls=quebrarLinhas(gm,tit,860);
@@ -1218,8 +1232,8 @@ function desenharResenha(c,k,A,v,o){
   g.letterSpacing="8px";texto(g,"ACETATO",W/2+4,cy+26,`800 30px ${FNT}`,"rgba(255,255,255,.75)");g.letterSpacing="0px";
 }
 
-/* ---- Layouts: Fade, Pôster, Vinil, Polaroid ---- */
-const LAYOUTS=["Fade","Pôster","Vinil","Polaroid","Clássico"];
+/* ---- Layouts: Fade, Pôster, Vinil, Polaroid, Clássico e Letra ---- */
+const LAYOUTS=["Fade","Pôster","Vinil","Polaroid","Clássico","Letra"];
 function cortar(g,t,maxW){t=String(t||"");if(g.measureText(t).width<=maxW)return t;while(t.length>1&&g.measureText(t+"…").width>maxW)t=t.slice(0,-1);return t+"…"}
 function desfocar(src,w,h){
   let cur=src;
@@ -1338,6 +1352,39 @@ function desenharPolaroid(c,I,v,o){
   siteNome(g,W/2,H-(o.fundo?120:50),"center");
 }
 
+/* Letra: trecho digitado pelo usuário em destaque, com a capa e o nome da música embaixo */
+function desenharLetra(c,I,v,o){
+  const W=1080,{A,nota,m}=I,est=!!(o.estrelas&&nota);
+  const bruto=(o.letra||"").trim(),vazio=!bruto;
+  const txt=vazio?"Digite o trecho da letra que você quer compartilhar":bruto;
+  const gm=c.getContext("2d"),MAXW=880;
+  let fs=88,ls=[];
+  for(;fs>=36;fs-=4){
+    gm.font=`800 ${fs}px ${FNT}`;
+    ls=txt.split(/\n/).flatMap(p=>p.trim()?quebrarLinhas(gm,p,MAXW):[""]);
+    if(ls.length*fs*1.2<=820)break;
+  }
+  const lh=fs*1.2,th=ls.length*lh,rod=130;
+  const h=170+th+70+rod+50+(est?100:0)+60;
+  const H=o.fundo?1920:Math.round(h+100);
+  c.width=W;c.height=H;const g=c.getContext("2d");
+  if(o.fundo)fundoStory(g,W,H,I.pal,A.capa,v);
+  let y=o.fundo?(H-h)/2:50;
+  texto(g,"“",W/2,y+170,`900 240px ${FNT}`,"rgba(255,255,255,.3)");
+  y+=170;
+  ls.forEach((l,i)=>texto(g,l,W/2,y+fs*.9+i*lh,`800 ${fs}px ${FNT}`,vazio?"rgba(255,255,255,.4)":"#fff"));
+  y+=th+70;
+  g.font=`800 44px ${FNT}`;const wt=Math.min(640,g.measureText(I.tit).width);
+  g.font=`600 34px ${FNT}`;const wa=Math.min(640,g.measureText(m.a||"").width);
+  const rw=rod+28+Math.max(wt,wa),x0=(W-rw)/2;
+  fotoOuGrad(g,I,x0,y,rod,rod,22);
+  g.font=`800 44px ${FNT}`;texto(g,cortar(g,I.tit,640),x0+rod+28,y+58,`800 44px ${FNT}`,"#fff","left");
+  g.font=`600 34px ${FNT}`;texto(g,cortar(g,m.a||"",640),x0+rod+28,y+104,`600 34px ${FNT}`,"rgba(255,255,255,.75)","left");
+  y+=rod+50;
+  if(est){desenharEstrelas(g,W/2,y+52,nota,70);y+=100}
+  siteNome(g,W/2,y+30,"center");
+}
+
 /* ---- Desenho: perfil ---- */
 function desenharPerfil(g,W,H,A,v){
   const p=P(),fav=p.fav||[];
@@ -1379,60 +1426,97 @@ function compartilharCanvas(c,nome){
     flash("Imagem salva. Poste no Story pelo app do Instagram.");
   },"image/png");
 }
-(function(){const s=document.createElement("style");s.textContent=`#stv{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.95);display:flex;flex-direction:column;align-items:center;gap:14px;padding:calc(14px + env(safe-area-inset-top,0px)) 16px calc(16px + env(safe-area-inset-bottom,0px));overflow:auto}
-#stv canvas{height:min(64vh,680px);width:auto;max-width:100%;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.6);flex-shrink:0}
+/* Painel de Story: prévia ocupa o espaço livre e os controles ficam embaixo, com rolagem horizontal nas linhas de botões */
+(function(){const s=document.createElement("style");s.textContent=`
+#stv{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.96);display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden}
+#stv .stprev{flex:1 1 0;min-height:0;display:flex;align-items:center;justify-content:center;padding:calc(12px + env(safe-area-inset-top,0px)) 16px 8px;overflow:hidden}
+#stv canvas{display:block;flex:0 0 auto;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
 #stv canvas.xp{background:repeating-conic-gradient(#2a2a2e 0 25%,#1c1c1f 0 50%) 0 0/24px 24px}
-#stv .stbar{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
-#stv .stld{color:#8e8e93;font-weight:700;padding:80px 0}`;document.head.appendChild(s)})();
+#stv .stctl{flex:0 1 auto;max-height:46vh;max-height:46dvh;overflow-y:auto;overscroll-behavior:contain;padding:6px 14px 10px;display:flex;flex-direction:column;gap:4px}
+#stv .stlbl{font-size:11px;font-weight:800;color:#8e8e93;text-transform:uppercase;letter-spacing:.06em;padding:4px 2px 0}
+#stv .strow{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding:2px 0 4px;flex-shrink:0}
+#stv .strow::-webkit-scrollbar{display:none}
+#stv .strow>*{flex:0 0 auto}
+#stv .strow>:first-child{margin-left:auto}
+#stv .strow>:last-child{margin-right:auto}
+#stv .stctl .field{min-height:76px;font-size:16px;resize:none;flex-shrink:0}
+#stv .stacts{flex:0 0 auto;display:flex;gap:10px;padding:10px 14px calc(12px + env(safe-area-inset-bottom,0px));border-top:1px solid rgba(255,255,255,.08);background:rgba(10,10,12,.92)}
+#stv .stacts .btn{flex:1;justify-content:center;padding:13px 16px;font-size:15px}
+#stv .stld{margin:auto;color:#8e8e93;font-weight:700}
+@media(min-width:760px){#stv .stacts{justify-content:center}#stv .stacts .btn{flex:0 0 180px}}
+`;document.head.appendChild(s)})();
 async function abrirStory(tipo,k,mus){
   document.getElementById("stv")?.remove();
   const ov=document.createElement("div");ov.id="stv";
   ov.innerHTML=`<div class="stld">Preparando imagem…</div>`;
   document.body.appendChild(ov);document.body.style.overflow="hidden";
-  const fechar=()=>{ov.remove();document.body.style.overflow="";document.removeEventListener("keydown",esc2)};
-  const esc2=e=>{if(e.key==="Escape")fechar()};document.addEventListener("keydown",esc2);
+  let ro=null;
+  const esc2=e=>{if(e.key==="Escape"&&e.target.tagName!=="TEXTAREA")fechar()};
+  const fechar=()=>{if(ro)ro.disconnect();ov.remove();document.body.style.overflow="";document.removeEventListener("keydown",esc2)};
+  document.addEventListener("keydown",esc2);
   try{await Promise.all(["400","500","600","700","800","900"].map(w=>document.fonts.load(`${w} 40px Inter`)))}catch(e){}
+  if(!ov.isConnected)return;
   let A={};
   if(mus)A.musica=mus;
-  if(tipo==="resenha"){A.capa=await carregarImg((S.meta[k]||{}).cover)}
+  if(tipo==="resenha"){A.capa=await carregarImg(coverDe(k))}
   else{
     const p=P(),fav=p.fav||[];
-    A.capas=await Promise.all(fav.slice(0,4).map(x=>carregarImg((S.meta[x]||{}).cover)));
+    A.capas=await Promise.all(fav.slice(0,4).map(x=>carregarImg(coverDe(x))));
     A.avatar=await carregarImg(p.avatar);
     const banner=await carregarImg(p.banner);
     A.fonte=A.capas.find(Boolean)||banner||A.avatar||null;
   }
+  if(!ov.isConnected)return;
   const W=1080,H=1920,c=document.createElement("canvas");
   const temNota=tipo==="resenha"&&!!(mus?(S.u[tkey(mus.t,(S.meta[k]||{}).a)]||{}).r:(S.u[k]||{}).r);
-  let v=0;const o={fundo:true,estrelas:true,lay:0};
+  let v=0;const o={fundo:true,estrelas:true,lay:0,letra:""};
+  ov.innerHTML=`<div class="stprev"></div>
+  <div class="stctl">
+    ${tipo==="resenha"?`<div id="stletra" style="display:none;flex-direction:column;gap:4px"><div class="stlbl">Trecho da letra</div><textarea class="field" id="stlt" rows="3" maxlength="300" placeholder="Digite ou cole o trecho que você quer compartilhar"></textarea></div>
+    <div class="stlbl">Layout</div><div class="strow" id="stlay"></div>
+    <div class="stlbl">Opções</div><div class="strow" id="stopc"></div>`:""}
+    <div id="stfw"><div class="stlbl">Estilo do fundo</div><div class="strow" id="stvar"></div></div>
+  </div>
+  <div class="stacts"><button class="btn" data-sf>Fechar</button><button class="btn p" data-ss>Compartilhar</button></div>`;
+  const prev=ov.querySelector(".stprev");prev.appendChild(c);
+  const ajusta=()=>{
+    const pw=prev.clientWidth-32,ph=prev.clientHeight-8;
+    if(pw<=0||ph<=0||!c.width||!c.height)return;
+    const s=Math.min(pw/c.width,ph/c.height);
+    c.style.width=Math.floor(c.width*s)+"px";c.style.height=Math.floor(c.height*s)+"px";
+  };
   const desenhar=()=>{
     if(tipo==="resenha"){desenharResenha(c,k,A,v,o);c.classList.toggle("xp",!o.fundo)}
     else{c.width=W;c.height=H;desenharPerfil(c.getContext("2d"),W,H,A,v)}
+    ajusta();
   };
-  desenhar();
-  ov.innerHTML="";
-  ov.appendChild(c);
-  const bar=document.createElement("div");bar.className="stbar chips";
-  const opc=document.createElement("div");opc.className="stbar chips";
-  const lays=document.createElement("div");lays.className="stbar chips";
   const pintar=()=>{
-    lays.innerHTML=tipo==="resenha"?LAYOUTS.map((n,i)=>`<button class="chip ${i===o.lay?"on":""}" data-sl="${i}">${n}</button>`).join(""):"";
-    bar.style.display=o.fundo?"":"none";
-    bar.innerHTML=VARIACOES.map((n,i)=>`<button class="chip ${i===v?"on":""}" data-sv="${i}">${n}</button>`).join("");
-    opc.innerHTML=tipo==="resenha"?`<button class="chip ${o.fundo?"on":""}" data-so="fundo">Fundo</button>${temNota?`<button class="chip ${o.estrelas?"on":""}" data-so="estrelas">Estrelas</button>`:""}`:"";
+    if(tipo==="resenha"){
+      ov.querySelector("#stlay").innerHTML=LAYOUTS.map((n,i)=>`<button class="chip ${i===o.lay?"on":""}" data-sl="${i}">${n}</button>`).join("");
+      ov.querySelector("#stopc").innerHTML=`<button class="chip ${o.fundo?"on":""}" data-so="fundo">Fundo</button>${temNota?`<button class="chip ${o.estrelas?"on":""}" data-so="estrelas">Estrelas</button>`:""}`;
+      ov.querySelector("#stletra").style.display=o.lay===5?"flex":"none";
+    }
+    ov.querySelector("#stfw").style.display=o.fundo?"":"none";
+    ov.querySelector("#stvar").innerHTML=VARIACOES.map((n,i)=>`<button class="chip ${i===v?"on":""}" data-sv="${i}">${n}</button>`).join("");
   };
-  pintar();
-  ov.appendChild(lays);ov.appendChild(opc);ov.appendChild(bar);
-  const acoes=document.createElement("div");acoes.className="stbar";
-  acoes.innerHTML=`<button class="btn" data-sf>Fechar</button><button class="btn p" data-ss>Compartilhar</button>`;
-  ov.appendChild(acoes);
-  bar.onclick=e=>{const b=e.target.closest("[data-sv]");if(!b)return;v=+b.dataset.sv;pintar();desenhar()};
-  lays.onclick=e=>{const b=e.target.closest("[data-sl]");if(!b)return;o.lay=+b.dataset.sl;pintar();desenhar()};
-  opc.onclick=e=>{const b=e.target.closest("[data-so]");if(!b)return;o[b.dataset.so]=!o[b.dataset.so];pintar();desenhar()};
-  acoes.onclick=e=>{
-    if(e.target.closest("[data-sf]"))fechar();
-    if(e.target.closest("[data-ss]"))compartilharCanvas(c,tipo==="resenha"?(o.fundo?`acetato-${A.musica?"musica":"resenha"}-story.png`:`acetato-${A.musica?"musica":"resenha"}-sem-fundo.png`):"acetato-perfil-story.png");
-  };
+  pintar();desenhar();
+  ro=new ResizeObserver(ajusta);ro.observe(prev);
+  let tl=null;
+  ov.addEventListener("input",e=>{
+    if(e.target.id!=="stlt")return;
+    o.letra=e.target.value;clearTimeout(tl);tl=setTimeout(desenhar,120);
+  });
+  ov.addEventListener("click",e=>{
+    const t=e.target;
+    const sv=t.closest("[data-sv]");if(sv){v=+sv.dataset.sv;pintar();desenhar();return}
+    const sl=t.closest("[data-sl]");if(sl){o.lay=+sl.dataset.sl;pintar();desenhar();return}
+    const so=t.closest("[data-so]");if(so){o[so.dataset.so]=!o[so.dataset.so];pintar();desenhar();return}
+    if(t.closest("[data-sf]")){fechar();return}
+    if(t.closest("[data-ss]")){
+      const base=tipo==="resenha"?(o.lay===5?"letra":(A.musica?"musica":"resenha")):"perfil";
+      compartilharCanvas(c,tipo==="resenha"?(o.fundo?`acetato-${base}-story.png`:`acetato-${base}-sem-fundo.png`):"acetato-perfil-story.png");
+    }
+  });
 }
 function gerarStoryPerfil(){abrirStory("perfil")}
 function gerarStoryResenha(k){
