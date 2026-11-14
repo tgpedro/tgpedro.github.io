@@ -345,16 +345,32 @@ function rateHTML(r=0){let h="";for(let i=1;i<=5;i++){const c=r>=i?"on":r>=i-.5?
 function estrelas(r){let h="";for(let i=1;i<=5;i++){const c=r>=i?"on":r>=i-.5?"half":"";h+=`<span class="st ${c}">★</span>`}return `<span class="stars">${h}</span>`}
 const erroHTML=()=>`<div class="empty">Não foi possível carregar agora. Tente de novo em alguns segundos.</div>`;
 
-/* ===== Início ===== */
+async function tendencias(){
+  const paises=["us","gb","de","fr","jp","mx","kr","au","ca"];
+  const res=await Promise.all(paises.map(p=>getJSON(`https://rss.applemarketingtools.com/api/v2/${p}/music/most-played/25/albums.json`).then(j=>j.feed?.results||[]).catch(()=>[])));
+  const cont=new Map();
+  res.forEach(lista=>lista.forEach((r,i)=>{const k=albumKey(r.name,r.artistName);const c=cont.get(k)||{r,n:0,s:0};c.n++;c.s+=25-i;cont.set(k,c)}));
+  return [...cont.values()].sort((a,b)=>b.n-a.n||b.s-a.s).slice(0,24).map(c=>c.r);
+}
 let homeGenero=0;
 const GENEROS_HOME=[[0,"Mundial"],[132,"Pop"],[116,"Hip-hop"],[85,"Alternativo"],[106,"Eletrônica"],[165,"R&B"]];
 async function homeView(){
   const mapDz=x=>({src:"dz",id:x.id,t:x.title,a:x.artist?.name||"",y:(x.release_date||"").slice(0,4),tipo:x.record_type||"album",cover:x.cover_xl||x.cover_big||x.cover_medium||""});
   const cardsDe=lista=>unirAlbuns(lista.map(mapDz)).map(u=>{guardarAlbum(u);return cardAlbum(u)}).join("");
-  const chart=await dz(`/chart/${homeGenero}/albums?limit=12`).catch(()=>({data:[]}));
-  const emAlta=cardsDe(chart.data||[]);
-  window.__chart=chart.data||[];
-  const topo=window.__chart[0];
+  let emAlta="";
+  if(homeGenero===0){
+    const ap=await tendencias();
+    if(ap.length){
+      emAlta=unirAlbuns(ap.map(r=>({src:"it",id:r.id,t:r.name,a:r.artistName,y:"",tipo:"album",cover:capaIT(r.artworkUrl100)}))).map(u=>{guardarAlbum(u);return cardAlbum(u)}).join("");
+      window.__chart=ap.map(r=>({title:r.name,artist:{name:r.artistName},cover_xl:capaIT(r.artworkUrl100)}));
+    }
+  }
+  if(!emAlta){
+    const chart=await dz(`/chart/${homeGenero}/albums?limit=12`).catch(()=>({data:[]}));
+    emAlta=cardsDe(chart.data||[]);
+    window.__chart=chart.data||[];
+  }
+  const topo=(window.__chart||[])[0];
   const heroi=topo?`<div class="hero-home" style="background-image:url(${topo.cover_xl||topo.cover_big||""})"><div class="hh-shade"></div><div class="hh-body"><span class="pill">Mais ouvido agora</span><h2 class="hh-t">${esc(topo.title)}</h2><div class="mut" style="font-size:17px;font-weight:700">${esc(topo.artist?.name||"")}</div><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px"><a class="btn p" href="#album-${albumKey(topo.title,topo.artist?.name||"")}">Abrir</a><button class="btn" data-rnd>🎲 Aleatório</button></div></div></div>`:"";
   const avaliados=Object.entries(S.u).filter(([k,v])=>v.r&&S.meta[k]).sort((a,b)=>b[1].r-a[1].r);
   const jaAvaliados=new Set(Object.keys(S.u));
@@ -372,6 +388,16 @@ async function homeView(){
       rec=cardsDe(lista.slice(0,12));
     }catch(e){}
   }
+  let popRec="";
+  const ult=S.ultimoArtista;
+  if(ult&&ult.id){
+    try{
+      const rel=((await dz(`/artist/${ult.id}/related?limit=12`)).data||[]).sort((a,b)=>(b.nb_fan||0)-(a.nb_fan||0)).slice(0,6);
+      const alb=await Promise.all(rel.map(o=>dz(`/artist/${o.id}/albums?limit=1`).then(j=>(j.data||[]).map(x=>({...x,artist:{name:o.name}}))).catch(()=>[])));
+      const cards=cardsDe(alb.flat());
+      if(cards)popRec=`<h2>Porque você pesquisou ${esc(ult.n)}</h2><div class="mut sm" style="font-weight:700;margin:-6px 0 14px">Artistas parecidos, do mais popular ao menos popular</div><div class="grid">${cards}</div>`;
+    }catch(e){}
+  }
   const generosHit=[132,116,85,106,165];
   const hitsRes=await Promise.all(generosHit.map(g=>dz(`/chart/${g}/albums?limit=4`).then(j=>j.data||[]).catch(()=>[])));
   const hits=cardsDe(hitsRes.flat().filter(x=>!jaAvaliados.has(albumKey(x.title,x.artist?.name||""))).slice(0,12));
@@ -381,6 +407,7 @@ async function homeView(){
   <div class="chips" style="padding-top:0">${GENEROS_HOME.map(([id,l])=>`<button class="chip ${homeGenero===id?"on":""}" data-hg="${id}">${l}</button>`).join("")}</div>
   ${emAlta?`<div class="grid">${emAlta}</div>`:`<div class="empty">Não foi possível carregar as tendências agora.</div>`}
   ${rec?`<h2>Recomendados para você</h2><div class="mut sm" style="font-weight:700;margin:-6px 0 14px">Com base nos artistas que você mais avaliou</div><div class="grid">${rec}</div>`:""}
+  ${popRec}
   ${hits?`<h2>Hits internacionais</h2><div class="mut sm" style="font-weight:700;margin:-6px 0 14px">Os mais tocados agora em pop, hip-hop, alternativo, eletrônica e R&amp;B</div><div class="grid">${hits}</div>`:""}
   ${diario.length?`<h2>Recentes do seu diário</h2><div class="grid">${diario.map(([k])=>cardMeta(k)).join("")}</div>`:""}`;
 }
@@ -492,6 +519,7 @@ async function artistView(k){
   }
   const [c1,c2]=cores(k);
   setAmb(c1);
+  if(a.ids.dz){S.ultimoArtista={id:a.ids.dz,n:a.n};salvar()}
   let albuns=[],top=[];
   if(a.ids.dz){
     try{
