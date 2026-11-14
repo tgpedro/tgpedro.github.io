@@ -154,6 +154,45 @@ textarea.field{min-height:100px;resize:vertical;font-weight:500}
   .flash{top:70px}
 }
 .card>.cover{border-radius:0;box-shadow:none}.card .info{padding:12px 14px 16px}.ta{font-weight:800;font-size:16px;letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sa{font-size:13px;color:rgba(255,255,255,.7);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cover img{width:100%;height:100%;object-fit:cover;display:block}
+.lbl{font-size:12px;font-weight:800;color:var(--mut);margin-top:6px}
+.edtabs{display:flex;background:rgba(255,255,255,.08);border-radius:14px;padding:4px;gap:4px}
+.edtabs button{flex:1;padding:10px;border-radius:11px;font-weight:800;color:var(--mut);text-align:center}
+.edtabs button.on{background:var(--txt);color:#000}
+.edmedia{height:140px;border-radius:20px;overflow:hidden;background:#111}
+.edbn{width:100%;height:100%;background:linear-gradient(135deg,#222,#111) center/cover no-repeat}
+.edav{width:88px;height:88px;border-radius:50%;border:4px solid #000;overflow:hidden;display:grid;place-items:center;font-weight:900;font-size:26px;background:#222}
+.edav img{width:100%;height:100%;object-fit:cover}
+.edbtns{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+.xb{width:28px;height:28px;border-radius:50%;background:rgba(0,0,0,.65);font-weight:800;flex-shrink:0}
+.fitem .xb{position:absolute;top:6px;right:6px;z-index:3}
+@media(max-width:640px){
+  .pban{height:170px;margin-top:-84px}
+  .phead{margin-top:-64px;grid-template-columns:1fr;justify-items:center;text-align:center;gap:12px}
+  .pav{width:104px;height:104px;font-size:30px;border-width:4px}
+  .pinfo{width:100%;text-align:center}
+  .pinfo h1{font-size:28px;margin:0 0 4px}
+  .pbio{font-size:15px;margin:8px auto 0;max-width:100%}
+  .pright{width:100%;flex-direction:column;gap:12px;align-items:stretch}
+  .pstats{width:100%;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));padding:4px;border-radius:18px}
+  .pstats div{padding:8px 2px;border-right:0;text-align:center;min-width:0}
+  .pstats strong{font-size:16px;letter-spacing:-.3px}
+  .pstats span{font-size:8px;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+  .shbtn{align-self:center;width:40px;height:40px}
+  .ptabs{margin-top:18px}
+  .ptabs button{padding:10px;font-size:14px}
+  .pgrid{margin-top:18px;gap:28px}
+  .favs{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .fvazio{font-size:12px}
+  .hero .cover{width:180px;height:180px}
+  h2{font-size:19px;margin:22px 0 10px}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .ta{font-size:14px}
+  .sa{font-size:12px}
+  .nav a{font-size:12px}
+  body.perfil .gear{width:30px;height:30px}
+  .edmedia{height:120px}
+  .edav{width:76px;height:76px}
+}
 </style>
 </head>
 <body>
@@ -278,10 +317,30 @@ function estrelas(r){let h="";for(let i=1;i<=5;i++){const c=r>=i?"on":r>=i-.5?"h
 const erroHTML=()=>`<div class="empty">Não foi possível carregar agora. Tente de novo em alguns segundos.</div>`;
 
 /* ===== Início ===== */
-function homeView(){
-  const recs=Object.entries(S.u).filter(([,v])=>v.d).sort((a,b)=>b[1].d.localeCompare(a[1].d)).slice(0,8);
+async function homeView(){
+  const mapDz=x=>({src:"dz",id:x.id,t:x.title,a:x.artist?.name||"",y:(x.release_date||"").slice(0,4),tipo:x.record_type||"album",cover:x.cover_xl||x.cover_big||x.cover_medium||""});
+  const cardsDe=lista=>unirAlbuns(lista.map(mapDz)).map(u=>{guardarAlbum(u);return cardAlbum(u)}).join("");
+  const chart=await dz("/chart/0/albums?limit=12").catch(()=>({data:[]}));
+  const emAlta=cardsDe(chart.data||[]);
+  let rec="",tituloRec="";
+  const melhor=Object.entries(S.u).filter(([k,v])=>v.r&&S.meta[k]).sort((a,b)=>b[1].r-a[1].r)[0];
+  if(melhor){
+    const m=S.meta[melhor[0]];
+    const did=S.artists[artistKey(m.a)]?.ids?.dz;
+    if(did){
+      try{
+        const rel=((await dz(`/artist/${did}/related?limit=6`)).data||[]).slice(0,4);
+        const listas=await Promise.all(rel.map(o=>dz(`/artist/${o.id}/albums?limit=2`).then(j=>(j.data||[]).map(x=>({...x,artist:{name:o.name}}))).catch(()=>[])));
+        rec=cardsDe(listas.flat().slice(0,12));
+        if(rec)tituloRec=`Porque você avaliou ${esc(m.t)}`;
+      }catch(e){}
+    }
+  }
+  const diario=Object.entries(S.u).filter(([,v])=>v.d).sort((a,b)=>b[1].d.localeCompare(a[1].d)).slice(0,6);
   return `<h1>Início</h1><input class="search" id="hq" placeholder="Procure álbuns, EPs, músicas ou artistas" autocomplete="off">
-  <h2>Recentes do seu diário</h2>${recs.length?`<div class="grid">${recs.map(([k])=>cardMeta(k)).join("")}</div>`:`<div class="empty">Você ainda não marcou nada como ouvido. Use a busca para começar.</div>`}`;
+  ${rec?`<h2>Recomendados</h2><div class="sub mut sm" style="font-weight:700;margin:-6px 0 14px">${tituloRec}</div><div class="grid">${rec}</div>`:""}
+  ${emAlta?`<h2>Em alta</h2><div class="grid">${emAlta}</div>`:`<div class="empty" style="margin-top:24px">Não foi possível carregar as tendências agora.</div>`}
+  ${diario.length?`<h2>Recentes do seu diário</h2><div class="grid">${diario.map(([k])=>cardMeta(k)).join("")}</div>`:""}`;
 }
 
 /* ===== Buscar: três fontes em paralelo, resultados aparecem conforme chegam ===== */
@@ -342,6 +401,8 @@ async function albumView(k){
   const m=S.meta[k];
   if(!m)return `<div class="empty">Abra este álbum pela busca para carregar os dados.</div>`;
   setAmb(cores(k)[0]);
+  const ak=artistKey(m.a);
+  if(!S.artists[ak]){S.artists[ak]={n:m.a,foto:"",fas:0,genre:"",info:"",ids:{},fontes:[]};salvar()}
   const x=dd(k);
   const faixas=await faixasDe(m);
   const listas=S.listas.map((l,i)=>`<option value="${i}">${esc(l.nome)}</option>`).join("");
@@ -350,7 +411,7 @@ async function albumView(k){
   return `<div class="hero">${capaAlbum(k,m.t,230)}<div class="info">
     <span class="pill">${esc([(m.tipo||"álbum").toUpperCase(),m.genre].filter(Boolean).join(" · "))}</span>
     <h1>${esc(m.t)}</h1>
-    <div style="font-size:18px;font-weight:700" class="mut">${esc(m.a)}${m.y?` · ${m.y}`:""}${faixas.length?` · ${faixas.length} faixas`:""}</div>
+    <div style="font-size:18px;font-weight:700" class="mut"><a href="#artist-${ak}" style="border-bottom:2px solid currentColor">${esc(m.a)}</a>${m.y?` · ${m.y}`:""}${faixas.length?` · ${faixas.length} faixas`:""}</div>
     <div class="mut sm" style="font-weight:700;margin-top:6px">Dados de: ${esc(fontesTxt)}</div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin:20px 0">
       <button class="btn ${x.d?"on":""}" data-act="ouvi">${x.d?"✓ Ouvido":"Marcar como ouvido"}</button>
@@ -379,7 +440,14 @@ function albumAct(a){
 /* ===== Página do artista ===== */
 async function artistView(k){
   const a=S.artists[k];
-  if(!a)return `<div class="empty">Abra este artista pela busca para carregar os dados.</div>`;
+  if(!a)return `<div class="empty">Artista não encontrado.</div>`;
+  if(!a.ids.dz){
+    try{
+      const j=await dz(`/search/artist?q=${encodeURIComponent(a.n)}&limit=5`);
+      const hit=(j.data||[]).find(x=>norm(x.name)===norm(a.n))||null;
+      if(hit){a.ids.dz=hit.id;a.foto=hit.picture_xl||hit.picture_big||a.foto;a.fas=hit.nb_fan||0;salvar()}
+    }catch(e){}
+  }
   const [c1,c2]=cores(k);
   setAmb(c1);
   let albuns=[],top=[];
@@ -478,7 +546,7 @@ function listAct(el){
 }
 
 /* ===== Editor do perfil ===== */
-function abrirEditor(){EDIT=JSON.parse(JSON.stringify(P()));renderEditor()}
+function abrirEditor(){EDIT=JSON.parse(JSON.stringify(P()));EDTAB="perfil";renderEditor()}
 function renderEditorAntigo(){
   let el=$("#ed");
   if(!el){el=document.createElement("div");el.id="ed";document.body.appendChild(el)}
@@ -519,33 +587,46 @@ const tkey=(t,a)=>"t"+hash(norm(t)+"|"+norm(a));
 function trateHTML(t,a){const k=tkey(t,a);const r=(S.u[k]||{}).r||0;return `<span class="trate" data-tk="${k}" data-tt="${esc(t)}" data-ta="${esc(a)}" style="display:inline-flex;flex-shrink:0;transform:scale(.6);transform-origin:center;margin:-8px -6px">${rateHTML(r).replace(/data-v=/g,'data-tv=')}</span>`}
 
 /* ===== Editor do perfil com busca de álbuns e músicas ===== */
-let EDQ="",EDQF="albuns",edT=null,edTok=0,EDRES=[];
+let EDQ="",EDQF="albuns",edT=null,edTok=0,EDRES=[],EDTAB="perfil";
 function renderEditor(){
   let el=$("#ed");
   if(!el){el=document.createElement("div");el.id="ed";document.body.appendChild(el)}
   const e=EDIT,favs=e.fav||[];
-  el.innerHTML=`<div class="ehead"><button class="lk" data-ed="fechar">Cancelar</button><h2>Editar perfil</h2><button class="sv" data-ed="salvar">Salvar</button></div>
-  <div class="ebody">
-    <div class="esec"><h3 class="sec">Foto e banner</h3><div style="display:flex;gap:10px;flex-wrap:wrap">
-      <label class="btn" style="cursor:pointer">Escolher foto<input id="edfoto" type="file" accept="image/*" hidden></label>
-      <label class="btn" style="cursor:pointer">Escolher banner<input id="edbanner" type="file" accept="image/*" hidden></label>
-      <button class="btn" data-ed="foto-rm">Sem foto</button><button class="btn" data-ed="banner-rm">Sem banner</button></div></div>
-    <div class="esec"><h3 class="sec">Informações</h3>
-      <input class="field" data-f="nome" maxlength="40" placeholder="Nome" value="${esc(e.nome)}">
-      <input class="field" data-f="handle" maxlength="30" placeholder="Usuário" value="${esc(e.handle)}">
-      <textarea class="field" data-f="bio" maxlength="160" placeholder="Bio">${esc(e.bio)}</textarea>
-      <input class="field" data-f="local" maxlength="40" placeholder="Localização" value="${esc(e.local)}"></div>
+  const tabs=[["perfil","Perfil"],["favoritos","Favoritos"]].map(([k,l])=>`<button class="${EDTAB===k?"on":""}" data-edt="${k}">${l}</button>`).join("");
+  const corpoPerfil=`
+    <div class="esec"><h3 class="sec">Foto e banner</h3>
+      <div class="edmedia"><div class="edbn" style="${e.banner?`background-image:url(${e.banner})`:""}"></div></div>
+      <div style="display:flex;align-items:center;gap:14px;margin-top:-44px;padding-left:18px;position:relative;z-index:2">
+        <div class="edav">${e.avatar?`<img src="${e.avatar}" alt="">`:`<span>${esc(ini(e.nome))}</span>`}</div>
+      </div>
+      <div class="edbtns">
+        <label class="btn" style="cursor:pointer">Trocar foto<input id="edfoto" type="file" accept="image/*" hidden></label>
+        <label class="btn" style="cursor:pointer">Trocar banner<input id="edbanner" type="file" accept="image/*" hidden></label>
+        <button class="btn" data-ed="foto-rm">Remover foto</button>
+        <button class="btn" data-ed="banner-rm">Remover banner</button>
+      </div></div>
+    <div class="esec"><h3 class="sec">Dados</h3>
+      <label class="lbl">Nome</label><input class="field" data-f="nome" maxlength="40" value="${esc(e.nome)}">
+      <label class="lbl">Usuário</label><input class="field" data-f="handle" maxlength="30" value="${esc(e.handle)}">
+      <label class="lbl">Bio</label><textarea class="field" data-f="bio" maxlength="160">${esc(e.bio)}</textarea>
+      <label class="lbl">Localização</label><input class="field" data-f="local" maxlength="40" value="${esc(e.local)}">
+    </div>`;
+  const corpoFav=`
     <div class="esec"><h3 class="sec">Álbuns favoritos · ${favs.length}/4</h3>
-      <div class="favs">${[0,1,2,3].map(i=>favs[i]?`<div class="fitem" style="position:relative">${capaAlbum(favs[i],(S.meta[favs[i]]||{}).t,null)}<button data-ed="fav-rm" data-k="${favs[i]}" aria-label="Remover" style="position:absolute;top:6px;right:6px;z-index:3;width:28px;height:28px;border-radius:50%;background:rgba(0,0,0,.65);font-weight:800">×</button></div>`:`<div class="fvazio">Vazio</div>`).join("")}</div></div>
+      <div class="favs">${[0,1,2,3].map(i=>favs[i]?`<div class="fitem" style="position:relative">${capaAlbum(favs[i],(S.meta[favs[i]]||{}).t,null)}<button data-ed="fav-rm" data-k="${favs[i]}" class="xb" aria-label="Remover">×</button></div>`:`<div class="fvazio">Vazio</div>`).join("")}</div>
+    </div>
     <div class="esec"><h3 class="sec">Músicas favoritas · ${e.musicas.length}/10</h3>
-      ${e.musicas.length?`<div class="mlist">${e.musicas.map((m,i)=>`<div class="row"><span class="num">${String(i+1).padStart(2,"0")}</span><div class="ttl grow">${esc(m)}</div><button data-ed="mus-rm" data-i="${i}" aria-label="Remover" style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.14);font-weight:800">×</button></div>`).join("")}</div>`:`<div class="empty">Nenhuma música ainda.</div>`}</div>
-    <div class="esec"><h3 class="sec">Pesquisar para adicionar</h3>
+      ${e.musicas.length?`<div class="mlist">${e.musicas.map((m,i)=>`<div class="row"><span class="num">${String(i+1).padStart(2,"0")}</span><div class="ttl grow">${esc(m)}</div><button data-ed="mus-rm" data-i="${i}" class="xb" aria-label="Remover">×</button></div>`).join("")}</div>`:`<div class="empty">Nenhuma música ainda.</div>`}
+    </div>
+    <div class="esec"><h3 class="sec">Adicionar</h3>
       <input class="search" id="edq" placeholder="Busque um álbum ou uma música" autocomplete="off" value="${esc(EDQ)}">
       <div class="chips" style="padding-top:0">${[["albuns","Álbuns"],["musicas","Músicas"]].map(([k,l])=>`<button class="chip ${EDQF===k?"on":""}" data-edf="${k}">${l}</button>`).join("")}</div>
-      <div id="edres"></div></div>
-  </div>`;
+      <div id="edres"></div>
+    </div>`;
+  el.innerHTML=`<div class="ehead"><button class="lk" data-ed="fechar">Cancelar</button><h2>Editar perfil</h2><button class="sv" data-ed="salvar">Salvar</button></div>
+  <div class="ebody"><div class="edtabs">${tabs}</div>${EDTAB==="perfil"?corpoPerfil:corpoFav}</div>`;
   document.body.style.overflow="hidden";
-  if(EDQ.trim().length>=2)runEdSearch();
+  if(EDTAB==="favoritos"&&EDQ.trim().length>=2)runEdSearch();
 }
 async function runEdSearch(){
   const q=EDQ.trim(),res=$("#edres");
@@ -585,7 +666,7 @@ function rota(){
   if(h==="diary"){app.innerHTML=`<h1>Diário</h1>${diaryList()}`;return}
   if(h==="profile"){app.innerHTML=perfilView();return}
   if(h.startsWith("lista-")){app.innerHTML=listaView(+h.slice(6));return}
-  app.innerHTML=homeView();
+  carrega(homeView());
 }
 window.addEventListener("hashchange",rota);
 
@@ -609,6 +690,8 @@ document.addEventListener("click",e=>{
   const t=e.target;
   const tv=t.closest("[data-tv]");
   if(tv){e.preventDefault();const box=tv.closest(".trate");const k=box.dataset.tk;const d=dd(k);const val=+tv.dataset.tv;d.r=d.r===val?0:val;if(!d.r)delete d.r;S.tracks=S.tracks||{};S.tracks[k]={t:box.dataset.tt,a:box.dataset.ta};salvar();box.innerHTML=rateHTML(d.r).replace(/data-v=/g,'data-tv=');flash(d.r?`Nota ${String(val).replace(".",",")} para a música`:"Nota removida");return}
+  const edt=t.closest("[data-edt]");
+  if(edt){EDTAB=edt.dataset.edt;renderEditor();return}
   const edf=t.closest("[data-edf]");
   if(edf){EDQF=edf.dataset.edf;renderEditor();return}
   const ed=t.closest("[data-ed]");
