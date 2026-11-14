@@ -4,8 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Acetato</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#000;--txt:#fff;--mut:#8e8e93;--line:rgba(255,255,255,.1);--acc:#8B5CF6;--acc2:#B794F6;--fx:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif}
+:root{--bg:#000;--txt:#fff;--mut:#8e8e93;--line:rgba(255,255,255,.1);--acc:#8B5CF6;--acc2:#B794F6;--fx:"Inter",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Helvetica,Arial,sans-serif}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:var(--fx);background:var(--bg);color:var(--txt);min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:clip}
 a{color:inherit;text-decoration:none}
@@ -1010,24 +1013,24 @@ function gerarCartao(){
   const [c1,c2]=fav[0]?cores(fav[0]):cores(p.handle||"acetato");
   const fundo=g.createLinearGradient(0,0,0,1350);fundo.addColorStop(0,c1);fundo.addColorStop(.55,c2);fundo.addColorStop(1,"#000");
   g.fillStyle=fundo;g.fillRect(0,0,1080,1350);
-  g.fillStyle="#fff";g.font="900 104px -apple-system, Helvetica, Arial, sans-serif";g.fillText(p.nome.slice(0,16),80,260);
-  g.font="700 44px -apple-system, Helvetica, Arial, sans-serif";g.fillStyle="rgba(255,255,255,.8)";g.fillText("@"+p.handle,84,330);
+  g.fillStyle="#fff";g.font="900 104px Inter, -apple-system, Helvetica, Arial, sans-serif";g.fillText(p.nome.slice(0,16),80,260);
+  g.font="700 44px Inter, -apple-system, Helvetica, Arial, sans-serif";g.fillStyle="rgba(255,255,255,.8)";g.fillText("@"+p.handle,84,330);
   const ouv=Object.values(S.u).filter(v=>v.d).length;
   const av=Object.values(S.u).filter(v=>v.r);
   const media=av.length?(av.reduce((s,v)=>s+v.r,0)/av.length).toFixed(1).replace(".",","):"—";
-  g.font="600 38px -apple-system, Helvetica, Arial, sans-serif";g.fillText(`${ouv} ouvidos · ${av.length} avaliações · média ${media}`,84,410);
+  g.font="600 38px Inter, -apple-system, Helvetica, Arial, sans-serif";g.fillText(`${ouv} ouvidos · ${av.length} avaliações · média ${media}`,84,410);
   fav.slice(0,4).forEach((k,i)=>{
     const x=80+i*236,y=500,[a,b]=cores(k);
     const t=g.createLinearGradient(x,y,x+200,y+200);t.addColorStop(0,a);t.addColorStop(1,b);
     g.fillStyle=t;rr(g,x,y,200,200,26);g.fill();
-    g.fillStyle="#fff";g.font="800 26px -apple-system, Helvetica, Arial, sans-serif";
+    g.fillStyle="#fff";g.font="800 26px Inter, -apple-system, Helvetica, Arial, sans-serif";
     const nome=(S.meta[k]||{}).t||"";
     g.fillText(nome.slice(0,14),x,y+240);
   });
-  g.font="800 40px -apple-system, Helvetica, Arial, sans-serif";g.fillStyle="#fff";g.fillText("Músicas favoritas",84,880);
-  g.font="600 36px -apple-system, Helvetica, Arial, sans-serif";
+  g.font="800 40px Inter, -apple-system, Helvetica, Arial, sans-serif";g.fillStyle="#fff";g.fillText("Músicas favoritas",84,880);
+  g.font="600 36px Inter, -apple-system, Helvetica, Arial, sans-serif";
   (p.musicas||[]).slice(0,5).forEach((m,i)=>{g.fillStyle="rgba(255,255,255,.9)";g.fillText(`${i+1}. ${m.slice(0,40)}`,84,950+i*62)});
-  g.font="900 46px -apple-system, Helvetica, Arial, sans-serif";g.fillStyle="#fff";g.fillText("Acetato.",84,1250);
+  g.font="900 46px Inter, -apple-system, Helvetica, Arial, sans-serif";g.fillStyle="#fff";g.fillText("Acetato.",84,1250);
   c.toBlob(blob=>{
     const file=new File([blob],"acetato-perfil.png",{type:"image/png"});
     if(navigator.canShare&&navigator.canShare({files:[file]})){navigator.share({files:[file],title:"Acetato"}).catch(()=>{});return}
@@ -1086,7 +1089,7 @@ function quebrarLinhas(g,texto,maxW){
 }
 function rrect(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
 function texto(g,t,x,y,font,cor,align){g.font=font;g.fillStyle=cor;g.textAlign=align||"center";g.fillText(t,x,y)}
-const FNT="-apple-system, Helvetica, Arial, sans-serif";
+const FNT="Inter, -apple-system, Helvetica, Arial, sans-serif";
 
 /* Carregamento com CORS (necessário para exportar o canvas e ler os pixels) */
 function tentarImg(src,cors){return new Promise(res=>{const im=new Image();if(cors)im.crossOrigin="anonymous";im.onload=()=>res(im);im.onerror=()=>res(null);im.src=src})}
@@ -1388,6 +1391,7 @@ async function abrirStory(tipo,k,mus){
   document.body.appendChild(ov);document.body.style.overflow="hidden";
   const fechar=()=>{ov.remove();document.body.style.overflow="";document.removeEventListener("keydown",esc2)};
   const esc2=e=>{if(e.key==="Escape")fechar()};document.addEventListener("keydown",esc2);
+  try{await Promise.all(["400","500","600","700","800","900"].map(w=>document.fonts.load(`${w} 40px Inter`)))}catch(e){}
   let A={};
   if(mus)A.musica=mus;
   if(tipo==="resenha"){A.capa=await carregarImg((S.meta[k]||{}).cover)}
