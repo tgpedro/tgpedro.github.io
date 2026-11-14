@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Acetato</title>
 <style>
-:root{--bg:#000;--txt:#fff;--mut:#8e8e93;--line:rgba(255,255,255,.1);--acc:#fa2d48;--acc2:#ff5f7e;--fx:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif}
+:root{--bg:#000;--txt:#fff;--mut:#8e8e93;--line:rgba(255,255,255,.1);--acc:#8B5CF6;--acc2:#B794F6;--fx:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:var(--fx);background:var(--bg);color:var(--txt);min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:clip}
 a{color:inherit;text-decoration:none}
@@ -209,7 +209,7 @@ textarea.field{min-height:100px;resize:vertical;font-weight:500}
 a.row{transition:background .2s,transform .25s}a.row:hover{transform:translateX(3px)}
 .cover img{transition:transform .6s cubic-bezier(.2,.8,.2,1)}
 .card:hover .cover img{transform:scale(1.05)}
-.search:focus{box-shadow:0 0 0 3px rgba(250,45,72,.45)}
+.search:focus{box-shadow:0 0 0 3px rgba(139,92,246,.5)}
 .flash{animation:fl 2.4s cubic-bezier(.2,.8,.2,1) forwards}
 .hero-home{position:relative;height:340px;border-radius:28px;overflow:hidden;background-size:cover;background-position:center;margin:4px 0 22px;box-shadow:0 30px 60px rgba(0,0,0,.5);animation:fadeUp .7s cubic-bezier(.2,.8,.2,1) both}
 .hh-shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.88) 0%,rgba(0,0,0,.35) 60%,rgba(0,0,0,.1) 100%)}
@@ -370,12 +370,16 @@ async function homeView(){
       rec=cardsDe(lista.slice(0,12));
     }catch(e){}
   }
+  const generosHit=[132,116,85,106,165];
+  const hitsRes=await Promise.all(generosHit.map(g=>dz(`/chart/${g}/albums?limit=4`).then(j=>j.data||[]).catch(()=>[])));
+  const hits=cardsDe(hitsRes.flat().filter(x=>!jaAvaliados.has(albumKey(x.title,x.artist?.name||""))).slice(0,12));
   const diario=Object.entries(S.u).filter(([,v])=>v.d).sort((a,b)=>b[1].d.localeCompare(a[1].d)).slice(0,6);
   return `${heroi}<h1>Início</h1><input class="search" id="hq" placeholder="Procure álbuns, EPs, músicas ou artistas" autocomplete="off">
   <h2>Em alta</h2>
   <div class="chips" style="padding-top:0">${GENEROS_HOME.map(([id,l])=>`<button class="chip ${homeGenero===id?"on":""}" data-hg="${id}">${l}</button>`).join("")}</div>
   ${emAlta?`<div class="grid">${emAlta}</div>`:`<div class="empty">Não foi possível carregar as tendências agora.</div>`}
   ${rec?`<h2>Recomendados para você</h2><div class="mut sm" style="font-weight:700;margin:-6px 0 14px">Com base nos artistas que você mais avaliou</div><div class="grid">${rec}</div>`:""}
+  ${hits?`<h2>Hits internacionais</h2><div class="mut sm" style="font-weight:700;margin:-6px 0 14px">Os mais tocados agora em pop, hip-hop, alternativo, eletrônica e R&amp;B</div><div class="grid">${hits}</div>`:""}
   ${diario.length?`<h2>Recentes do seu diário</h2><div class="grid">${diario.map(([k])=>cardMeta(k)).join("")}</div>`:""}`;
 }
 
@@ -578,7 +582,7 @@ function listaView(i){
   const l=S.listas[i];
   if(!l)return `<div class="empty">Lista não encontrada.</div>`;
   return `<span class="pill">Lista</span><h1 style="margin-top:12px">${esc(l.nome)}</h1>
-  <div style="display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 22px"><input class="field" id="lnome" value="${esc(l.nome)}" style="flex:1;min-width:200px"><button class="btn" data-lst="ren" data-i="${i}">Renomear</button><button class="btn" data-lst="del" data-i="${i}" style="color:#ff5f7e">${listaDel===i?"Confirmar exclusão":"Excluir lista"}</button></div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 22px"><input class="field" id="lnome" value="${esc(l.nome)}" style="flex:1;min-width:200px"><button class="btn" data-lst="ren" data-i="${i}">Renomear</button><button class="btn" data-lst="del" data-i="${i}" style="color:#B794F6">${listaDel===i?"Confirmar exclusão":"Excluir lista"}</button></div>
   ${l.ids.length?`<div class="grid">${l.ids.map(k=>{const m=S.meta[k]||{t:"Álbum",a:""};return `<div style="position:relative">${cardAlbum({key:k,t:m.t,a:m.a,y:m.y,fontes:m.fontes||[]})}<button data-lst="rm" data-i="${i}" data-id="${k}" aria-label="Remover" style="position:absolute;top:10px;right:10px;z-index:3;width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,.6);font-weight:800">×</button></div>`}).join("")}</div>`:`<div class="empty">Esta lista está vazia. Adicione álbuns pela página de cada um.</div>`}`;
 }
 function listAct(el){
