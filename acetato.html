@@ -647,7 +647,7 @@ async function albumView(k){
     </div>
     <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap"><div style="display:flex" id="rate" data-id="${k}">${rateHTML(x.r)}</div><span class="mut" style="font-weight:700" id="rlab">${x.r?String(x.r).replace(".",",")+" de 5":"Sua nota"}</span></div>
   </div></div>
-  ${faixas.length?`<h2>Faixas</h2><div class="mlist">${faixas.map((t,i)=>`<div class="row"><span class="num">${String(i+1).padStart(2,"0")}</span><div class="ttl grow">${esc(t.t)}</div>${trateHTML(t.t,m.a)}<button class="shbtn" data-story="musica" data-tt="${esc(t.t)}" aria-label="Compartilhar música" title="Compartilhar música" style="width:30px;height:30px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M8 11H6.5A1.5 1.5 0 0 0 5 12.5v7A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5v-7A1.5 1.5 0 0 0 17.5 11H16"/></svg></button><span class="mut sm">${tempo(t.ms)}</span></div>`).join("")}</div>`:`<div class="empty" style="margin-top:30px">Sem faixas disponíveis para este álbum.</div>`}
+  ${faixas.length?`<h2>Faixas</h2><div class="mlist">${faixas.map((t,i)=>`<div class="row"><span class="num">${String(i+1).padStart(2,"0")}</span><div class="ttl grow">${esc(t.t)}</div>${trateHTML(t.t,m.a)}<button class="shbtn" data-story="musica" data-tt="${esc(t.t)}" data-ms="${t.ms||0}" aria-label="Compartilhar música" title="Compartilhar música" style="width:30px;height:30px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M8 11H6.5A1.5 1.5 0 0 0 5 12.5v7A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5v-7A1.5 1.5 0 0 0 17.5 11H16"/></svg></button><span class="mut sm">${tempo(t.ms)}</span></div>`).join("")}</div>`:`<div class="empty" style="margin-top:30px">Sem faixas disponíveis para este álbum.</div>`}
   <h2>Sua resenha</h2><div class="mlist" style="padding:16px;background:#111"><textarea class="field" id="rev" placeholder="O que você achou deste álbum?">${esc(x.rev||"")}</textarea><div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="fab" data-act="rev">Salvar resenha</button><button class="btn" data-story="album" style="margin-left:8px">Compartilhar no Story</button></div></div>
   ${S.listas.length?`<h2>Adicionar a uma lista</h2><div style="display:flex;gap:10px;flex-wrap:wrap"><select class="field" id="lsel" style="width:auto">${listas}</select><button class="btn" data-act="addLista">Adicionar</button></div>`:`<h2>Listas</h2><div class="empty">Crie uma lista na aba Listas do Perfil para adicionar álbuns.</div>`}`;
 }
@@ -1181,6 +1181,9 @@ function desenharResenha(c,k,A,v,o){
   const m=S.meta[k],d=S.u[k]||{},W=1080,pal=paletaDaImagem(A.capa,k);
   const tam=620;
   const tit=A.musica?A.musica.t:m.t,nota=A.musica?((S.u[tkey(A.musica.t,m.a)]||{}).r||0):(d.r||0);
+  const I={m,tit,nota,pal,A,ms:A.musica&&A.musica.ms};
+  if(o.lay===1)return desenharLock(c,I,v,o);
+  if(o.lay===2)return desenharCartao(c,I,v,o);
   const gm=c.getContext("2d");
   let fs=64;gm.font=`900 ${fs}px ${FNT}`;
   let ls=quebrarLinhas(gm,tit,860);
@@ -1207,6 +1210,72 @@ function desenharResenha(c,k,A,v,o){
   if(estrelas){cy+=34;desenharEstrelas(g,W/2,cy+58,nota,70);cy+=70}
   cy+=64;
   g.letterSpacing="8px";texto(g,"ACETATO",W/2+4,cy+26,`800 30px ${FNT}`,"rgba(255,255,255,.75)");g.letterSpacing="0px";
+}
+
+/* ---- Outros layouts: tela de bloqueio (iOS) e cartão ---- */
+const LAYOUTS=["Clássico","Bloqueio","Cartão"];
+function cortar(g,t,maxW){t=String(t||"");if(g.measureText(t).width<=maxW)return t;while(t.length>1&&g.measureText(t+"…").width>maxW)t=t.slice(0,-1);return t+"…"}
+function tri(g,cx,cy,s,dir){g.beginPath();g.moveTo(cx+dir*s,cy-s);g.lineTo(cx-dir*s,cy);g.lineTo(cx+dir*s,cy+s);g.closePath();g.fill()}
+function capaOuGrad(g,I,x,y,t,r){
+  if(I.A.capa)desenharCapa(g,I.A.capa,x,y,t,t,r);
+  else{const f=g.createLinearGradient(x,y,x+t,y+t);f.addColorStop(0,rgba(I.pal[0]));f.addColorStop(1,rgba(escurece(I.pal[1],.2)));g.fillStyle=f;rrect(g,x,y,t,t,r);g.fill();texto(g,ini(I.m.t),x+t/2,y+t/2+t*.12,`900 ${Math.round(t*.34)}px ${FNT}`,"rgba(255,255,255,.92)")}
+}
+function desenharLock(c,I,v,o){
+  const W=1080,{m,tit,nota,pal,A}=I,est=!!(o.estrelas&&nota);
+  const pw=960,ph=520,px=60,pad=50,bloco=ph+(est?120:0)+94;
+  const H=o.fundo?1920:Math.round(bloco+pad*2);
+  c.width=W;c.height=H;const g=c.getContext("2d");
+  if(o.fundo)fundoStory(g,W,H,pal,A.capa,v);
+  let py=pad;
+  if(o.fundo){
+    const d=new Date();
+    const hh=String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");
+    const data=d.toLocaleDateString("pt-BR",{weekday:"long",day:"numeric",month:"long"});
+    texto(g,data.charAt(0).toUpperCase()+data.slice(1),W/2,260,`600 48px ${FNT}`,"rgba(255,255,255,.85)");
+    texto(g,hh,W/2,470,`700 250px ${FNT}`,"rgba(255,255,255,.95)");
+    py=1020;
+  }
+  rrect(g,px,py,pw,ph,56);g.fillStyle=o.fundo?"rgba(30,30,34,.5)":"rgba(38,38,42,.92)";g.fill();
+  g.lineWidth=2;g.strokeStyle="rgba(255,255,255,.14)";g.stroke();
+  capaOuGrad(g,I,px+48,py+48,190,26);
+  const tx=px+48+190+36,tw=pw-48-190-36-48;
+  g.font=`700 46px ${FNT}`;texto(g,cortar(g,tit,tw),tx,py+48+88,`700 46px ${FNT}`,"#fff","left");
+  g.font=`500 40px ${FNT}`;texto(g,cortar(g,m.a||"",tw),tx,py+48+148,`500 40px ${FNT}`,"rgba(255,255,255,.62)","left");
+  const bx=px+48,bw=pw-96,by=py+292;
+  rrect(g,bx,by,bw,12,6);g.fillStyle="rgba(255,255,255,.28)";g.fill();
+  rrect(g,bx,by,bw*.38,12,6);g.fillStyle="#fff";g.fill();
+  if(I.ms){texto(g,tempo(I.ms*.38),bx,by+56,`600 28px ${FNT}`,"rgba(255,255,255,.6)","left");texto(g,"-"+tempo(I.ms*.62),bx+bw,by+56,`600 28px ${FNT}`,"rgba(255,255,255,.6)","right")}
+  const cy2=py+ph-112;g.fillStyle="#fff";
+  tri(g,W/2-230-24,cy2,28,1);tri(g,W/2-230+24,cy2,28,1);
+  rrect(g,W/2-30,cy2-42,22,84,6);g.fill();rrect(g,W/2+8,cy2-42,22,84,6);g.fill();
+  tri(g,W/2+230-24,cy2,28,-1);tri(g,W/2+230+24,cy2,28,-1);
+  g.textAlign="center";
+  let cy=py+ph;
+  if(est){cy+=50;desenharEstrelas(g,W/2,cy+58,nota,70);cy+=70}
+  cy+=64;
+  g.letterSpacing="8px";texto(g,"ACETATO",W/2+4,cy+26,`800 30px ${FNT}`,"rgba(255,255,255,.75)");g.letterSpacing="0px";
+}
+function desenharCartao(c,I,v,o){
+  const W=1080,{m,tit,nota,pal,A}=I,est=!!(o.estrelas&&nota);
+  const cw=960,ch=380,cx=60,pad=50;
+  const H=o.fundo?1920:ch+pad*2;
+  c.width=W;c.height=H;const g=c.getContext("2d");
+  if(o.fundo)fundoStory(g,W,H,pal,A.capa,v);
+  const cy=o.fundo?(H-ch)/2:pad;
+  rrect(g,cx,cy,cw,ch,52);g.fillStyle=o.fundo?"rgba(20,20,24,.5)":"rgba(28,28,32,.92)";g.fill();
+  g.lineWidth=2;g.strokeStyle="rgba(255,255,255,.14)";g.stroke();
+  capaOuGrad(g,I,cx+40,cy+40,300,32);
+  const tx=cx+380,tw=cw-380-40;
+  let fs=54;g.font=`700 ${fs}px ${FNT}`;
+  let ls=quebrarLinhas(g,tit,tw);
+  if(ls.length>2){fs=44;g.font=`700 ${fs}px ${FNT}`;ls=quebrarLinhas(g,tit,tw)}
+  ls=ls.slice(0,2);
+  let ty=cy+40+fs*.85;
+  ls.forEach(l=>{texto(g,l,tx,ty,`700 ${fs}px ${FNT}`,"#fff","left");ty+=fs*1.15});
+  g.font=`500 36px ${FNT}`;texto(g,cortar(g,m.a||"",tw),tx,ty+6,`500 36px ${FNT}`,"rgba(255,255,255,.68)","left");
+  if(est)desenharEstrelas(g,tx+26+62*2,cy+ch-120,nota,52);
+  g.letterSpacing="6px";texto(g,"ACETATO",tx,cy+ch-40,`800 24px ${FNT}`,"rgba(255,255,255,.65)","left");g.letterSpacing="0px";
+  g.textAlign="center";
 }
 
 /* ---- Desenho: perfil ---- */
@@ -1274,7 +1343,7 @@ async function abrirStory(tipo,k,mus){
   }
   const W=1080,H=1920,c=document.createElement("canvas");
   const temNota=tipo==="resenha"&&!!(mus?(S.u[tkey(mus.t,(S.meta[k]||{}).a)]||{}).r:(S.u[k]||{}).r);
-  let v=0;const o={fundo:true,estrelas:true};
+  let v=0;const o={fundo:true,estrelas:true,lay:0};
   const desenhar=()=>{
     if(tipo==="resenha"){desenharResenha(c,k,A,v,o);c.classList.toggle("xp",!o.fundo)}
     else{c.width=W;c.height=H;desenharPerfil(c.getContext("2d"),W,H,A,v)}
@@ -1284,17 +1353,20 @@ async function abrirStory(tipo,k,mus){
   ov.appendChild(c);
   const bar=document.createElement("div");bar.className="stbar chips";
   const opc=document.createElement("div");opc.className="stbar chips";
+  const lays=document.createElement("div");lays.className="stbar chips";
   const pintar=()=>{
+    lays.innerHTML=tipo==="resenha"?LAYOUTS.map((n,i)=>`<button class="chip ${i===o.lay?"on":""}" data-sl="${i}">${n}</button>`).join(""):"";
     bar.style.display=o.fundo?"":"none";
     bar.innerHTML=VARIACOES.map((n,i)=>`<button class="chip ${i===v?"on":""}" data-sv="${i}">${n}</button>`).join("");
     opc.innerHTML=tipo==="resenha"?`<button class="chip ${o.fundo?"on":""}" data-so="fundo">Fundo</button>${temNota?`<button class="chip ${o.estrelas?"on":""}" data-so="estrelas">Estrelas</button>`:""}`:"";
   };
   pintar();
-  ov.appendChild(opc);ov.appendChild(bar);
+  ov.appendChild(lays);ov.appendChild(opc);ov.appendChild(bar);
   const acoes=document.createElement("div");acoes.className="stbar";
   acoes.innerHTML=`<button class="btn" data-sf>Fechar</button><button class="btn p" data-ss>Compartilhar</button>`;
   ov.appendChild(acoes);
   bar.onclick=e=>{const b=e.target.closest("[data-sv]");if(!b)return;v=+b.dataset.sv;pintar();desenhar()};
+  lays.onclick=e=>{const b=e.target.closest("[data-sl]");if(!b)return;o.lay=+b.dataset.sl;pintar();desenhar()};
   opc.onclick=e=>{const b=e.target.closest("[data-so]");if(!b)return;o[b.dataset.so]=!o[b.dataset.so];pintar();desenhar()};
   acoes.onclick=e=>{
     if(e.target.closest("[data-sf]"))fechar();
@@ -1309,7 +1381,7 @@ function gerarStoryResenha(k){
 document.addEventListener("click",e=>{
   const b=e.target.closest("[data-story]");
   if(b&&b.dataset.story==="album"){gerarStoryResenha(location.hash.slice(7));}
-  if(b&&b.dataset.story==="musica"){const k=location.hash.slice(7);if(S.meta[k])abrirStory("resenha",k,{t:b.dataset.tt});}
+  if(b&&b.dataset.story==="musica"){const k=location.hash.slice(7);if(S.meta[k])abrirStory("resenha",k,{t:b.dataset.tt,ms:+b.dataset.ms||0});}
 });
 </script>
 </body>
