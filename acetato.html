@@ -117,6 +117,7 @@ textarea.field{min-height:100px;resize:vertical;font-weight:500}
   .hero h1{font-size:44px}
   .pban{height:clamp(180px,50vw,240px)}
 }
+.src{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.src span{font-size:10px;font-weight:800;padding:3px 7px;border-radius:999px;background:rgba(255,255,255,.14);color:var(--mut)}
 </style>
 </head>
 <body>
@@ -134,12 +135,13 @@ textarea.field{min-height:100px;resize:vertical;font-weight:500}
 <main id="app"></main>
 
 <script>
-/* ===== Dados locais ===== */
-const DZ="https://api.deezer.com";
-const KEY="acetato-deezer-v1";
+/* ===== Configuração e dados locais ===== */
+const DZ="https://api.deezer.com",IT="https://itunes.apple.com",MB="https://musicbrainz.org/ws/2",CAA="https://coverartarchive.org";
+const KEY="acetato-multi-v1";
 let S=null;
 try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
-if(!S)S={u:{},meta:{},listas:[],perfil:null};
+if(!S)S={u:{},meta:{},artists:{},listas:[],perfil:null};
+S.meta=S.meta||{};S.artists=S.artists||{};
 const salvar=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){flash("Não foi possível salvar no navegador")}};
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -147,51 +149,94 @@ const ini=t=>String(t||"?").split(/\s+/).filter(Boolean).map(w=>w[0]).slice(0,2)
 function cores(s){let h=0;for(const ch of String(s))h=(h*31+ch.charCodeAt(0))%360;return [`hsl(${h} 70% 55%)`,`hsl(${(h+50)%360} 65% 22%)`]}
 function flash(m){const f=document.createElement("div");f.className="flash";f.textContent=m;document.body.appendChild(f);setTimeout(()=>f.remove(),2400)}
 const P=()=>{if(!S.perfil)S.perfil={nome:"Seu nome",handle:"seu.usuario",bio:"",local:"",avatar:"",banner:"",fav:[],musicas:[]};return S.perfil};
-const dados=id=>S.u[id]||{};
-const dd=id=>S.u[id]||(S.u[id]={});
+const dd=k=>S.u[k]||(S.u[k]={});
 const hoje=()=>new Date().toISOString().slice(0,10);
-const tempo=s=>s?`${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`:"";
+const tempo=ms=>{const s=Math.round((ms||0)/1000);return s?`${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`:""};
 function setAmb(c){$("#amb").style.background=`radial-gradient(80% 60% at 50% 0%,${c}88,transparent 80%)`}
 function resetAmb(){$("#amb").style.background="none"}
 let rotaTok=0,aba="perfil",EDIT=null,busca={q:"",f:"tudo"},buscaTok=0,hqT=null,listaDel=null;
 
-/* ===== Deezer: rápida, sem chave. Tenta fetch e cai para JSONP se o navegador bloquear ===== */
-const cache=new Map();
-function jsonp(url){return new Promise((ok,err)=>{const cb="dz"+Math.random().toString(36).slice(2,9);const s=document.createElement("script");const t=setTimeout(()=>{limpa();err(new Error("tempo esgotado"))},9000);function limpa(){clearTimeout(t);delete window[cb];s.remove()}window[cb]=j=>{limpa();ok(j)};s.onerror=()=>{limpa();err(new Error("falha"))};s.src=url+(url.includes("?")?"&":"?")+`output=jsonp&callback=${cb}`;document.head.appendChild(s)})}
-async function dz(p){
-  if(cache.has(p))return cache.get(p);
-  const url=DZ+p;
-  let j;
-  try{const r=await fetch(url);j=await r.json()}catch(e){j=await jsonp(url)}
-  if(j.error)throw new Error(j.error.message);
-  cache.set(p,j);
-  return j;
-}
+/* ===== Normalização e chaves de união ===== */
+const norm=s=>String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/\(.*?\)|\[.*?\]/g,"").replace(/[^a-z0-9]+/g,"");
+function hash(s){let h=5381;for(const c of s)h=((h<<5)+h)^c.charCodeAt(0);return (h>>>0).toString(36)}
+const albumKey=(t,a)=>"a"+hash(norm(t)+"|"+norm(a));
+const artistKey=n=>"r"+hash(norm(n));
+const RANK={dz:0,it:1,mb:2};
 
-/* ===== Guardar metadados (capas, nomes) para diário, listas e perfil ===== */
-function guardarAlbum(x){
-  if(!x||!x.id)return;
-  S.meta[x.id]={t:x.title,a:x.artist?.name||"",y:(x.release_date||"").slice(0,4),tipo:x.record_type||"album",cover:x.cover_xl||x.cover_big||x.cover_medium||x.cover||""};
+/* ===== Chamadas às fontes ===== */
+async function getJSON(url){const r=await fetch(url);if(!r.ok)throw new Error(r.status);return r.json()}
+function jsonp(url){return new Promise((ok,err)=>{const cb="dz"+Math.random().toString(36).slice(2,9);const s=document.createElement("script");const t=setTimeout(()=>{limpa();err(new Error("tempo"))},9000);function limpa(){clearTimeout(t);delete window[cb];s.remove()}window[cb]=j=>{limpa();ok(j)};s.onerror=()=>{limpa();err(new Error("falha"))};s.src=url+(url.includes("?")?"&":"?")+`output=jsonp&callback=${cb}`;document.head.appendChild(s)})}
+async function dz(p){const url=DZ+p;let j;try{j=await getJSON(url)}catch(e){j=await jsonp(url)}if(j.error)throw new Error(j.error.message);return j}
+let mbFila=Promise.resolve();
+function mb(c){const p=mbFila.then(async()=>{await new Promise(r=>setTimeout(r,1100));const j=await getJSON(`${MB}${c}${c.includes("?")?"&":"?"}fmt=json`);return j});mbFila=p.catch(()=>{});return p}
+const acMB=x=>(x["artist-credit"]||[]).map(c=>c.name).join(", ")||"Desconhecido";
+const capaIT=u=>(u||"").replace("100x100bb","600x600bb");
+
+/* Cada fonte devolve itens no mesmo formato: {src,id,t,a,y,tipo,cover,genre,n} */
+const fontes={
+  albunsDZ:q=>dz(`/search/album?q=${q}&limit=25`).then(j=>(j.data||[]).map(x=>({src:"dz",id:x.id,t:x.title,a:x.artist?.name||"",y:(x.release_date||"").slice(0,4),tipo:x.record_type||"album",cover:x.cover_xl||x.cover_big||"",n:x.nb_tracks}))),
+  albunsIT:q=>getJSON(`${IT}/search?term=${q}&entity=album&limit=25`).then(j=>j.results.map(x=>({src:"it",id:x.collectionId,t:x.collectionName,a:x.artistName,y:(x.releaseDate||"").slice(0,4),tipo:x.trackCount<=6?"ep":"album",cover:capaIT(x.artworkUrl100),genre:x.primaryGenreName,n:x.trackCount}))),
+  albunsMB:q=>mb(`/release-group?query=${q}&limit=25`).then(j=>(j["release-groups"]||[]).map(r=>({src:"mb",id:r.id,t:r.title,a:acMB(r),y:(r["first-release-date"]||"").slice(0,4),tipo:(r["primary-type"]||"album").toLowerCase(),cover:`${CAA}/release-group/${r.id}/front-500`}))),
+  musicasDZ:q=>dz(`/search/track?q=${q}&limit=20`).then(j=>(j.data||[]).map(t=>({src:"dz",titulo:t.title,artista:t.artist.name,ms:t.duration*1000,album:{src:"dz",id:t.album.id,t:t.album.title,a:t.artist.name,y:"",tipo:"album",cover:t.album.cover_big||t.album.cover_medium||""}}))),
+  musicasIT:q=>getJSON(`${IT}/search?term=${q}&entity=song&limit=20`).then(j=>j.results.map(t=>({src:"it",titulo:t.trackName,artista:t.artistName,ms:t.trackTimeMillis,album:{src:"it",id:t.collectionId,t:t.collectionName,a:t.artistName,y:(t.releaseDate||"").slice(0,4),tipo:"album",cover:capaIT(t.artworkUrl100),genre:t.primaryGenreName}}))),
+  artistasDZ:q=>dz(`/search/artist?q=${q}&limit=20`).then(j=>(j.data||[]).map(x=>({src:"dz",id:x.id,n:x.name,foto:x.picture_xl||x.picture_big||"",fas:x.nb_fan||0}))),
+  artistasIT:q=>getJSON(`${IT}/search?term=${q}&entity=musicArtist&limit=10`).then(j=>j.results.map(x=>({src:"it",id:x.artistId,n:x.artistName,genre:x.primaryGenreName}))),
+  artistasMB:q=>mb(`/artist?query=${q}&limit=12`).then(j=>(j.artists||[]).map(x=>({src:"mb",id:x.id,n:x.name,info:x.disambiguation||x.type||""})))
+};
+
+/* ===== Unificação ===== */
+function unirAlbuns(itens){
+  const mapa=new Map();
+  for(const it of itens){
+    if(!it.t)continue;
+    const k=albumKey(it.t,it.a);
+    let u=mapa.get(k);
+    if(!u){u={key:k,t:it.t,a:it.a,y:it.y,tipo:"",cover:"",coverRank:9,genre:"",ids:{},fontes:[]};mapa.set(k,u)}
+    if(it.y&&(!u.y||it.y<u.y))u.y=it.y;
+    if(!u.tipo||it.src==="dz")u.tipo=it.tipo||u.tipo;
+    if(it.cover&&RANK[it.src]<u.coverRank){u.cover=it.cover;u.coverRank=RANK[it.src]}
+    if(!u.genre&&it.genre)u.genre=it.genre;
+    if(it.n&&!u.n)u.n=it.n;
+    u.ids[it.src]=it.id;
+    if(!u.fontes.includes(it.src))u.fontes.push(it.src);
+  }
+  return [...mapa.values()].sort((a,b)=>b.fontes.length-a.fontes.length);
 }
-function guardarTrack(t){if(t.album)guardarAlbum({...t.album,artist:t.artist,release_date:""})}
+function unirArtistas(itens){
+  const mapa=new Map();
+  for(const it of itens){
+    if(!it.n)continue;
+    const k=artistKey(it.n);
+    let u=mapa.get(k);
+    if(!u){u={key:k,n:it.n,foto:"",fas:0,genre:"",ids:{},fontes:[]};mapa.set(k,u)}
+    if(it.foto&&!u.foto)u.foto=it.foto;
+    if(it.fas>u.fas)u.fas=it.fas;
+    if(it.genre&&!u.genre)u.genre=it.genre;
+    if(it.info&&!u.info)u.info=it.info;
+    u.ids[it.src]=it.id;
+    if(!u.fontes.includes(it.src))u.fontes.push(it.src);
+  }
+  return [...mapa.values()].sort((a,b)=>b.fontes.length-a.fontes.length);
+}
+function guardarAlbum(u){S.meta[u.key]={t:u.t,a:u.a,y:u.y||"",tipo:u.tipo||"album",cover:u.cover||"",genre:u.genre||"",ids:u.ids,fontes:u.fontes}}
+function guardarArtista(u){S.artists[u.key]={n:u.n,foto:u.foto||"",fas:u.fas||0,genre:u.genre||"",info:u.info||"",ids:u.ids,fontes:u.fontes}}
 
 /* ===== Componentes visuais ===== */
-function capaRG(id,t,px){
-  const m=S.meta[id]||{};
-  const [a,b]=cores(id);
+function capaAlbum(k,t,px){
+  const m=S.meta[k]||{};
+  const [a,b]=cores(k);
   const sz=px?`width:${px}px;height:${px}px;font-size:${Math.round(px*.34)}px`:`width:100%;aspect-ratio:1;font-size:40px`;
   const img=m.cover?`<img src="${m.cover}" alt="" loading="lazy" onerror="this.remove()">`:"";
   return `<div class="cover" style="${sz};background:linear-gradient(145deg,${a},${b})">${img}<span>${esc(ini(t))}</span></div>`;
 }
-function capaUrl(url,t,px,redonda){
+function capaFoto(url,t,px,redonda){
   const [a,b]=cores(t);
   const img=url?`<img src="${url}" alt="" loading="lazy" onerror="this.remove()">`:"";
   return `<div class="cover" style="width:${px}px;height:${px}px;font-size:${Math.round(px*.34)}px;background:linear-gradient(145deg,${a},${b})${redonda?";border-radius:50%":""}">${img}<span>${esc(ini(t))}</span></div>`;
 }
-function cardAlbum(m){return `<a class="card gc" href="#album-${m.id}" style="--c:${cores(m.id)[0]}">${capaRG(m.id,m.t,150)}<div class="t">${esc(m.t)}</div><div class="s">${esc(m.a)}${m.y?` · ${m.y}`:""}</div></a>`}
-function albumCard(x){guardarAlbum(x);return cardAlbum({id:x.id,t:x.title,a:x.artist?.name||"",y:(x.release_date||"").slice(0,4)})}
-function cardMeta(id){const m=S.meta[id]||{t:"Álbum",a:""};return cardAlbum({id,t:m.t,a:m.a,y:m.y})}
-function artistCard(a){return `<a class="card gc" href="#artist-${a.id}" style="--c:${cores(a.name)[0]}">${capaUrl(a.picture_xl||a.picture_big||"",a.name,150,true)}<div class="t">${esc(a.name)}</div><div class="s">${(a.nb_fan||0).toLocaleString("pt-BR")} fãs</div></a>`}
+function cardAlbum(u){return `<a class="card gc" href="#album-${u.key}" style="--c:${cores(u.key)[0]}">${capaAlbum(u.key,u.t,150)}<div class="t">${esc(u.t)}</div><div class="s">${esc(u.a)}${u.y?` · ${u.y}`:""}</div><div class="src">${u.fontes.map(f=>`<span>${f==="dz"?"Deezer":f==="it"?"iTunes":"MusicBrainz"}</span>`).join("")}</div></a>`}
+function cardArtista(u){return `<a class="card gc" href="#artist-${u.key}" style="--c:${cores(u.n)[0]}">${capaFoto(u.foto,u.n,150,true)}<div class="t">${esc(u.n)}</div><div class="s">${u.fas?u.fas.toLocaleString("pt-BR")+" fãs":esc(u.genre||u.info||"Artista")}</div></a>`}
+function cardMeta(k){const m=S.meta[k]||{t:"Álbum",a:""};return cardAlbum({key:k,t:m.t,a:m.a,y:m.y,fontes:m.fontes||[]})}
 function rateHTML(r=0){let h="";for(let i=1;i<=5;i++){const c=r>=i?"on":r>=i-.5?"half":"";h+=`<span class="rbtn"><i class="${c}">★</i><b class="l" data-v="${i-.5}"></b><b class="r" data-v="${i}"></b></span>`}return h}
 function estrelas(r){let h="";for(let i=1;i<=5;i++){const c=r>=i?"on":r>=i-.5?"half":"";h+=`<span class="st ${c}">★</span>`}return `<span class="stars">${h}</span>`}
 const erroHTML=()=>`<div class="empty">Não foi possível carregar agora. Tente de novo em alguns segundos.</div>`;
@@ -200,10 +245,10 @@ const erroHTML=()=>`<div class="empty">Não foi possível carregar agora. Tente 
 function homeView(){
   const recs=Object.entries(S.u).filter(([,v])=>v.d).sort((a,b)=>b[1].d.localeCompare(a[1].d)).slice(0,8);
   return `<h1>Início</h1><input class="search" id="hq" placeholder="Procure álbuns, EPs, músicas ou artistas" autocomplete="off">
-  <h2>Recentes do seu diário</h2>${recs.length?`<div class="grid">${recs.map(([id])=>cardMeta(id)).join("")}</div>`:`<div class="empty">Você ainda não marcou nada como ouvido. Use a busca para começar.</div>`}`;
+  <h2>Recentes do seu diário</h2>${recs.length?`<div class="grid">${recs.map(([k])=>cardMeta(k)).join("")}</div>`:`<div class="empty">Você ainda não marcou nada como ouvido. Use a busca para começar.</div>`}`;
 }
 
-/* ===== Buscar ===== */
+/* ===== Buscar: três fontes em paralelo, resultados aparecem conforme chegam ===== */
 function searchView(){
   return `<h1>Buscar</h1><input class="search" id="q" placeholder="Álbuns, EPs, músicas ou artistas" autocomplete="off" value="${esc(busca.q)}">
   <div class="chips">${[["tudo","Tudo"],["albuns","Álbuns e EPs"],["musicas","Músicas"],["artistas","Artistas"]].map(([k,l])=>`<button class="chip ${busca.f===k?"on":""}" data-fl="${k}">${l}</button>`).join("")}</div>
@@ -214,88 +259,121 @@ async function runSearch(){
   if(!res)return;
   if(q.length<2){res.innerHTML=`<div class="empty">Digite pelo menos 2 letras para buscar.</div>`;return}
   const tok=++buscaTok,f=busca.f,e=encodeURIComponent(q);
-  res.innerHTML=`<div class="load">Buscando…</div>`;
-  try{
-    const [al,mu,ar]=await Promise.all([
-      f==="tudo"||f==="albuns"?dz(`/search/album?q=${e}&limit=30`):null,
-      f==="tudo"||f==="musicas"?dz(`/search/track?q=${e}&limit=20`):null,
-      f==="tudo"||f==="artistas"?dz(`/search/artist?q=${e}&limit=20`):null
-    ]);
+  const pool={alb:[],mus:[],art:[]};
+  const pendentes=new Set();
+  const render=()=>{
     if(tok!==buscaTok)return;
+    const albuns=unirAlbuns(pool.alb);
+    const artistas=unirArtistas(pool.art);
+    albuns.forEach(guardarAlbum);artistas.forEach(guardarArtista);
+    salvar();
     let html="";
-    if(al){const l=(al.data||[]).filter(x=>f==="tudo"||f==="albuns");if(l.length)html+=`<h2>Álbuns e EPs</h2><div class="grid">${l.map(albumCard).join("")}</div>`}
-    if(mu){const l=mu.data||[];if(l.length){l.forEach(guardarTrack);html+=`<h2>Músicas</h2><div class="mlist">${l.map(t=>`<a class="row" href="#album-${t.album.id}">${capaRG(t.album.id,t.album.title,46)}<div class="grow"><div class="ttl">${esc(t.title)}</div><div class="sm mut" style="font-weight:700">${esc(t.artist.name)} · ${esc(t.album.title)}</div></div><span class="mut">›</span></a>`).join("")}</div>`}}
-    if(ar){const l=ar.data||[];if(l.length)html+=`<h2>Artistas</h2><div class="grid">${l.map(artistCard).join("")}</div>`}
-    res.innerHTML=html||`<div class="empty">Nada encontrado para "${esc(q)}".</div>`;
-  }catch(err){if(tok===buscaTok)res.innerHTML=erroHTML()}
+    if((f==="tudo"||f==="albuns")&&albuns.length)html+=`<h2>Álbuns e EPs</h2><div class="grid">${albuns.map(cardAlbum).join("")}</div>`;
+    if((f==="tudo"||f==="musicas")&&pool.mus.length){
+      const vistos=new Set();
+      const lista=pool.mus.filter(m=>{const c=norm(m.titulo)+"|"+norm(m.artista);if(vistos.has(c))return false;vistos.add(c);return true}).slice(0,30);
+      html+=`<h2>Músicas</h2><div class="mlist">${lista.map(m=>{const k=albumKey(m.album.t,m.album.a);return `<a class="row" href="#album-${k}">${capaAlbum(k,m.album.t,46).replace(/^<div class="cover"/,'<div class="cover"')}<div class="grow"><div class="ttl">${esc(m.titulo)}</div><div class="sm mut" style="font-weight:700">${esc(m.artista)} · ${esc(m.album.t)} · ${tempo(m.ms)}</div></div><span class="mut">›</span></a>`}).join("")}</div>`;
+    }
+    if((f==="tudo"||f==="artistas")&&artistas.length)html+=`<h2>Artistas</h2><div class="grid">${artistas.map(cardArtista).join("")}</div>`;
+    res.innerHTML=html||(pendentes.size?`<div class="load">Buscando nas fontes…</div>`:`<div class="empty">Nada encontrado para "${esc(q)}".</div>`);
+    if(pendentes.size&&html){res.insertAdjacentHTML("beforeend",`<div class="load" style="padding:14px">Buscando mais resultados…</div>`)}
+  };
+  const alvo=[];
+  if(f==="tudo"||f==="albuns"){alvo.push(["alb",fontes.albunsDZ(e)],["alb",fontes.albunsIT(e)],["alb",fontes.albunsMB(e)])}
+  if(f==="tudo"||f==="musicas"){alvo.push(["mus",fontes.musicasDZ(e)],["mus",fontes.musicasIT(e)])}
+  if(f==="tudo"||f==="artistas"){alvo.push(["art",fontes.artistasDZ(e)],["art",fontes.artistasIT(e)],["art",fontes.artistasMB(e)])}
+  res.innerHTML=`<div class="load">Buscando nas fontes…</div>`;
+  alvo.forEach(([campo,p])=>{
+    const id=Symbol();pendentes.add(id);
+    p.then(lista=>{
+      pool[campo].push(...lista);
+      if(campo==="mus")lista.forEach(m=>pool.alb.push(m.album));
+    }).catch(()=>{}).finally(()=>{pendentes.delete(id);render()});
+  });
+  if(!alvo.length)res.innerHTML=`<div class="empty">Escolha um filtro válido.</div>`;
 }
 
 /* ===== Página do álbum ===== */
-async function albumView(id){
-  const d=await dz(`/album/${id}`);
-  guardarAlbum(d);
-  const faixas=(d.tracks?.data||[]);
-  const generos=(d.genres?.data||[]).map(g=>g.name).slice(0,3);
-  const x=dd(id);
-  let mais=[];
-  try{mais=((await dz(`/artist/${d.artist.id}/albums?limit=12`)).data||[]).filter(r=>String(r.id)!==String(id))}catch(e){}
-  mais.forEach(guardarAlbum);
-  salvar();
-  setAmb(cores(id)[0]);
+async function faixasDe(m){
+  try{
+    if(m.ids.dz){const d=await dz(`/album/${m.ids.dz}`);return (d.tracks?.data||[]).map(t=>({t:t.title,ms:t.duration*1000}))}
+    if(m.ids.it){const j=await getJSON(`${IT}/lookup?id=${m.ids.it}&entity=song`);return j.results.filter(r=>r.wrapperType==="track").map(r=>({t:r.trackName,ms:r.trackTimeMillis}))}
+    if(m.ids.mb){const rel=(await mb(`/release?release-group=${m.ids.mb}&limit=1`)).releases||[];if(!rel[0])return[];const x=await mb(`/release/${rel[0].id}?inc=recordings`);return (x.media||[]).flatMap(md=>(md.tracks||[]).map(t=>({t:t.title,ms:t.length})))}
+  }catch(e){}
+  return [];
+}
+async function albumView(k){
+  const m=S.meta[k];
+  if(!m)return `<div class="empty">Abra este álbum pela busca para carregar os dados.</div>`;
+  setAmb(cores(k)[0]);
+  const x=dd(k);
+  const faixas=await faixasDe(m);
   const listas=S.listas.map((l,i)=>`<option value="${i}">${esc(l.nome)}</option>`).join("");
-  const fav=(P().fav||[]).includes(String(id));
-  const tipo=d.record_type?d.record_type.toUpperCase():"ÁLBUM";
-  const dur=faixas.reduce((s,t)=>s+(t.duration||0),0);
-  return `<div class="hero">${capaRG(id,d.title,230)}<div class="info">
-    <span class="pill">${esc([tipo,...generos].join(" · "))}</span>
-    <h1>${esc(d.title)}</h1>
-    <div style="font-size:18px;font-weight:700" class="mut"><a href="#artist-${d.artist.id}" style="border-bottom:2px solid currentColor">${esc(d.artist.name)}</a>${d.release_date?` · ${d.release_date.slice(0,4)}`:""}${dur?` · ${faixas.length} faixas · ${Math.round(dur/60)} min`:""}</div>
+  const fav=(P().fav||[]).includes(k);
+  const fontesTxt=(m.fontes||[]).map(f=>f==="dz"?"Deezer":f==="it"?"iTunes":"MusicBrainz").join(" · ");
+  return `<div class="hero">${capaAlbum(k,m.t,230)}<div class="info">
+    <span class="pill">${esc([(m.tipo||"álbum").toUpperCase(),m.genre].filter(Boolean).join(" · "))}</span>
+    <h1>${esc(m.t)}</h1>
+    <div style="font-size:18px;font-weight:700" class="mut">${esc(m.a)}${m.y?` · ${m.y}`:""}${faixas.length?` · ${faixas.length} faixas`:""}</div>
+    <div class="mut sm" style="font-weight:700;margin-top:6px">Dados de: ${esc(fontesTxt)}</div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin:20px 0">
       <button class="btn ${x.d?"on":""}" data-act="ouvi">${x.d?"✓ Ouvido":"Marcar como ouvido"}</button>
       <button class="btn ${x.w?"on":""}" data-act="quero">${x.w?"✓ Na fila":"+ Quero ouvir"}</button>
       <button class="btn ${x.l?"on":""}" data-act="curtir">${x.l?"♥ Curtido":"♡ Curtir"}</button>
       <button class="btn ${fav?"on":""}" data-act="fav">${fav?"★ Favorito":"☆ Favoritar"}</button>
     </div>
-    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap"><div style="display:flex" id="rate" data-id="${id}">${rateHTML(x.r)}</div><span class="mut" style="font-weight:700" id="rlab">${x.r?String(x.r).replace(".",",")+" de 5":"Sua nota"}</span></div>
+    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap"><div style="display:flex" id="rate" data-id="${k}">${rateHTML(x.r)}</div><span class="mut" style="font-weight:700" id="rlab">${x.r?String(x.r).replace(".",",")+" de 5":"Sua nota"}</span></div>
   </div></div>
-  ${faixas.length?`<h2>Faixas</h2><div class="mlist">${faixas.map((t,i)=>`<div class="row"><span class="num">${String(i+1).padStart(2,"0")}</span><div class="ttl grow">${esc(t.title)}</div><span class="mut sm">${tempo(t.duration)}</span></div>`).join("")}</div>`:`<div class="empty" style="margin-top:30px">Sem faixas cadastradas para este álbum.</div>`}
+  ${faixas.length?`<h2>Faixas</h2><div class="mlist">${faixas.map((t,i)=>`<div class="row"><span class="num">${String(i+1).padStart(2,"0")}</span><div class="ttl grow">${esc(t.t)}</div><span class="mut sm">${tempo(t.ms)}</span></div>`).join("")}</div>`:`<div class="empty" style="margin-top:30px">Sem faixas disponíveis para este álbum.</div>`}
   <h2>Sua resenha</h2><div class="mlist" style="padding:16px;background:#111"><textarea class="field" id="rev" placeholder="O que você achou deste álbum?">${esc(x.rev||"")}</textarea><div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="fab" data-act="rev">Salvar resenha</button></div></div>
-  ${S.listas.length?`<h2>Adicionar a uma lista</h2><div style="display:flex;gap:10px;flex-wrap:wrap"><select class="field" id="lsel" style="width:auto">${listas}</select><button class="btn" data-act="addLista">Adicionar</button></div>`:`<h2>Listas</h2><div class="empty">Crie uma lista na aba Listas do Perfil para adicionar álbuns.</div>`}
-  ${mais.length?`<h2>Mais de ${esc(d.artist.name)}</h2><div class="grid">${mais.map(r=>cardAlbum({id:r.id,t:r.title,a:d.artist.name,y:(r.release_date||"").slice(0,4)})).join("")}</div>`:""}`;
+  ${S.listas.length?`<h2>Adicionar a uma lista</h2><div style="display:flex;gap:10px;flex-wrap:wrap"><select class="field" id="lsel" style="width:auto">${listas}</select><button class="btn" data-act="addLista">Adicionar</button></div>`:`<h2>Listas</h2><div class="empty">Crie uma lista na aba Listas do Perfil para adicionar álbuns.</div>`}`;
 }
 function albumAct(a){
-  const id=location.hash.slice(7);
-  const d=dd(id);
+  const k=location.hash.slice(7);
+  const d=dd(k);
   if(a==="ouvi"){if(d.d){delete d.d;flash("Removido do diário")}else{d.d=hoje();flash("Registrado no diário")}}
   if(a==="quero"){d.w=!d.w;flash(d.w?"Adicionado à fila":"Removido da fila")}
   if(a==="curtir"){d.l=!d.l;flash(d.l?"Curtido":"Descurtido")}
-  if(a==="fav"){const p=P();const i=p.fav.indexOf(id);if(i>=0)p.fav.splice(i,1);else if(p.fav.length<4)p.fav.push(id);else{flash("Até 4 álbuns favoritos");return}}
+  if(a==="fav"){const p=P();const i=p.fav.indexOf(k);if(i>=0)p.fav.splice(i,1);else if(p.fav.length<4)p.fav.push(k);else{flash("Até 4 álbuns favoritos");return}}
   if(a==="rev"){d.rev=($("#rev").value||"").trim();flash("Resenha salva")}
-  if(a==="addLista"){const l=S.listas[+$("#lsel").value];if(l&&!l.ids.includes(id)){l.ids.push(id);flash(`Adicionado a "${l.nome}"`)}else flash("Já está nessa lista")}
-  salvar();
-  rota();
+  if(a==="addLista"){const l=S.listas[+$("#lsel").value];if(l&&!l.ids.includes(k)){l.ids.push(k);flash(`Adicionado a "${l.nome}"`)}else flash("Já está nessa lista")}
+  salvar();rota();
 }
 
 /* ===== Página do artista ===== */
-async function artistView(id){
-  const [a,alb,top]=await Promise.all([dz(`/artist/${id}`),dz(`/artist/${id}/albums?limit=100`),dz(`/artist/${id}/top?limit=10`).catch(()=>({data:[]}))]);
-  const foto=a.picture_xl||a.picture_big||a.picture_medium||"";
-  const [c1,c2]=cores(id);
+async function artistView(k){
+  const a=S.artists[k];
+  if(!a)return `<div class="empty">Abra este artista pela busca para carregar os dados.</div>`;
+  const [c1,c2]=cores(k);
   setAmb(c1);
-  (top.data||[]).forEach(guardarTrack);
+  let albuns=[],top=[];
+  if(a.ids.dz){
+    try{
+      const [alb,tp]=await Promise.all([dz(`/artist/${a.ids.dz}/albums?limit=100`),dz(`/artist/${a.ids.dz}/top?limit=5`).catch(()=>({data:[]}))]);
+      albuns=(alb.data||[]).map(x=>{const u={key:albumKey(x.title,a.n),t:x.title,a:a.n,y:(x.release_date||"").slice(0,4),tipo:x.record_type,cover:x.cover_xl||x.cover_big||"",ids:{dz:x.id},fontes:["dz"]};guardarAlbum({...u,genre:""});return u});
+      top=(tp.data||[]).map(t=>({t:t.title,al:albumKey(t.album.title,t.artist.name),ms:t.duration*1000,alb:t.album.title}));
+      (tp.data||[]).forEach(t=>S.meta[albumKey(t.album.title,t.artist.name)]||guardarAlbum({key:albumKey(t.album.title,t.artist.name),t:t.album.title,a:t.artist.name,y:"",tipo:"album",cover:t.album.cover_big||"",ids:{dz:t.album.id},fontes:["dz"]}));
+    }catch(e){}
+  }else if(a.ids.mb){
+    try{
+      const rgs=(await mb(`/release-group?artist=${a.ids.mb}&limit=100`))["release-groups"]||[];
+      albuns=unirAlbuns(rgs.map(r=>({src:"mb",id:r.id,t:r.title,a:a.n,y:(r["first-release-date"]||"").slice(0,4),tipo:(r["primary-type"]||"album").toLowerCase(),cover:`${CAA}/release-group/${r.id}/front-500`})));
+    }catch(e){}
+  }
+  albuns.forEach(u=>{if(!S.meta[u.key])guardarAlbum({...u,genre:""})});
+  const foto=a.foto||"";
   const banner=foto?`<div class="pban"><div class="art img" style="background-image:url(${foto})"></div></div>`:`<div class="pban"><div class="art" style="background:linear-gradient(135deg,${c1},${c2})"></div></div>`;
-  const avatar=foto?`<img src="${foto}" alt="${esc(a.name)}">`:`<div style="width:100%;height:100%;background:linear-gradient(145deg,${c1},${c2});display:grid;place-items:center;font-size:44px;font-weight:900">${esc(ini(a.name))}</div>`;
-  const lista=alb.data||[];
   const secoes=[["Álbuns","album"],["EPs","ep"],["Singles","single"]].map(([nome,tipo])=>{
-    const l=lista.filter(r=>r.record_type===tipo);
-    return l.length?`<h2>${nome}</h2><div class="grid">${l.map(r=>{guardarAlbum({...r,artist:{name:a.name}});return cardAlbum({id:r.id,t:r.title,a:a.name,y:(r.release_date||"").slice(0,4)})}).join("")}</div>`:"";
+    const l=albuns.filter(u=>(u.tipo||"").toLowerCase()===tipo);
+    return l.length?`<h2>${nome}</h2><div class="grid">${l.map(u=>cardAlbum({...u,fontes:u.fontes})).join("")}</div>`:"";
   }).join("");
-  const populares=(top.data||[]).length?`<h2>Músicas populares</h2><div class="mlist">${top.data.map((t,i)=>`<a class="row" href="#album-${t.album.id}">${capaRG(t.album.id,t.album.title,46)}<div class="grow"><div class="ttl">${esc(t.title)}</div><div class="sm mut" style="font-weight:700">${esc(t.album.title)}</div></div><span class="mut sm">${tempo(t.duration)}</span></a>`).join("")}</div>`:"";
-  return `${banner}
-  <div class="phead"><div class="pav">${avatar}</div>
+  const populares=top.length?`<h2>Músicas populares</h2><div class="mlist">${top.map(t=>`<a class="row" href="#album-${t.al}">${capaAlbum(t.al,t.alb,46)}<div class="grow"><div class="ttl">${esc(t.t)}</div><div class="sm mut" style="font-weight:700">${esc(t.alb)}</div></div><span class="mut sm">${tempo(t.ms)}</span></a>`).join("")}</div>`:"";
+  const info=[a.fas?a.fas.toLocaleString("pt-BR")+" fãs":"",a.genre,a.info].filter(Boolean).join(" · ");
+  return `${banner}<div class="phead"><div class="pav">${foto?`<img src="${foto}" alt="${esc(a.n)}">`:`<div style="width:100%;height:100%;background:linear-gradient(145deg,${c1},${c2});display:grid;place-items:center;font-size:44px;font-weight:900">${esc(ini(a.n))}</div>`}</div>
     <div class="pinfo"><span class="pill">Artista</span>
-      <h1 style="font-size:clamp(48px,8vw,84px);letter-spacing:-.05em;line-height:.95;margin:10px 0 8px">${esc(a.name)}</h1>
-      <div class="phandle">${(a.nb_fan||0).toLocaleString("pt-BR")} fãs · ${a.nb_album||lista.length} álbuns</div>
+      <h1 style="font-size:clamp(48px,8vw,84px);letter-spacing:-.05em;line-height:.95;margin:10px 0 8px">${esc(a.n)}</h1>
+      <div class="phandle">${esc(info||"Artista")}</div>
+      <div class="mut sm" style="font-weight:700;margin-top:6px">Dados de: ${esc(a.fontes.map(f=>f==="dz"?"Deezer":f==="it"?"iTunes":"MusicBrainz").join(" · "))}</div>
     </div></div>
   ${populares}${secoes||`<div class="empty" style="margin-top:30px">Nenhum lançamento encontrado.</div>`}`;
 }
@@ -304,7 +382,7 @@ async function artistView(id){
 function diaryList(){
   const e=Object.entries(S.u).filter(([,v])=>v.d).sort((a,b)=>b[1].d.localeCompare(a[1].d));
   if(!e.length)return `<div class="empty">Você ainda não marcou nenhum álbum como ouvido.</div>`;
-  return `<div class="mlist">${e.map(([id,v])=>{const m=S.meta[id]||{t:"Álbum",a:""};return `<a class="row" href="#album-${id}">${capaRG(id,m.t,50)}<div class="grow"><div class="ttl">${esc(m.t)}</div><div class="sm mut" style="font-weight:700">${esc(m.a)} · ${v.d}</div></div>${v.r?estrelas(v.r):""}</a>`}).join("")}</div>`;
+  return `<div class="mlist">${e.map(([k,v])=>{const m=S.meta[k]||{t:"Álbum",a:""};return `<a class="row" href="#album-${k}">${capaAlbum(k,m.t,50)}<div class="grow"><div class="ttl">${esc(m.t)}</div><div class="sm mut" style="font-weight:700">${esc(m.a)} · ${v.d}</div></div>${v.r?estrelas(v.r):""}</a>`}).join("")}</div>`;
 }
 
 /* ===== Perfil ===== */
@@ -321,13 +399,13 @@ function perfilView(){
   const tabs=[["perfil","Perfil"],["avaliacoes","Avaliações"],["diario","Diário"],["listas","Listas"]];
   let corpo="";
   if(aba==="perfil"){
-    const slots=[0,1,2,3].map(i=>fav[i]?`<a class="fitem" href="#album-${fav[i]}">${capaRG(fav[i],(S.meta[fav[i]]||{}).t,null)}<div class="ttl" style="margin-top:8px">${esc((S.meta[fav[i]]||{}).t||"")}</div></a>`:`<div class="fvazio">Vazio</div>`).join("");
+    const slots=[0,1,2,3].map(i=>fav[i]?`<a class="fitem" href="#album-${fav[i]}">${capaAlbum(fav[i],(S.meta[fav[i]]||{}).t,null)}<div class="ttl" style="margin-top:8px">${esc((S.meta[fav[i]]||{}).t||"")}</div></a>`:`<div class="fvazio">Vazio</div>`).join("");
     const mus=p.musicas.length?`<div class="mlist">${p.musicas.map((m,i)=>`<div class="row"><span class="num">${String(i+1).padStart(2,"0")}</span><div class="ttl grow">${esc(m)}</div></div>`).join("")}</div>`:`<div class="empty">Adicione músicas favoritas em Editar.</div>`;
     const recs=av.slice(-5).reverse();
-    const rec=recs.length?`<div class="mlist">${recs.map(([id,v])=>{const m=S.meta[id]||{t:"Álbum",a:""};return `<a class="row" href="#album-${id}">${capaRG(id,m.t,46)}<div class="grow"><div class="ttl">${esc(m.t)}</div><div class="sm mut" style="font-weight:700">${esc(m.a)}</div></div>${estrelas(v.r)}</a>`}).join("")}</div>`:`<div class="empty">Nenhuma avaliação ainda.</div>`;
+    const rec=recs.length?`<div class="mlist">${recs.map(([k,v])=>{const m=S.meta[k]||{t:"Álbum",a:""};return `<a class="row" href="#album-${k}">${capaAlbum(k,m.t,46)}<div class="grow"><div class="ttl">${esc(m.t)}</div><div class="sm mut" style="font-weight:700">${esc(m.a)}</div></div>${estrelas(v.r)}</a>`}).join("")}</div>`:`<div class="empty">Nenhuma avaliação ainda.</div>`;
     corpo=`<div class="pgrid"><div><h3 class="sec">Álbuns favoritos</h3><div class="favs">${slots}</div><h3 class="sec" style="margin-top:34px">Músicas favoritas</h3>${mus}</div><aside><h3 class="sec">Avaliações recentes</h3>${rec}</aside></div>`;
   }else if(aba==="avaliacoes"){
-    corpo=av.length?`<div class="mlist" style="margin-top:30px">${[...av].reverse().map(([id,v])=>{const m=S.meta[id]||{t:"Álbum",a:""};return `<a class="row" href="#album-${id}" style="display:block"><div style="display:flex;align-items:center;gap:14px">${capaRG(id,m.t,46)}<div class="grow"><div class="ttl">${esc(m.t)}</div><div class="sm mut" style="font-weight:700">${esc(m.a)}</div></div>${estrelas(v.r)}</div>${v.rev?`<div style="font-weight:600;padding:10px 0 0 60px;line-height:1.45">${esc(v.rev)}</div>`:""}</a>`}).join("")}</div>`:`<div class="empty" style="margin-top:30px">Você ainda não avaliou nenhum álbum.</div>`;
+    corpo=av.length?`<div class="mlist" style="margin-top:30px">${[...av].reverse().map(([k,v])=>{const m=S.meta[k]||{t:"Álbum",a:""};return `<a class="row" href="#album-${k}" style="display:block"><div style="display:flex;align-items:center;gap:14px">${capaAlbum(k,m.t,46)}<div class="grow"><div class="ttl">${esc(m.t)}</div><div class="sm mut" style="font-weight:700">${esc(m.a)}</div></div>${estrelas(v.r)}</div>${v.rev?`<div style="font-weight:600;padding:10px 0 0 60px;line-height:1.45">${esc(v.rev)}</div>`:""}</a>`}).join("")}</div>`:`<div class="empty" style="margin-top:30px">Você ainda não avaliou nenhum álbum.</div>`;
   }else if(aba==="diario"){
     corpo=`<div style="margin-top:30px">${diaryList()}</div>`;
   }else{
@@ -340,7 +418,7 @@ function perfilView(){
 }
 function compartilhar(){
   const p=P();
-  const favs=(p.fav||[]).map(id=>(S.meta[id]||{}).t).filter(Boolean).join(", ")||"—";
+  const favs=(p.fav||[]).map(k=>(S.meta[k]||{}).t).filter(Boolean).join(", ")||"—";
   const txt=`${p.nome} (@${p.handle}) no Acetato\n\nÁlbuns favoritos: ${favs}\nMúsicas favoritas: ${p.musicas.join(", ")||"—"}`;
   if(navigator.share){navigator.share({title:"Acetato",text:txt}).catch(()=>{});return}
   navigator.clipboard?.writeText(txt).then(()=>flash("Perfil copiado")).catch(()=>flash("Não foi possível copiar"));
@@ -352,7 +430,7 @@ function listaView(i){
   if(!l)return `<div class="empty">Lista não encontrada.</div>`;
   return `<span class="pill">Lista</span><h1 style="margin-top:12px">${esc(l.nome)}</h1>
   <div style="display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 22px"><input class="field" id="lnome" value="${esc(l.nome)}" style="flex:1;min-width:200px"><button class="btn" data-lst="ren" data-i="${i}">Renomear</button><button class="btn" data-lst="del" data-i="${i}" style="color:#ff5f7e">${listaDel===i?"Confirmar exclusão":"Excluir lista"}</button></div>
-  ${l.ids.length?`<div class="grid">${l.ids.map(id=>{const m=S.meta[id]||{t:"Álbum",a:""};return `<div style="position:relative">${cardAlbum({id,t:m.t,a:m.a,y:m.y})}<button data-lst="rm" data-i="${i}" data-id="${id}" aria-label="Remover" style="position:absolute;top:10px;right:10px;z-index:3;width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,.6);font-weight:800">×</button></div>`}).join("")}</div>`:`<div class="empty">Esta lista está vazia. Adicione álbuns pela página de cada um.</div>`}`;
+  ${l.ids.length?`<div class="grid">${l.ids.map(k=>{const m=S.meta[k]||{t:"Álbum",a:""};return `<div style="position:relative">${cardAlbum({key:k,t:m.t,a:m.a,y:m.y,fontes:m.fontes||[]})}<button data-lst="rm" data-i="${i}" data-id="${k}" aria-label="Remover" style="position:absolute;top:10px;right:10px;z-index:3;width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,.6);font-weight:800">×</button></div>`}).join("")}</div>`:`<div class="empty">Esta lista está vazia. Adicione álbuns pela página de cada um.</div>`}`;
 }
 function listAct(el){
   const a=el.dataset.lst,i=+el.dataset.i;
@@ -382,7 +460,7 @@ function renderEditor(){
     <div class="esec"><h3 class="sec">Músicas favoritas · uma por linha, até 10</h3>
       <textarea class="field" data-f="musicasTxt" style="min-height:160px">${esc(e.musicasTxt??e.musicas.join("\n"))}</textarea></div>
     <div class="esec"><h3 class="sec">Álbuns favoritos</h3><p class="mut sm">Na página de qualquer álbum, toque em ☆ Favoritar para escolhê-lo (até 4).</p>
-      <div class="favs">${[0,1,2,3].map(i=>e.fav[i]?`<div class="fitem">${capaRG(e.fav[i],(S.meta[e.fav[i]]||{}).t,null)}</div>`:`<div class="fvazio">Vazio</div>`).join("")}</div></div>
+      <div class="favs">${[0,1,2,3].map(i=>e.fav[i]?`<div class="fitem">${capaAlbum(e.fav[i],(S.meta[e.fav[i]]||{}).t,null)}</div>`:`<div class="fvazio">Vazio</div>`).join("")}</div></div>
   </div>`;
   document.body.style.overflow="hidden";
 }
@@ -420,7 +498,7 @@ window.addEventListener("hashchange",rota);
 /* ===== Eventos ===== */
 document.addEventListener("input",e=>{
   const t=e.target;
-  if(t.id==="q"){busca.q=t.value;clearTimeout(hqT);hqT=setTimeout(runSearch,250);return}
+  if(t.id==="q"){busca.q=t.value;clearTimeout(hqT);hqT=setTimeout(runSearch,300);return}
   if(t.dataset&&t.dataset.f&&EDIT)EDIT[t.dataset.f]=t.value;
 });
 document.addEventListener("keydown",e=>{
@@ -456,7 +534,7 @@ document.addEventListener("click",e=>{
   if(fl){busca.f=fl.dataset.fl;document.querySelectorAll("[data-fl]").forEach(c=>c.classList.toggle("on",c===fl));runSearch();return}
   const v=t.closest("#rate [data-v]");
   if(v){
-    const id=$("#rate").dataset.id;const d=dd(id);const val=+v.dataset.v;
+    const k=$("#rate").dataset.id;const d=dd(k);const val=+v.dataset.v;
     d.r=d.r===val?0:val;if(!d.r)delete d.r;
     salvar();
     $("#rate").innerHTML=rateHTML(d.r);
