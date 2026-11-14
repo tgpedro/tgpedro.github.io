@@ -153,6 +153,7 @@ textarea.field{min-height:100px;resize:vertical;font-weight:500}
   .ebody{padding:18px 14px 60px}
   .flash{top:70px}
 }
+.card>.cover{border-radius:0;box-shadow:none}.card .info{padding:12px 14px 16px}.ta{font-weight:800;font-size:16px;letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sa{font-size:13px;color:rgba(255,255,255,.7);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cover img{width:100%;height:100%;object-fit:cover;display:block}
 </style>
 </head>
 <body>
@@ -269,7 +270,7 @@ function capaFoto(url,t,px,redonda){
   const img=url?`<img src="${url}" alt="" loading="lazy" onerror="this.remove()">`:"";
   return `<div class="cover" style="width:${px}px;height:${px}px;font-size:${Math.round(px*.34)}px;background:linear-gradient(145deg,${a},${b})${redonda?";border-radius:50%":""}">${img}<span>${esc(ini(t))}</span></div>`;
 }
-function cardAlbum(u){return `<a class="card gc" href="#album-${u.key}" style="--c:${cores(u.key)[0]}">${capaAlbum(u.key,u.t,150)}<div class="t">${esc(u.t)}</div><div class="s">${esc(u.a)}${u.y?` · ${u.y}`:""}</div><div class="src">${u.fontes.map(f=>`<span>${f==="dz"?"Deezer":f==="it"?"iTunes":"MusicBrainz"}</span>`).join("")}</div></a>`}
+function cardAlbum(u){return `<a class="card" href="#album-${u.key}" style="--c:${cores(u.key)[0]}">${capaAlbum(u.key,u.t,null)}<div class="info"><div class="ta">${esc(u.t)}</div><div class="sa">${esc(u.a)}${u.y?` · ${u.y}`:""}</div></div></a>`}
 function cardArtista(u){return `<a class="card gc" href="#artist-${u.key}" style="--c:${cores(u.n)[0]}">${capaFoto(u.foto,u.n,150,true)}<div class="t">${esc(u.n)}</div><div class="s">${esc(u.genre||u.info||"Artista")}</div></a>`}
 function cardMeta(k){const m=S.meta[k]||{t:"Álbum",a:""};return cardAlbum({key:k,t:m.t,a:m.a,y:m.y,fontes:m.fontes||[]})}
 function rateHTML(r=0){let h="";for(let i=1;i<=5;i++){const c=r>=i?"on":r>=i-.5?"half":"";h+=`<span class="rbtn"><i class="${c}">★</i><b class="l" data-v="${i-.5}"></b><b class="r" data-v="${i}"></b></span>`}return h}
@@ -397,7 +398,8 @@ async function artistView(k){
   }
   albuns.forEach(u=>{if(!S.meta[u.key])guardarAlbum({...u,genre:""})});
   const foto=a.foto||"";
-  const banner=foto?`<div class="pban"><div class="art img" style="background-image:url(${foto})"></div></div>`:`<div class="pban"><div class="art" style="background:linear-gradient(135deg,${c1},${c2})"></div></div>`;
+  const fundo=albuns.find(u=>u.cover)?.cover||foto;
+  const banner=fundo?`<div class="pban"><div class="art img" style="background-image:url(${fundo})"></div></div>`:`<div class="pban"><div class="art" style="background:linear-gradient(135deg,${c1},${c2})"></div></div>`;
   const secoes=[["Álbuns","album"],["EPs","ep"],["Singles","single"]].map(([nome,tipo])=>{
     const l=albuns.filter(u=>(u.tipo||"").toLowerCase()===tipo);
     return l.length?`<h2>${nome}</h2><div class="grid">${l.map(u=>cardAlbum({...u,fontes:u.fontes})).join("")}</div>`:"";
