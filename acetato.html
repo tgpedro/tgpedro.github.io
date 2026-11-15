@@ -580,12 +580,38 @@ h3.sec{font-size:12px;letter-spacing:.1em}
 .ap-sim .im{width:100%;aspect-ratio:1;border-radius:50%;background:linear-gradient(145deg,#8B5CF6,#B794F6) center/cover no-repeat;display:grid;place-items:center;font-weight:900;font-size:36px;box-shadow:0 14px 34px rgba(0,0,0,.55);transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s}
 .ap-sim:hover .im{transform:translateY(-6px) scale(1.04);box-shadow:0 30px 60px rgba(0,0,0,.7),0 0 0 2px rgba(255,255,255,.35)}
 .ap-sim .t{margin-top:12px;font-weight:800;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-/* Desktop sem banner: foto em cartão ao lado do nome (não estica nem cobre o rosto) */
+/* Página do artista no PC: estilo Apple Music (hero largo, nome centralizado, botões redondos) */
 @media(min-width:821px){
+  .ap-hero{height:min(78vh,620px);min-height:500px}
+  .ap-shade{background:linear-gradient(180deg,transparent 40%,color-mix(in srgb,var(--apbg) 75%,transparent) 72%,var(--apbg) 98%),linear-gradient(180deg,rgba(0,0,0,.5),transparent 24%)}
+  .ap-hbody{align-items:center;text-align:center;bottom:26px;max-width:900px}
+  .ap-hbody .atv-tag{display:none}
+  .ap-name{font-size:calc(clamp(44px,6.4vw,96px)*var(--asz));text-align:center}
+  .ap-btns{justify-content:center;gap:14px}
   .ap-hero.nob::before{content:"";position:absolute;inset:-60px;background:var(--hero,none) center/cover no-repeat;filter:blur(70px) saturate(150%) brightness(.5);transform:scale(1.1)}
-  .ap-hero.nob .ap-img{z-index:2;inset:auto;top:auto;bottom:38px;left:max(18px,calc(50% - 472px));width:280px;height:280px;border-radius:26px;background-size:cover;background-position:50% 20%;box-shadow:0 30px 70px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.14);animation:none;transform:none}
-  .ap-hero.nob .ap-hbody{padding-left:330px}
+  .ap-hero.nob .ap-img{inset:0 auto 0 50%;width:auto;height:100%;aspect-ratio:1/1;transform:translateX(-50%);animation:none;background-size:cover;background-position:50% 20%;-webkit-mask-image:linear-gradient(90deg,transparent,#000 24%,#000 76%,transparent);mask-image:linear-gradient(90deg,transparent,#000 24%,#000 76%,transparent)}
 }
+.ap-name{color:color-mix(in srgb,var(--ac,#fff) 55%,#fff)}
+.gl.ap-play{width:58px;height:58px;padding:0;justify-content:center;background:color-mix(in srgb,var(--ac,#fff) 75%,#fff);color:#111;border-color:transparent}
+.gl.ic.on{background:color-mix(in srgb,var(--ac,#888) 70%,#fff);color:#111}
+.ap-btns .gl.ic{font-size:18px}
+#apabout{scroll-margin-top:90px}
+/* Latest release + Top songs lado a lado */
+.ap-row2{display:block}
+@media(min-width:960px){.ap-row2{display:grid;grid-template-columns:minmax(260px,330px) minmax(0,1fr);column-gap:44px;align-items:start}}
+.ap-late{padding:0;background:none;border:0;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;align-items:flex-end}
+.ap-late:hover{background:none;transform:none}
+.ap-late .cover{border-radius:8px}
+.ap-latei .d{font-size:12px;color:var(--mut);font-weight:700}
+.ap-latei .t{font-size:17px;margin-top:4px;letter-spacing:-.2px}
+.ap-latei .s{font-size:17px;color:var(--mut);font-weight:600;margin-top:2px}
+.ap-top{gap:0}
+.ap-tr{border-radius:0;padding:9px 4px;border-bottom:1px solid rgba(255,255,255,.1)}
+.ap-tr:hover{background:rgba(255,255,255,.05)}
+.ap-tl .cover{border-radius:5px;box-shadow:none}
+.ap-more{flex-shrink:0;background:none;border:0;color:var(--mut);font-size:20px;letter-spacing:1px;line-height:1;padding:6px 10px;border-radius:10px;cursor:pointer}
+.ap-more:hover{background:rgba(255,255,255,.1);color:#fff}
+.ap .carrossel .card>.cover{border-radius:8px}
 .ap-hero:not(.nob) .ap-img{background-position:50% 30%}
 /* Fundo da página do artista com a cor da foto/banner até o fim */
 .ap-main{padding-bottom:110px}
@@ -791,7 +817,7 @@ function capaFoto(url,t,px,redonda){
   const img=url?`<img src="${url}" alt="" loading="lazy" onerror="this.remove()">`:"";
   return `<div class="cover" style="width:${px}px;height:${px}px;font-size:${Math.round(px*.34)}px;background:linear-gradient(145deg,${a},${b})${redonda?";border-radius:50%":""}">${img}<span>${esc(ini(t))}</span></div>`;
 }
-function cardAlbum(u){return `<a class="card" href="#album-${u.key}" style="--c:${cores(u.key)[0]}">${capaAlbum(u.key,u.t,null)}<div class="info"><div class="ta">${esc(u.t)}</div><div class="sa">${esc(u.a)}${u.y?` · ${u.y}`:""}</div></div></a>`}
+function cardAlbum(u){return `<a class="card" href="#album-${u.key}" style="--c:${cores(u.key)[0]}">${capaAlbum(u.key,u.t,null)}<div class="info"><div class="ta">${esc(u.t)}</div><div class="sa">${u.solo?esc(u.y||""):`${esc(u.a)}${u.y?` · ${u.y}`:""}`}</div></div></a>`}
 function cardArtista(u){return `<a class="card gc" href="#artist-${u.key}" style="--c:${cores(u.n)[0]}">${capaFoto(u.foto,u.n,150,true)}<div class="t">${esc(u.n)}</div><div class="s">${esc(u.genre||u.info||"Artist")}</div></a>`}
 function cardMeta(k){const m=S.meta[k]||{t:"Album",a:""};return cardAlbum({key:k,t:m.t,a:m.a,y:m.y,fontes:m.fontes||[]})}
 function rateHTML(r=0){let h="";for(let i=1;i<=5;i++){const c=r>=i?"on":r>=i-.5?"half":"";h+=`<span class="rbtn"><i class="${c}">★</i><b class="l" data-v="${i-.5}"></b><b class="r" data-v="${i}"></b></span>`}return h}
@@ -1068,22 +1094,22 @@ async function artistView(k){
     const ord=({new:(x,y)=>por(x,y),old:(x,y)=>por(y,x),az:(x,y)=>String(x.t).localeCompare(String(y.t))})[sv]||por;
     return grupos.map(([nome,f])=>{
       const l=todos.filter(f).sort(ord);
-      return l.length?`<div class="sec-h"><h2>${nome} <span class="cnt">${l.length}</span></h2></div><div class="carrossel" data-keep>${l.map(u=>cardAlbum({...u,fontes:u.fontes||[]})).join("")}</div>`:"";
+      return l.length?`<div class="sec-h"><h2>${nome} <span class="cnt">${l.length}</span></h2></div><div class="carrossel" data-keep>${l.map(u=>cardAlbum({...u,fontes:u.fontes||[],solo:true})).join("")}</div>`:"";
     }).join("");
   };
   window.__apDiscos=discosHTML;
   const sv=window.__apSort||"new";
   const discos=discosHTML(sv);
   const barra=todos.length>1?`<div class="apbar"><span class="mut sm" style="font-weight:700">Sort releases by</span>${xsel("apsort",[["new","Newest first"],["old","Oldest first"],["az","Title A–Z"]],sv)}</div>`:"";
-  const late=ult?`<div class="sec-h"><h2>Latest release</h2></div>
-    <a class="ap-late" href="#album-${ult.key}">${capaAlbum(ult.key,ult.t,132)}<div class="ap-latei"><span class="pill">${tipoLabel(ult.tipo)}${ult.d?" · "+esc(fmtData(ult.d)):""}</span><div class="t">${esc(ult.t)}</div><div class="s">${esc(a.n)}</div></div><span class="ap-chev">›</span></a>`:"";
-  const tops=D.top.length?`<div class="sec-h"><h2>Top songs</h2></div><div class="ap-top">${D.top.map((t,i)=>`<div class="ap-tr"><span class="n">${i+1}</span><a class="ap-tl" href="#album-${t.al}">${capaAlbum(t.al,t.alb,50)}<span class="ap-tt"><b>${esc(t.t)}</b><i>${esc(t.alb)}</i></span></a><span class="mut sm ap-dur">${tempo(t.ms)}</span><button class="shbtn" data-aplay="${i}" aria-label="Preview, video and links" title="Preview, video and links" style="width:32px;height:32px;font-size:11px;padding-left:2px">▶</button></div>`).join("")}</div>`:"";
+  const late=ult?`<div class="ap-lw"><div class="sec-h"><h2>Latest release</h2></div>
+    <a class="ap-late" href="#album-${ult.key}">${capaAlbum(ult.key,ult.t,160)}<div class="ap-latei"><div class="d">${ult.d?esc(fmtData(ult.d)):""}</div><div class="t">${esc(ult.t)}</div><div class="s">${tipoLabel(ult.tipo)}</div></div></a></div>`:"";
+  const tops=D.top.length?`<div class="ap-tw"><div class="sec-h"><h2>Top songs</h2></div><div class="ap-top">${D.top.map((t,i)=>{const yy=((D.albuns.find(u=>u.key===t.al)||{}).y)||"";return `<div class="ap-tr"><a class="ap-tl" href="#album-${t.al}">${capaAlbum(t.al,t.alb,44)}<span class="ap-tt"><b>${esc(t.t)}</b><i>${esc(t.alb)}${yy?" · "+yy:""}</i></span></a><button class="ap-more" data-aplay="${i}" aria-label="Preview, video and links" title="Preview, video and links">···</button></div>`}).join("")}</div></div>`:"";
   const sim=D.rel.length?`<div class="sec-h"><h2>Similar artists</h2></div><div class="carrossel sim" data-keep>${D.rel.map(o=>`<a class="ap-sim" href="#artist-${o.key}"><div class="im" style="background-image:url('${o.foto}')">${o.foto?"":esc(ini(o.n))}</div><div class="t">${esc(o.n)}</div></a>`).join("")}</div>`:"";
   const nAlb=todos.filter(grupos[0][1]).length,nSin=todos.filter(u=>/single|ep/.test(tipoDe(u))).length;
   const kp=(n,l)=>`<div class="kpi"><strong>${n}</strong><span>${l}</span></div>`;
   const banBtns=`<label class="btn" style="cursor:pointer">🖼 Change banner<input id="apbanup" type="file" accept="image/*" hidden></label>${(S.banners||{})[k]?`<button class="btn" data-apbanrm="${k}">Restore original banner</button>`:""}`;
   const links=[a.ids.dz?`<a class="btn" href="https://www.deezer.com/artist/${a.ids.dz}" target="_blank" rel="noopener">Deezer ↗</a>`:"",a.ids.sp?`<a class="btn" href="https://open.spotify.com/artist/${a.ids.sp}" target="_blank" rel="noopener">Spotify ↗</a>`:"",`<a class="btn" href="https://music.apple.com/search?term=${encodeURIComponent(a.n)}" target="_blank" rel="noopener">Apple Music ↗</a>`,banBtns].join("");
-  const sobre=`<div class="sec-h"><h2>About</h2></div><div class="kpis">${kp(a.fas?fmtFas(a.fas):"—","Fans")}${kp(nAlb,"Albums")}${kp(nSin,"Singles & EPs")}${kp(desde||"—","Active since")}</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">${links}</div>`;
+  const sobre=`<div class="sec-h" id="apabout"><h2>About</h2></div><div class="kpis">${kp(a.fas?fmtFas(a.fas):"—","Fans")}${kp(nAlb,"Albums")}${kp(nSin,"Singles & EPs")}${kp(desde||"—","Active since")}</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">${links}</div>`;
   setTimeout(()=>{if(document.querySelector(`.ap[data-k="${k}"]`))apBg(D.ac||c1);apTema(k,hero)},0);
   return `<div class="ap" data-k="${k}" data-fi="${fi}" style="--ac:${D.ac||c1};--af:'${F.n}';--aw:${F.w};--ai:${F.i?"italic":"normal"};--als:${F.ls};--asz:${F.sz}">
   <section class="ap-hero${ban?"":" nob"}"${hero?` style="--hero:url('${hero}')"`:""}><div class="ap-img" style="${hero?`background-image:url('${hero}')`:`background:linear-gradient(135deg,${c1},#000)`}"></div><div class="ap-shade"></div>
@@ -1091,12 +1117,13 @@ async function artistView(k){
       <h1 class="ap-name${F.up?" up":""}">${esc(a.n)}</h1>
       ${meta?`<div class="ap-meta">${esc(meta)}</div>`:""}
       <div class="ap-btns">
-        ${D.top.length?`<button class="gl pri" data-aplay="0">▶ Play</button>`:""}
-        <button class="gl ${seg?"on":""}" data-apfollow="${k}">${seg?"✓ Following":"+ Follow"}</button>
+        <button class="gl ic" data-apabout aria-label="About" title="About"><span style="font-family:Georgia,serif;font-style:italic;font-weight:700;font-size:20px">i</span></button>
+        ${D.top.length?`<button class="gl ap-play" data-aplay="0" aria-label="Play" title="Play"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="margin-left:3px"><path d="M8 5v14l11-7z"/></svg></button>`:""}
+        <button class="gl ic ${seg?"on":""}" data-apfollow="${k}" aria-label="Follow" title="Follow">${seg?"★":"☆"}</button>
         <button class="gl ic" data-apshare aria-label="Share" title="Share"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M8 11H6.5A1.5 1.5 0 0 0 5 12.5v7A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5v-7A1.5 1.5 0 0 0 17.5 11H16"/></svg></button>
       </div>
     </div></section>
-  <div class="ap-main">${late}${tops}${barra}<div id="apdiscos">${discos||`<div class="empty" style="margin-top:30px">No releases found.</div>`}</div>${sim}${sobre}</div></div>`;
+  <div class="ap-main"><div class="ap-row2">${late}${tops}</div>${barra}<div id="apdiscos">${discos||`<div class="empty" style="margin-top:30px">No releases found.</div>`}</div>${sim}${sobre}</div></div>`;
 }
 function apBg(c){document.documentElement.style.setProperty("--bg",`color-mix(in srgb,${c} 14%,#000)`)}
 async function bannerDe(k,a){
@@ -1138,7 +1165,7 @@ document.addEventListener("click",e=>{
     if(i>=0){S.seguindo.splice(i,1);flash("Unfollowed")}
     else{const a=S.artists[k]||{};S.seguindo.push({k,n:a.n||"",dz:(a.ids||{}).dz||""});flash("Following")}
     const on=S.seguindo.some(s=>s.k===k);
-    fo.textContent=on?"✓ Following":"+ Follow";fo.classList.toggle("on",on);
+    fo.textContent=on?"★":"☆";fo.classList.toggle("on",on);
     salvar();return;
   }
   if(t.closest("[data-apshare]")&&ap){
@@ -1396,6 +1423,7 @@ function xsel(id,opts,cur){
 document.addEventListener("click",e=>{
   const t=e.target,b=t.closest&&t.closest(".xs-btn"),op=t.closest&&t.closest(".xs-o"),br=t.closest&&t.closest("[data-apbanrm]");
   document.querySelectorAll(".xsel.open").forEach(x=>{if(!b||x!==b.parentNode)x.classList.remove("open")});
+  if(t.closest&&t.closest("[data-apabout]")){const el=document.getElementById("apabout");if(el)el.scrollIntoView({behavior:"smooth",block:"start"});return}
   if(br){const k=br.dataset.apbanrm;if(S.banners)delete S.banners[k];salvar();rota();flash("Original banner restored");return}
   if(b){const x=b.parentNode,abre=x.classList.toggle("open");if(abre){const r=b.getBoundingClientRect(),baixo=innerHeight-r.bottom;x.classList.toggle("up",baixo<280&&r.top>baixo)}return}
   if(op){const x=op.closest(".xsel");x.dataset.v=op.dataset.xv;x.querySelector(".xs-l").textContent=op.textContent;x.querySelectorAll(".xs-o").forEach(y=>y.classList.toggle("on",y===op));x.classList.remove("open");x.dispatchEvent(new CustomEvent("xselchange",{bubbles:true,detail:op.dataset.xv}))}
