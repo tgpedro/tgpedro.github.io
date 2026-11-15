@@ -449,6 +449,55 @@ img{max-width:100%}
 .chip.on{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff}
 .carrossel .card:hover{transform:translateY(-6px) scale(1.03)}
 @media(max-width:640px){.hero-home{height:300px}}
+</style><style>
+/* ===== Apple TV look ===== */
+#hq{display:none}
+.gl{display:inline-flex;align-items:center;gap:8px;padding:13px 24px;border-radius:999px;font-weight:800;font-size:15px;color:#fff;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 8px 24px rgba(0,0,0,.3);transition:transform .2s,background .2s}
+.gl:hover{background:rgba(255,255,255,.28);transform:scale(1.04)}.gl.pri{background:#fff;color:#000}.gl.pri:hover{background:#fff}
+.atv{position:relative;width:100vw;margin:-84px 0 14px calc(50% - 50vw);height:min(80vh,680px);min-height:460px;overflow:hidden;background:#000}
+.atv-s{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity .9s ease,visibility .9s}.atv-s.on{opacity:1;visibility:visible}
+.atv-bg{position:absolute;inset:-60px;background-size:cover;background-position:center;filter:blur(70px) saturate(170%) brightness(.8);transform:scale(1.1)}
+.atv-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,0) 30%,rgba(0,0,0,.55) 75%,#000)}
+.atv-body{position:absolute;left:0;right:0;bottom:64px;max-width:1080px;margin:0 auto;padding:0 28px;display:flex;align-items:flex-end;gap:36px}
+.atv-art{width:clamp(180px,26vw,330px);aspect-ratio:1;border-radius:22px;object-fit:cover;box-shadow:0 40px 90px rgba(0,0,0,.65),0 0 0 1px rgba(255,255,255,.12);flex-shrink:0;transform:translateY(10px);transition:transform 1s}
+.atv-s.on .atv-art{transform:none}
+.atv-info{min-width:0;padding-bottom:6px}
+.atv-tag{font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.75)}
+.atv-t{font-size:clamp(32px,6vw,68px);font-weight:900;letter-spacing:-.04em;line-height:1;margin:10px 0 8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.atv-a{font-size:clamp(16px,2.2vw,22px);font-weight:700;color:rgba(255,255,255,.8)}
+.atv-b{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.atv-dots{position:absolute;left:0;right:0;bottom:26px;display:flex;justify-content:center;gap:8px;z-index:3}
+.atv-dots button{width:8px;height:8px;border-radius:50%;padding:0;background:rgba(255,255,255,.35);transition:all .3s}.atv-dots button.on{width:26px;border-radius:4px;background:#fff}
+.sec-h h2::before{display:none}.sec-h h2{font-size:22px;letter-spacing:-.5px}.sec-h h2::after{content:"›";color:var(--mut);font-weight:700;margin-left:6px}
+.carrossel{gap:16px}.carrossel>*{flex-basis:200px}
+.carrossel .card{background:none;box-shadow:none;overflow:visible;border-radius:0}
+.carrossel .card>.cover{border-radius:18px;box-shadow:0 14px 34px rgba(0,0,0,.55);transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s}
+.carrossel a.card:hover{transform:none}
+.carrossel a.card:hover>.cover{transform:translateY(-8px) scale(1.06);box-shadow:0 30px 60px rgba(0,0,0,.7),0 0 0 2px rgba(255,255,255,.35)}
+.carrossel .card .info{padding:12px 2px 0}.carrossel .ta{font-size:14px}
+.chips{padding:18px 0 0}.chip{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(20px);padding:8px 16px}
+@media(max-width:640px){.atv{height:560px;margin-top:-76px}.atv-body{flex-direction:column;align-items:center;text-align:center;gap:20px;bottom:56px}.atv-art{width:210px}.atv-b{justify-content:center}.carrossel>*{flex-basis:150px}}
+/* ===== Card da faixa ===== */
+#trk .trkbox{background:#0c0c0e;padding:0 0 22px;overflow-x:hidden}
+#trk .trkbg{position:absolute;inset:0 0 auto 0;height:340px;background:#222 center/cover;filter:blur(60px) saturate(180%) brightness(.7);transform:scale(1.5);opacity:.9;pointer-events:none}
+#trk .trkbox::before{content:"";position:absolute;inset:0 0 auto 0;height:340px;background:linear-gradient(180deg,transparent,#0c0c0e);z-index:0;pointer-events:none}
+#trk .trkbox>*{position:relative;z-index:1}#trk .trkbox>.trkbg{position:absolute}
+#trk .trkhead{flex-direction:column;text-align:center;margin:0;padding:34px 24px 10px;gap:0;display:flex;align-items:center}
+#trk .trkhead img,#trk .trkph{width:190px;height:190px;border-radius:20px;box-shadow:0 30px 70px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.12);transition:transform .6s}
+#trk.pl .trkhead img,#trk.pl .trkph{transform:scale(1.04)}
+#trk .trkt{font-size:24px;margin-top:20px}#trk .trksub{font-weight:700;color:rgba(255,255,255,.7);margin-top:4px;font-size:14px}
+#trk h3.sec,#trk #trkprev,#trk #trkyt,#trk .trklinks{margin-left:20px;margin-right:20px}
+#trk .trkx{z-index:5;background:rgba(0,0,0,.4);backdrop-filter:blur(14px)}
+#trk .trkpl{display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:20px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.08)}
+#trk .trkpp{width:50px;height:50px;border-radius:50%;background:#fff;color:#000;font-size:16px;display:grid;place-items:center;padding:0 0 0 2px;text-align:center;flex-shrink:0;transition:transform .15s}#trk .trkpp:active{transform:scale(.92)}
+#trk .trkcol{flex:1;min-width:0}#trk .trkbar{height:6px;border-radius:3px;background:rgba(255,255,255,.18);cursor:pointer;overflow:hidden}#trk .trkfill{height:100%;width:0;background:#fff;border-radius:3px}
+#trk .trktm{display:flex;justify-content:space-between;font-size:11px;font-weight:700;color:var(--mut);margin-top:6px}
+#trk .trklinks{grid-template-columns:1fr;gap:8px}
+#trk .trklinks a{display:grid;grid-template-columns:38px 1fr auto;align-items:center;gap:12px;padding:10px 14px 10px 10px;border-radius:16px;background:rgba(255,255,255,.07)}
+#trk .trklinks a.ok{background:rgba(255,255,255,.12);box-shadow:inset 0 0 0 1px rgba(255,255,255,.18)}
+#trk .trklinks .bd{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;font-style:normal;font-weight:900;font-size:16px;color:#fff;background:#555}
+#trk .trklinks span{display:flex;flex-direction:column}#trk .trklinks b{font-size:15px}#trk .trklinks em{font-style:normal;color:var(--mut);font-weight:800}
+[data-b="Spotify"] .bd{background:#1DB954!important;color:#000!important}[data-b="Apple Music"] .bd{background:linear-gradient(135deg,#FA243C,#FB5C74)!important}[data-b="Deezer"] .bd{background:linear-gradient(135deg,#A238FF,#EF5466)!important}[data-b="YouTube"] .bd,[data-b="YouTube Music"] .bd{background:#F00!important}
 </style></head>
 <body>
 <div class="amb" id="amb"></div>
@@ -656,7 +705,7 @@ async function homeView(){
   window.__chart=top.map(u=>({title:u.t,artist:{name:u.a},cover_xl:u.cover}));
   const emAlta=top.map(u=>cardAlbum(u)).join("");
   const t0=top[0];
-  const heroi=t0?`<div class="hero-home" style="background-image:url(${coverDe(t0.key)||t0.cover})"><div class="hh-shade"></div><div class="hh-body"><span class="pill">Top album right now</span><h2 class="hh-t">${esc(t0.t)}</h2><div class="mut" style="font-size:17px;font-weight:700">${esc(t0.a)}</div><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px"><a class="btn p" href="#album-${t0.key}">Open</a><button class="btn" data-rnd>🎲 Random</button></div></div></div>`:"";
+  const heroi=top.length?`<div class="atv" id="atv"><div class="atv-track">${top.slice(0,6).map((u,i)=>{const cv=coverDe(u.key)||u.cover;return `<div class="atv-s${i?"":" on"}"><div class="atv-bg" style="background-image:url('${cv}')"></div><div class="atv-shade"></div><div class="atv-body"><img class="atv-art" src="${cv}" alt=""><div class="atv-info"><span class="atv-tag">${i===0?"#1 Right Now":"Trending #"+(i+1)}</span><h2 class="atv-t">${esc(u.t)}</h2><div class="atv-a">${esc(u.a)}${u.y?" · "+u.y:""}</div><div class="atv-b"><a class="gl pri" href="#album-${u.key}">Open Album</a><button class="gl" data-rnd>Surprise Me</button></div></div></div></div>`}).join("")}</div><div class="atv-dots">${top.slice(0,6).map((u,i)=>`<button class="${i?"":"on"}" data-atv="${i}" aria-label="Slide ${i+1}"></button>`).join("")}</div></div>`:"";
   let popRec="",rec="";
   const ult=S.ultimoArtista;
   if(ult&&ult.id){
@@ -2225,7 +2274,7 @@ async function abrirFaixa(t,a,alb,cover){
   const ov=document.createElement("div");ov.id="trk";
   const q=encodeURIComponent(`${t} ${a}`),nt=norm(t);
   ov.innerHTML=`<div class="trkbox"><button class="trkx" data-trkx aria-label="Close">×</button>
-  <div class="trkhead">${cover?`<img src="${cover}" alt="">`:`<div class="trkph">${esc(ini(t))}</div>`}<div><div class="trkt">${esc(t)}</div><div class="mut sm" style="font-weight:700;margin-top:3px">${esc(a)}${alb?" · "+esc(alb):""}</div></div></div>
+  <div class="trkbg"${cover?` style="background-image:url('${cover}')"`:""}></div><div class="trkhead">${cover?`<img src="${cover}" alt="">`:`<div class="trkph">${esc(ini(t))}</div>`}<div class="trkt">${esc(t)}</div><div class="trksub">${esc(a)}${alb?" · "+esc(alb):""}</div></div>
   <h3 class="sec">Preview</h3><div id="trkprev" class="mut sm" style="font-weight:600">Looking for a preview…</div>
   <h3 class="sec" style="margin-top:20px">Music video</h3><div id="trkyt" class="mut sm" style="font-weight:600">Looking for the video…</div>
   <h3 class="sec" style="margin-top:20px">Listen on</h3><div class="trklinks" id="trklinks"></div></div>`;
@@ -2234,7 +2283,7 @@ async function abrirFaixa(t,a,alb,cover){
   const $$=s=>ov.querySelector(s);
   const pinta=()=>{const el=$$("#trklinks");if(!el)return;
     const it=[["Spotify",L.sp,`https://open.spotify.com/search/${q}`],["Apple Music",L.it,`https://music.apple.com/search?term=${q}`],["Deezer",L.dz,`https://www.deezer.com/search/${q}`],["YouTube",L.yt,ytSearch],["YouTube Music",null,`https://music.youtube.com/search?q=${q}`]];
-    el.innerHTML=it.map(([n,d,f])=>`<a class="${d?"ok":""}" href="${esc(d||f)}" target="_blank" rel="noopener"><span>${n}</span><small>${d?"Open track":"Search"}</small></a>`).join("")};
+    el.innerHTML=it.map(([n,d,f])=>`<a class="${d?"ok":""}" data-b="${n}" href="${esc(d||f)}" target="_blank" rel="noopener"><i class="bd">${n[0]}</i><span><b>${n}</b><small>${d?"Open this track":"Search for it"}</small></span><em>↗</em></a>`).join("")};
   pinta();
   const bate=x=>norm(x)===nt;
   const prev={};
@@ -2246,7 +2295,15 @@ async function abrirFaixa(t,a,alb,cover){
   Promise.all(tarefas).then(()=>{
     pinta();const el=$$("#trkprev");if(!el)return;
     const u=prev.dz||prev.it||prev.sp;
-    el.innerHTML=u?`<audio controls preload="none" src="${esc(u)}"></audio><div class="sm mut" style="margin-top:4px">30-second preview</div>`:"No preview available for this track.";
+    if(!u){el.textContent="No preview available for this track.";return}
+    el.innerHTML=`<div class="trkpl"><button class="trkpp" aria-label="Play">▶</button><div class="trkcol"><div class="trkbar"><div class="trkfill"></div></div><div class="trktm"><span class="tc">0:00</span><span>0:30</span></div></div><audio preload="none" src="${esc(u)}"></audio></div>`;
+    const au=el.querySelector("audio"),pp=el.querySelector(".trkpp"),fl=el.querySelector(".trkfill"),tc=el.querySelector(".tc"),br=el.querySelector(".trkbar");
+    pp.onclick=()=>{au.paused?au.play().catch(()=>{}):au.pause()};
+    au.onplay=()=>{pp.textContent="❚❚";ov.classList.add("pl")};
+    au.onpause=()=>{pp.textContent="▶";ov.classList.remove("pl")};
+    au.onended=()=>{fl.style.width="0";tc.textContent="0:00"};
+    au.ontimeupdate=()=>{const d=au.duration||30;fl.style.width=(au.currentTime/d*100)+"%";tc.textContent="0:"+String(Math.floor(au.currentTime)).padStart(2,"0")};
+    br.onclick=e=>{const r=br.getBoundingClientRect();au.currentTime=((e.clientX-r.left)/r.width)*(au.duration||30)};
   });
   (async()=>{
     let id=null;
@@ -2273,6 +2330,11 @@ document.addEventListener("click",e=>{
   if(e.target.closest("[data-trkx]")||e.target.id==="trk")fecharFaixa();
 });
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&document.getElementById("trk"))fecharFaixa()});
+function atvGo(i){const sl=document.querySelectorAll("#atv .atv-s"),dt=document.querySelectorAll("#atv .atv-dots button");if(!sl.length)return;i=(i+sl.length)%sl.length;sl.forEach((x,n)=>x.classList.toggle("on",n===i));dt.forEach((x,n)=>x.classList.toggle("on",n===i))}
+function atvCur(){return [...document.querySelectorAll("#atv .atv-s")].findIndex(x=>x.classList.contains("on"))}
+setInterval(()=>{if(!document.hidden&&document.getElementById("atv")&&!document.getElementById("atv").matches(":hover"))atvGo(atvCur()+1)},6500);
+document.addEventListener("click",e=>{const b=e.target.closest("[data-atv]");if(b)atvGo(+b.dataset.atv)});
+(function(){let x0=null;document.addEventListener("touchstart",e=>{x0=e.target.closest("#atv")?e.touches[0].clientX:null},{passive:true});document.addEventListener("touchend",e=>{if(x0===null)return;const d=e.changedTouches[0].clientX-x0;if(Math.abs(d)>40)atvGo(atvCur()+(d<0?1:-1));x0=null},{passive:true})})();
 </script>
 </body>
 </html>
