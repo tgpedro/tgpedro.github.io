@@ -540,7 +540,58 @@ h3.sec{font-size:12px;letter-spacing:.1em}
 /* v3: o hover não é mais cortado pela fileira */
 .carrossel{padding-top:26px;padding-bottom:40px;margin-top:-22px;margin-bottom:-26px}
 .carrossel a.card:not(.gc):hover>.cover,.grid a.card:not(.gc):hover>.cover{transform:translateY(-6px) scale(1.04)}
-</style></head>
+</style><style>
+/* ===== Página do artista: Apple Music / Apple TV ===== */
+.ap{--apbg:color-mix(in srgb,var(--ac,#333) 26%,#000)}
+.ap-hero{position:relative;width:100vw;margin:-84px 0 0 calc(50% - 50vw);height:min(88vh,700px);min-height:500px;overflow:hidden;background:var(--apbg)}
+.ap-img{position:absolute;inset:0;background-size:cover;background-position:50% 22%;background-repeat:no-repeat;transform-origin:50% 30%;animation:apz 28s ease-in-out infinite alternate}
+@keyframes apz{to{transform:scale(1.08)}}
+.ap-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.55),transparent 26%),linear-gradient(90deg,rgba(0,0,0,.5),transparent 65%),linear-gradient(180deg,transparent 40%,color-mix(in srgb,var(--apbg) 75%,transparent) 72%,var(--apbg) 100%)}
+.ap-hbody{position:absolute;left:0;right:0;bottom:38px;max-width:980px;margin:0 auto;padding:0 18px;display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.ap-name{font-family:var(--af),"Inter",sans-serif;font-weight:var(--aw);font-style:var(--ai);letter-spacing:var(--als);font-size:calc(clamp(52px,11vw,132px)*var(--asz));line-height:.94;margin:6px 0 2px;text-wrap:balance;overflow-wrap:anywhere;text-shadow:0 6px 40px rgba(0,0,0,.45);animation:fadeUp .8s cubic-bezier(.2,.8,.2,1) both}
+.ap-name.up{text-transform:uppercase}
+.ap-meta{font-size:clamp(15px,2vw,19px);font-weight:700;color:rgba(255,255,255,.82);text-shadow:0 2px 14px rgba(0,0,0,.5)}
+.ap-btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center}
+.gl.ic{width:46px;height:46px;padding:0;justify-content:center}
+.gl.on{background:rgba(255,255,255,.34)}
+.ap-main{position:relative;isolation:isolate;padding-top:4px}
+.ap-main::before{content:"";position:absolute;z-index:-1;top:0;left:calc(50% - 50vw);width:100vw;height:560px;background:linear-gradient(180deg,var(--apbg),#000)}
+.ap .cnt{color:var(--mut);font-size:15px;font-weight:700;margin-left:6px}
+.ap-late{display:flex;align-items:center;gap:18px;padding:16px;border-radius:26px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(24px) saturate(160%);-webkit-backdrop-filter:blur(24px) saturate(160%);box-shadow:inset 0 1px 0 rgba(255,255,255,.18);transition:background .25s,transform .25s}
+.ap-late:hover{background:rgba(255,255,255,.14);transform:translateY(-2px)}
+.ap-late .cover{border-radius:16px}
+.ap-latei{flex:1;min-width:0}
+.ap-latei .t{font-size:clamp(20px,3vw,28px);font-weight:900;letter-spacing:-.6px;margin-top:10px;line-height:1.1}
+.ap-latei .s{color:rgba(255,255,255,.7);font-weight:700;margin-top:3px}
+.ap-chev{font-size:30px;color:var(--mut);padding-right:6px}
+.ap-top{display:grid;grid-template-columns:minmax(0,1fr);gap:2px}
+@media(min-width:820px){.ap-top{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(5,auto);grid-auto-flow:column;column-gap:28px}}
+.ap-tr{display:flex;align-items:center;gap:12px;padding:8px 10px;border-radius:16px;transition:background .2s;min-width:0}
+.ap-tr:hover{background:rgba(255,255,255,.09)}
+.ap-tr .n{width:22px;text-align:center;font-weight:800;color:var(--mut);font-size:14px;flex-shrink:0}
+.ap-tl{display:flex;align-items:center;gap:12px;flex:1;min-width:0}
+.ap-tl .cover{border-radius:10px;box-shadow:0 6px 16px rgba(0,0,0,.4)}
+.ap-tt{min-width:0;display:block}
+.ap-tt b{display:block;font-size:15px;font-weight:800;letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ap-tt i{display:block;font-style:normal;font-size:12px;font-weight:600;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.ap-dur{flex-shrink:0}
+.ap .carrossel.sim>*{flex-basis:160px}
+.ap-sim{display:block;text-align:center}
+.ap-sim .im{width:100%;aspect-ratio:1;border-radius:50%;background:linear-gradient(145deg,#8B5CF6,#B794F6) center/cover no-repeat;display:grid;place-items:center;font-weight:900;font-size:36px;box-shadow:0 14px 34px rgba(0,0,0,.55);transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s}
+.ap-sim:hover .im{transform:translateY(-6px) scale(1.04);box-shadow:0 30px 60px rgba(0,0,0,.7),0 0 0 2px rgba(255,255,255,.35)}
+.ap-sim .t{margin-top:12px;font-weight:800;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:640px){
+  .ap-hero{margin-top:-76px;height:min(78vh,580px);min-height:440px}
+  .ap-hbody{bottom:26px;align-items:center;text-align:center}
+  .ap-name{font-size:calc(clamp(44px,15vw,84px)*var(--asz))}
+  .ap-btns{justify-content:center}
+  .ap-late{gap:14px;padding:12px}
+  .ap-late .cover{width:96px!important;height:96px!important}
+  .ap-dur{display:none}
+  .ap .carrossel.sim>*{flex-basis:130px}
+}
+</style>
+</head>
 <body>
 <div class="amb" id="amb"></div>
 <header>
@@ -915,67 +966,187 @@ function albumAct(a){
   salvar();rota();
 }
 
-/* ===== Página do artista ===== */
+/* ===== Página do artista (estilo Apple Music / Apple TV) ===== */
+const ERA_FONTES=[
+{n:"Bebas Neue",w:400,i:0,ls:".02em",sz:1.2,up:1},
+{n:"Anton",w:400,i:0,ls:"0",sz:1.05,up:1},
+{n:"Playfair Display",w:900,i:1,ls:"-.02em",sz:.95},
+{n:"Abril Fatface",w:400,i:0,ls:"-.01em",sz:.95},
+{n:"Righteous",w:400,i:0,ls:"0",sz:1},
+{n:"Orbitron",w:900,i:0,ls:".02em",sz:.78,up:1},
+{n:"Pacifico",w:400,i:0,ls:"0",sz:.9},
+{n:"Permanent Marker",w:400,i:0,ls:"0",sz:.9},
+{n:"Rye",w:400,i:0,ls:".01em",sz:.82},
+{n:"Monoton",w:400,i:0,ls:".02em",sz:.68},
+{n:"Bungee",w:400,i:0,ls:"0",sz:.8,up:1},
+{n:"Cormorant Garamond",w:700,i:1,ls:"-.01em",sz:1.15},
+{n:"Syne",w:800,i:0,ls:"-.03em",sz:.95},
+{n:"Space Grotesk",w:700,i:0,ls:"-.04em",sz:1},
+{n:"Fredoka",w:700,i:0,ls:"-.01em",sz:1},
+{n:"UnifrakturCook",w:700,i:0,ls:"0",sz:1.05},
+{n:"Cinzel",w:900,i:0,ls:".02em",sz:.82,up:1},
+{n:"Lobster",w:400,i:0,ls:"0",sz:1},
+{n:"DM Serif Display",w:400,i:1,ls:"-.01em",sz:1.05},
+{n:"Archivo Black",w:400,i:0,ls:"-.03em",sz:.92},
+{n:"Poppins",w:800,i:0,ls:"-.04em",sz:.95}
+];
+/* Artistas conhecidos: fonte que lembra a era/identidade visual */
+const ERA_OVR={taylorswift:18,lanadelrey:11,dualipa:9,harrystyles:4,metallica:15,nirvana:7,kendricklamar:1,theweeknd:13,billieeilish:12,tylerthecreator:6,daftpunk:5,queen:16,abba:9,kanyewest:19,brunomars:4,oliviarodrigo:7,drake:20,arianagrande:20,sza:12,travisscott:10,ledzeppelin:8,acdc:0,ironmaiden:15,blackpink:12,bts:20};
+/* Gênero → fonte */
+const ERA_GEN=[[/metal/,15],[/punk|grunge/,7],[/hip.?hop|rap|trap/,1],[/r&b|soul/,3],[/electro|dance|house|techno|edm/,5],[/country/,8],[/folk|acoustic|singer/,11],[/jazz|blues/,2],[/classical|opera|soundtrack|score/,16],[/disco|funk/,4],[/latin|reggaeton|samba|mpb|brazil|sertanejo|pagode|forr/,10],[/k-?pop|j-?pop/,12],[/alternative|indie/,13],[/rock/,0],[/pop/,20]];
+function eraFonte(k,a,generos,desde){
+  const o=(S.artFonts||{})[k];if(o!=null&&ERA_FONTES[o])return o;
+  const nk=norm(a.n);if(ERA_OVR[nk]!=null)return ERA_OVR[nk];
+  const g=String(generos||"").toLowerCase();
+  for(const [re,i] of ERA_GEN)if(re.test(g))return i;
+  const y=+desde||0;
+  if(y&&y<1980)return 4;if(y>=1980&&y<1990)return 9;if(y>=1990&&y<2000)return 19;if(y>=2000&&y<2010)return 12;
+  return parseInt(hash(nk),36)%ERA_FONTES.length;
+}
+function apFontes(){
+  if(document.getElementById("apf"))return;
+  const l=document.createElement("link");l.id="apf";l.rel="stylesheet";
+  l.href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Anton&family=Archivo+Black&family=Bebas+Neue&family=Bungee&family=Cinzel:wght@900&family=Cormorant+Garamond:ital,wght@1,700&family=DM+Serif+Display:ital@1&family=Fredoka:wght@700&family=Lobster&family=Monoton&family=Orbitron:wght@900&family=Pacifico&family=Permanent+Marker&family=Playfair+Display:ital,wght@1,900&family=Poppins:wght@800&family=Righteous&family=Rye&family=Space+Grotesk:wght@700&family=Syne:wght@800&family=UnifrakturCook:wght@700&display=swap";
+  document.head.appendChild(l);
+}
+function apSetFonte(el,i){
+  const F=ERA_FONTES[i];if(!el||!F)return;
+  el.dataset.fi=i;
+  el.style.setProperty("--af","'"+F.n+"'");el.style.setProperty("--aw",F.w);el.style.setProperty("--ai",F.i?"italic":"normal");
+  el.style.setProperty("--als",F.ls);el.style.setProperty("--asz",F.sz);
+  const h=el.querySelector(".ap-name");if(h)h.classList.toggle("up",!!F.up);
+}
+const fmtFas=n=>{try{return new Intl.NumberFormat("en",{notation:"compact",maximumFractionDigits:1}).format(n)}catch(e){return String(n)}};
+const fmtData=d=>{if(!/^\d{4}-\d{2}-\d{2}$/.test(d||""))return d||"";try{return new Date(d+"T00:00:00Z").toLocaleDateString("en",{month:"short",day:"numeric",year:"numeric",timeZone:"UTC"})}catch(e){return d}};
+
+async function apDados(k,a){
+  let albuns=[],top=[],rel=[],gen="";
+  if(a.ids.dz){
+    const [alb,tp,rl]=await Promise.all([
+      dz(`/artist/${a.ids.dz}/albums?limit=100`).catch(()=>({data:[]})),
+      dz(`/artist/${a.ids.dz}/top?limit=10`).catch(()=>({data:[]})),
+      dz(`/artist/${a.ids.dz}/related?limit=14`).catch(()=>({data:[]}))
+    ]);
+    const mapa=new Map();
+    (alb.data||[]).forEach(x=>{
+      const key=albumKey(x.title,a.n);
+      const u={key,t:x.title,a:a.n,y:(x.release_date||"").slice(0,4),d:x.release_date||"",tipo:x.record_type,cover:x.cover_xl||x.cover_big||"",ids:{dz:x.id},fontes:["dz"]};
+      const o=mapa.get(key);
+      if(!o||(u.d&&o.d&&u.d<o.d))mapa.set(key,u);
+    });
+    albuns=[...mapa.values()];
+    top=(tp.data||[]).map(t=>({t:t.title,al:albumKey(t.album.title,t.artist.name),ms:t.duration*1000,alb:t.album.title}));
+    (tp.data||[]).forEach(t=>{const kk=albumKey(t.album.title,t.artist.name);if(!S.meta[kk])guardarAlbum({key:kk,t:t.album.title,a:t.artist.name,y:"",tipo:"album",cover:t.album.cover_xl||t.album.cover_big||"",ids:{dz:t.album.id},fontes:["dz"]})});
+    rel=(rl.data||[]).filter(o=>o&&o.name).map(o=>({key:artistKey(o.name),n:o.name,foto:o.picture_xl||o.picture_big||"",fas:o.nb_fan||0,id:o.id}));
+    rel.forEach(o=>{if(!S.artists[o.key])guardarArtista({key:o.key,n:o.n,foto:o.foto,fas:o.fas,ids:{dz:o.id},fontes:["dz"]})});
+    const ult=[...albuns].sort((x,y)=>(y.d||y.y||"").localeCompare(x.d||x.y||""))[0];
+    if(ult){try{const d=await dz(`/album/${ult.ids.dz}`);gen=((d.genres||{}).data||[]).map(g=>g.name).join(", ")}catch(e){}}
+  }else if(a.ids.sp){
+    try{const j=await spGet(`/v1/artists/${a.ids.sp}/albums?include_groups=album,single&limit=50`);
+      albuns=unirAlbuns((j.items||[]).map(x=>({src:"sp",id:x.id,t:x.name,a:a.n,y:(x.release_date||"").slice(0,4),tipo:spTipo(x),cover:spImg(x),n:x.total_tracks}))).map(u=>({...u,d:u.y}))}catch(e){}
+  }else if(a.ids.mb){
+    try{const rgs=(await mb(`/release-group?artist=${a.ids.mb}&limit=100`))["release-groups"]||[];
+      albuns=unirAlbuns(rgs.map(r=>({src:"mb",id:r.id,t:r.title,a:a.n,y:(r["first-release-date"]||"").slice(0,4),tipo:(r["primary-type"]||"album").toLowerCase(),cover:`${CAA}/release-group/${r.id}/front-500`}))).map(u=>({...u,d:u.y}))}catch(e){}
+  }
+  albuns.forEach(u=>{const m=S.meta[u.key];if(!m||(!m.cover&&u.cover))guardarAlbum({...u,genre:(m&&m.genre)||""})});
+  return {albuns,top,rel,gen};
+}
+
 async function artistView(k){
   const a=S.artists[k];
   if(!a)return `<div class="empty">Artist not found.</div>`;
+  apFontes();
   if(!a.ids.dz||!window.__dzOk||!window.__dzOk.has(k)){
     (window.__dzOk=window.__dzOk||new Set()).add(k);
     try{
       const j=await dz(`/search/artist?q=${encodeURIComponent(a.n)}&limit=10`);
       const hit=(j.data||[]).filter(x=>norm(x.name)===norm(a.n)).sort((x,y)=>(y.nb_fan||0)-(x.nb_fan||0))[0]||null;
       if(hit&&String(hit.id)!==String(a.ids.dz||"")){a.ids.dz=hit.id;a.foto=hit.picture_xl||hit.picture_big||a.foto;a.fas=hit.nb_fan||0;salvar()}
+      else if(hit&&!a.foto){a.foto=hit.picture_xl||hit.picture_big||"";a.fas=a.fas||hit.nb_fan||0;salvar()}
     }catch(e){}
   }
-  const [c1,c2]=cores(k);
-  setAmb(c1);
   S.seguindo=S.seguindo||[];
   if(a.ids.dz){S.ultimoArtista={id:a.ids.dz,n:a.n};salvar()}
-  let albuns=[],top=[];
-  if(a.ids.dz){
-    try{
-      const [alb,tp]=await Promise.all([dz(`/artist/${a.ids.dz}/albums?limit=100`),dz(`/artist/${a.ids.dz}/top?limit=5`).catch(()=>({data:[]}))]);
-      albuns=(alb.data||[]).map(x=>{const u={key:albumKey(x.title,a.n),t:x.title,a:a.n,y:(x.release_date||"").slice(0,4),tipo:x.record_type,cover:x.cover_xl||x.cover_big||"",ids:{dz:x.id},fontes:["dz"]};guardarAlbum({...u,genre:""});return u});
-      top=(tp.data||[]).map(t=>({t:t.title,al:albumKey(t.album.title,t.artist.name),ms:t.duration*1000,alb:t.album.title}));
-      (tp.data||[]).forEach(t=>S.meta[albumKey(t.album.title,t.artist.name)]||guardarAlbum({key:albumKey(t.album.title,t.artist.name),t:t.album.title,a:t.artist.name,y:"",tipo:"album",cover:t.album.cover_big||"",ids:{dz:t.album.id},fontes:["dz"]}));
-    }catch(e){}
-  }else if(a.ids.sp){
-    try{
-      const j=await spGet(`/v1/artists/${a.ids.sp}/albums?include_groups=album,single&limit=50`);
-      albuns=unirAlbuns((j.items||[]).map(x=>({src:"sp",id:x.id,t:x.name,a:a.n,y:(x.release_date||"").slice(0,4),tipo:spTipo(x),cover:spImg(x),n:x.total_tracks})));
-    }catch(e){}
-  }else if(a.ids.mb){
-    try{
-      const rgs=(await mb(`/release-group?artist=${a.ids.mb}&limit=100`))["release-groups"]||[];
-      albuns=unirAlbuns(rgs.map(r=>({src:"mb",id:r.id,t:r.title,a:a.n,y:(r["first-release-date"]||"").slice(0,4),tipo:(r["primary-type"]||"album").toLowerCase(),cover:`${CAA}/release-group/${r.id}/front-500`})));
-    }catch(e){}
-  }
-  albuns.forEach(u=>{if(!S.meta[u.key])guardarAlbum({...u,genre:""})});
-  const foto=a.foto||"";
-  const fundo=albuns.find(u=>u.cover)?.cover||foto;
-  const banner=fundo?`<div class="pban"><div class="art img" style="background-image:url(${fundo})"></div></div>`:`<div class="pban"><div class="art" style="background:linear-gradient(135deg,${c1},${c2})"></div></div>`;
-  const ordenarAno=(a,b)=>(b.y||"").localeCompare(a.y||"");
+  const C=(window.__apC=window.__apC||{});
+  const D=C[k]||(C[k]=await apDados(k,a));
+  const [c1]=cores(k);
+  const por=(x,y)=>(y.d||y.y||"").localeCompare(x.d||x.y||"");
+  const todos=[...D.albuns].sort(por),ult=todos[0];
+  const anos=D.albuns.map(u=>+u.y).filter(Boolean),desde=anos.length?Math.min(...anos):0;
+  const fi=eraFonte(k,a,[a.genre,D.gen].join(" "),desde),F=ERA_FONTES[fi];
+  const foto=a.foto||(todos.find(u=>u.cover)||{}).cover||"";
+  const gs=[...new Set([a.genre,...String(D.gen||"").split(", ")].filter(Boolean))].slice(0,2);
+  const meta=[...gs,a.fas?fmtFas(a.fas)+" fans":""].filter(Boolean).join(" · ");
+  const seg=S.seguindo.some(s=>s.k===k);
   const tipoDe=u=>(u.tipo||"album").toLowerCase();
-  const grupos=[
-    ["Albums",u=>tipoDe(u)==="album"],
-    ["EPs",u=>tipoDe(u)==="ep"],
-    ["Singles",u=>tipoDe(u)==="single"],
-    ["Compilations & live",u=>/compil|live/.test(tipoDe(u))]
-  ];
-  const secoes=grupos.map(([nome,f])=>{
-    const l=albuns.filter(f).sort(ordenarAno);
-    return l.length?`<div class="secao"><h2>${nome} <span class="mut" style="font-size:16px;font-weight:700">${l.length}</span></h2><div class="grid">${l.map(u=>cardAlbum({...u,fontes:u.fontes||[]})).join("")}</div></div>`:"";
+  const grupos=[["Albums",u=>tipoDe(u)==="album"],["EPs",u=>tipoDe(u)==="ep"],["Singles",u=>tipoDe(u)==="single"],["Compilations & live",u=>/compil|live/.test(tipoDe(u))]];
+  const discos=grupos.map(([nome,f])=>{
+    const l=todos.filter(f);
+    return l.length?`<div class="sec-h"><h2>${nome} <span class="cnt">${l.length}</span></h2></div><div class="carrossel" data-keep>${l.map(u=>cardAlbum({...u,fontes:u.fontes||[]})).join("")}</div>`:"";
   }).join("");
-  const populares=top.length?`<h2>Popular songs</h2><div class="mlist">${top.map(t=>`<a class="row" href="#album-${t.al}">${capaAlbum(t.al,t.alb,46)}<div class="grow"><div class="ttl">${esc(t.t)}</div><div class="sm mut" style="font-weight:700">${esc(t.alb)}</div></div><span class="mut sm">${tempo(t.ms)}</span></a>`).join("")}</div>`:"";
-  const info=[a.genre,a.info].filter(Boolean).join(" · ");
-  return `${banner}<div class="phead"><div class="pav">${foto?`<img src="${foto}" alt="${esc(a.n)}">`:`<div style="width:100%;height:100%;background:linear-gradient(145deg,${c1},${c2});display:grid;place-items:center;font-size:44px;font-weight:900">${esc(ini(a.n))}</div>`}</div>
-    <div class="pinfo"><span class="pill">Artist</span>
-      <h1 style="font-size:clamp(48px,8vw,84px);letter-spacing:-.05em;line-height:.95;margin:10px 0 8px">${esc(a.n)}</h1>
-      <div class="phandle">${esc(info||"Artist")}</div><button class="btn ${(S.seguindo||[]).some(s=>s.k===k)?"on":""}" data-seguir="${k}" style="margin-top:10px">${(S.seguindo||[]).some(s=>s.k===k)?"✓ Following":"+ Follow"}</button>
-      <div class="mut sm" style="font-weight:700;margin-top:6px">Data from: ${esc(a.fontes.map(nomeFonte).join(" · "))}</div>
-    </div></div>
-  ${populares}${secoes||`<div class="empty" style="margin-top:30px">No releases found.</div>`}`;
+  const late=ult?`<div class="sec-h"><h2>Latest release</h2></div>
+    <a class="ap-late" href="#album-${ult.key}">${capaAlbum(ult.key,ult.t,132)}<div class="ap-latei"><span class="pill">${tipoLabel(ult.tipo)}${ult.d?" · "+esc(fmtData(ult.d)):""}</span><div class="t">${esc(ult.t)}</div><div class="s">${esc(a.n)}</div></div><span class="ap-chev">›</span></a>`:"";
+  const tops=D.top.length?`<div class="sec-h"><h2>Top songs</h2></div><div class="ap-top">${D.top.map((t,i)=>`<div class="ap-tr"><span class="n">${i+1}</span><a class="ap-tl" href="#album-${t.al}">${capaAlbum(t.al,t.alb,50)}<span class="ap-tt"><b>${esc(t.t)}</b><i>${esc(t.alb)}</i></span></a><span class="mut sm ap-dur">${tempo(t.ms)}</span><button class="shbtn" data-aplay="${i}" aria-label="Preview, video and links" title="Preview, video and links" style="width:32px;height:32px;font-size:11px;padding-left:2px">▶</button></div>`).join("")}</div>`:"";
+  const sim=D.rel.length?`<div class="sec-h"><h2>Similar artists</h2></div><div class="carrossel sim" data-keep>${D.rel.map(o=>`<a class="ap-sim" href="#artist-${o.key}"><div class="im" style="background-image:url('${o.foto}')">${o.foto?"":esc(ini(o.n))}</div><div class="t">${esc(o.n)}</div></a>`).join("")}</div>`:"";
+  const nAlb=todos.filter(grupos[0][1]).length,nSin=todos.filter(u=>/single|ep/.test(tipoDe(u))).length;
+  const kp=(n,l)=>`<div class="kpi"><strong>${n}</strong><span>${l}</span></div>`;
+  const links=[a.ids.dz?`<a class="btn" href="https://www.deezer.com/artist/${a.ids.dz}" target="_blank" rel="noopener">Deezer ↗</a>`:"",a.ids.sp?`<a class="btn" href="https://open.spotify.com/artist/${a.ids.sp}" target="_blank" rel="noopener">Spotify ↗</a>`:"",`<a class="btn" href="https://music.apple.com/search?term=${encodeURIComponent(a.n)}" target="_blank" rel="noopener">Apple Music ↗</a>`].join("");
+  const sobre=`<div class="sec-h"><h2>About</h2></div><div class="kpis">${kp(a.fas?fmtFas(a.fas):"—","Fans")}${kp(nAlb,"Albums")}${kp(nSin,"Singles & EPs")}${kp(desde||"—","Active since")}</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">${links}</div>`;
+  setTimeout(()=>apTema(k,foto),0);
+  return `<div class="ap" data-k="${k}" data-fi="${fi}" style="--ac:${D.ac||c1};--af:'${F.n}';--aw:${F.w};--ai:${F.i?"italic":"normal"};--als:${F.ls};--asz:${F.sz}">
+  <section class="ap-hero"><div class="ap-img" style="${foto?`background-image:url('${foto}')`:`background:linear-gradient(135deg,${c1},#000)`}"></div><div class="ap-shade"></div>
+    <div class="ap-hbody"><span class="atv-tag">Artist</span>
+      <h1 class="ap-name${F.up?" up":""}">${esc(a.n)}</h1>
+      ${meta?`<div class="ap-meta">${esc(meta)}</div>`:""}
+      <div class="ap-btns">
+        ${D.top.length?`<button class="gl pri" data-aplay="0">▶ Play</button>`:""}
+        <button class="gl ${seg?"on":""}" data-apfollow="${k}">${seg?"✓ Following":"+ Follow"}</button>
+        <button class="gl ic" data-apshare aria-label="Share" title="Share"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M8 11H6.5A1.5 1.5 0 0 0 5 12.5v7A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5v-7A1.5 1.5 0 0 0 17.5 11H16"/></svg></button>
+        <button class="gl ic" data-apfont aria-label="Change title font" title="Change title font" style="font-family:var(--af),serif;font-weight:var(--aw);font-size:17px">Aa</button>
+      </div>
+    </div></section>
+  <div class="ap-main">${late}${tops}${discos||`<div class="empty" style="margin-top:30px">No releases found.</div>`}${sim}${sobre}</div></div>`;
 }
+async function apTema(k,src){
+  const D=(window.__apC||{})[k];
+  if(!D||D.ac||!src)return;
+  const im=await carregarImg(src);
+  if(!im)return;
+  const p=paletaDaImagem(im,k)[0];if(!p)return;
+  D.ac=`rgb(${p.join(",")})`;
+  const el=document.querySelector(`.ap[data-k="${k}"]`);
+  if(el)el.style.setProperty("--ac",D.ac);
+}
+document.addEventListener("click",e=>{
+  const t=e.target,ap=t.closest&&t.closest(".ap");
+  const pl=t.closest("[data-aplay]");
+  if(pl&&ap){
+    const k=ap.dataset.k,D=(window.__apC||{})[k],a=S.artists[k],tr=D&&D.top[+pl.dataset.aplay];
+    if(tr&&a){const m=S.meta[tr.al]||{};abrirFaixa(tr.t,a.n,tr.alb,coverDe(tr.al)||m.cover||"")}
+    return;
+  }
+  const fo=t.closest("[data-apfollow]");
+  if(fo){
+    const k=fo.dataset.apfollow;S.seguindo=S.seguindo||[];
+    const i=S.seguindo.findIndex(s=>s.k===k);
+    if(i>=0){S.seguindo.splice(i,1);flash("Unfollowed")}
+    else{const a=S.artists[k]||{};S.seguindo.push({k,n:a.n||"",dz:(a.ids||{}).dz||""});flash("Following")}
+    const on=S.seguindo.some(s=>s.k===k);
+    fo.textContent=on?"✓ Following":"+ Follow";fo.classList.toggle("on",on);
+    salvar();return;
+  }
+  if(t.closest("[data-apshare]")&&ap){
+    const a=S.artists[ap.dataset.k]||{};
+    if(navigator.share)navigator.share({title:a.n,url:location.href}).catch(()=>{});
+    else navigator.clipboard?.writeText(location.href).then(()=>flash("Link copied")).catch(()=>flash("Could not copy"));
+    return;
+  }
+  if(t.closest("[data-apfont]")&&ap){
+    const k=ap.dataset.k,nx=((+ap.dataset.fi||0)+1)%ERA_FONTES.length;
+    S.artFonts=S.artFonts||{};S.artFonts[k]=nx;salvar();
+    apSetFonte(ap,nx);flash("Title font: "+ERA_FONTES[nx].n);
+  }
+});
 
 /* ===== Diário ===== */
 function diaryList(){
@@ -1391,7 +1562,7 @@ document.addEventListener("click",e=>{
 function melhorarCarrosseis(){
   document.querySelectorAll('.carrossel:not([data-m])').forEach(c=>{
     c.dataset.m='1';
-    if(c.children.length>2&&c.children.length%2)c.lastElementChild.remove();
+    if(!c.hasAttribute('data-keep')&&c.children.length>2&&c.children.length%2)c.lastElementChild.remove();
     const w=document.createElement('div');w.className='carw';
     c.parentNode.insertBefore(w,c);w.appendChild(c);
     const bot=(d)=>{const b=document.createElement('button');b.className='carbtn '+(d<0?'l':'r');b.innerHTML=d<0?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>';b.setAttribute('aria-label',d<0?'Previous':'Next');b.onclick=()=>c.scrollBy({left:d*c.clientWidth*.8,behavior:'smooth'});return b};
