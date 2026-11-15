@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#000000">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -411,6 +411,32 @@ textarea.gr-in{resize:none;min-height:56px;line-height:1.4}
   .favdots button{width:8px;height:8px;border-radius:50%;padding:0;background:rgba(255,255,255,.25);transition:width .25s,background .25s}
   .favdots button.on{width:22px;border-radius:4px;background:#fff}
 }
+</style>
+<style>
+/* ===== Correções mobile: sem rolagem lateral e sem zoom ===== */
+html{overflow-x:hidden;max-width:100%;-webkit-text-size-adjust:100%;text-size-adjust:100%;touch-action:manipulation;overscroll-behavior-x:none}
+body{max-width:100%;overflow-x:clip;overscroll-behavior-x:none;touch-action:manipulation}
+main,#app{min-width:0;max-width:100%}
+/* colunas de grid com 1fr crescem junto com textos longos (nowrap); minmax(0,1fr) trava na largura da tela */
+.pgrid{grid-template-columns:minmax(0,1fr)}
+.pgrid>*{min-width:0}
+@media(min-width:900px){.pgrid{grid-template-columns:minmax(0,1fr) 340px}}
+.phead{grid-template-columns:auto minmax(0,1fr) auto}
+.phead>*,.hero>*,.lhead>*,.pright,.pinfo,.grow{min-width:0}
+@media(max-width:760px){
+  .phead{grid-template-columns:minmax(0,1fr)}
+  main{overflow-x:clip}
+  .pright{width:100%;max-width:100%}
+  .pstats{max-width:100%}
+  .hero .info{max-width:100%}
+}
+.mlist,.hist2,.card{max-width:100%}
+.mlist .row{min-width:0}
+.ptabs,.chips,.carrossel,.favpages,.throw{touch-action:pan-x pan-y}
+img{max-width:100%}
+#ed{overflow-x:hidden;overscroll-behavior:contain;touch-action:pan-y}
+#ed .ebody,#ed .gr,#ed .mlist{max-width:100%;min-width:0}
+#ed .chips{touch-action:pan-x pan-y}
 </style>
 </head>
 <body>
@@ -2130,6 +2156,13 @@ document.addEventListener("click",e=>{
   const el=document.getElementById("favpages");
   if(el)el.scrollTo({left:+b.dataset.favpg*el.clientWidth,behavior:"smooth"});
 });
+</script>
+<script>
+/* Sem zoom: o Safari do iPhone ignora user-scalable=no, então bloqueia os gestos na mão */
+["gesturestart","gesturechange","gestureend"].forEach(n=>document.addEventListener(n,e=>e.preventDefault(),{passive:false}));
+document.addEventListener("touchmove",e=>{if(e.touches&&e.touches.length>1)e.preventDefault()},{passive:false});
+/* Se algo ainda empurrar a página pro lado, volta pro lugar */
+window.addEventListener("scroll",()=>{if(window.scrollX)window.scrollTo(0,window.scrollY)},{passive:true});
 </script>
 </body>
 </html>
