@@ -647,6 +647,40 @@ h3.sec{font-size:12px;letter-spacing:.1em}
 .ap-sim:hover .im{transform:translateY(-4px) scale(1.03);box-shadow:0 10px 24px rgba(0,0,0,.4)}
 /* seta da esquerda só aparece depois que a lista foi rolada */
 .carw:has(.carrossel:not(.fl)) .carbtn.l{opacity:0;pointer-events:none}
+/* Cantos das capas: 10px em todo o site */
+:root{--r-alb:10px}
+.cover,.carrossel .card>.cover,.grid a.card:not(.gc)>.cover,.hero .cover,.ap-late .cover,.fitem .cover,.ed-fitem .cover{border-radius:var(--r-alb)}
+.ap-tl .cover{border-radius:6px}
+/* Sem roxo nas estrelas, números das faixas e destaques */
+.rbtn i.on,.st.on{color:#fff}
+.rbtn i.half,.st.half{background:linear-gradient(90deg,#fff 50%,rgba(255,255,255,.22) 50%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.stars{color:#fff}
+.num{color:var(--mut)}
+:focus-visible{outline-color:rgba(255,255,255,.7)}
+.search:focus,.hsearch input:focus{box-shadow:0 0 0 3px rgba(255,255,255,.25)}
+.xs-o.on{background:rgba(255,255,255,.14)}
+.carbtn:hover{background:rgba(255,255,255,.28)}
+/* Faixas: título sempre visível (mobile em duas linhas) */
+.tact{display:contents}
+@media(max-width:640px){
+  #tlist .row{display:grid;grid-template-columns:26px minmax(0,1fr) auto;grid-template-areas:"n t d" ". a a";align-items:center;row-gap:4px;column-gap:10px}
+  #tlist .row .num{grid-area:n}
+  #tlist .row .ttl{grid-area:t}
+  #tlist .row .tdur{grid-area:d}
+  #tlist .row .tact{grid-area:a;display:flex;align-items:center;gap:10px}
+}
+/* Review estilo Letterboxd */
+.lbx{display:grid;gap:14px;padding:18px;border-radius:22px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09)}
+.lbx-h{display:flex;gap:14px;align-items:center}
+.lbx-t{font-weight:900;font-size:20px;letter-spacing:-.4px;line-height:1.15}
+.lbx-s{color:var(--mut);font-weight:700;font-size:14px;margin-top:3px}
+.lbx-d{display:flex;align-items:center;gap:10px;font-weight:700;font-size:14px;color:var(--mut)}
+.lbx-d input{background:rgba(255,255,255,.1);border:0;border-radius:10px;padding:8px 10px;color-scheme:dark;font:inherit;font-size:16px;color:#fff}
+.lbx .field{min-height:140px;border-radius:14px;resize:vertical;font-weight:500}
+.lbx-f{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.lbx-r{display:flex;align-items:center;gap:10px}
+.lbx-r .rbtn{zoom:.75}
+.lbx-b{display:flex;gap:10px;flex-wrap:wrap}
 </style>
 </head>
 <body>
@@ -993,7 +1027,6 @@ async function albumView(k){
     <span class="pill">${esc([(m.tipo||"álbum").toUpperCase(),m.genre].filter(Boolean).join(" · "))}</span>
     <h1>${esc(m.t)}</h1>
     <div style="font-size:18px;font-weight:700" class="mut"><a href="#artist-${ak}" style="border-bottom:2px solid currentColor">${esc(m.a)}</a>${m.y?` · ${m.y}`:""}${faixas.length?` · ${faixas.length} tracks`:""}</div>
-    <div class="mut sm" style="font-weight:700;margin-top:6px">Data from: ${esc(fontesTxt)}${capaCustom?" · custom cover":""}</div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin:20px 0">
       <button class="btn ${x.d?"on":""}" data-act="ouvi">${x.d?"✓ Listened":"Mark as listened"}</button>
       <button class="btn ${x.w?"on":""}" data-act="quero">${x.w?"✓ In queue":"+ Want to listen"}</button>
@@ -1002,20 +1035,31 @@ async function albumView(k){
     </div>
     <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;justify-content:inherit"><div style="display:flex" id="rate" data-id="${k}">${rateHTML(x.r)}</div><span class="mut" style="font-weight:700" id="rlab">${x.r?String(x.r)+" of 5":"Your rating"}</span></div>
     ${faixas.length?mediaBloco(faixas,m,x):""}
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">${m.ids.sp?`<a class="btn" href="https://open.spotify.com/album/${m.ids.sp}" target="_blank" rel="noopener">Open on Spotify</a>`:""}<label class="btn" style="cursor:pointer">🖼 Change cover<input id="capaup" type="file" accept="image/*" hidden></label>${capaCustom?`<button class="btn" data-act="capaRm">Restore original cover</button>`:""}</div>
+    ${m.ids.sp?`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px"><a class="btn" href="https://open.spotify.com/album/${m.ids.sp}" target="_blank" rel="noopener">Open on Spotify</a></div>`:""}
   </div></div>
-  ${faixas.length?`<h2>Tracks</h2>${faixas.length>1?`<div class="tbar"><div class="tsearch"><input class="search" id="tsearch" type="search" placeholder="Search tracks in this album" autocomplete="off"></div>${xsel("tsort",[["n","Album order"],["az","Title A–Z"],["za","Title Z–A"],["long","Longest first"],["short","Shortest first"]],"n")}</div>`:""}<div class="mlist" id="tlist">${faixas.map((t,i)=>`<div class="row" data-tn="${esc(t.t.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase())}" data-i="${i}" data-ms="${t.ms||0}"><span class="num">${String(i+1).padStart(2,"0")}</span><div class="ttl grow">${esc(t.t)}</div>${trateHTML(t.t,m.a)}<button class="shbtn" data-play data-tt="${esc(t.t)}" data-ta="${esc(m.a)}" aria-label="Preview, video and links" title="Preview, video and links" style="width:30px;height:30px;font-size:11px;padding-left:2px">▶</button><button class="shbtn" data-story="musica" data-tt="${esc(t.t)}" data-ms="${t.ms||0}" aria-label="Share song" title="Share song" style="width:30px;height:30px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M8 11H6.5A1.5 1.5 0 0 0 5 12.5v7A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5v-7A1.5 1.5 0 0 0 17.5 11H16"/></svg></button><span class="mut sm">${tempo(t.ms)}</span></div>`).join("")}<div class="tnone" id="tnone">No tracks found</div></div>`:`<div class="empty" style="margin-top:30px">No tracks available for this album.</div>`}
-  <h2>Your review</h2><div class="mlist" style="padding:16px;background:#111"><textarea class="field" id="rev" placeholder="What did you think of this album?">${esc(x.rev||"")}</textarea><div style="display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px;margin-top:12px"><button class="fab" data-act="rev">Save review</button><button class="btn" data-story="album">Share to Story</button></div></div>
+  ${faixas.length?`<h2>Tracks</h2>${faixas.length>1?`<div class="tbar"><div class="tsearch"><input class="search" id="tsearch" type="search" placeholder="Search tracks in this album" autocomplete="off"></div>${xsel("tsort",[["n","Album order"],["az","Title A–Z"],["za","Title Z–A"],["long","Longest first"],["short","Shortest first"]],"n")}</div>`:""}<div class="mlist" id="tlist">${faixas.map((t,i)=>`<div class="row" data-tn="${esc(t.t.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase())}" data-i="${i}" data-ms="${t.ms||0}"><span class="num">${String(i+1).padStart(2,"0")}</span><div class="ttl grow">${esc(t.t)}</div><div class="tact">${trateHTML(t.t,m.a)}<button class="shbtn" data-play data-tt="${esc(t.t)}" data-ta="${esc(m.a)}" aria-label="Preview, video and links" title="Preview, video and links" style="width:30px;height:30px;font-size:11px;padding-left:2px">▶</button><button class="shbtn" data-story="musica" data-tt="${esc(t.t)}" data-ms="${t.ms||0}" aria-label="Share song" title="Share song" style="width:30px;height:30px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M8 11H6.5A1.5 1.5 0 0 0 5 12.5v7A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5v-7A1.5 1.5 0 0 0 17.5 11H16"/></svg></button></div><span class="mut sm tdur">${tempo(t.ms)}</span></div>`).join("")}<div class="tnone" id="tnone">No tracks found</div></div>`:`<div class="empty" style="margin-top:30px">No tracks available for this album.</div>`}
+  <h2>Review</h2>
+  <div class="lbx">
+    <div class="lbx-h">${capaAlbum(k,m.t,64)}<div style="min-width:0"><div class="lbx-t">${esc(m.t)}</div><div class="lbx-s">${esc(m.a)}${m.y?` · ${m.y}`:""}</div></div></div>
+    <label class="lbx-d"><span>Listened on</span><input type="date" id="revd" value="${esc(x.d||hoje())}" max="${hoje()}"></label>
+    <textarea class="field" id="rev" placeholder="Add a review…">${esc(x.rev||"")}</textarea>
+    <div class="lbx-f">
+      <div class="lbx-r"><span class="mut sm" style="font-weight:700">Rating</span><div style="display:flex" id="rate2">${rateHTML(x.r)}</div></div>
+      <button class="btn ${x.l?"on":""}" data-act="revlike">${x.l?"♥ Liked":"♡ Like"}</button>
+    </div>
+    <div class="lbx-b"><button class="fab" data-act="rev">Save</button><button class="btn" data-story="album">Share to Story</button></div>
+  </div>
   ${S.listas.length?`<h2>Add to a list</h2><div style="display:flex;gap:10px;flex-wrap:wrap">${xsel("lsel",S.listas.map((l,i)=>[String(i),l.nome]),"0")}<button class="btn" data-act="addLista">Add</button></div>`:`<h2>Lists</h2><div class="empty">Create a list in the Lists tab of your Profile to add albums.</div>`}`;
 }
 function albumAct(a){
   const k=location.hash.slice(7);
   const d=dd(k);
+  if(a==="revlike"){d.l=!d.l;salvar();document.querySelectorAll('[data-act="revlike"],[data-act="curtir"]').forEach(b=>{b.classList.toggle("on",!!d.l);b.innerHTML=a==="revlike"&&b.dataset.act==="revlike"?(d.l?"♥ Liked":"♡ Like"):(d.l?"♥ Liked":"♡ Like")});flash(d.l?"Liked":"Unliked");return}
   if(a==="ouvi"){if(d.d){delete d.d;flash("Removed from diary")}else{d.d=hoje();flash("Logged in diary")}}
   if(a==="quero"){d.w=!d.w;flash(d.w?"Added to queue":"Removed from queue")}
   if(a==="curtir"){d.l=!d.l;flash(d.l?"Liked":"Unliked")}
   if(a==="fav"){const p=P();const i=p.fav.indexOf(k);if(i>=0)p.fav.splice(i,1);else if(p.fav.length<10)p.fav.push(k);else{flash("Up to 10 favorite albums");return}}
-  if(a==="rev"){d.rev=($("#rev").value||"").trim();flash("Review saved")}
+  if(a==="rev"){d.rev=($("#rev").value||"").trim();const dv=($("#revd")||{}).value;d.d=dv||d.d||hoje();flash("Saved to your diary")}
   if(a==="capaRm"){delete S.covers[k];flash("Original cover restored")}
   if(a==="auto"){d.auto=!d.auto;const md=mediaDOM();if(d.auto&&md.n)d.r=meioPonto(md.avg);flash(d.auto?"Auto rating on":"Auto rating off")}
   if(a==="usarMedia"){const md=mediaDOM();if(md.n){d.r=meioPonto(md.avg);flash("Album rating updated")}}
@@ -1321,7 +1365,7 @@ function lerImg(f,max,quadrado,cb){
 
 /* ===== Avaliação de músicas ===== */
 const tkey=(t,a)=>"t"+hash(norm(t)+"|"+norm(a));
-function trateHTML(t,a){const k=tkey(t,a);const r=(S.u[k]||{}).r||0;return `<span class="trate" data-tk="${k}" data-tt="${esc(t)}" data-ta="${esc(a)}" style="display:inline-flex;flex-shrink:0;transform:scale(.6);transform-origin:center;margin:-8px -6px">${rateHTML(r).replace(/data-v=/g,'data-tv=')}</span>`}
+function trateHTML(t,a){const k=tkey(t,a);const r=(S.u[k]||{}).r||0;return `<span class="trate" data-tk="${k}" data-tt="${esc(t)}" data-ta="${esc(a)}" style="display:inline-flex;flex-shrink:0;zoom:.6">${rateHTML(r).replace(/data-v=/g,'data-tv=')}</span>`}
 
 /* ===== Editor do perfil com busca de álbuns e músicas ===== */
 let EDQ="",EDQF="albuns",edT=null,edTok=0,EDRES=[],EDTAB="perfil";
@@ -1568,12 +1612,12 @@ document.addEventListener("click",e=>{
   if(ab){aba=ab.dataset.aba;rota();return}
   const fl=t.closest("[data-fl]");
   if(fl){busca.f=fl.dataset.fl;document.querySelectorAll("[data-fl]").forEach(c=>c.classList.toggle("on",c===fl));runSearch();return}
-  const v=t.closest("#rate [data-v]");
+  const v=t.closest("#rate [data-v], #rate2 [data-v]");
   if(v){
     const k=$("#rate").dataset.id;const d=dd(k);const val=+v.dataset.v;
     d.r=d.r===val?0:val;if(!d.r)delete d.r;
     salvar();
-    tic();$("#rate").innerHTML=rateHTML(d.r);
+    tic();$("#rate").innerHTML=rateHTML(d.r);const r2=$("#rate2");if(r2)r2.innerHTML=rateHTML(d.r);
     $("#rlab").textContent=d.r?String(d.r)+" of 5":"Your rating";
     flash(d.r?`Rating ${String(val)} saved`:"Rating removed");
     return;
@@ -2439,9 +2483,7 @@ function mediaHTML(md){
 }
 function mediaBloco(faixas,m,x){
   const md=calcMedia(faixas.map(t=>tkey(t.t,m.a)));
-  return `<div class="autobox"><div id="mediaf" class="mediaf">${mediaHTML(md)}</div>
-  <button class="chip ${x.auto?"on":""}" data-act="auto" style="margin-top:10px">${x.auto?"✓ ":""}Auto rating from track average</button>
-  ${x.d?`<label class="datal">Listened on  <input type="date" id="ddate" value="${esc(x.d)}" max="${hoje()}"></label>`:""}</div>`;
+  return `<div class="autobox"><div id="mediaf" class="mediaf">${mediaHTML(md)}</div></div>`;
 }
 function atualizarMedia(){
   const el=document.getElementById("mediaf");if(!el)return;
