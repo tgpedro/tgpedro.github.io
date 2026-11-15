@@ -430,6 +430,8 @@ textarea.gr-in{resize:none;min-height:56px;line-height:1.4}
 <script>
 /* ===== Configuração e dados locais ===== */
 const PROXY="https://acetato-proxy.tgpedro.workers.dev",DZ="https://api.deezer.com",IT="https://itunes.apple.com",MB="https://musicbrainz.org/ws/2",CAA="https://coverartarchive.org";
+/* Spotify: cole aqui o endereço do Worker do Spotify (ex.: https://acetato-spotify.seuusuario.workers.dev). Vazio = Spotify desligado. */
+const SPOTIFY_PROXY="";
 const KEY="acetato-multi-v1";
 let S=null;
 try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
@@ -462,7 +464,8 @@ function baseTitulo(t){
 }
 const albumKey=(t,a)=>"a"+hash(baseTitulo(t)+"|"+norm(a));
 const artistKey=n=>"r"+hash(norm(n));
-const RANK={dz:0,it:1,mb:2};
+const RANK={dz:0,it:1,sp:1.5,mb:2};
+const nomeFonte=f=>f==="dz"?"Deezer":f==="it"?"Apple Music":f==="sp"?"Spotify":"MusicBrainz";
 
 /* ===== Chamadas às fontes ===== */
 async function getJSON(url){const r=await fetch(url);if(!r.ok)throw new Error(r.status);return r.json()}
@@ -473,6 +476,26 @@ function mb(c){const p=mbFila.then(async()=>{await new Promise(r=>setTimeout(r,1
 const acMB=x=>(x["artist-credit"]||[]).map(c=>c.name).join(", ")||"Desconhecido";
 const capaIT=u=>(u||"").replace("100x100bb","600x600bb");
 
+/* ===== Spotify (catálogo, via Worker) ===== */
+const spOn=()=>!!SPOTIFY_PROXY;
+function spGet(path){
+  if(!spOn())return Promise.reject(new Error("spotify desligado"));
+  return getJSON(`${SPOTIFY_PROXY.replace(/\/$/,"")}/spotify?path=${encodeURIComponent(path)}`);
+}
+const spMemo=new Map();
+function spSearch(q){
+  if(!spMemo.has(q)){
+    const pr=spGet(`/v1/search?q=${q}&type=album,artist,track&limit=10`);
+    pr.catch(()=>spMemo.delete(q));
+    spMemo.set(q,pr);
+    if(spMemo.size>30)spMemo.delete(spMemo.keys().next().value);
+  }
+  return spMemo.get(q);
+}
+const spImg=x=>(x&&x.images&&x.images[0]&&x.images[0].url)||"";
+const spTipo=a=>a.album_type==="compilation"?"compile":a.album_type==="single"?((a.total_tracks||1)<=3?"single":"ep"):"album";
+const spNome=x=>((x.artists||[])[0]||{}).name||"";
+
 /* Cada fonte devolve itens no mesmo formato: {src,id,t,a,y,tipo,cover,genre,n} */
 const fontes={
   albunsDZ:q=>dz(`/search/album?q=${q}&limit=25`).then(j=>(j.data||[]).map(x=>({src:"dz",id:x.id,t:x.title,a:x.artist?.name||"",y:(x.release_date||"").slice(0,4),tipo:x.record_type||"album",cover:x.cover_xl||x.cover_big||"",n:x.nb_tracks}))),
@@ -482,6 +505,9 @@ const fontes={
   musicasIT:q=>getJSON(`${IT}/search?term=${q}&entity=song&limit=20`).then(j=>j.results.map(t=>({src:"it",titulo:t.trackName,artista:t.artistName,ms:t.trackTimeMillis,album:{src:"it",id:t.collectionId,t:t.collectionName,a:t.artistName,y:(t.releaseDate||"").slice(0,4),tipo:"album",cover:capaIT(t.artworkUrl100),genre:t.primaryGenreName}}))),
   artistasDZ:q=>dz(`/search/artist?q=${q}&limit=20`).then(j=>(j.data||[]).map(x=>({src:"dz",id:x.id,n:x.name,foto:x.picture_xl||x.picture_big||"",fas:x.nb_fan||0}))),
   artistasIT:q=>getJSON(`${IT}/search?term=${q}&entity=musicArtist&limit=10`).then(j=>j.results.map(x=>({src:"it",id:x.artistId,n:x.artistName,genre:x.primaryGenreName}))),
+  albunsSP:q=>spSearch(q).then(j=>((j.albums||{}).items||[]).filter(Boolean).map(x=>({src:"sp",id:x.id,t:x.name,a:spNome(x),y:(x.release_date||"").slice(0,4),tipo:spTipo(x),cover:spImg(x),n:x.total_tracks}))),
+  musicasSP:q=>spSearch(q).then(j=>((j.tracks||{}).items||[]).filter(Boolean).map(t=>({src:"sp",titulo:t.name,artista:spNome(t),ms:t.duration_ms,album:{src:"sp",id:t.album.id,t:t.album.name,a:spNome(t.album),y:(t.album.release_date||"").slice(0,4),tipo:spTipo(t.album),cover:spImg(t.album)}}))),
+  artistasSP:q=>spSearch(q).then(j=>((j.artists||{}).items||[]).filter(Boolean).map(x=>({src:"sp",id:x.id,n:x.name,foto:spImg(x),genre:(x.genres||[])[0]||""}))),
   artistasMB:q=>mb(`/artist?query=${q}&limit=12`).then(j=>(j.artists||[]).map(x=>({src:"mb",id:x.id,n:x.name,info:x.disambiguation||x.type||""})))
 };
 
@@ -662,13 +688,13 @@ async function runSearch(){
   const coleta={alb:[],mus:[],art:[]};
   const desenhar=()=>{if(tok===buscaTok)res.innerHTML=montarBusca(q,coleta,f)};
   res.innerHTML=`<div class="load">Buscando…</div>`;
-  const rapido=await Promise.allSettled([fontes.albunsDZ(e),fontes.albunsIT(e),fontes.musicasDZ(e),fontes.musicasIT(e),fontes.artistasDZ(e),fontes.artistasIT(e)]);
+  const rapido=await Promise.allSettled([fontes.albunsDZ(e),fontes.albunsIT(e),fontes.musicasDZ(e),fontes.musicasIT(e),fontes.artistasDZ(e),fontes.artistasIT(e),fontes.albunsSP(e),fontes.musicasSP(e),fontes.artistasSP(e)]);
   if(tok!==buscaTok)return;
   const ok=i=>rapido[i].status==="fulfilled"?rapido[i].value:[];
-  coleta.alb.push(...ok(0),...ok(1));
-  coleta.mus.push(...ok(2),...ok(3));
+  coleta.alb.push(...ok(0),...ok(1),...ok(6));
+  coleta.mus.push(...ok(2),...ok(3),...ok(7));
   coleta.mus.forEach(m=>coleta.alb.push(m.album));
-  coleta.art.push(...ok(4),...ok(5));
+  coleta.art.push(...ok(4),...ok(5),...ok(8));
   desenhar();
   Promise.allSettled([fontes.albunsMB(e),fontes.artistasMB(e)]).then(r=>{
     if(tok!==buscaTok)return;
@@ -683,6 +709,7 @@ async function faixasDe(m){
   try{
     if(m.ids.dz){const d=await dz(`/album/${m.ids.dz}`);return (d.tracks?.data||[]).map(t=>({t:t.title,ms:t.duration*1000}))}
     if(m.ids.it){const j=await getJSON(`${IT}/lookup?id=${m.ids.it}&entity=song`);return j.results.filter(r=>r.wrapperType==="track").map(r=>({t:r.trackName,ms:r.trackTimeMillis}))}
+    if(m.ids.sp){const d=await spGet(`/v1/albums/${m.ids.sp}`);return ((d.tracks||{}).items||[]).map(t=>({t:t.name,ms:t.duration_ms}))}
     if(m.ids.mb){const rel=(await mb(`/release?release-group=${m.ids.mb}&limit=1`)).releases||[];if(!rel[0])return[];const x=await mb(`/release/${rel[0].id}?inc=recordings`);return (x.media||[]).flatMap(md=>(md.tracks||[]).map(t=>({t:t.title,ms:t.length})))}
   }catch(e){}
   return [];
@@ -697,7 +724,7 @@ async function albumView(k){
   const faixas=await faixasDe(m);
   const listas=S.listas.map((l,i)=>`<option value="${i}">${esc(l.nome)}</option>`).join("");
   const fav=(P().fav||[]).includes(k);
-  const fontesTxt=(m.fontes||[]).map(f=>f==="dz"?"Deezer":f==="it"?"iTunes":"MusicBrainz").join(" · ");
+  const fontesTxt=(m.fontes||[]).map(nomeFonte).join(" · ");
   const cv=coverDe(k),capaCustom=!!S.covers[k];
   return `${cv?`<div class="abg" aria-hidden="true"><div style="background-image:url(${cv})"></div></div>`:""}<div class="hero">${capaAlbum(k,m.t,230)}<div class="info">
     <span class="pill">${esc([(m.tipo||"álbum").toUpperCase(),m.genre].filter(Boolean).join(" · "))}</span>
@@ -712,7 +739,7 @@ async function albumView(k){
     </div>
     <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;justify-content:inherit"><div style="display:flex" id="rate" data-id="${k}">${rateHTML(x.r)}</div><span class="mut" style="font-weight:700" id="rlab">${x.r?String(x.r).replace(".",",")+" de 5":"Sua nota"}</span></div>
     ${faixas.length?mediaBloco(faixas,m,x):""}
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px"><label class="btn" style="cursor:pointer">🖼 Trocar capa<input id="capaup" type="file" accept="image/*" hidden></label>${capaCustom?`<button class="btn" data-act="capaRm">Voltar à capa original</button>`:""}</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">${m.ids.sp?`<a class="btn" href="https://open.spotify.com/album/${m.ids.sp}" target="_blank" rel="noopener">Abrir no Spotify</a>`:""}<label class="btn" style="cursor:pointer">🖼 Trocar capa<input id="capaup" type="file" accept="image/*" hidden></label>${capaCustom?`<button class="btn" data-act="capaRm">Voltar à capa original</button>`:""}</div>
   </div></div>
   ${faixas.length?`<h2>Faixas</h2><div class="mlist">${faixas.map((t,i)=>`<div class="row"><span class="num">${String(i+1).padStart(2,"0")}</span><div class="ttl grow">${esc(t.t)}</div>${trateHTML(t.t,m.a)}<button class="shbtn" data-story="musica" data-tt="${esc(t.t)}" data-ms="${t.ms||0}" aria-label="Compartilhar música" title="Compartilhar música" style="width:30px;height:30px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M8 11H6.5A1.5 1.5 0 0 0 5 12.5v7A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5v-7A1.5 1.5 0 0 0 17.5 11H16"/></svg></button><span class="mut sm">${tempo(t.ms)}</span></div>`).join("")}</div>`:`<div class="empty" style="margin-top:30px">Sem faixas disponíveis para este álbum.</div>`}
   <h2>Sua resenha</h2><div class="mlist" style="padding:16px;background:#111"><textarea class="field" id="rev" placeholder="O que você achou deste álbum?">${esc(x.rev||"")}</textarea><div style="display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px;margin-top:12px"><button class="fab" data-act="rev">Salvar resenha</button><button class="btn" data-story="album">Compartilhar no Story</button></div></div>
@@ -756,6 +783,11 @@ async function artistView(k){
       top=(tp.data||[]).map(t=>({t:t.title,al:albumKey(t.album.title,t.artist.name),ms:t.duration*1000,alb:t.album.title}));
       (tp.data||[]).forEach(t=>S.meta[albumKey(t.album.title,t.artist.name)]||guardarAlbum({key:albumKey(t.album.title,t.artist.name),t:t.album.title,a:t.artist.name,y:"",tipo:"album",cover:t.album.cover_big||"",ids:{dz:t.album.id},fontes:["dz"]}));
     }catch(e){}
+  }else if(a.ids.sp){
+    try{
+      const j=await spGet(`/v1/artists/${a.ids.sp}/albums?include_groups=album,single&limit=50`);
+      albuns=unirAlbuns((j.items||[]).map(x=>({src:"sp",id:x.id,t:x.name,a:a.n,y:(x.release_date||"").slice(0,4),tipo:spTipo(x),cover:spImg(x),n:x.total_tracks})));
+    }catch(e){}
   }else if(a.ids.mb){
     try{
       const rgs=(await mb(`/release-group?artist=${a.ids.mb}&limit=100`))["release-groups"]||[];
@@ -784,7 +816,7 @@ async function artistView(k){
     <div class="pinfo"><span class="pill">Artista</span>
       <h1 style="font-size:clamp(48px,8vw,84px);letter-spacing:-.05em;line-height:.95;margin:10px 0 8px">${esc(a.n)}</h1>
       <div class="phandle">${esc(info||"Artista")}</div><button class="btn ${(S.seguindo||[]).some(s=>s.k===k)?"on":""}" data-seguir="${k}" style="margin-top:10px">${(S.seguindo||[]).some(s=>s.k===k)?"✓ Seguindo":"+ Seguir"}</button>
-      <div class="mut sm" style="font-weight:700;margin-top:6px">Dados de: ${esc(a.fontes.map(f=>f==="dz"?"Deezer":f==="it"?"iTunes":"MusicBrainz").join(" · "))}</div>
+      <div class="mut sm" style="font-weight:700;margin-top:6px">Dados de: ${esc(a.fontes.map(nomeFonte).join(" · "))}</div>
     </div></div>
   ${populares}${secoes||`<div class="empty" style="margin-top:30px">Nenhum lançamento encontrado.</div>`}`;
 }
