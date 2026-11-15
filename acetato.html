@@ -592,19 +592,9 @@ h3.sec{font-size:12px;letter-spacing:.1em}
   .ap-hero.nob .ap-img{inset:0 auto 0 50%;width:auto;height:100%;aspect-ratio:1/1;transform:translateX(-50%);animation:none;background-size:cover;background-position:50% 20%;-webkit-mask-image:linear-gradient(90deg,transparent,#000 24%,#000 76%,transparent);mask-image:linear-gradient(90deg,transparent,#000 24%,#000 76%,transparent)}
 }
 .ap-name{color:color-mix(in srgb,var(--ac,#fff) 55%,#fff)}
-.gl.ap-play{width:58px;height:58px;padding:0;justify-content:center;background:color-mix(in srgb,var(--ac,#fff) 75%,#fff);color:#111;border-color:transparent}
-.gl.ic.on{background:color-mix(in srgb,var(--ac,#888) 70%,#fff);color:#111}
-.ap-btns .gl.ic{font-size:18px}
 #apabout{scroll-margin-top:90px}
 /* Latest release + Top songs lado a lado */
 .ap-row2{display:block}
-@media(min-width:960px){.ap-row2{display:grid;grid-template-columns:minmax(260px,330px) minmax(0,1fr);column-gap:44px;align-items:start}}
-.ap-late{padding:0;background:none;border:0;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;align-items:flex-end}
-.ap-late:hover{background:none;transform:none}
-.ap-late .cover{border-radius:8px}
-.ap-latei .d{font-size:12px;color:var(--mut);font-weight:700}
-.ap-latei .t{font-size:17px;margin-top:4px;letter-spacing:-.2px}
-.ap-latei .s{font-size:17px;color:var(--mut);font-weight:600;margin-top:2px}
 .ap-top{gap:0}
 .ap-tr{border-radius:0;padding:9px 4px;border-bottom:1px solid rgba(255,255,255,.1)}
 .ap-tr:hover{background:rgba(255,255,255,.05)}
@@ -1101,8 +1091,8 @@ async function artistView(k){
   const sv=window.__apSort||"new";
   const discos=discosHTML(sv);
   const barra=todos.length>1?`<div class="apbar"><span class="mut sm" style="font-weight:700">Sort releases by</span>${xsel("apsort",[["new","Newest first"],["old","Oldest first"],["az","Title A–Z"]],sv)}</div>`:"";
-  const late=ult?`<div class="ap-lw"><div class="sec-h"><h2>Latest release</h2></div>
-    <a class="ap-late" href="#album-${ult.key}">${capaAlbum(ult.key,ult.t,160)}<div class="ap-latei"><div class="d">${ult.d?esc(fmtData(ult.d)):""}</div><div class="t">${esc(ult.t)}</div><div class="s">${tipoLabel(ult.tipo)}</div></div></a></div>`:"";
+  const late=ult?`<div class="sec-h"><h2>Latest release</h2></div>
+    <a class="ap-late" href="#album-${ult.key}">${capaAlbum(ult.key,ult.t,132)}<div class="ap-latei"><span class="pill">${tipoLabel(ult.tipo)}${ult.d?" · "+esc(fmtData(ult.d)):""}</span><div class="t">${esc(ult.t)}</div><div class="s">${esc(a.n)}</div></div><span class="ap-chev">›</span></a>`:"";
   const tops=D.top.length?`<div class="ap-tw"><div class="sec-h"><h2>Top songs</h2></div><div class="ap-top">${D.top.map((t,i)=>{const yy=((D.albuns.find(u=>u.key===t.al)||{}).y)||"";return `<div class="ap-tr"><a class="ap-tl" href="#album-${t.al}">${capaAlbum(t.al,t.alb,44)}<span class="ap-tt"><b>${esc(t.t)}</b><i>${esc(t.alb)}${yy?" · "+yy:""}</i></span></a><button class="ap-more" data-aplay="${i}" aria-label="Preview, video and links" title="Preview, video and links">···</button></div>`}).join("")}</div></div>`:"";
   const sim=D.rel.length?`<div class="sec-h"><h2>Similar artists</h2></div><div class="carrossel sim" data-keep>${D.rel.map(o=>`<a class="ap-sim" href="#artist-${o.key}"><div class="im" style="background-image:url('${o.foto}')">${o.foto?"":esc(ini(o.n))}</div><div class="t">${esc(o.n)}</div></a>`).join("")}</div>`:"";
   const nAlb=todos.filter(grupos[0][1]).length,nSin=todos.filter(u=>/single|ep/.test(tipoDe(u))).length;
@@ -1117,9 +1107,8 @@ async function artistView(k){
       <h1 class="ap-name${F.up?" up":""}">${esc(a.n)}</h1>
       ${meta?`<div class="ap-meta">${esc(meta)}</div>`:""}
       <div class="ap-btns">
-        <button class="gl ic" data-apabout aria-label="About" title="About"><span style="font-family:Georgia,serif;font-style:italic;font-weight:700;font-size:20px">i</span></button>
-        ${D.top.length?`<button class="gl ap-play" data-aplay="0" aria-label="Play" title="Play"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="margin-left:3px"><path d="M8 5v14l11-7z"/></svg></button>`:""}
-        <button class="gl ic ${seg?"on":""}" data-apfollow="${k}" aria-label="Follow" title="Follow">${seg?"★":"☆"}</button>
+        ${D.top.length?`<button class="gl pri" data-aplay="0">▶ Play</button>`:""}
+        <button class="gl ${seg?"on":""}" data-apfollow="${k}">${seg?"✓ Following":"+ Follow"}</button>
         <button class="gl ic" data-apshare aria-label="Share" title="Share"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M8 11H6.5A1.5 1.5 0 0 0 5 12.5v7A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5v-7A1.5 1.5 0 0 0 17.5 11H16"/></svg></button>
       </div>
     </div></section>
@@ -1165,7 +1154,7 @@ document.addEventListener("click",e=>{
     if(i>=0){S.seguindo.splice(i,1);flash("Unfollowed")}
     else{const a=S.artists[k]||{};S.seguindo.push({k,n:a.n||"",dz:(a.ids||{}).dz||""});flash("Following")}
     const on=S.seguindo.some(s=>s.k===k);
-    fo.textContent=on?"★":"☆";fo.classList.toggle("on",on);
+    fo.textContent=on?"✓ Following":"+ Follow";fo.classList.toggle("on",on);
     salvar();return;
   }
   if(t.closest("[data-apshare]")&&ap){
