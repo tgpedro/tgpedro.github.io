@@ -503,7 +503,7 @@ img{max-width:100%}
 @property --ml{syntax:"<length>";inherits:false;initial-value:0px}
 @property --mr{syntax:"<length>";inherits:false;initial-value:0px}
 .carrossel{--ml:0px;--mr:0px;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 var(--ml),#000 calc(100% - var(--mr)),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 var(--ml),#000 calc(100% - var(--mr)),transparent 100%);transition:--ml .35s ease,--mr .35s ease;cursor:grab}
-.carrossel.scr.fl{--ml:64px}.carrossel.scr.fr{--mr:64px}
+.carrossel.fl{--ml:64px}.carrossel.fr{--mr:64px}
 .carrossel img,.carrossel a{-webkit-user-drag:none;user-select:none}
 :focus-visible{outline:3px solid #fff;outline-offset:3px}
 *{-webkit-tap-highlight-color:transparent}
@@ -1399,6 +1399,10 @@ function melhorarCarrosseis(){
 }
 new MutationObserver(melhorarCarrosseis).observe(document.getElementById('app'),{childList:true,subtree:true});
 melhorarCarrosseis();
+function fadeCarrosseis(){document.querySelectorAll('.carrossel').forEach(c=>{const mx=c.scrollWidth-c.clientWidth;c.classList.toggle('fl',c.scrollLeft>4);c.classList.toggle('fr',mx>4&&c.scrollLeft<mx-4)})}
+new MutationObserver(()=>requestAnimationFrame(fadeCarrosseis)).observe(document.getElementById('app'),{childList:true,subtree:true});
+window.addEventListener('resize',fadeCarrosseis);
+window.addEventListener('load',fadeCarrosseis);
 (function(){
   const nav=document.querySelector('.nav');
   if(!nav)return;
