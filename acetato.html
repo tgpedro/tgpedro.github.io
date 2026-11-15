@@ -498,6 +498,44 @@ img{max-width:100%}
 #trk .trklinks .bd{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;font-style:normal;font-weight:900;font-size:16px;color:#fff;background:#555}
 #trk .trklinks span{display:flex;flex-direction:column}#trk .trklinks b{font-size:15px}#trk .trklinks em{font-style:normal;color:var(--mut);font-weight:800}
 [data-b="Spotify"] .bd{background:#1DB954!important;color:#000!important}[data-b="Apple Music"] .bd{background:linear-gradient(135deg,#FA243C,#FB5C74)!important}[data-b="Deezer"] .bd{background:linear-gradient(135deg,#A238FF,#EF5466)!important}[data-b="YouTube"] .bd,[data-b="YouTube Music"] .bd{background:#F00!important}
+</style><style>
+/* ===== v2: borda desfocada só ao arrastar + padronização Apple TV (vidro, pílulas) ===== */
+@property --ml{syntax:"<length>";inherits:false;initial-value:0px}
+@property --mr{syntax:"<length>";inherits:false;initial-value:0px}
+.carrossel{--ml:0px;--mr:0px;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 var(--ml),#000 calc(100% - var(--mr)),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 var(--ml),#000 calc(100% - var(--mr)),transparent 100%);transition:--ml .35s ease,--mr .35s ease;cursor:grab}
+.carrossel.scr.fl{--ml:64px}.carrossel.scr.fr{--mr:64px}
+.carrossel img,.carrossel a{-webkit-user-drag:none;user-select:none}
+:focus-visible{outline:3px solid #fff;outline-offset:3px}
+*{-webkit-tap-highlight-color:transparent}
+/* botões = pílulas de vidro */
+.btn,.fab,.chip{border-radius:999px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(22px) saturate(170%);-webkit-backdrop-filter:blur(22px) saturate(170%);box-shadow:inset 0 1px 0 rgba(255,255,255,.22);font-weight:800}
+.btn{padding:10px 18px}.btn:hover,.chip:hover{background:rgba(255,255,255,.2)}
+.btn.on,.chip.on{background:#fff;color:#000;border-color:#fff}
+.btn.p,.fab{background:#fff;color:#000;border-color:#fff}
+.btn.p:hover,.fab:hover{background:#fff;transform:scale(1.03)}
+.pill{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(14px);letter-spacing:.04em}
+/* abas do perfil = controle segmentado de vidro */
+.ptabs{display:flex;width:max-content;max-width:100%;gap:2px;padding:4px;border:1px solid rgba(255,255,255,.1);border-radius:999px;background:rgba(255,255,255,.07);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);margin:26px auto 0}
+.ptabs button{padding:9px 16px;border-radius:999px;font-size:14px;transition:background .25s,color .25s}
+.ptabs button.on{background:#fff;color:#000}.ptabs button.on::after{display:none}
+/* perfil: vidro nas estatísticas, listas e campos */
+.pstats{border-radius:22px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);box-shadow:inset 0 1px 0 rgba(255,255,255,.18)}
+.pav{box-shadow:0 0 0 1px rgba(255,255,255,.2),0 24px 60px rgba(0,0,0,.7)}
+.mlist,.hist2,.kpi,.empty,.gr{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:22px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.mlist{overflow:hidden}.row{border-bottom-color:rgba(255,255,255,.07)}
+a.row:hover{background:rgba(255,255,255,.1);transform:none}
+.search,.field{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);border-radius:999px;backdrop-filter:blur(20px)}
+textarea.field{border-radius:20px}
+h3.sec{font-size:12px;letter-spacing:.1em}
+/* pôsteres iguais em todo lugar: sem caixa, canto grande, sobe ao focar */
+.grid a.card:not(.gc){background:none;box-shadow:none;overflow:visible;border-radius:0}
+.grid a.card:not(.gc)>.cover{border-radius:18px;box-shadow:0 14px 34px rgba(0,0,0,.55);transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s}
+.grid a.card:not(.gc):hover{transform:none}
+.grid a.card:not(.gc):hover>.cover{transform:translateY(-8px) scale(1.05);box-shadow:0 30px 60px rgba(0,0,0,.7),0 0 0 2px rgba(255,255,255,.35)}
+.grid a.card:not(.gc) .info{padding:12px 2px 0}
+.gc{background:none!important;box-shadow:none;overflow:visible}.gc .t{text-align:center}.gc .s{text-align:center}
+.gc:hover .cover{transform:scale(1.06);transition:transform .35s}
+.hero .cover{border-radius:22px}
 </style></head>
 <body>
 <div class="amb" id="amb"></div>
@@ -2335,6 +2373,20 @@ function atvCur(){return [...document.querySelectorAll("#atv .atv-s")].findIndex
 setInterval(()=>{if(!document.hidden&&document.getElementById("atv")&&!document.getElementById("atv").matches(":hover"))atvGo(atvCur()+1)},6500);
 document.addEventListener("click",e=>{const b=e.target.closest("[data-atv]");if(b)atvGo(+b.dataset.atv)});
 (function(){let x0=null;document.addEventListener("touchstart",e=>{x0=e.target.closest("#atv")?e.touches[0].clientX:null},{passive:true});document.addEventListener("touchend",e=>{if(x0===null)return;const d=e.changedTouches[0].clientX-x0;if(Math.abs(d)>40)atvGo(atvCur()+(d<0?1:-1));x0=null},{passive:true})})();
+</script>
+<script>
+/* v2: efeito de borda só durante o arraste/rolagem, e arrastar com o mouse */
+document.addEventListener("scroll",e=>{const c=e.target;if(!c||!c.classList||!c.classList.contains("carrossel"))return;
+  const mx=c.scrollWidth-c.clientWidth;c.classList.toggle("fl",c.scrollLeft>4);c.classList.toggle("fr",c.scrollLeft<mx-4);
+  c.classList.add("scr");clearTimeout(c._t);c._t=setTimeout(()=>c.classList.remove("scr"),500)},true);
+(function(){let c=null,x0=0,s0=0,mv=false;
+  document.addEventListener("pointerdown",e=>{mv=false;if(e.pointerType!=="mouse"||e.button)return;c=e.target.closest(".carrossel");if(c){x0=e.clientX;s0=c.scrollLeft}});
+  document.addEventListener("pointermove",e=>{if(!c)return;const d=e.clientX-x0;if(Math.abs(d)>5){mv=true;c.style.scrollSnapType="none";c.style.cursor="grabbing";c.scrollLeft=s0-d}});
+  const up=()=>{if(c){c.style.scrollSnapType="";c.style.cursor=""}c=null};
+  document.addEventListener("pointerup",up);document.addEventListener("pointercancel",up);
+  document.addEventListener("click",e=>{if(mv){e.preventDefault();e.stopPropagation();mv=false}},true);
+  document.addEventListener("dragstart",e=>{if(e.target.closest&&e.target.closest(".carrossel"))e.preventDefault()});
+})();
 </script>
 </body>
 </html>
