@@ -503,7 +503,7 @@ img{max-width:100%}
 @property --ml{syntax:"<length>";inherits:false;initial-value:0px}
 @property --mr{syntax:"<length>";inherits:false;initial-value:0px}
 .carrossel{--ml:0px;--mr:0px;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 var(--ml),#000 calc(100% - var(--mr)),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 var(--ml),#000 calc(100% - var(--mr)),transparent 100%);transition:--ml .35s ease,--mr .35s ease;cursor:grab}
-.carrossel.fl{--ml:64px}.carrossel.fr{--mr:64px}
+.carrossel.scr.fl{--ml:64px}.carrossel.scr.fr{--mr:64px}
 .carrossel img,.carrossel a{-webkit-user-drag:none;user-select:none}
 :focus-visible{outline:3px solid #fff;outline-offset:3px}
 *{-webkit-tap-highlight-color:transparent}
@@ -1391,6 +1391,7 @@ document.addEventListener("click",e=>{
 function melhorarCarrosseis(){
   document.querySelectorAll('.carrossel:not([data-m])').forEach(c=>{
     c.dataset.m='1';
+    if(c.children.length>2&&c.children.length%2)c.lastElementChild.remove();
     const w=document.createElement('div');w.className='carw';
     c.parentNode.insertBefore(w,c);w.appendChild(c);
     const bot=(d)=>{const b=document.createElement('button');b.className='carbtn '+(d<0?'l':'r');b.innerHTML=d<0?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>';b.setAttribute('aria-label',d<0?'Previous':'Next');b.onclick=()=>c.scrollBy({left:d*c.clientWidth*.8,behavior:'smooth'});return b};
@@ -1399,10 +1400,6 @@ function melhorarCarrosseis(){
 }
 new MutationObserver(melhorarCarrosseis).observe(document.getElementById('app'),{childList:true,subtree:true});
 melhorarCarrosseis();
-function fadeCarrosseis(){document.querySelectorAll('.carrossel').forEach(c=>{const mx=c.scrollWidth-c.clientWidth;c.classList.toggle('fl',c.scrollLeft>4);c.classList.toggle('fr',mx>4&&c.scrollLeft<mx-4)})}
-new MutationObserver(()=>requestAnimationFrame(fadeCarrosseis)).observe(document.getElementById('app'),{childList:true,subtree:true});
-window.addEventListener('resize',fadeCarrosseis);
-window.addEventListener('load',fadeCarrosseis);
 (function(){
   const nav=document.querySelector('.nav');
   if(!nav)return;
@@ -2386,7 +2383,10 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-atv]");if(
 /* v2: efeito de borda só durante o arraste/rolagem, e arrastar com o mouse */
 document.addEventListener("scroll",e=>{const c=e.target;if(!c||!c.classList||!c.classList.contains("carrossel"))return;
   const mx=c.scrollWidth-c.clientWidth;c.classList.toggle("fl",c.scrollLeft>4);c.classList.toggle("fr",c.scrollLeft<mx-4);
-  c.classList.add("scr");clearTimeout(c._t);c._t=setTimeout(()=>c.classList.remove("scr"),500)},true);
+  c.classList.add("scr");clearTimeout(c._t);if(!c._dn)c._t=setTimeout(()=>c.classList.remove("scr"),500)},true);
+(function(){const on=(e,v)=>{const c=e.target.closest&&e.target.closest('.carrossel');if(!c)return;c._dn=v;if(!v){clearTimeout(c._t);c._t=setTimeout(()=>c.classList.remove('scr'),350)}};
+  document.addEventListener('pointerdown',e=>on(e,true));
+  ['pointerup','pointercancel'].forEach(n=>document.addEventListener(n,()=>{document.querySelectorAll('.carrossel').forEach(c=>{if(c._dn){c._dn=false;clearTimeout(c._t);c._t=setTimeout(()=>c.classList.remove('scr'),350)}})}))})();
 (function(){let c=null,x0=0,s0=0,mv=false;
   document.addEventListener("pointerdown",e=>{mv=false;if(e.pointerType!=="mouse"||e.button)return;c=e.target.closest(".carrossel");if(c){x0=e.clientX;s0=c.scrollLeft}});
   document.addEventListener("pointermove",e=>{if(!c)return;const d=e.clientX-x0;if(Math.abs(d)>5){mv=true;c.style.scrollSnapType="none";c.style.cursor="grabbing";c.scrollLeft=s0-d}});
