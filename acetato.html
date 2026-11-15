@@ -431,7 +431,7 @@ textarea.gr-in{resize:none;min-height:56px;line-height:1.4}
 /* ===== Configuração e dados locais ===== */
 const PROXY="https://acetato-proxy.tgpedro.workers.dev",DZ="https://api.deezer.com",IT="https://itunes.apple.com",MB="https://musicbrainz.org/ws/2",CAA="https://coverartarchive.org";
 /* Spotify: cole aqui o endereço do Worker do Spotify (ex.: https://acetato-spotify.seuusuario.workers.dev). Vazio = Spotify desligado. */
-const SPOTIFY_PROXY = "https://acetato-spotify.tgpeedro.workers.dev";
+const SPOTIFY_PROXY="https://acetato-spotify.tgpedro.workers.dev";
 const KEY="acetato-multi-v1";
 let S=null;
 try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
@@ -480,7 +480,7 @@ const capaIT=u=>(u||"").replace("100x100bb","600x600bb");
 const spOn=()=>!!SPOTIFY_PROXY;
 function spGet(path){
   if(!spOn())return Promise.reject(new Error("spotify desligado"));
-  return getJSON(`${SPOTIFY_PROXY.replace(/\/$/,"")}/spotify?path=${encodeURIComponent(path)}`);
+  return getJSON(`${SPOTIFY_PROXY.replace(/\/spotify\/?$/,"").replace(/\/$/,"")}/spotify?path=${encodeURIComponent(path)}`);
 }
 const spMemo=new Map();
 function spSearch(q){
@@ -524,7 +524,7 @@ function unirAlbuns(itens){
     if(it.cover&&RANK[it.src]<u.coverRank){u.cover=it.cover;u.coverRank=RANK[it.src]}
     if(!u.genre&&it.genre)u.genre=it.genre;
     if(it.n&&!u.n)u.n=it.n;
-    u.ids[it.src]=it.id;
+    if(!u.ids[it.src])u.ids[it.src]=it.id;
     if(!u.fontes.includes(it.src))u.fontes.push(it.src);
   }
   return [...mapa.values()].sort((a,b)=>b.fontes.length-a.fontes.length);
@@ -540,7 +540,8 @@ function unirArtistas(itens){
     if(it.fas>u.fas)u.fas=it.fas;
     if(it.genre&&!u.genre)u.genre=it.genre;
     if(it.info&&!u.info)u.info=it.info;
-    u.ids[it.src]=it.id;
+    u._f=u._f||{};const fn=it.fas||0;
+    if(!u.ids[it.src]||fn>(u._f[it.src]||0)){u.ids[it.src]=it.id;u._f[it.src]=fn}
     if(!u.fontes.includes(it.src))u.fontes.push(it.src);
   }
   return [...mapa.values()].sort((a,b)=>b.fontes.length-a.fontes.length);
@@ -764,11 +765,12 @@ function albumAct(a){
 async function artistView(k){
   const a=S.artists[k];
   if(!a)return `<div class="empty">Artista não encontrado.</div>`;
-  if(!a.ids.dz){
+  if(!a.ids.dz||!window.__dzOk||!window.__dzOk.has(k)){
+    (window.__dzOk=window.__dzOk||new Set()).add(k);
     try{
-      const j=await dz(`/search/artist?q=${encodeURIComponent(a.n)}&limit=5`);
-      const hit=(j.data||[]).find(x=>norm(x.name)===norm(a.n))||null;
-      if(hit){a.ids.dz=hit.id;a.foto=hit.picture_xl||hit.picture_big||a.foto;a.fas=hit.nb_fan||0;salvar()}
+      const j=await dz(`/search/artist?q=${encodeURIComponent(a.n)}&limit=10`);
+      const hit=(j.data||[]).filter(x=>norm(x.name)===norm(a.n)).sort((x,y)=>(y.nb_fan||0)-(x.nb_fan||0))[0]||null;
+      if(hit&&String(hit.id)!==String(a.ids.dz||"")){a.ids.dz=hit.id;a.foto=hit.picture_xl||hit.picture_big||a.foto;a.fas=hit.nb_fan||0;salvar()}
     }catch(e){}
   }
   const [c1,c2]=cores(k);
