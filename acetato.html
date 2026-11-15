@@ -602,6 +602,9 @@ h3.sec{font-size:12px;letter-spacing:.1em}
 .ap-more{flex-shrink:0;background:none;border:0;color:var(--mut);font-size:20px;letter-spacing:1px;line-height:1;padding:6px 10px;border-radius:10px;cursor:pointer}
 .ap-more:hover{background:rgba(255,255,255,.1);color:#fff}
 .ap .carrossel .card>.cover{border-radius:8px}
+@media(min-width:821px){
+  .ap-hero.nob.edge::before{inset:-40px;background:var(--eL) left top/50% 100% no-repeat,var(--eR) right top/50% 100% no-repeat;filter:blur(36px);transform:none}
+}
 .ap-hero:not(.nob) .ap-img{background-position:50% 30%}
 /* Fundo da página do artista com a cor da foto/banner até o fim */
 .ap-main{padding-bottom:110px}
@@ -1130,14 +1133,32 @@ async function bannerDe(k,a){
   }catch(e){return ""}
   S.bcache[k]={u,t:Date.now()};salvar();return u;
 }
+function apBordas(im){
+  try{
+    const W=48,H=48,N=8,c=document.createElement("canvas");c.width=W;c.height=H;
+    const x=c.getContext("2d",{willReadFrequently:true});x.drawImage(im,0,0,W,H);
+    const lado=x0=>{const arr=[];for(let i=0;i<N;i++){const y0=Math.floor(i*H/N),h=Math.floor((i+1)*H/N)-y0,d=x.getImageData(x0,y0,2,h).data;let r=0,g=0,b=0;const n=d.length/4;for(let j=0;j<d.length;j+=4){r+=d[j];g+=d[j+1];b+=d[j+2]}arr.push(`rgb(${Math.round(r/n)},${Math.round(g/n)},${Math.round(b/n)})`)}return arr};
+    return {L:lado(0),R:lado(W-2)};
+  }catch(e){return null}
+}
+function apEdge(el,E){
+  const h=el&&el.querySelector(".ap-hero");if(!h||!E)return;
+  const g=a=>`linear-gradient(180deg,${a.join(",")})`;
+  h.style.setProperty("--eL",g(E.L));h.style.setProperty("--eR",g(E.R));h.classList.add("edge");
+}
 async function apTema(k,src){
-  const D=(window.__apC||{})[k];if(!D||D.ac||!src)return;
+  const D=(window.__apC||{})[k];if(!D||!src)return;
+  const el=()=>document.querySelector(`.ap[data-k="${k}"]`);
+  const nob=()=>{const e=el();return !!(e&&e.querySelector(".ap-hero.nob"))};
+  if(D.ac&&(D.edge||!nob())){if(D.edge)apEdge(el(),D.edge);return}
   const im=await carregarImg(src);
   if(!im)return;
-  const p=paletaDaImagem(im,k)[0];if(!p)return;
-  D.ac=`rgb(${p.join(",")})`;
-  const el=document.querySelector(`.ap[data-k="${k}"]`);
-  if(el){el.style.setProperty("--ac",D.ac);apBg(D.ac)}
+  if(!D.ac){
+    const p=paletaDaImagem(im,k)[0];
+    if(p){D.ac=`rgb(${p.join(",")})`;const e=el();if(e){e.style.setProperty("--ac",D.ac);apBg(D.ac)}}
+  }
+  if(nob()&&!D.edge)D.edge=apBordas(im);
+  if(D.edge)apEdge(el(),D.edge);
 }
 document.addEventListener("click",e=>{
   const t=e.target,ap=t.closest&&t.closest(".ap");
