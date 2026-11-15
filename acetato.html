@@ -398,6 +398,20 @@ textarea.gr-in{resize:none;min-height:56px;line-height:1.4}
   main{padding-bottom:calc(112px + env(safe-area-inset-bottom,0px))}
 }
 </style>
+<style>
+.favpages{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.favpage{display:contents}
+.favdots{display:none}
+.ed-fitem .xb{width:22px;height:22px;top:5px;right:5px;font-size:14px}
+@media(max-width:640px){
+  .favpages{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin:0 -14px;padding:0 14px;scroll-padding:0 14px}
+  .favpages::-webkit-scrollbar{display:none}
+  .favpage{display:grid;flex:0 0 100%;scroll-snap-align:start;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-content:start}
+  .favdots{display:flex;justify-content:center;gap:8px;margin-top:14px}
+  .favdots button{width:8px;height:8px;border-radius:50%;padding:0;background:rgba(255,255,255,.25);transition:width .25s,background .25s}
+  .favdots button.on{width:22px;border-radius:4px;background:#fff}
+}
+</style>
 </head>
 <body>
 <div class="amb" id="amb"></div>
@@ -710,7 +724,7 @@ function albumAct(a){
   if(a==="ouvi"){if(d.d){delete d.d;flash("Removido do diário")}else{d.d=hoje();flash("Registrado no diário")}}
   if(a==="quero"){d.w=!d.w;flash(d.w?"Adicionado à fila":"Removido da fila")}
   if(a==="curtir"){d.l=!d.l;flash(d.l?"Curtido":"Descurtido")}
-  if(a==="fav"){const p=P();const i=p.fav.indexOf(k);if(i>=0)p.fav.splice(i,1);else if(p.fav.length<4)p.fav.push(k);else{flash("Até 4 álbuns favoritos");return}}
+  if(a==="fav"){const p=P();const i=p.fav.indexOf(k);if(i>=0)p.fav.splice(i,1);else if(p.fav.length<10)p.fav.push(k);else{flash("Até 10 álbuns favoritos");return}}
   if(a==="rev"){d.rev=($("#rev").value||"").trim();flash("Resenha salva")}
   if(a==="capaRm"){delete S.covers[k];flash("Capa original restaurada")}
   if(a==="auto"){d.auto=!d.auto;const md=mediaDOM();if(d.auto&&md.n)d.r=meioPonto(md.avg);flash(d.auto?"Nota automática ligada":"Nota automática desligada")}
@@ -808,11 +822,13 @@ function perfilView(){
   const tabs=[["perfil","Perfil"],["avaliacoes","Avaliações"],["diario","Diário"],["fila","Fila"],["stats","Estatísticas"],["listas","Listas"]];
   let corpo="";
   if(aba==="perfil"){
-    const slots=[0,1,2,3].map(i=>fav[i]?`<a class="fitem" href="#album-${fav[i]}">${capaAlbum(fav[i],(S.meta[fav[i]]||{}).t,null)}<div class="ttl" style="margin-top:8px">${esc((S.meta[fav[i]]||{}).t||"")}</div></a>`:`<div class="fvazio">Vazio</div>`).join("");
+    const slot=i=>fav[i]?`<a class="fitem" href="#album-${fav[i]}">${capaAlbum(fav[i],(S.meta[fav[i]]||{}).t,null)}<div class="ttl" style="margin-top:8px">${esc((S.meta[fav[i]]||{}).t||"")}</div></a>`:`<div class="fvazio">Vazio</div>`;
+    const nPag=Math.max(1,Math.ceil(fav.length/4));
+    const slots=`<div class="favpages" id="favpages">${Array.from({length:nPag},(_,pg)=>`<div class="favpage">${[0,1,2,3].map(j=>slot(pg*4+j)).join("")}</div>`).join("")}</div>${nPag>1?`<div class="favdots">${Array.from({length:nPag},(_,n)=>`<button class="${n===0?"on":""}" data-favpg="${n}" aria-label="Grupo ${n+1}"></button>`).join("")}</div>`:""}`;
     const mus=p.musicas.length?`<div class="mlist">${p.musicas.map((m,i)=>`<div class="row"><span class="num">${String(i+1).padStart(2,"0")}</span><div class="ttl grow">${esc(m)}</div></div>`).join("")}</div>`:`<div class="empty">Adicione músicas favoritas em Editar.</div>`;
     const recs=av.slice(-5).reverse();
     const rec=recs.length?`<div class="mlist">${recs.map(([k,v])=>{const m=S.meta[k]||{t:"Álbum",a:""};return `<a class="row" href="#album-${k}">${capaAlbum(k,m.t,46)}<div class="grow"><div class="ttl">${esc(m.t)}</div><div class="sm mut" style="font-weight:700">${esc(m.a)}</div></div>${estrelas(v.r)}</a>`}).join("")}</div>`:`<div class="empty">Nenhuma avaliação ainda.</div>`;
-    corpo=`<div class="pgrid"><div><h3 class="sec">Álbuns favoritos</h3><div class="favs">${slots}</div><h3 class="sec" style="margin-top:34px">Músicas favoritas</h3>${mus}</div><aside><h3 class="sec">Avaliações recentes</h3>${rec}</aside></div>`;
+    corpo=`<div class="pgrid"><div><h3 class="sec">Álbuns favoritos${fav.length>4?` <span style="text-transform:none;letter-spacing:0;font-weight:700">· ${fav.length}</span>`:""}</h3>${slots}<h3 class="sec" style="margin-top:34px">Músicas favoritas</h3>${mus}</div><aside><h3 class="sec">Avaliações recentes</h3>${rec}</aside></div>`;
   }else if(aba==="avaliacoes"){
     corpo=av.length?`<div class="mlist" style="margin-top:30px">${[...av].reverse().map(([k,v])=>{const m=S.meta[k]||{t:"Álbum",a:""};return `<a class="row" href="#album-${k}" style="display:block"><div style="display:flex;align-items:center;gap:14px">${capaAlbum(k,m.t,46)}<div class="grow"><div class="ttl">${esc(m.t)}</div><div class="sm mut" style="font-weight:700">${esc(m.a)}</div></div>${estrelas(v.r)}</div>${v.rev?`<div style="font-weight:600;padding:10px 0 0 60px;line-height:1.45">${esc(v.rev)}</div>`:""}</a>`}).join("")}</div>`:`<div class="empty" style="margin-top:30px">Você ainda não avaliou nenhum álbum.</div>`;
   }else if(aba==="diario"){
@@ -933,8 +949,8 @@ function renderEditor(){
       <div class="gr-row"><span class="gr-lbl">Local</span><input class="gr-in" data-f="local" maxlength="40" value="${esc(e.local)}" placeholder="Cidade, país"></div>
     </div>`;
   const favoritosAlb=`
-    <div class="gr-tit">Álbuns favoritos <span>${favs.length}/4</span></div>
-    <div class="ed-fav">${[0,1,2,3].map(i=>favs[i]?`<div class="ed-fitem">${capaAlbum(favs[i],(S.meta[favs[i]]||{}).t,null)}<button data-ed="fav-rm" data-k="${favs[i]}" class="xb" aria-label="Remover">×</button></div>`:`<div class="ed-vazio">+</div>`).join("")}</div>`;
+    <div class="gr-tit">Álbuns favoritos <span>${favs.length}/10</span></div><div class="mut sm" style="margin:-6px 2px 0;font-weight:600">No perfil eles aparecem em grupos de 4.</div>
+    <div class="ed-fav">${Array.from({length:Math.min(10,Math.ceil((favs.length+1)/4)*4)},(_,i)=>i).map(i=>favs[i]?`<div class="ed-fitem">${capaAlbum(favs[i],(S.meta[favs[i]]||{}).t,null)}<button data-ed="fav-rm" data-k="${favs[i]}" class="xb" aria-label="Remover">×</button></div>`:`<div class="ed-vazio">+</div>`).join("")}</div>`;
   const favoritosMus=`
     <div class="gr-tit">Músicas favoritas <span>${e.musicas.length}/10</span></div>
     ${e.musicas.length?`<div class="gr">${e.musicas.map((m,i)=>`<div class="gr-row"><span class="num">${String(i+1).padStart(2,"0")}</span><span class="gr-in" style="flex:1">${esc(m)}</span><button data-ed="mus-rm" data-i="${i}" class="xb" aria-label="Remover">×</button></div>`).join("")}</div>`:`<div class="empty" style="padding:22px">Nenhuma música ainda. Busque abaixo.</div>`}`;
@@ -1044,7 +1060,7 @@ document.addEventListener("click",e=>{
     if(a==="fechar"){fecharEditor();return}
     if(a==="foto-rm"){EDIT.avatar="";renderEditor();return}
     if(a==="banner-rm"){EDIT.banner="";renderEditor();return}
-    if(a==="pick-alb"){const k=ed.dataset.k;if(EDIT.fav.includes(k)){EDIT.fav=EDIT.fav.filter(x=>x!==k)}else if(EDIT.fav.length<4)EDIT.fav.push(k);else{flash("Até 4 álbuns favoritos");return}renderEditor();return}
+    if(a==="pick-alb"){const k=ed.dataset.k;if(EDIT.fav.includes(k)){EDIT.fav=EDIT.fav.filter(x=>x!==k)}else if(EDIT.fav.length<10)EDIT.fav.push(k);else{flash("Até 10 álbuns favoritos");return}renderEditor();return}
     if(a==="fav-rm"){EDIT.fav=EDIT.fav.filter(x=>x!==ed.dataset.k);renderEditor();return}
     if(a==="pick-mus"){const m=EDRES[+ed.dataset.i];const linha=`${m.titulo} — ${m.artista}`;if(EDIT.musicas.includes(linha)){EDIT.musicas=EDIT.musicas.filter(x=>x!==linha)}else if(EDIT.musicas.length<10)EDIT.musicas.push(linha);else{flash("Até 10 músicas");return}renderEditor();return}
     if(a==="mus-rm"){EDIT.musicas.splice(+ed.dataset.i,1);renderEditor();return}
@@ -2019,6 +2035,20 @@ document.addEventListener("click",e=>{
   if(t.closest("[data-bk]"))exportar();
 });
 
+</script>
+<script>
+/* pontos do carrossel de favoritos */
+document.addEventListener("scroll",e=>{
+  const el=e.target;
+  if(!el||!el.classList||!el.classList.contains("favpages"))return;
+  const i=Math.round(el.scrollLeft/Math.max(1,el.clientWidth-0));
+  document.querySelectorAll(".favdots button").forEach((b,n)=>b.classList.toggle("on",n===i));
+},true);
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-favpg]");if(!b)return;
+  const el=document.getElementById("favpages");
+  if(el)el.scrollTo({left:+b.dataset.favpg*el.clientWidth,behavior:"smooth"});
+});
 </script>
 </body>
 </html>
