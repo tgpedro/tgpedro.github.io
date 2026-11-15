@@ -640,10 +640,11 @@ h3.sec{font-size:12px;letter-spacing:.1em}
   .ap-dur{display:none}
   .ap .carrossel.sim>*{flex-basis:130px}
 }
-/* Cantos das capas: menos arredondado, igual em todo o site */
-:root{--r-alb:10px}
-.cover,.carrossel .card>.cover,.grid a.card:not(.gc)>.cover,.hero .cover,.ap-late .cover,.fitem .cover,.ed-fitem .cover{border-radius:var(--r-alb)}
-.ap-tl .cover{border-radius:6px}
+/* Hover das capas: leve, sem sombra escura cortada pelo carrossel */
+.carrossel .card>.cover,.grid a.card:not(.gc)>.cover{box-shadow:0 8px 20px rgba(0,0,0,.35)}
+.carrossel a.card:hover>.cover,.carrossel a.card:not(.gc):hover>.cover,.grid a.card:not(.gc):hover>.cover{transform:translateY(-4px) scale(1.03);box-shadow:0 10px 24px rgba(0,0,0,.4)}
+.ap-sim .im{box-shadow:0 8px 20px rgba(0,0,0,.35)}
+.ap-sim:hover .im{transform:translateY(-4px) scale(1.03);box-shadow:0 10px 24px rgba(0,0,0,.4)}
 /* seta da esquerda só aparece depois que a lista foi rolada */
 .carw:has(.carrossel:not(.fl)) .carbtn.l{opacity:0;pointer-events:none}
 </style>
