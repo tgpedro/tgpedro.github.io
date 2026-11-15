@@ -1149,7 +1149,7 @@ const rgba=(c,a=1)=>`rgba(${c[0]},${c[1]},${c[2]},${a})`;
 const escurece=(c,k)=>c.map(v=>Math.round(v*(1-k)));
 
 /* ---- Variações de fundo ---- */
-const VARIACOES=["Degradê","Radial","Desfocado","Vibrante","Escuro"];
+const VARIACOES=["Degradê","Radial","Desfocado","Vibrante","Escuro","Claro","Sólido"];
 function fundoStory(g,W,H,pal,im,v){
   const [p1,p2,p3]=pal;
   if(v===2&&!im)v=0;
@@ -1172,6 +1172,13 @@ function fundoStory(g,W,H,pal,im,v){
   }else if(v===3){
     const f=g.createLinearGradient(0,0,W,H);f.addColorStop(0,rgba(p1));f.addColorStop(.5,rgba(p3));f.addColorStop(1,rgba(escurece(p2,.4)));
     g.fillStyle=f;g.fillRect(0,0,W,H);
+  }else if(v===5){
+    const mix=(c,k)=>c.map(x=>Math.round(x+(255-x)*k));
+    const f=g.createLinearGradient(0,0,0,H);f.addColorStop(0,rgba(mix(p1,.82)));f.addColorStop(1,rgba(mix(p2,.62)));
+    g.fillStyle=f;g.fillRect(0,0,W,H);return;
+  }else if(v===6){
+    const f=g.createLinearGradient(0,0,W*.4,H);f.addColorStop(0,rgba(escurece(p1,.12)));f.addColorStop(1,rgba(escurece(p1,.38)));
+    g.fillStyle=f;g.fillRect(0,0,W,H);return;
   }else{
     const f=g.createLinearGradient(0,0,0,H);f.addColorStop(0,rgba(escurece(p1,.72)));f.addColorStop(1,"#000");
     g.fillStyle=f;g.fillRect(0,0,W,H);
@@ -1199,11 +1206,11 @@ function desenharResenha(c,k,A,v,o){
   const tam=620;
   const tit=A.musica?A.musica.t:m.t,nota=A.musica?((S.u[tkey(A.musica.t,m.a)]||{}).r||0):(d.r||0);
   const I={m,tit,nota,pal,A,ms:A.musica&&A.musica.ms};
+  if(o.mode==="let")return desenharLetra(c,I,v,o);
   if(o.lay===0)return desenharFade(c,I,v,o);
   if(o.lay===1)return desenharPoster(c,I,v,o);
   if(o.lay===2)return desenharVinil(c,I,v,o);
   if(o.lay===3)return desenharPolaroid(c,I,v,o);
-  if(o.lay===5)return desenharLetra(c,I,v,o);
   const gm=c.getContext("2d");
   let fs=64;gm.font=`900 ${fs}px ${FNT}`;
   let ls=quebrarLinhas(gm,tit,860);
@@ -1229,11 +1236,11 @@ function desenharResenha(c,k,A,v,o){
   texto(g,(m.a||"").slice(0,44),W/2,cy+30,`600 38px ${FNT}`,"rgba(255,255,255,.78)");cy+=46;
   if(estrelas){cy+=34;desenharEstrelas(g,W/2,cy+58,nota,70);cy+=70}
   cy+=64;
-  g.letterSpacing="8px";texto(g,"ACETATO",W/2+4,cy+26,`800 30px ${FNT}`,"rgba(255,255,255,.75)");g.letterSpacing="0px";
+  siteNome(g,W/2,cy+26,"center");
 }
 
 /* ---- Layouts: Fade, Pôster, Vinil, Polaroid, Clássico e Letra ---- */
-const LAYOUTS=["Fade","Pôster","Vinil","Polaroid","Clássico","Letra"];
+const LAYOUTS=["Fade","Pôster","Vinil","Polaroid","Clássico"];
 function cortar(g,t,maxW){t=String(t||"");if(g.measureText(t).width<=maxW)return t;while(t.length>1&&g.measureText(t+"…").width>maxW)t=t.slice(0,-1);return t+"…"}
 function desfocar(src,w,h){
   let cur=src;
@@ -1260,7 +1267,7 @@ function blocoTexto(g,I,x,y,max,fs,al,cor,cor2){
   texto(g,cortar(g,I.m.a||"",max),x,cy+s+4,`600 ${s}px ${FNT}`,cor2,al);
   return cy+s+20;
 }
-function siteNome(g,x,y,al,cor){g.letterSpacing="8px";texto(g,"ACETATO",x+(al==="center"?4:0),y,`800 30px ${FNT}`,cor||"rgba(255,255,255,.75)",al);g.letterSpacing="0px"}
+function siteNome(g,x,y,al,cor){if(window.__marca===false)return;g.letterSpacing="8px";texto(g,"ACETATO",x+(al==="center"?4:0),y,`800 30px ${FNT}`,cor||"rgba(255,255,255,.75)",al);g.letterSpacing="0px"}
 
 /* Fade: foto inteira no topo que vira desfoque e some em degradê com as informações embaixo */
 function desenharFade(c,I,v,o){
@@ -1295,7 +1302,7 @@ function desenharPoster(c,I,v,o){
   g.fillStyle=sc;g.fillRect(0,H*.3,W,H*.7);
   const tp=g.createLinearGradient(0,0,0,260);tp.addColorStop(0,"rgba(0,0,0,.45)");tp.addColorStop(1,"rgba(0,0,0,0)");
   g.fillStyle=tp;g.fillRect(0,0,W,260);
-  g.letterSpacing="8px";texto(g,"ACETATO",80,120,`800 30px ${FNT}`,"rgba(255,255,255,.85)","left");g.letterSpacing="0px";
+  siteNome(g,80,120,"left","rgba(255,255,255,.85)");
   const mt=medirTitulo(g,I.tit,920,112,3);
   let yb=H-110;
   if(est){estrelasAl(g,80,yb,nota,70,"left");yb-=110}
@@ -1352,38 +1359,227 @@ function desenharPolaroid(c,I,v,o){
   siteNome(g,W/2,H-(o.fundo?120:50),"center");
 }
 
-/* Letra: trecho digitado pelo usuário em destaque, com a capa e o nome da música embaixo */
-function desenharLetra(c,I,v,o){
-  const W=1080,{A,nota,m}=I,est=!!(o.estrelas&&nota);
-  const bruto=(o.letra||"").trim(),vazio=!bruto;
-  const txt=vazio?"Digite o trecho da letra que você quer compartilhar":bruto;
-  const gm=c.getContext("2d"),MAXW=880;
-  let fs=88,ls=[];
-  for(;fs>=36;fs-=4){
-    gm.font=`800 ${fs}px ${FNT}`;
-    ls=txt.split(/\n/).flatMap(p=>p.trim()?quebrarLinhas(gm,p,MAXW):[""]);
-    if(ls.length*fs*1.2<=820)break;
-  }
-  const lh=fs*1.2,th=ls.length*lh,rod=130;
-  const h=170+th+70+rod+50+(est?100:0)+60;
-  const H=o.fundo?1920:Math.round(h+100);
-  c.width=W;c.height=H;const g=c.getContext("2d");
-  if(o.fundo)fundoStory(g,W,H,I.pal,A.capa,v);
-  let y=o.fundo?(H-h)/2:50;
-  texto(g,"“",W/2,y+170,`900 240px ${FNT}`,"rgba(255,255,255,.3)");
-  y+=170;
-  ls.forEach((l,i)=>texto(g,l,W/2,y+fs*.9+i*lh,`800 ${fs}px ${FNT}`,vazio?"rgba(255,255,255,.4)":"#fff"));
-  y+=th+70;
-  g.font=`800 44px ${FNT}`;const wt=Math.min(640,g.measureText(I.tit).width);
-  g.font=`600 34px ${FNT}`;const wa=Math.min(640,g.measureText(m.a||"").width);
-  const rw=rod+28+Math.max(wt,wa),x0=(W-rw)/2;
-  fotoOuGrad(g,I,x0,y,rod,rod,22);
-  g.font=`800 44px ${FNT}`;texto(g,cortar(g,I.tit,640),x0+rod+28,y+58,`800 44px ${FNT}`,"#fff","left");
-  g.font=`600 34px ${FNT}`;texto(g,cortar(g,m.a||"",640),x0+rod+28,y+104,`600 34px ${FNT}`,"rgba(255,255,255,.75)","left");
-  y+=rod+50;
-  if(est){desenharEstrelas(g,W/2,y+52,nota,70);y+=100}
-  siteNome(g,W/2,y+30,"center");
+/* ---- Letra: vários estilos para o trecho digitado pelo usuário ---- */
+const LSTYLES=["Centro","Cartão","Destaque","Minimal","Capa","Pôster"];
+const LSTYLE_AL=[1,0,0,0,0,0];
+const LFONTS=[
+  ["Sans",s=>`800 ${s}px ${FNT}`],
+  ["Serif",s=>`700 ${s}px Georgia,"Times New Roman",serif`],
+  ["Mono",s=>`600 ${s}px ui-monospace,Menlo,Consolas,monospace`],
+  ["Itálico",s=>`italic 700 ${s}px Georgia,"Times New Roman",serif`]
+];
+const LALIN=["left","center","right"];
+const LTAM=[["P",.72],["M",1],["G",1.3]];
+const LCORES=["Auto","Branco","Preto","Cor"];
+const marcaOn=()=>window.__marca!==false;
+const ancora=(L,W,M)=>L.al==="left"?M:L.al==="right"?W-M:W/2;
+
+function lyricCfg(I,o,v){
+  const vazio=!(o.letra||"").trim();
+  const txt=vazio?"Escreva aqui o trecho\nda letra que você\nquer compartilhar":o.letra.trim();
+  const clar=I.pal[0].map(x=>Math.round(x+(255-x)*.5));
+  const sobreClaro=!!(o.fundo&&v===5);
+  const escuro=o.lc===2||(o.lc===0&&sobreClaro);
+  let real=escuro?"#101012":"#fff";
+  if(o.lc===3)real=sobreClaro?rgba(escurece(I.pal[0],.4)):rgba(clar);
+  const textoEscuro=escuro||(o.lc===3&&sobreClaro);
+  return {
+    vazio,txt,clar,sobreClaro,escuro,
+    mainReal:real,
+    main:vazio?(textoEscuro?"rgba(16,16,18,.38)":"rgba(255,255,255,.4)"):real,
+    sub:textoEscuro?"rgba(16,16,18,.62)":"rgba(255,255,255,.75)",
+    faint:textoEscuro?"rgba(16,16,18,.18)":"rgba(255,255,255,.28)",
+    font:LFONTS[o.lf||0][1],
+    al:LALIN[o.la==null?1:o.la],
+    mult:LTAM[o.lt==null?1:o.lt][1]
+  };
 }
+/* Versão do texto para superfícies escuras ou coloridas (cartão, pôster) */
+function sobreSuperficie(L,I,o,preto){
+  const p=!!(preto&&o.lc===2);
+  const real=o.lc===3?rgba(L.clar):p?"#101012":"#fff";
+  return {...L,mainReal:real,main:L.vazio?(p?"rgba(16,16,18,.4)":"rgba(255,255,255,.45)"):real,sub:p?"rgba(16,16,18,.65)":"rgba(255,255,255,.78)",faint:p?"rgba(16,16,18,.18)":"rgba(255,255,255,.28)",escuro:p};
+}
+function ajustarLetra(g,L,maxW,maxH,fsMax,lhm,inq){
+  lhm=lhm||1.22;
+  const base=inq&&!L.vazio?`“${L.txt}”`:L.txt;
+  let fs=Math.round(fsMax*L.mult),ls=[];
+  for(;;){
+    g.font=L.font(fs);
+    ls=base.split(/\n/).flatMap(p=>p.trim()?quebrarLinhas(g,p.trim(),maxW):[""]);
+    if(ls.length*fs*lhm<=maxH||fs<=30)break;
+    fs-=4;
+  }
+  return {fs,ls,lh:fs*lhm};
+}
+function linhasLetra(g,L,T,ax,y){
+  T.ls.forEach((l,i)=>{if(l)texto(g,l,ax,y+T.fs*.9+i*T.lh,L.font(T.fs),L.main,L.al)});
+}
+/* Rodapé: capa pequena + título e artista, alinhado conforme a opção de alinhamento */
+function rodapeLetra(g,I,o,L,W,M,y,rod,comCapa){
+  const tc=comCapa&&o.lcapa,ti=o.linfo;
+  if(!tc&&!ti)return 0;
+  g.font=`800 40px ${FNT}`;const wt=g.measureText(I.tit).width;
+  g.font=`600 32px ${FNT}`;const wa=g.measureText(I.m.a||"").width;
+  const tw=ti?Math.min(620,Math.max(wt,wa)):0,gap=tc&&ti?26:0,bw=(tc?rod:0)+gap+tw;
+  const x0=L.al==="left"?M:L.al==="right"?W-M-bw:(W-bw)/2;
+  if(tc)fotoOuGrad(g,I,x0,y,rod,rod,18);
+  const hh=tc?rod:84;
+  if(ti){
+    const tx=x0+(tc?rod+gap:0),ty=y+hh/2-6;
+    g.font=`800 40px ${FNT}`;const t1=cortar(g,I.tit,620);
+    g.font=`600 32px ${FNT}`;const t2=cortar(g,I.m.a||"",620);
+    texto(g,t1,tx,ty,`800 40px ${FNT}`,L.mainReal,"left");
+    texto(g,t2,tx,ty+46,`600 32px ${FNT}`,L.sub,"left");
+  }
+  return hh;
+}
+function estrelasLetra(g,I,L,x,y){
+  desenharEstrelas(g,x,y,I.nota,70,L.escuro?"#101012":"#fff",L.escuro?"rgba(16,16,18,.2)":undefined);
+}
+
+/* 0 · Centro: aspas grandes, texto, e capa com título embaixo */
+function letraCentro(c,I,v,o,L){
+  const W=1080,M=100,rod=120,est=!!(o.estrelas&&I.nota),mk=marcaOn();
+  const T=ajustarLetra(c.getContext("2d"),L,W-2*M,820,86);
+  const th=T.ls.length*T.lh,qh=o.lq?150:0,ft=(o.lcapa||o.linfo)?(o.lcapa?rod:84):0;
+  const h=qh+th+(ft?70+ft:0)+(est?110:0)+(mk?90:0);
+  const pad=60,H=o.fundo?1920:Math.round(h+pad*2);
+  c.width=W;c.height=H;const g=c.getContext("2d");
+  if(o.fundo)fundoStory(g,W,H,I.pal,I.A.capa,v);
+  const ax=ancora(L,W,M);let y=o.fundo?(H-h)/2:pad;
+  if(o.lq){texto(g,"“",ax,y+190,`900 240px Georgia,serif`,L.faint,L.al);y+=qh}
+  linhasLetra(g,L,T,ax,y);y+=th;
+  if(ft){y+=70;rodapeLetra(g,I,o,L,W,M,y,rod,true);y+=ft}
+  if(est){estrelasLetra(g,I,L,W/2,y+80);y+=110}
+  siteNome(g,W/2,y+40,"center",L.sub);
+}
+
+/* 1 · Cartão: cartão colorido com a capa no topo e a letra dentro */
+function letraCartao(c,I,v,o,L0){
+  const W=1080,cw=920,px=70,x0=(W-cw)/2,rod=130,est=!!(o.estrelas&&I.nota),mk=marcaOn();
+  const L=sobreSuperficie(L0,I,o,true);
+  const T=ajustarLetra(c.getContext("2d"),L,cw-2*px,760,74);
+  const th=T.ls.length*T.lh,hd=(o.lcapa||o.linfo)?(o.lcapa?rod:84)+56:0;
+  const ch=px+hd+th+(est?110:0)+(mk?90:20)+Math.round(px*.6);
+  const H=o.fundo?1920:Math.round(ch+120);
+  c.width=W;c.height=H;const g=c.getContext("2d");
+  if(o.fundo)fundoStory(g,W,H,I.pal,I.A.capa,v);
+  const cy=(H-ch)/2;
+  g.save();g.shadowColor="rgba(0,0,0,.5)";g.shadowBlur=70;g.shadowOffsetY=28;
+  const f=g.createLinearGradient(x0,cy,x0+cw,cy+ch);f.addColorStop(0,rgba(escurece(I.pal[0],.1)));f.addColorStop(1,rgba(escurece(I.pal[1],.25)));
+  g.fillStyle=f;rrect(g,x0,cy,cw,ch,56);g.fill();g.restore();
+  if(o.lq)texto(g,"”",x0+cw-px+10,cy+px+170,`900 220px Georgia,serif`,L.faint,"right");
+  let y=cy+px;
+  if(hd){rodapeLetra(g,I,o,{...L,al:"left"},W,x0+px,y,rod,true);y+=hd}
+  const ax=L.al==="left"?x0+px:L.al==="right"?x0+cw-px:W/2;
+  linhasLetra(g,L,T,ax,y);y+=th;
+  if(est){
+    const cr=L.escuro?"#101012":"#fff",vz=L.escuro?"rgba(16,16,18,.2)":undefined;
+    if(L.al==="left")estrelasAl(g,x0+px,y+80,I.nota,70,"left",cr,vz);else desenharEstrelas(g,L.al==="right"?x0+cw-px-70*2.4:W/2,y+80,I.nota,70,cr,vz);
+    y+=110;
+  }
+  if(mk){g.letterSpacing="6px";texto(g,"ACETATO",x0+px,y+54,`800 26px ${FNT}`,L.sub,"left");g.letterSpacing="0px"}
+}
+
+/* 2 · Destaque: cada linha com marca-texto atrás */
+function letraDestaque(c,I,v,o,L){
+  const W=1080,M=90,rod=120,padx=30,est=!!(o.estrelas&&I.nota),mk=marcaOn();
+  const T=ajustarLetra(c.getContext("2d"),L,W-2*M-2*padx,820,76,1.4);
+  const th=T.ls.length*T.lh,ft=(o.lcapa||o.linfo)?(o.lcapa?rod:84):0;
+  const h=th+(ft?80+ft:0)+(est?110:0)+(mk?90:0);
+  const pad=60,H=o.fundo?1920:Math.round(h+pad*2);
+  c.width=W;c.height=H;const g=c.getContext("2d");
+  if(o.fundo)fundoStory(g,W,H,I.pal,I.A.capa,v);
+  const bar=o.lc===2?["#101012","#fff"]:o.lc===3?[rgba(L.sobreClaro?escurece(I.pal[0],.2):I.pal[0]),"#fff"]:["#fff","#101012"];
+  let y=o.fundo?(H-h)/2:pad;
+  T.ls.forEach((l,i)=>{
+    if(!l)return;
+    g.font=L.font(T.fs);
+    const w=g.measureText(l).width,bw=w+2*padx;
+    const bx=L.al==="left"?M:L.al==="right"?W-M-bw:(W-bw)/2,by=y+i*T.lh;
+    g.fillStyle=L.vazio?"rgba(255,255,255,.5)":bar[0];rrect(g,bx,by,bw,T.fs*1.22,14);g.fill();
+    texto(g,l,bx+padx,by+T.fs*.93,L.font(T.fs),L.vazio?"rgba(16,16,18,.6)":bar[1],"left");
+  });
+  y+=th;
+  if(ft){y+=80;rodapeLetra(g,I,o,L,W,M,y,rod,true);y+=ft}
+  if(est){estrelasLetra(g,I,L,W/2,y+80);y+=110}
+  siteNome(g,W/2,y+40,"center",L.sub);
+}
+
+/* 3 · Minimal: só o texto grande, com informações discretas embaixo */
+function letraMinimal(c,I,v,o,L){
+  const W=1080,M=100,rod=120,est=!!(o.estrelas&&I.nota),mk=marcaOn();
+  const T=ajustarLetra(c.getContext("2d"),L,W-2*M,1000,118,1.18,o.lq);
+  const th=T.ls.length*T.lh,ft=(o.lcapa||o.linfo)?(o.lcapa?rod:84):0;
+  const h=th+(est?110:0)+(ft?130+ft:0)+(mk?100:0);
+  const pad=70,H=o.fundo?1920:Math.round(h+pad*2);
+  c.width=W;c.height=H;const g=c.getContext("2d");
+  if(o.fundo)fundoStory(g,W,H,I.pal,I.A.capa,v);
+  const ax=ancora(L,W,M);
+  let y=o.fundo?Math.max(150,(H-th-(est?110:0))/2-90):pad;
+  linhasLetra(g,L,T,ax,y);y+=th;
+  if(est){estrelasLetra(g,I,L,W/2,y+90);y+=110}
+  if(ft){
+    const fy=o.fundo?H-ft-(mk?220:140):y+130;
+    const rx=L.al==="left"?M:L.al==="right"?W-M-120:(W-120)/2;
+    g.fillStyle=L.faint;rrect(g,rx,fy-60,120,8,4);g.fill();
+    rodapeLetra(g,I,o,L,W,M,fy,rod,true);y=fy+ft;
+  }
+  siteNome(g,W/2,o.fundo?H-90:y+70,"center",L.sub);
+}
+
+/* 4 · Capa: capa grande no topo e a letra logo abaixo */
+function letraCapa(c,I,v,o,L){
+  const W=1080,M=100,tam=700,est=!!(o.estrelas&&I.nota),mk=marcaOn();
+  const T=ajustarLetra(c.getContext("2d"),L,W-2*M,o.lcapa?560:900,68,1.22,o.lq);
+  const th=T.ls.length*T.lh,cap=o.lcapa?tam+70:0,fi=o.linfo?84:0;
+  const h=cap+th+(fi?60+fi:0)+(est?110:0)+(mk?90:0);
+  const pad=70,H=o.fundo?1920:Math.round(h+pad*2);
+  c.width=W;c.height=H;const g=c.getContext("2d");
+  if(o.fundo)fundoStory(g,W,H,I.pal,I.A.capa,v);
+  const ax=ancora(L,W,M);let y=o.fundo?(H-h)/2:pad;
+  if(o.lcapa){
+    const cx=L.al==="left"?M:L.al==="right"?W-M-tam:(W-tam)/2;
+    g.save();g.shadowColor="rgba(0,0,0,.5)";g.shadowBlur=60;g.shadowOffsetY=26;rrect(g,cx,y,tam,tam,34);g.fillStyle="#000";g.fill();g.restore();
+    fotoOuGrad(g,I,cx,y,tam,tam,34);y+=cap;
+  }
+  linhasLetra(g,L,T,ax,y);y+=th;
+  if(fi){y+=60;rodapeLetra(g,I,o,L,W,M,y,120,false);y+=fi}
+  if(est){estrelasLetra(g,I,L,W/2,y+80);y+=110}
+  siteNome(g,W/2,y+40,"center",L.sub);
+}
+
+/* 5 · Pôster: capa em tela cheia escurecida com a letra por cima */
+function letraPoster(c,I,v,o,L0){
+  const W=1080,M=90,est=!!(o.estrelas&&I.nota),mk=marcaOn();
+  const H=o.fundo?1920:1500;
+  const L=sobreSuperficie(L0,I,o,false);
+  const T=ajustarLetra(c.getContext("2d"),L,W-2*M,H*.5,96,1.2,o.lq);
+  c.width=W;c.height=H;const g=c.getContext("2d");
+  if(!o.fundo){rrect(g,0,0,W,H,56);g.clip()}
+  fotoOuGrad(g,I,0,0,W,H,0);
+  g.fillStyle="rgba(0,0,0,.28)";g.fillRect(0,0,W,H);
+  const sc=g.createLinearGradient(0,H*.25,0,H);sc.addColorStop(0,"rgba(0,0,0,0)");sc.addColorStop(.55,"rgba(0,0,0,.6)");sc.addColorStop(1,"rgba(0,0,0,.92)");
+  g.fillStyle=sc;g.fillRect(0,H*.25,W,H*.75);
+  if(mk)siteNome(g,M,120,"left","rgba(255,255,255,.85)");
+  const th=T.ls.length*T.lh,fi=o.linfo?84:0;
+  const total=th+(est?110:0)+(fi?50+fi:0);
+  let y=H-110-total;
+  const ax=ancora(L,W,M);
+  linhasLetra(g,L,T,ax,y);y+=th;
+  if(est){
+    if(L.al==="left")estrelasAl(g,M,y+80,I.nota,70,"left");else estrelasLetra(g,I,{escuro:false},W/2,y+80);
+    y+=110;
+  }
+  if(fi){y+=50;rodapeLetra(g,I,o,L,W,M,y,120,false)}
+}
+
+function desenharLetra(c,I,v,o){
+  const L=lyricCfg(I,o,v);
+  [letraCentro,letraCartao,letraDestaque,letraMinimal,letraCapa,letraPoster][o.ly||0](c,I,v,o,L);
+}
+
 
 /* ---- Desenho: perfil ---- */
 function desenharPerfil(g,W,H,A,v){
@@ -1426,33 +1622,67 @@ function compartilharCanvas(c,nome){
     flash("Imagem salva. Poste no Story pelo app do Instagram.");
   },"image/png");
 }
-/* Painel de Story: prévia ocupa o espaço livre e os controles ficam embaixo, com rolagem horizontal nas linhas de botões */
+/* Painel de Story: prévia em cima e abas embaixo (Estilo, Letra, Fundo, Extras) */
 (function(){const s=document.createElement("style");s.textContent=`
-#stv{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.96);display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden}
-#stv .stprev{flex:1 1 0;min-height:0;display:flex;align-items:center;justify-content:center;padding:calc(12px + env(safe-area-inset-top,0px)) 16px 8px;overflow:hidden}
-#stv canvas{display:block;flex:0 0 auto;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+#stv{position:fixed;left:0;right:0;top:0;height:var(--vh,100dvh);z-index:90;background:#050506;display:flex;flex-direction:column;overflow:hidden}
+#stv .stprev{position:relative;flex:1 1 0;min-height:0;display:flex;align-items:center;justify-content:center;padding:calc(16px + env(safe-area-inset-top,0px)) 16px 12px;overflow:hidden}
+#stv canvas{display:block;flex:0 0 auto;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
 #stv canvas.xp{background:repeating-conic-gradient(#2a2a2e 0 25%,#1c1c1f 0 50%) 0 0/24px 24px}
-#stv .stctl{flex:0 1 auto;max-height:46vh;max-height:46dvh;overflow-y:auto;overscroll-behavior:contain;padding:6px 14px 10px;display:flex;flex-direction:column;gap:4px}
-#stv .stlbl{font-size:11px;font-weight:800;color:#8e8e93;text-transform:uppercase;letter-spacing:.06em;padding:4px 2px 0}
-#stv .strow{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding:2px 0 4px;flex-shrink:0}
-#stv .strow::-webkit-scrollbar{display:none}
-#stv .strow>*{flex:0 0 auto}
-#stv .strow>:first-child{margin-left:auto}
-#stv .strow>:last-child{margin-right:auto}
-#stv .stctl .field{min-height:76px;font-size:16px;resize:none;flex-shrink:0}
-#stv .stacts{flex:0 0 auto;display:flex;gap:10px;padding:10px 14px calc(12px + env(safe-area-inset-bottom,0px));border-top:1px solid rgba(255,255,255,.08);background:rgba(10,10,12,.92)}
+#stv .stx{position:absolute;top:calc(10px + env(safe-area-inset-top,0px));right:12px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.14);display:grid;place-items:center;font-size:22px;font-weight:600;line-height:1;z-index:3;text-align:center;padding:0}
+#stv .stpanel{flex:0 0 auto;display:flex;flex-direction:column;background:#111113;border-radius:24px 24px 0 0;border-top:1px solid rgba(255,255,255,.08)}
+#stv .sttabs{display:flex;gap:4px;margin:12px 14px 2px;padding:4px;border-radius:14px;background:rgba(255,255,255,.07);flex-shrink:0}
+#stv .stt{flex:1;padding:9px 4px;border-radius:10px;text-align:center;font-weight:800;font-size:13px;color:#8e8e93;white-space:nowrap}
+#stv .stt.on{background:#fff;color:#000}
+#stv .stbody{height:min(200px,calc(var(--vh,100vh)*.3));overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:10px 14px 8px;display:flex;flex-direction:column;gap:10px}
+#stv .seg{display:flex;gap:3px;padding:3px;border-radius:12px;background:rgba(255,255,255,.07);min-width:0;flex-shrink:0}
+#stv .opt .seg{flex:1}
+#stv .seg button{flex:1;padding:8px 2px;border-radius:9px;text-align:center;font-weight:700;font-size:13px;color:#b0b0b5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#stv .seg button.on{background:#fff;color:#000}
+#stv .opt{display:flex;align-items:center;gap:10px;flex-shrink:0}
+#stv .opt>span{flex:0 0 62px;font-size:12px;font-weight:800;color:#8e8e93}
+#stv .throw{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding:2px 2px 4px;flex-shrink:0}
+#stv .throw::-webkit-scrollbar{display:none}
+#stv .th{flex:0 0 auto;width:58px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0}
+#stv .thb{display:block;width:58px;height:103px;border-radius:12px;background:#1c1c1f center/cover no-repeat;border:2px solid transparent;box-sizing:border-box}
+#stv .th.on .thb{border-color:#fff}
+#stv .th em{font-style:normal;font-size:11px;font-weight:700;color:#8e8e93;white-space:nowrap}
+#stv .th.on em{color:#fff}
+#stv .tg{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.06);font-weight:700;font-size:14px;width:100%;flex-shrink:0}
+#stv .sw{display:block;width:42px;height:26px;border-radius:13px;background:rgba(255,255,255,.2);position:relative;flex-shrink:0;transition:background .2s}
+#stv .sw::after{content:"";position:absolute;left:3px;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .2s}
+#stv .sw.on{background:var(--acc)}
+#stv .sw.on::after{transform:translateX(16px)}
+#stv textarea.field{min-height:84px;font-size:16px;resize:none;flex-shrink:0}
+#stv .sthint{font-size:12px;color:#8e8e93;font-weight:600;flex-shrink:0}
+#stv .stacts{flex:0 0 auto;display:flex;gap:10px;padding:10px 14px calc(12px + env(safe-area-inset-bottom,0px));border-top:1px solid rgba(255,255,255,.08)}
 #stv .stacts .btn{flex:1;justify-content:center;padding:13px 16px;font-size:15px}
 #stv .stld{margin:auto;color:#8e8e93;font-weight:700}
-@media(min-width:760px){#stv .stacts{justify-content:center}#stv .stacts .btn{flex:0 0 180px}}
+#stv.kb .stacts{display:none}
+#stv.kb .stbody{height:auto;max-height:calc(var(--vh,100vh)*.36)}
+@media(min-width:900px){
+  #stv{flex-direction:row}
+  #stv .stpanel{width:410px;height:100%;border-radius:0;border-top:0;border-left:1px solid rgba(255,255,255,.08)}
+  #stv .stbody{height:auto;flex:1 1 auto}
+}
 `;document.head.appendChild(s)})();
+
 async function abrirStory(tipo,k,mus){
   document.getElementById("stv")?.remove();
   const ov=document.createElement("div");ov.id="stv";
   ov.innerHTML=`<div class="stld">Preparando imagem…</div>`;
   document.body.appendChild(ov);document.body.style.overflow="hidden";
+  const vv=window.visualViewport;
+  const medir=()=>{if(!vv)return;ov.style.setProperty("--vh",vv.height+"px");ov.style.top=vv.offsetTop+"px";ov.classList.toggle("kb",vv.height<window.innerHeight*.75)};
+  medir();
+  if(vv){vv.addEventListener("resize",medir);vv.addEventListener("scroll",medir)}
   let ro=null;
   const esc2=e=>{if(e.key==="Escape"&&e.target.tagName!=="TEXTAREA")fechar()};
-  const fechar=()=>{if(ro)ro.disconnect();ov.remove();document.body.style.overflow="";document.removeEventListener("keydown",esc2)};
+  const fechar=()=>{
+    if(ro)ro.disconnect();
+    if(vv){vv.removeEventListener("resize",medir);vv.removeEventListener("scroll",medir)}
+    ov.remove();document.body.style.overflow="";window.__marca=true;
+    document.removeEventListener("keydown",esc2);
+  };
   document.addEventListener("keydown",esc2);
   try{await Promise.all(["400","500","600","700","800","900"].map(w=>document.fonts.load(`${w} 40px Inter`)))}catch(e){}
   if(!ov.isConnected)return;
@@ -1467,40 +1697,111 @@ async function abrirStory(tipo,k,mus){
     A.fonte=A.capas.find(Boolean)||banner||A.avatar||null;
   }
   if(!ov.isConnected)return;
+
   const W=1080,H=1920,c=document.createElement("canvas");
   const temNota=tipo==="resenha"&&!!(mus?(S.u[tkey(mus.t,(S.meta[k]||{}).a)]||{}).r:(S.u[k]||{}).r);
-  let v=0;const o={fundo:true,estrelas:true,lay:0,letra:""};
-  ov.innerHTML=`<div class="stprev"></div>
-  <div class="stctl">
-    ${tipo==="resenha"?`<div id="stletra" style="display:none;flex-direction:column;gap:4px"><div class="stlbl">Trecho da letra</div><textarea class="field" id="stlt" rows="3" maxlength="300" placeholder="Digite ou cole o trecho que você quer compartilhar"></textarea></div>
-    <div class="stlbl">Layout</div><div class="strow" id="stlay"></div>
-    <div class="stlbl">Opções</div><div class="strow" id="stopc"></div>`:""}
-    <div id="stfw"><div class="stlbl">Estilo do fundo</div><div class="strow" id="stvar"></div></div>
-  </div>
-  <div class="stacts"><button class="btn" data-sf>Fechar</button><button class="btn p" data-ss>Compartilhar</button></div>`;
+  let v=0,tab=tipo==="resenha"?"estilo":"fundo";
+  const o={fundo:true,estrelas:true,marca:true,mode:"res",lay:0,ly:0,letra:"",lf:0,la:1,lt:1,lc:0,lq:true,lcapa:true,linfo:true};
+  const pal0=tipo==="resenha"?paletaDaImagem(A.capa,k):paletaDaImagem(A.fonte,P().handle||"acetato");
+  const im0=tipo==="resenha"?A.capa:A.fonte;
+
+  ov.innerHTML=`<div class="stprev"><button class="stx" data-sf aria-label="Fechar">×</button></div>
+  <div class="stpanel"><div class="sttabs" id="sttabs"></div><div class="stbody" id="stbody"></div>
+  <div class="stacts"><button class="btn" data-sf>Fechar</button><button class="btn p" data-ss>Compartilhar</button></div></div>`;
   const prev=ov.querySelector(".stprev");prev.appendChild(c);
+
   const ajusta=()=>{
-    const pw=prev.clientWidth-32,ph=prev.clientHeight-8;
+    const cs=getComputedStyle(prev);
+    const pw=prev.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight);
+    const ph=prev.clientHeight-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom);
     if(pw<=0||ph<=0||!c.width||!c.height)return;
     const s=Math.min(pw/c.width,ph/c.height);
     c.style.width=Math.floor(c.width*s)+"px";c.style.height=Math.floor(c.height*s)+"px";
   };
   const desenhar=()=>{
+    window.__marca=o.marca;
     if(tipo==="resenha"){desenharResenha(c,k,A,v,o);c.classList.toggle("xp",!o.fundo)}
     else{c.width=W;c.height=H;desenharPerfil(c.getContext("2d"),W,H,A,v)}
     ajusta();
   };
-  const pintar=()=>{
-    if(tipo==="resenha"){
-      ov.querySelector("#stlay").innerHTML=LAYOUTS.map((n,i)=>`<button class="chip ${i===o.lay?"on":""}" data-sl="${i}">${n}</button>`).join("");
-      ov.querySelector("#stopc").innerHTML=`<button class="chip ${o.fundo?"on":""}" data-so="fundo">Fundo</button>${temNota?`<button class="chip ${o.estrelas?"on":""}" data-so="estrelas">Estrelas</button>`:""}`;
-      ov.querySelector("#stletra").style.display=o.lay===5?"flex":"none";
+
+  /* Miniaturas: estilos desenhados de verdade e amostras de fundo */
+  const thCache=new Map(),swCache=[];
+  const swatch=i=>{
+    if(swCache[i])return swCache[i];
+    const t=document.createElement("canvas");t.width=116;t.height=206;
+    try{fundoStory(t.getContext("2d"),116,206,pal0,im0,i)}catch(e){}
+    return swCache[i]=t.toDataURL("image/jpeg",.7);
+  };
+  const tk=()=>[v,o.estrelas,o.marca,o.letra,o.lf,o.la,o.lt,o.lc,o.lq,o.lcapa,o.linfo].join("¦");
+  let thTok=0;
+  const renderThumbs=()=>{
+    if(tab!=="estilo"||tipo!=="resenha")return;
+    const tok=++thTok,modo=o.mode,n=(modo==="let"?LSTYLES:LAYOUTS).length,key=tk();
+    let i=0;
+    const prox=()=>{
+      if(tok!==thTok||!ov.isConnected||i>=n)return;
+      const ck=key+"|"+modo+"|"+i,el=ov.querySelector(`.thb[data-ti="${i}"]`);
+      let url=thCache.get(ck);
+      if(!url){
+        try{
+          window.__marca=o.marca;
+          const oo={...o,fundo:true,mode:modo};
+          if(modo==="let")oo.ly=i;else oo.lay=i;
+          const tmp=document.createElement("canvas");
+          desenharResenha(tmp,k,A,v,oo);
+          const th=document.createElement("canvas");th.width=116;th.height=206;
+          const tg=th.getContext("2d");tg.imageSmoothingEnabled=true;tg.imageSmoothingQuality="high";
+          tg.drawImage(tmp,0,0,116,206);
+          url=th.toDataURL("image/jpeg",.72);thCache.set(ck,url);
+        }catch(e){url=""}
+      }
+      if(el&&url)el.style.backgroundImage=`url(${url})`;
+      i++;setTimeout(prox,0);
+    };
+    setTimeout(prox,30);
+  };
+
+  /* Conteúdo das abas */
+  const seg=(attr,arr,sel)=>`<div class="seg">${arr.map((n,i)=>`<button class="${i===sel?"on":""}" ${attr}="${i}">${n}</button>`).join("")}</div>`;
+  const tog=(key,label,on)=>`<button class="tg" data-so="${key}"><span>${label}</span><i class="sw ${on?"on":""}"></i></button>`;
+  const abasDe=()=>tipo!=="resenha"?[["fundo","Fundo"]]:[["estilo","Estilo"],...(o.mode==="let"?[["texto","Letra"]]:[]),["fundo","Fundo"],["extras","Extras"]];
+  const corpo=()=>{
+    if(tab==="estilo"){
+      const nomes=o.mode==="let"?LSTYLES:LAYOUTS,atual=o.mode==="let"?o.ly:o.lay,key=tk();
+      return `<div class="seg"><button class="${o.mode==="res"?"on":""}" data-md="res">Resenha</button><button class="${o.mode==="let"?"on":""}" data-md="let">Trecho de letra</button></div>
+      <div class="throw">${nomes.map((n,i)=>{const u=thCache.get(key+"|"+o.mode+"|"+i);return `<button class="th ${i===atual?"on":""}" data-sl="${i}"><span class="thb" data-ti="${i}"${u?` style="background-image:url(${u})"`:""}></span><em>${n}</em></button>`}).join("")}</div>`;
     }
-    ov.querySelector("#stfw").style.display=o.fundo?"":"none";
-    ov.querySelector("#stvar").innerHTML=VARIACOES.map((n,i)=>`<button class="chip ${i===v?"on":""}" data-sv="${i}">${n}</button>`).join("");
+    if(tab==="texto"){
+      return `<textarea class="field" id="stlt" rows="3" maxlength="400" placeholder="Digite ou cole o trecho que você quer compartilhar">${esc(o.letra)}</textarea>
+      <div class="opt"><span>Fonte</span>${seg("data-lf",LFONTS.map(f=>f[0]),o.lf)}</div>
+      <div class="opt"><span>Alinhar</span>${seg("data-la",["Esq.","Centro","Dir."],o.la)}</div>
+      <div class="opt"><span>Tamanho</span>${seg("data-lt",LTAM.map(t=>t[0]),o.lt)}</div>
+      <div class="opt"><span>Cor</span>${seg("data-lc",LCORES,o.lc)}</div>`;
+    }
+    if(tab==="fundo"){
+      return `${tog("fundo","Usar fundo",o.fundo)}
+      <div class="throw" style="opacity:${o.fundo?1:.35};pointer-events:${o.fundo?"auto":"none"}">${VARIACOES.map((n,i)=>`<button class="th ${i===v?"on":""}" data-sv="${i}"><span class="thb" style="background-image:url(${swatch(i)})"></span><em>${n}</em></button>`).join("")}</div>
+      ${o.fundo?"":`<div class="sthint">Sem fundo, a imagem sai com transparência (PNG).</div>`}`;
+    }
+    if(o.mode==="let"){
+      return `${tog("lq","Aspas",o.lq)}${tog("lcapa","Mostrar capa",o.lcapa)}${tog("linfo","Mostrar música e artista",o.linfo)}${temNota?tog("estrelas","Mostrar estrelas",o.estrelas):""}${tog("marca","Assinatura Acetato",o.marca)}`;
+    }
+    return `${temNota?tog("estrelas","Mostrar estrelas",o.estrelas):""}${tog("marca","Assinatura Acetato",o.marca)}`;
+  };
+  const pintar=()=>{
+    const abas=abasDe();
+    if(!abas.some(a=>a[0]===tab))tab=abas[0][0];
+    const tb=ov.querySelector("#sttabs");
+    tb.style.display=abas.length>1?"":"none";
+    tb.innerHTML=abas.map(([id,n])=>`<button class="stt ${id===tab?"on":""}" data-tab="${id}">${n}</button>`).join("");
+    const sb=ov.querySelector("#stbody"),st=sb.scrollTop;
+    sb.innerHTML=corpo();sb.scrollTop=st;
+    renderThumbs();
   };
   pintar();desenhar();
   ro=new ResizeObserver(ajusta);ro.observe(prev);
+
   let tl=null;
   ov.addEventListener("input",e=>{
     if(e.target.id!=="stlt")return;
@@ -1508,16 +1809,29 @@ async function abrirStory(tipo,k,mus){
   });
   ov.addEventListener("click",e=>{
     const t=e.target;
+    const bt=t.closest("[data-tab]");if(bt){tab=bt.dataset.tab;pintar();return}
+    const md=t.closest("[data-md]");
+    if(md){o.mode=md.dataset.md;if(o.mode==="let"&&!o.letra.trim())tab="texto";pintar();desenhar();return}
+    const sl=t.closest("[data-sl]");
+    if(sl){
+      const i=+sl.dataset.sl;
+      if(o.mode==="let"){o.ly=i;o.la=LSTYLE_AL[i]}else o.lay=i;
+      pintar();desenhar();return;
+    }
     const sv=t.closest("[data-sv]");if(sv){v=+sv.dataset.sv;pintar();desenhar();return}
-    const sl=t.closest("[data-sl]");if(sl){o.lay=+sl.dataset.sl;pintar();desenhar();return}
     const so=t.closest("[data-so]");if(so){o[so.dataset.so]=!o[so.dataset.so];pintar();desenhar();return}
+    for(const a of ["lf","la","lt","lc"]){
+      const b=t.closest(`[data-${a}]`);
+      if(b){o[a]=+b.dataset[a];pintar();desenhar();return}
+    }
     if(t.closest("[data-sf]")){fechar();return}
     if(t.closest("[data-ss]")){
-      const base=tipo==="resenha"?(o.lay===5?"letra":(A.musica?"musica":"resenha")):"perfil";
+      const base=tipo==="resenha"?(o.mode==="let"?"letra":(A.musica?"musica":"resenha")):"perfil";
       compartilharCanvas(c,tipo==="resenha"?(o.fundo?`acetato-${base}-story.png`:`acetato-${base}-sem-fundo.png`):"acetato-perfil-story.png");
     }
   });
 }
+
 function gerarStoryPerfil(){abrirStory("perfil")}
 function gerarStoryResenha(k){
   if(!S.meta[k]){flash("Abra o álbum pela busca antes");return}
