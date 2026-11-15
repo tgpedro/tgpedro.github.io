@@ -501,6 +501,7 @@ function baseTitulo(t){
 }
 const albumKey=(t,a)=>"a"+hash(baseTitulo(t)+"|"+norm(a));
 const artistKey=n=>"r"+hash(norm(n));
+const temCapa=u=>!!u.cover&&!/\/cover\/\//.test(u.cover)&&!/\/artist\/\//.test(u.cover);
 const slug=s=>String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
 async function artistRoute(id){
   let k=id;
@@ -527,7 +528,7 @@ async function dz(p){const url=DZ+p;let j;if(PROXY){try{j=await getJSON(PROXY+"/
 let mbFila=Promise.resolve();
 function mb(c){const p=mbFila.then(async()=>{await new Promise(r=>setTimeout(r,1100));const j=await getJSON(`${MB}${c}${c.includes("?")?"&":"?"}fmt=json`);return j});mbFila=p.catch(()=>{});return p}
 const acMB=x=>(x["artist-credit"]||[]).map(c=>c.name).join(", ")||"Desconhecido";
-const capaIT=u=>(u||"").replace("100x100bb","600x600bb");
+const capaIT=u=>(u||"").replace(/\d+x\d+bb/,"600x600bb");
 
 /* ===== Spotify (catálogo, via Worker) ===== */
 const spOn=()=>!!SPOTIFY_PROXY;
@@ -625,13 +626,12 @@ const erroHTML=()=>`<div class="empty">Could not load right now. Try again in a 
 
 async function tendencias(){
   const paises=["us","gb","de","fr","jp","mx","kr","au","ca","it","es"];
-  const apUmPais=p=>getJSON(`${PROXY}/feed/${p}`).then(j=>j.results||[])
-    .catch(()=>getJSON(`https://itunes.apple.com/${p}/rss/topalbums/limit=25/json`).then(j=>(j.feed?.entry||[]).map(e=>({id:e.id.attributes["im:id"],name:e["im:name"].label,artistName:e["im:artist"].label,artworkUrl100:e["im:image"][2].label}))));
-  const ap=PROXY?await Promise.allSettled(paises.map(apUmPais)):[];
+  const apUmPais=p=>getJSON(`https://itunes.apple.com/${p}/rss/topalbums/limit=30/json`).then(j=>(j.feed?.entry||[]).map(e=>({id:e.id.attributes["im:id"],name:e["im:name"].label,artistName:e["im:artist"].label,artworkUrl100:e["im:image"][2].label}))).then(r=>{if(!r.length)throw 0;return r}).catch(()=>getJSON(`${PROXY}/feed/${p}`).then(j=>j.results||[]));
+  const ap=await Promise.allSettled(paises.map(apUmPais));
   const generos=[];
   const dzc=await Promise.allSettled(generos.map(g=>dz(`/chart/${g}/albums?limit=25`).then(j=>j.data||[])));
   const okAp=ap.filter(x=>x.status==="fulfilled").length;
-  const apStatus=PROXY?`Apple ${okAp}/${paises.length} countries`:"Apple off (no proxy)";
+  const apStatus=`Apple ${okAp}/${paises.length} countries`;
   const okDz=dzc.filter(x=>x.status==="fulfilled").length;
   const itens=[];
   ap.forEach(x=>{if(x.status==="fulfilled")x.value.forEach(r=>itens.push({src:"it",id:r.id,t:r.name,a:r.artistName,y:"",tipo:"album",cover:capaIT(r.artworkUrl100)}))});
@@ -641,7 +641,7 @@ async function tendencias(){
 let homeGenero=0;
 const GENEROS_HOME=[[0,"Worldwide"],[132,"Pop"],[116,"Hip-hop"],[85,"Alternative"],[106,"Electronic"],[165,"R&B"]];
 async function homeView(){
-  const cardsDe=lista=>unirAlbuns(lista.map(x=>({src:"dz",id:x.id,t:x.title,a:x.artist?.name||"",y:(x.release_date||"").slice(0,4),tipo:x.record_type||"album",cover:x.cover_xl||x.cover_big||x.cover_medium||""}))).map(u=>{guardarAlbum(u);return cardAlbum(u)}).join("");
+  const cardsDe=lista=>unirAlbuns(lista.map(x=>({src:"dz",id:x.id,t:x.title,a:x.artist?.name||"",y:(x.release_date||"").slice(0,4),tipo:x.record_type||"album",cover:x.cover_xl||x.cover_big||x.cover_medium||""}))).filter(temCapa).map(u=>{guardarAlbum(u);return cardAlbum(u)}).join("");
   let lista=[],status="";
   if(homeGenero===0){const r=await tendencias();lista=r.lista;status=r.status}
   else{
@@ -651,7 +651,7 @@ async function homeView(){
     lista=unirAlbuns(fd.flatMap(x=>x.status==="fulfilled"?x.value:[]));
     status="Apple Music · global";
   }
-  lista.forEach(guardarAlbum);
+  lista=lista.filter(temCapa);lista.forEach(guardarAlbum);
   const top=lista.slice(0,24);
   window.__chart=top.map(u=>({title:u.t,artist:{name:u.a},cover_xl:u.cover}));
   const emAlta=top.map(u=>cardAlbum(u)).join("");
@@ -696,9 +696,9 @@ async function homeView(){
   let regioes="";
   (window.__ap||[]).forEach(([p,r])=>{
     if(!NP[p]||r.status!=="fulfilled")return;
-    const l=unirAlbuns(r.value.slice(0,12).map(x=>({src:"it",id:x.id,t:x.name,a:x.artistName,y:"",tipo:"album",cover:capaIT(x.artworkUrl100)})));
+    const l=unirAlbuns(r.value.slice(0,30).map(x=>({src:"it",id:x.id,t:x.name,a:x.artistName,y:"",tipo:"album",cover:capaIT(x.artworkUrl100)})));
     l.forEach(guardarAlbum);
-    regioes+=`<div class="sec-h"><h2>Top in ${NP[p]}</h2></div><div class="carrossel">${l.map(cardAlbum).join("")}</div>`;
+    const lf=l.filter(temCapa).slice(0,12);if(lf.length)regioes+=`<div class="sec-h"><h2>Top in ${NP[p]}</h2></div><div class="carrossel">${lf.map(u=>cardAlbum(u)).join("")}</div>`;
   });
   const diario=Object.entries(S.u).filter(([,v])=>v.d).sort((a,b)=>b[1].d.localeCompare(a[1].d)).slice(0,10);
   return `${heroi}
