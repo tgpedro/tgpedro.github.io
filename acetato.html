@@ -580,6 +580,18 @@ h3.sec{font-size:12px;letter-spacing:.1em}
 .ap-sim .im{width:100%;aspect-ratio:1;border-radius:50%;background:linear-gradient(145deg,#8B5CF6,#B794F6) center/cover no-repeat;display:grid;place-items:center;font-weight:900;font-size:36px;box-shadow:0 14px 34px rgba(0,0,0,.55);transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s}
 .ap-sim:hover .im{transform:translateY(-6px) scale(1.04);box-shadow:0 30px 60px rgba(0,0,0,.7),0 0 0 2px rgba(255,255,255,.35)}
 .ap-sim .t{margin-top:12px;font-weight:800;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Desktop: a foto deixa de ser esticada na largura da tela inteira e fica quadrada, à direita, sem cortar o rosto */
+@media(min-width:821px){
+  .ap-hero::before{content:"";position:absolute;inset:-60px;background:var(--hero,none) center/cover no-repeat;filter:blur(70px) saturate(150%) brightness(.5);transform:scale(1.1)}
+  .ap-img{inset:0 max(0px,calc(50% - 760px)) 0 auto;width:auto;height:100%;aspect-ratio:1/1;background-size:cover;background-position:50% 18%;transform-origin:50% 40%;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 32%);mask-image:linear-gradient(90deg,transparent 0,#000 32%)}
+  .ap-shade{background:linear-gradient(180deg,transparent 55%,color-mix(in srgb,var(--apbg) 70%,transparent) 80%,var(--apbg) 98%),linear-gradient(180deg,rgba(0,0,0,.45),transparent 22%)}
+  .ap-hbody>*{max-width:52%}
+  .ap-name{font-size:calc(clamp(52px,7vw,112px)*var(--asz))}
+}
+/* Busca dentro do álbum */
+.tsearch{position:relative;margin:0 0 12px;max-width:420px}
+.tsearch .search{font-size:15px;padding:11px 14px 11px 44px;border-radius:999px}
+.tnone{display:none;padding:22px;text-align:center;color:var(--mut);font-weight:700}
 @media(max-width:640px){
   .ap-hero{margin-top:-76px;height:min(78vh,580px);min-height:440px}
   .ap-hbody{bottom:26px;align-items:center;text-align:center}
@@ -947,7 +959,7 @@ async function albumView(k){
     ${faixas.length?mediaBloco(faixas,m,x):""}
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">${m.ids.sp?`<a class="btn" href="https://open.spotify.com/album/${m.ids.sp}" target="_blank" rel="noopener">Open on Spotify</a>`:""}<label class="btn" style="cursor:pointer">🖼 Change cover<input id="capaup" type="file" accept="image/*" hidden></label>${capaCustom?`<button class="btn" data-act="capaRm">Restore original cover</button>`:""}</div>
   </div></div>
-  ${faixas.length?`<h2>Tracks</h2><div class="mlist">${faixas.map((t,i)=>`<div class="row"><span class="num">${String(i+1).padStart(2,"0")}</span><div class="ttl grow">${esc(t.t)}</div>${trateHTML(t.t,m.a)}<button class="shbtn" data-play data-tt="${esc(t.t)}" data-ta="${esc(m.a)}" aria-label="Preview, video and links" title="Preview, video and links" style="width:30px;height:30px;font-size:11px;padding-left:2px">▶</button><button class="shbtn" data-story="musica" data-tt="${esc(t.t)}" data-ms="${t.ms||0}" aria-label="Share song" title="Share song" style="width:30px;height:30px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M8 11H6.5A1.5 1.5 0 0 0 5 12.5v7A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5v-7A1.5 1.5 0 0 0 17.5 11H16"/></svg></button><span class="mut sm">${tempo(t.ms)}</span></div>`).join("")}</div>`:`<div class="empty" style="margin-top:30px">No tracks available for this album.</div>`}
+  ${faixas.length?`<h2>Tracks</h2>${faixas.length>1?`<div class="tsearch"><input class="search" id="tsearch" type="search" placeholder="Search tracks in this album" autocomplete="off"></div>`:""}<div class="mlist" id="tlist">${faixas.map((t,i)=>`<div class="row" data-tn="${esc(t.t.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase())}"><span class="num">${String(i+1).padStart(2,"0")}</span><div class="ttl grow">${esc(t.t)}</div>${trateHTML(t.t,m.a)}<button class="shbtn" data-play data-tt="${esc(t.t)}" data-ta="${esc(m.a)}" aria-label="Preview, video and links" title="Preview, video and links" style="width:30px;height:30px;font-size:11px;padding-left:2px">▶</button><button class="shbtn" data-story="musica" data-tt="${esc(t.t)}" data-ms="${t.ms||0}" aria-label="Share song" title="Share song" style="width:30px;height:30px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M8 11H6.5A1.5 1.5 0 0 0 5 12.5v7A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5v-7A1.5 1.5 0 0 0 17.5 11H16"/></svg></button><span class="mut sm">${tempo(t.ms)}</span></div>`).join("")}<div class="tnone" id="tnone">No tracks found</div></div>`:`<div class="empty" style="margin-top:30px">No tracks available for this album.</div>`}
   <h2>Your review</h2><div class="mlist" style="padding:16px;background:#111"><textarea class="field" id="rev" placeholder="What did you think of this album?">${esc(x.rev||"")}</textarea><div style="display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px;margin-top:12px"><button class="fab" data-act="rev">Save review</button><button class="btn" data-story="album">Share to Story</button></div></div>
   ${S.listas.length?`<h2>Add to a list</h2><div style="display:flex;gap:10px;flex-wrap:wrap"><select class="field" id="lsel" style="width:auto">${listas}</select><button class="btn" data-act="addLista">Add</button></div>`:`<h2>Lists</h2><div class="empty">Create a list in the Lists tab of your Profile to add albums.</div>`}`;
 }
@@ -1045,7 +1057,7 @@ async function artistView(k){
   const sobre=`<div class="sec-h"><h2>About</h2></div><div class="kpis">${kp(a.fas?fmtFas(a.fas):"—","Fans")}${kp(nAlb,"Albums")}${kp(nSin,"Singles & EPs")}${kp(desde||"—","Active since")}</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">${links}</div>`;
   setTimeout(()=>apTema(k,hero),0);
   return `<div class="ap" data-k="${k}" data-fi="${fi}" style="--ac:${D.ac||c1};--af:'${F.n}';--aw:${F.w};--ai:${F.i?"italic":"normal"};--als:${F.ls};--asz:${F.sz}">
-  <section class="ap-hero"><div class="ap-img" style="${hero?`background-image:url('${hero}')`:`background:linear-gradient(135deg,${c1},#000)`}"></div><div class="ap-shade"></div>
+  <section class="ap-hero"${hero?` style="--hero:url('${hero}')"`:""}><div class="ap-img" style="${hero?`background-image:url('${hero}')`:`background:linear-gradient(135deg,${c1},#000)`}"></div><div class="ap-shade"></div>
     <div class="ap-hbody"><span class="atv-tag">Artist</span>
       <h1 class="ap-name${F.up?" up":""}">${esc(a.n)}</h1>
       ${meta?`<div class="ap-meta">${esc(meta)}</div>`:""}
@@ -1332,6 +1344,13 @@ window.addEventListener("hashchange",rota);
 
 /* ===== Eventos ===== */
 document.addEventListener("input",e=>{
+  if(e.target&&e.target.id==="tsearch"){
+    const q=e.target.value.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim();
+    const rows=document.querySelectorAll("#tlist .row");let n=0;
+    rows.forEach(r=>{const ok=!q||(r.dataset.tn||"").includes(q);r.style.display=ok?"":"none";if(ok)n++});
+    const none=document.getElementById("tnone");if(none)none.style.display=n?"none":"block";
+    return;
+  }
   const t=e.target;
   if(t.id==="q"){busca.q=t.value;clearTimeout(hqT);hqT=setTimeout(runSearch,300);return}
   if(t.id==="edq"){EDQ=t.value;clearTimeout(edT);edT=setTimeout(runEdSearch,300);return}
