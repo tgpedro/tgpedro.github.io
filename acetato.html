@@ -503,7 +503,7 @@ img{max-width:100%}
 @property --ml{syntax:"<length>";inherits:false;initial-value:0px}
 @property --mr{syntax:"<length>";inherits:false;initial-value:0px}
 .carrossel{--ml:0px;--mr:0px;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 var(--ml),#000 calc(100% - var(--mr)),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 var(--ml),#000 calc(100% - var(--mr)),transparent 100%);transition:--ml .35s ease,--mr .35s ease;cursor:grab}
-.carrossel.scr.fl{--ml:64px}.carrossel.scr.fr{--mr:64px}
+.carrossel.fl{--ml:64px}.carrossel.fr{--mr:64px}
 .carrossel img,.carrossel a{-webkit-user-drag:none;user-select:none}
 :focus-visible{outline:3px solid #fff;outline-offset:3px}
 *{-webkit-tap-highlight-color:transparent}
@@ -2382,7 +2382,7 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-atv]");if(
 <script>
 /* v2: efeito de borda só durante o arraste/rolagem, e arrastar com o mouse */
 document.addEventListener("scroll",e=>{const c=e.target;if(!c||!c.classList||!c.classList.contains("carrossel"))return;
-  const mx=c.scrollWidth-c.clientWidth;c.classList.toggle("fl",c.scrollLeft>4);c.classList.toggle("fr",c.scrollLeft<mx-4);
+  const mx=c.scrollWidth-c.clientWidth;if(c.scrollLeft>4)c._arr=1;c.classList.toggle("fl",c.scrollLeft>4);c.classList.toggle("fr",!!c._arr&&c.scrollLeft<mx-4);
   c.classList.add("scr");clearTimeout(c._t);if(!c._dn)c._t=setTimeout(()=>c.classList.remove("scr"),500)},true);
 (function(){const on=(e,v)=>{const c=e.target.closest&&e.target.closest('.carrossel');if(!c)return;c._dn=v;if(!v){clearTimeout(c._t);c._t=setTimeout(()=>c.classList.remove('scr'),350)}};
   document.addEventListener('pointerdown',e=>on(e,true));
