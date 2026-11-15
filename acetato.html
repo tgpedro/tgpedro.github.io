@@ -1027,15 +1027,33 @@ function apSetFonte(el,i){
 const fmtFas=n=>{try{return new Intl.NumberFormat("en",{notation:"compact",maximumFractionDigits:1}).format(n)}catch(e){return String(n)}};
 const fmtData=d=>{if(!/^\d{4}-\d{2}-\d{2}$/.test(d||""))return d||"";try{return new Date(d+"T00:00:00Z").toLocaleDateString("en",{month:"short",day:"numeric",year:"numeric",timeZone:"UTC"})}catch(e){return d}};
 
+async function apWikiLogo(nome){
+  try{
+    const W="https://www.wikidata.org/w/api.php?format=json&origin=*&";
+    const j=await getJSON(W+`action=wbsearchentities&language=en&type=item&limit=7&search=${encodeURIComponent(nome)}`);
+    const re=/singer|band|musician|rapper|duo|group|artist|composer|producer|dj|songwriter/i;
+    const c=(j.search||[]).filter(x=>norm(x.label)===norm(nome)&&re.test(x.description||""));
+    for(const x of c.slice(0,3)){
+      const e=await getJSON(W+`action=wbgetentities&props=claims&ids=${x.id}`);
+      const f=(((e.entities||{})[x.id]||{}).claims||{}).P154;
+      const v=f&&f[0]&&f[0].mainsnak&&f[0].mainsnak.datavalue&&f[0].mainsnak.datavalue.value;
+      if(v)return "https://commons.wikimedia.org/wiki/Special:FilePath/"+encodeURIComponent(v)+"?width=800";
+    }
+  }catch(e){}
+  return "";
+}
 async function apAudioDB(nome){
+  let o={};
   try{
     const c=new AbortController(),to=setTimeout(()=>c.abort(),6000);
     const r=await fetch(`https://www.theaudiodb.com/api/v1/json/2/search.php?s=${encodeURIComponent(nome)}`,{signal:c.signal});clearTimeout(to);
-    if(!r.ok)return {};
-    const j=await r.json(),x=(j.artists||[]).find(y=>norm(y.strArtist)===norm(nome));
-    if(!x)return {};
-    return {logo:x.strArtistLogo||x.strArtistClearart||"",fan:x.strArtistFanart||x.strArtistFanart2||x.strArtistWideThumb||"",bio:(x.strBiographyEN||"").trim(),genre:x.strGenre||""};
-  }catch(e){return {}}
+    if(r.ok){
+      const j=await r.json(),x=(j.artists||[]).find(y=>norm(y.strArtist)===norm(nome));
+      if(x)o={logo:x.strArtistLogo||x.strArtistClearart||"",fan:x.strArtistFanart||x.strArtistFanart2||x.strArtistWideThumb||"",bio:(x.strBiographyEN||"").trim(),genre:x.strGenre||""};
+    }
+  }catch(e){}
+  if(!o.logo)o.logo=await apWikiLogo(nome);
+  return o;
 }
 async function apDados(k,a){
   const adbP=apAudioDB(a.n);
@@ -1076,7 +1094,6 @@ async function apDados(k,a){
 async function artistView(k){
   const a=S.artists[k];
   if(!a)return `<div class="empty">Artist not found.</div>`;
-  apFontes();
   if(!a.ids.dz||!window.__dzOk||!window.__dzOk.has(k)){
     (window.__dzOk=window.__dzOk||new Set()).add(k);
     try{
@@ -1094,11 +1111,8 @@ async function artistView(k){
   const por=(x,y)=>(y.d||y.y||"").localeCompare(x.d||x.y||"");
   const todos=[...D.albuns].sort(por),ult=todos[0];
   const anos=D.albuns.map(u=>+u.y).filter(Boolean),desde=anos.length?Math.min(...anos):0;
-  const auto=eraFonte(k,a,[a.genre,D.gen].join(" "),desde);
   const logo=(S.artLogos||{})[k]||D.logo||"",custom=!!(S.artLogos||{})[k];
-  const pref=(S.artFonts||{})[k];
-  const modo=pref==null?(logo?-1:auto):(pref===-1&&!logo?auto:pref);
-  const fi=modo,F=ERA_FONTES[modo>=0?modo:auto];
+  const auto=0,modo=logo?-1:-2,fi=modo,F={n:"Inter",w:900,i:0,ls:"-.04em",sz:.95};
   const inv=(window.__invC||{})[logo];
   const foto=a.foto||(todos.find(u=>u.cover)||{}).cover||"";
   const hero=D.fan||foto;
@@ -1118,7 +1132,7 @@ async function artistView(k){
   const nAlb=todos.filter(grupos[0][1]).length,nSin=todos.filter(u=>/single|ep/.test(tipoDe(u))).length;
   const kp=(n,l)=>`<div class="kpi"><strong>${n}</strong><span>${l}</span></div>`;
   const links=[a.ids.dz?`<a class="btn" href="https://www.deezer.com/artist/${a.ids.dz}" target="_blank" rel="noopener">Deezer ↗</a>`:"",a.ids.sp?`<a class="btn" href="https://open.spotify.com/artist/${a.ids.sp}" target="_blank" rel="noopener">Spotify ↗</a>`:"",`<a class="btn" href="https://music.apple.com/search?term=${encodeURIComponent(a.n)}" target="_blank" rel="noopener">Apple Music ↗</a>`].join("");
-  const sobre=`<div class="sec-h"><h2>About</h2></div><div class="kpis">${kp(a.fas?fmtFas(a.fas):"—","Fans")}${kp(nAlb,"Albums")}${kp(nSin,"Singles & EPs")}${kp(desde||"—","Active since")}</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">${links}</div>${D.bio?`<div class="ap-bio" id="apbio">${esc(D.bio.slice(0,1400))}</div><button class="chip" data-apbio style="margin-top:10px">Read more</button><div class="mut sm" style="margin-top:8px;font-weight:600">Bio, logo and backdrop: TheAudioDB</div>`:""}`;
+  const sobre=`<div class="sec-h"><h2>About</h2></div><div class="kpis">${kp(a.fas?fmtFas(a.fas):"—","Fans")}${kp(nAlb,"Albums")}${kp(nSin,"Singles & EPs")}${kp(desde||"—","Active since")}</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">${links}</div>${D.bio?`<div class="ap-bio" id="apbio">${esc(D.bio.slice(0,1400))}</div><button class="chip" data-apbio style="margin-top:10px">Read more</button><div class="mut sm" style="margin-top:8px;font-weight:600">Bio and backdrop: TheAudioDB</div>`:""}`;
   setTimeout(()=>apTema(k,hero),0);
   return `<div class="ap" data-k="${k}" data-fi="${fi}" data-auto="${auto}" data-logo="${modo===-1?1:0}" style="--ac:${D.ac||c1};--af:'${F.n}';--aw:${F.w};--ai:${F.i?"italic":"normal"};--als:${F.ls};--asz:${F.sz}">
   <section class="ap-hero"><div class="ap-img" style="${hero?`background-image:url('${hero}')`:`background:linear-gradient(135deg,${c1},#000)`}"></div><div class="ap-shade"></div>
@@ -1130,8 +1144,7 @@ async function artistView(k){
         ${D.top.length?`<button class="gl pri" data-aplay="0">▶ Play</button>`:""}
         <button class="gl ${seg?"on":""}" data-apfollow="${k}">${seg?"✓ Following":"+ Follow"}</button>
         <button class="gl ic" data-apshare aria-label="Share" title="Share"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M8 11H6.5A1.5 1.5 0 0 0 5 12.5v7A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5v-7A1.5 1.5 0 0 0 17.5 11H16"/></svg></button>
-        <button class="gl ic" data-apfont aria-label="Switch title: logo or font" title="Switch title: logo or font" style="font-family:var(--af),serif;font-weight:var(--aw);font-size:17px">Aa</button>
-        <label class="gl ic" title="Upload your own logo (PNG with transparent background)" aria-label="Upload logo" style="cursor:pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="1.6"/><path d="M21 15l-5-5L5 21"/></svg><input id="aplogoup" type="file" accept="image/*" hidden></label>
+        <label class="gl ${logo?"ic":""}" title="Upload your own logo (PNG with transparent background)" aria-label="Upload logo" style="cursor:pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="1.6"/><path d="M21 15l-5-5L5 21"/></svg>${logo?"":"Add logo"}<input id="aplogoup" type="file" accept="image/*" hidden></label>
         ${custom?`<button class="gl ic" data-aplogorm aria-label="Remove my logo" title="Remove my logo">×</button>`:""}
       </div>
     </div></section>
