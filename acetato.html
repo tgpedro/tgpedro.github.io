@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
@@ -439,17 +439,27 @@ img{max-width:100%}
 #ed .ebody,#ed .gr,#ed .mlist{max-width:100%;min-width:0}
 #ed .chips{touch-action:pan-x pan-y}
 </style>
-</head>
+<style>
+.hero-home{height:360px;border-radius:30px}
+.hh-shade{background:linear-gradient(90deg,rgba(0,0,0,.92),rgba(0,0,0,.4) 55%,rgba(0,0,0,0)),linear-gradient(0deg,rgba(0,0,0,.6),transparent 50%)}
+.hh-t{font-size:clamp(30px,5.5vw,54px)!important}
+.sec-h h2{display:flex;align-items:center;gap:10px}
+.sec-h h2::before{content:"";width:4px;height:20px;border-radius:2px;background:linear-gradient(var(--acc2),var(--acc))}
+.chips{padding:16px 0 0}.chip{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.06)}
+.chip.on{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff}
+.carrossel .card:hover{transform:translateY(-6px) scale(1.03)}
+@media(max-width:640px){.hero-home{height:300px}}
+</style></head>
 <body>
 <div class="amb" id="amb"></div>
 <header>
   <a class="logo" href="#home">Acetato<b>.</b></a>
-  <nav class="nav" aria-label="Navegação">
-    <a href="#home" data-tab="home">Início</a>
-    <a href="#search" data-tab="search">Buscar</a>
-    <a href="#diary" data-tab="diary">Diário</a>
-    <a href="#profile" data-tab="profile">Perfil</a>
-    <button class="gear" data-pact="editar" aria-label="Configurações" title="Configurações"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+  <nav class="nav" aria-label="Navigation">
+    <a href="#home" data-tab="home">Home</a>
+    <a href="#search" data-tab="search">Search</a>
+    <a href="#diary" data-tab="diary">Diary</a>
+    <a href="#profile" data-tab="profile">Profile</a>
+    <button class="gear" data-pact="editar" aria-label="Settings" title="Settings"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
   </nav>
 </header>
 <main id="app"></main>
@@ -466,13 +476,13 @@ if(!S)S={u:{},meta:{},artists:{},listas:[],perfil:null};
 S.meta=S.meta||{};S.artists=S.artists||{};S.covers=S.covers||{};
 /* Capa personalizada (se existir) tem prioridade sobre a capa vinda das fontes */
 const coverDe=k=>(S.covers&&S.covers[k])||(S.meta[k]||{}).cover||"";
-const salvar=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){flash("Não foi possível salvar no navegador")}};
+const salvar=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){flash("Could not save to the browser")}};
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const ini=t=>String(t||"?").split(/\s+/).filter(Boolean).map(w=>w[0]).slice(0,2).join("").toUpperCase()||"?";
 function cores(s){let h=0;for(const ch of String(s))h=(h*31+ch.charCodeAt(0))%360;return [`hsl(${h} 70% 55%)`,`hsl(${(h+50)%360} 65% 22%)`]}
 function flash(m){const f=document.createElement("div");f.className="flash";f.textContent=m;document.body.appendChild(f);setTimeout(()=>f.remove(),2400)}
-const P=()=>{if(!S.perfil)S.perfil={nome:"Seu nome",handle:"seu.usuario",bio:"",local:"",avatar:"",banner:"",fav:[],musicas:[]};return S.perfil};
+const P=()=>{if(!S.perfil)S.perfil={nome:"Your name",handle:"your.handle",bio:"",local:"",avatar:"",banner:"",fav:[],musicas:[]};return S.perfil};
 const dd=k=>S.u[k]||(S.u[k]={});
 const hoje=()=>new Date().toISOString().slice(0,10);
 const tempo=ms=>{const s=Math.round((ms||0)/1000);return s?`${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`:""};
@@ -491,6 +501,22 @@ function baseTitulo(t){
 }
 const albumKey=(t,a)=>"a"+hash(baseTitulo(t)+"|"+norm(a));
 const artistKey=n=>"r"+hash(norm(n));
+const slug=s=>String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+async function artistRoute(id){
+  let k=id;
+  if(!S.artists[k]){
+    k=Object.keys(S.artists).find(x=>(slug(S.artists[x].n)||x)===id);
+    if(!k){
+      const j=await dz(`/search/artist?q=${encodeURIComponent(id.replace(/-/g," "))}&limit=5`).catch(()=>({data:[]}));
+      const h=(j.data||[]).find(x=>slug(x.name)===id)||(j.data||[])[0];
+      if(!h)return `<div class="empty">Artist not found.</div>`;
+      k=artistKey(h.name);
+      if(!S.artists[k]){guardarArtista({key:k,n:h.name,foto:h.picture_xl||"",fas:h.nb_fan||0,ids:{dz:h.id},fontes:["dz"]});salvar()}
+    }
+  }
+  history.replaceState(null,"","#artist-"+(slug(S.artists[k].n)||k));
+  return artistView(k);
+}
 const RANK={dz:0,it:1,sp:1.5,mb:2};
 const nomeFonte=f=>f==="dz"?"Deezer":f==="it"?"Apple Music":f==="sp"?"Spotify":"MusicBrainz";
 
@@ -591,44 +617,46 @@ function capaFoto(url,t,px,redonda){
   return `<div class="cover" style="width:${px}px;height:${px}px;font-size:${Math.round(px*.34)}px;background:linear-gradient(145deg,${a},${b})${redonda?";border-radius:50%":""}">${img}<span>${esc(ini(t))}</span></div>`;
 }
 function cardAlbum(u){return `<a class="card" href="#album-${u.key}" style="--c:${cores(u.key)[0]}">${capaAlbum(u.key,u.t,null)}<div class="info"><div class="ta">${esc(u.t)}</div><div class="sa">${esc(u.a)}${u.y?` · ${u.y}`:""}</div></div></a>`}
-function cardArtista(u){return `<a class="card gc" href="#artist-${u.key}" style="--c:${cores(u.n)[0]}">${capaFoto(u.foto,u.n,150,true)}<div class="t">${esc(u.n)}</div><div class="s">${esc(u.genre||u.info||"Artista")}</div></a>`}
-function cardMeta(k){const m=S.meta[k]||{t:"Álbum",a:""};return cardAlbum({key:k,t:m.t,a:m.a,y:m.y,fontes:m.fontes||[]})}
+function cardArtista(u){return `<a class="card gc" href="#artist-${u.key}" style="--c:${cores(u.n)[0]}">${capaFoto(u.foto,u.n,150,true)}<div class="t">${esc(u.n)}</div><div class="s">${esc(u.genre||u.info||"Artist")}</div></a>`}
+function cardMeta(k){const m=S.meta[k]||{t:"Album",a:""};return cardAlbum({key:k,t:m.t,a:m.a,y:m.y,fontes:m.fontes||[]})}
 function rateHTML(r=0){let h="";for(let i=1;i<=5;i++){const c=r>=i?"on":r>=i-.5?"half":"";h+=`<span class="rbtn"><i class="${c}">★</i><b class="l" data-v="${i-.5}"></b><b class="r" data-v="${i}"></b></span>`}return h}
 function estrelas(r){let h="";for(let i=1;i<=5;i++){const c=r>=i?"on":r>=i-.5?"half":"";h+=`<span class="st ${c}">★</span>`}return `<span class="stars">${h}</span>`}
-const erroHTML=()=>`<div class="empty">Não foi possível carregar agora. Tente de novo em alguns segundos.</div>`;
+const erroHTML=()=>`<div class="empty">Could not load right now. Try again in a few seconds.</div>`;
 
 async function tendencias(){
   const paises=["us","gb","de","fr","jp","mx","kr","au","ca","it","es"];
   const apUmPais=p=>getJSON(`${PROXY}/feed/${p}`).then(j=>j.results||[])
     .catch(()=>getJSON(`https://itunes.apple.com/${p}/rss/topalbums/limit=25/json`).then(j=>(j.feed?.entry||[]).map(e=>({id:e.id.attributes["im:id"],name:e["im:name"].label,artistName:e["im:artist"].label,artworkUrl100:e["im:image"][2].label}))));
   const ap=PROXY?await Promise.allSettled(paises.map(apUmPais)):[];
-  const generos=[0,132,116,85,106,165];
+  const generos=[];
   const dzc=await Promise.allSettled(generos.map(g=>dz(`/chart/${g}/albums?limit=25`).then(j=>j.data||[])));
   const okAp=ap.filter(x=>x.status==="fulfilled").length;
-  const apStatus=PROXY?`Apple ${okAp}/${paises.length} países`:"Apple desligada (sem proxy)";
+  const apStatus=PROXY?`Apple ${okAp}/${paises.length} countries`:"Apple off (no proxy)";
   const okDz=dzc.filter(x=>x.status==="fulfilled").length;
   const itens=[];
   ap.forEach(x=>{if(x.status==="fulfilled")x.value.forEach(r=>itens.push({src:"it",id:r.id,t:r.name,a:r.artistName,y:"",tipo:"album",cover:capaIT(r.artworkUrl100)}))});
   dzc.forEach(x=>{if(x.status==="fulfilled")x.value.forEach(r=>itens.push({src:"dz",id:r.id,t:r.title,a:r.artist?.name||"",y:(r.release_date||"").slice(0,4),tipo:"album",cover:r.cover_xl||r.cover_big||""}))});
-  return {lista:unirAlbuns(itens),status:`Fontes: ${apStatus} · Deezer ${okDz}/${generos.length} listas`};
+  window.__ap=paises.map((p,i)=>[p,ap[i]||{}]);return {lista:unirAlbuns(itens),status:`Sources: ${apStatus}`};
 }
 let homeGenero=0;
-const GENEROS_HOME=[[0,"Mundial"],[132,"Pop"],[116,"Hip-hop"],[85,"Alternativo"],[106,"Eletrônica"],[165,"R&B"]];
+const GENEROS_HOME=[[0,"Worldwide"],[132,"Pop"],[116,"Hip-hop"],[85,"Alternative"],[106,"Electronic"],[165,"R&B"]];
 async function homeView(){
   const cardsDe=lista=>unirAlbuns(lista.map(x=>({src:"dz",id:x.id,t:x.title,a:x.artist?.name||"",y:(x.release_date||"").slice(0,4),tipo:x.record_type||"album",cover:x.cover_xl||x.cover_big||x.cover_medium||""}))).map(u=>{guardarAlbum(u);return cardAlbum(u)}).join("");
   let lista=[],status="";
   if(homeGenero===0){const r=await tendencias();lista=r.lista;status=r.status}
   else{
-    const ch=await dz(`/chart/${homeGenero}/albums?limit=24`).then(j=>j.data||[]).catch(()=>[]);
-    lista=unirAlbuns(ch.map(x=>({src:"dz",id:x.id,t:x.title,a:x.artist?.name||"",y:(x.release_date||"").slice(0,4),tipo:"album",cover:x.cover_xl||x.cover_big||""})));
-    status="Deezer";
+    window.__ap=[];
+    const GA={132:14,116:18,85:20,106:7,165:15};
+    const fd=await Promise.allSettled(["us","gb","ca","au","de","jp"].map(p=>getJSON(`https://itunes.apple.com/${p}/rss/topalbums/genre=${GA[homeGenero]}/limit=20/json`).then(j=>(j.feed?.entry||[]).map(e=>({src:"it",id:e.id.attributes["im:id"],t:e["im:name"].label,a:e["im:artist"].label,y:"",tipo:"album",cover:capaIT(e["im:image"][2].label)})))));
+    lista=unirAlbuns(fd.flatMap(x=>x.status==="fulfilled"?x.value:[]));
+    status="Apple Music · global";
   }
   lista.forEach(guardarAlbum);
   const top=lista.slice(0,24);
   window.__chart=top.map(u=>({title:u.t,artist:{name:u.a},cover_xl:u.cover}));
   const emAlta=top.map(u=>cardAlbum(u)).join("");
   const t0=top[0];
-  const heroi=t0?`<div class="hero-home" style="background-image:url(${coverDe(t0.key)||t0.cover})"><div class="hh-shade"></div><div class="hh-body"><span class="pill">Mais ouvido agora</span><h2 class="hh-t">${esc(t0.t)}</h2><div class="mut" style="font-size:17px;font-weight:700">${esc(t0.a)}</div><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px"><a class="btn p" href="#album-${t0.key}">Abrir</a><button class="btn" data-rnd>🎲 Aleatório</button></div></div></div>`:"";
+  const heroi=t0?`<div class="hero-home" style="background-image:url(${coverDe(t0.key)||t0.cover})"><div class="hh-shade"></div><div class="hh-body"><span class="pill">Top album right now</span><h2 class="hh-t">${esc(t0.t)}</h2><div class="mut" style="font-size:17px;font-weight:700">${esc(t0.a)}</div><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px"><a class="btn p" href="#album-${t0.key}">Open</a><button class="btn" data-rnd>🎲 Random</button></div></div></div>`:"";
   let popRec="",rec="";
   const ult=S.ultimoArtista;
   if(ult&&ult.id){
@@ -636,7 +664,7 @@ async function homeView(){
       const rel=((await dz(`/artist/${ult.id}/related?limit=12`)).data||[]).sort((a,b)=>(b.nb_fan||0)-(a.nb_fan||0)).slice(0,8);
       const alb=await Promise.all(rel.map(o=>dz(`/artist/${o.id}/albums?limit=1`).then(j=>(j.data||[]).map(x=>({...x,artist:{name:o.name}}))).catch(()=>[])));
       const c=cardsDe(alb.flat());
-      if(c)popRec=`<div class="sec-h"><h2>Porque você pesquisou ${esc(ult.n)}</h2></div><div class="carrossel">${c}</div>`;
+      if(c)popRec=`<div class="sec-h"><h2>Because you searched ${esc(ult.n)}</h2></div><div class="carrossel">${c}</div>`;
     }catch(e){}
   }
   const avaliados=Object.entries(S.u).filter(([k,v])=>v.r&&S.meta[k]).sort((a,b)=>b[1].r-a[1].r);
@@ -651,7 +679,7 @@ async function homeView(){
       const topA=[...cont.values()].sort((x,y)=>y.n-x.n).slice(0,6);
       const listas=await Promise.all(topA.map(c=>dz(`/artist/${c.a.id}/albums?limit=2`).then(j=>(j.data||[]).map(x=>({...x,artist:{name:c.a.name}}))).catch(()=>[])));
       const c=cardsDe(listas.flat().filter(x=>!jaAvaliados.has(albumKey(x.title,x.artist.name))).slice(0,12));
-      if(c)rec=`<div class="sec-h"><h2>Recomendados para você</h2></div><div class="carrossel">${c}</div>`;
+      if(c)rec=`<div class="sec-h"><h2>Recommended for you</h2></div><div class="carrossel">${c}</div>`;
     }catch(e){}
   }
   let novidades="";
@@ -661,40 +689,48 @@ async function homeView(){
       const listas=await Promise.all(seguidos.map(s=>dz(`/artist/${s.dz}/albums?limit=3`).then(j=>(j.data||[]).map(x=>({...x,artist:{name:s.n}}))).catch(()=>[])));
       const recentes=listas.flat().sort((a,b)=>(b.release_date||"").localeCompare(a.release_date||"")).slice(0,12);
       const c=cardsDe(recentes);
-      if(c)novidades=`<div class="sec-h"><h2>Novidades de quem você segue</h2></div><div class="carrossel">${c}</div>`;
+      if(c)novidades=`<div class="sec-h"><h2>New from artists you follow</h2></div><div class="carrossel">${c}</div>`;
     }catch(e){}
   }
+  const NP={us:"United States",gb:"United Kingdom",jp:"Japan",kr:"South Korea",de:"Germany",fr:"France",mx:"Mexico"};
+  let regioes="";
+  (window.__ap||[]).forEach(([p,r])=>{
+    if(!NP[p]||r.status!=="fulfilled")return;
+    const l=unirAlbuns(r.value.slice(0,12).map(x=>({src:"it",id:x.id,t:x.name,a:x.artistName,y:"",tipo:"album",cover:capaIT(x.artworkUrl100)})));
+    l.forEach(guardarAlbum);
+    regioes+=`<div class="sec-h"><h2>Top in ${NP[p]}</h2></div><div class="carrossel">${l.map(cardAlbum).join("")}</div>`;
+  });
   const diario=Object.entries(S.u).filter(([,v])=>v.d).sort((a,b)=>b[1].d.localeCompare(a[1].d)).slice(0,10);
   return `${heroi}
-  <input class="search" id="hq" placeholder="Artistas, álbuns, músicas" autocomplete="off" style="margin-top:4px">
+  <input class="search" id="hq" placeholder="Artists, albums, songs" autocomplete="off" style="margin-top:4px">
   <div class="chips" style="padding-top:14px">${GENEROS_HOME.map(([id,l])=>`<button class="chip ${homeGenero===id?"on":""}" data-hg="${id}">${l}</button>`).join("")}</div>
-  <div class="sec-h"><h2>Em alta</h2><span class="mut sm">${esc(status)}</span></div>
-  ${emAlta?`<div class="carrossel">${emAlta}</div>`:`<div class="empty">Não foi possível carregar as tendências agora.</div>`}
-  ${novidades}
+  <div class="sec-h"><h2>Trending</h2><span class="mut sm">${esc(status)}</span></div>
+  ${emAlta?`<div class="carrossel">${emAlta}</div>`:`<div class="empty">Could not load trends right now.</div>`}
+  ${regioes}${novidades}
   ${rec}
   ${popRec}
-  ${diario.length?`<div class="sec-h"><h2>Recentes do seu diário</h2></div><div class="carrossel">${diario.map(([k])=>cardMeta(k)).join("")}</div>`:""}`;
+  ${diario.length?`<div class="sec-h"><h2>Recently in your diary</h2></div><div class="carrossel">${diario.map(([k])=>cardMeta(k)).join("")}</div>`:""}`;
 }
 
 /* ===== Buscar: três fontes em paralelo, resultados aparecem conforme chegam ===== */
 function searchView(){
-  return `<h1>Buscar</h1><input class="search" id="q" placeholder="Álbuns, EPs, músicas ou artistas" autocomplete="off" value="${esc(busca.q)}">
-  <div class="chips">${[["tudo","Tudo"],["albuns","Álbuns e EPs"],["musicas","Músicas"],["artistas","Artistas"]].map(([k,l])=>`<button class="chip ${busca.f===k?"on":""}" data-fl="${k}">${l}</button>`).join("")}</div>
+  return `<h1>Search</h1><input class="search" id="q" placeholder="Albums, EPs, songs or artists" autocomplete="off" value="${esc(busca.q)}">
+  <div class="chips">${[["tudo","All"],["albuns","Albums & EPs"],["musicas","Songs"],["artistas","Artists"]].map(([k,l])=>`<button class="chip ${busca.f===k?"on":""}" data-fl="${k}">${l}</button>`).join("")}</div>
   <div id="res" style="margin-top:18px"></div>`;
 }
-function tipoLabel(t){t=(t||"").toLowerCase();if(t==="ep")return"EP";if(t==="single")return"Single";if(t==="compile")return"Coletânea";return"Álbum"}
+function tipoLabel(t){t=(t||"").toLowerCase();if(t==="ep")return"EP";if(t==="single")return"Single";if(t==="compile")return"Compilation";return"Album"}
 function dedupMusicas(lista){const v=new Set();return lista.filter(m=>{const c=norm(m.titulo)+"|"+norm(m.artista);if(v.has(c))return false;v.add(c);return true})}
 function linhaMista(it){
-  if(it.tipo==="artista"){const a=it.a;return `<a class="row" href="#artist-${a.key}">${capaFoto(a.foto,a.n,52,true)}<div class="grow"><div class="ttl">${esc(a.n)}</div><div class="sm mut" style="font-weight:700">Artista</div></div><span class="pill">Artista</span></a>`}
+  if(it.tipo==="artista"){const a=it.a;return `<a class="row" href="#artist-${a.key}">${capaFoto(a.foto,a.n,52,true)}<div class="grow"><div class="ttl">${esc(a.n)}</div><div class="sm mut" style="font-weight:700">Artist</div></div><span class="pill">Artist</span></a>`}
   if(it.tipo==="album"){const u=it.u;return `<a class="row" href="#album-${u.key}">${capaAlbum(u.key,u.t,52)}<div class="grow"><div class="ttl">${esc(u.t)}</div><div class="sm mut" style="font-weight:700">${esc(u.a)}${u.y?" · "+u.y:""}</div></div><span class="pill">${tipoLabel(u.tipo)}</span></a>`}
   const m=it.m,k=albumKey(m.album.t,m.album.a);
-  return `<a class="row" href="#album-${k}">${capaAlbum(k,m.album.t,52)}<div class="grow"><div class="ttl">${esc(m.titulo)}</div><div class="sm mut" style="font-weight:700">${esc(m.artista)} · ${esc(m.album.t)}</div></div><span class="pill">Música</span></a>`;
+  return `<a class="row" href="#album-${k}">${capaAlbum(k,m.album.t,52)}<div class="grow"><div class="ttl">${esc(m.titulo)}</div><div class="sm mut" style="font-weight:700">${esc(m.artista)} · ${esc(m.album.t)}</div></div><span class="pill">Song</span></a>`;
 }
 function destaqueBusca(it){
-  if(it.tipo==="artista"){const a=it.a;return `<a class="card" href="#artist-${a.key}" style="display:flex;gap:20px;align-items:center;padding:20px;--c:${cores(a.key)[0]}">${capaFoto(a.foto,a.n,120,true)}<div class="grow"><span class="pill">Artista</span><div style="font-size:30px;font-weight:900;letter-spacing:-.8px;margin-top:8px">${esc(a.n)}</div></div></a>`}
+  if(it.tipo==="artista"){const a=it.a;return `<a class="card" href="#artist-${a.key}" style="display:flex;gap:20px;align-items:center;padding:20px;--c:${cores(a.key)[0]}">${capaFoto(a.foto,a.n,120,true)}<div class="grow"><span class="pill">Artist</span><div style="font-size:30px;font-weight:900;letter-spacing:-.8px;margin-top:8px">${esc(a.n)}</div></div></a>`}
   if(it.tipo==="album"){const u=it.u;return `<a class="card" href="#album-${u.key}" style="display:flex;gap:20px;align-items:center;padding:20px;--c:${cores(u.key)[0]}">${capaAlbum(u.key,u.t,120)}<div class="grow"><span class="pill">${tipoLabel(u.tipo)}</span><div style="font-size:30px;font-weight:900;letter-spacing:-.8px;margin-top:8px">${esc(u.t)}</div><div class="mut" style="font-weight:700;margin-top:4px">${esc(u.a)}${u.y?" · "+u.y:""}</div></div></a>`}
   const m=it.m,k=albumKey(m.album.t,m.album.a);
-  return `<a class="card" href="#album-${k}" style="display:flex;gap:20px;align-items:center;padding:20px;--c:${cores(k)[0]}">${capaAlbum(k,m.album.t,120)}<div class="grow"><span class="pill">Música</span><div style="font-size:30px;font-weight:900;letter-spacing:-.8px;margin-top:8px">${esc(m.titulo)}</div><div class="mut" style="font-weight:700;margin-top:4px">${esc(m.artista)} · ${esc(m.album.t)}</div></div></a>`;
+  return `<a class="card" href="#album-${k}" style="display:flex;gap:20px;align-items:center;padding:20px;--c:${cores(k)[0]}">${capaAlbum(k,m.album.t,120)}<div class="grow"><span class="pill">Song</span><div style="font-size:30px;font-weight:900;letter-spacing:-.8px;margin-top:8px">${esc(m.titulo)}</div><div class="mut" style="font-weight:700;margin-top:4px">${esc(m.artista)} · ${esc(m.album.t)}</div></div></a>`;
 }
 function montarBusca(q,coleta,f){
   const albuns=unirAlbuns(coleta.alb);albuns.forEach(guardarAlbum);
@@ -705,17 +741,17 @@ function montarBusca(q,coleta,f){
   if(f==="tudo"||f==="artistas")artistas.forEach(a=>itens.push({tipo:"artista",a,score:a.fontes.length*10+(norm(a.n)===nq?60:0)+(norm(a.n).startsWith(nq)?20:0)}));
   if(f==="tudo"||f==="musicas")musicas.forEach(m=>itens.push({tipo:"musica",m,score:(norm(m.titulo)===nq?50:0)+(norm(m.titulo).startsWith(nq)?15:0)+5}));
   itens.sort((x,y)=>y.score-x.score);
-  if(!itens.length)return `<div class="empty">Nada encontrado para "${esc(q)}".</div>`;
-  return `<div class="sec-h"><h2>Melhor resultado</h2></div>${destaqueBusca(itens[0])}<div class="sec-h"><h2>Resultados</h2></div><div class="mlist">${itens.slice(1,40).map(linhaMista).join("")}</div>`;
+  if(!itens.length)return `<div class="empty">Nothing found for "${esc(q)}".</div>`;
+  return `<div class="sec-h"><h2>Top result</h2></div>${destaqueBusca(itens[0])}<div class="sec-h"><h2>Results</h2></div><div class="mlist">${itens.slice(1,40).map(linhaMista).join("")}</div>`;
 }
 async function runSearch(){
   const q=busca.q.trim(),res=$("#res");
   if(!res)return;
-  if(q.length<2){res.innerHTML=`<div class="empty">Digite pelo menos 2 letras para buscar.</div>`;return}
+  if(q.length<2){res.innerHTML=`<div class="empty">Type at least 2 letters to search.</div>`;return}
   const tok=++buscaTok,f=busca.f,e=encodeURIComponent(q);
   const coleta={alb:[],mus:[],art:[]};
   const desenhar=()=>{if(tok===buscaTok)res.innerHTML=montarBusca(q,coleta,f)};
-  res.innerHTML=`<div class="load">Buscando…</div>`;
+  res.innerHTML=`<div class="load">Searching…</div>`;
   const rapido=await Promise.allSettled([fontes.albunsDZ(e),fontes.albunsIT(e),fontes.musicasDZ(e),fontes.musicasIT(e),fontes.artistasDZ(e),fontes.artistasIT(e),fontes.albunsSP(e),fontes.musicasSP(e),fontes.artistasSP(e)]);
   if(tok!==buscaTok)return;
   const ok=i=>rapido[i].status==="fulfilled"?rapido[i].value:[];
@@ -744,7 +780,7 @@ async function faixasDe(m){
 }
 async function albumView(k){
   const m=S.meta[k];
-  if(!m)return `<div class="empty">Abra este álbum pela busca para carregar os dados.</div>`;
+  if(!m)return `<div class="empty">Open this album from search to load its data.</div>`;
   setAmb(cores(k)[0]);
   const ak=artistKey(m.a);
   if(!S.artists[ak]){S.artists[ak]={n:m.a,foto:"",fas:0,genre:"",info:"",ids:{},fontes:[]};salvar()}
@@ -757,41 +793,41 @@ async function albumView(k){
   return `${cv?`<div class="abg" aria-hidden="true"><div style="background-image:url(${cv})"></div></div>`:""}<div class="hero">${capaAlbum(k,m.t,230)}<div class="info">
     <span class="pill">${esc([(m.tipo||"álbum").toUpperCase(),m.genre].filter(Boolean).join(" · "))}</span>
     <h1>${esc(m.t)}</h1>
-    <div style="font-size:18px;font-weight:700" class="mut"><a href="#artist-${ak}" style="border-bottom:2px solid currentColor">${esc(m.a)}</a>${m.y?` · ${m.y}`:""}${faixas.length?` · ${faixas.length} faixas`:""}</div>
-    <div class="mut sm" style="font-weight:700;margin-top:6px">Dados de: ${esc(fontesTxt)}${capaCustom?" · capa personalizada":""}</div>
+    <div style="font-size:18px;font-weight:700" class="mut"><a href="#artist-${ak}" style="border-bottom:2px solid currentColor">${esc(m.a)}</a>${m.y?` · ${m.y}`:""}${faixas.length?` · ${faixas.length} tracks`:""}</div>
+    <div class="mut sm" style="font-weight:700;margin-top:6px">Data from: ${esc(fontesTxt)}${capaCustom?" · custom cover":""}</div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin:20px 0">
-      <button class="btn ${x.d?"on":""}" data-act="ouvi">${x.d?"✓ Ouvido":"Marcar como ouvido"}</button>
-      <button class="btn ${x.w?"on":""}" data-act="quero">${x.w?"✓ Na fila":"+ Quero ouvir"}</button>
-      <button class="btn ${x.l?"on":""}" data-act="curtir">${x.l?"♥ Curtido":"♡ Curtir"}</button>
-      <button class="btn ${fav?"on":""}" data-act="fav">${fav?"★ Favorito":"☆ Favoritar"}</button>
+      <button class="btn ${x.d?"on":""}" data-act="ouvi">${x.d?"✓ Listened":"Mark as listened"}</button>
+      <button class="btn ${x.w?"on":""}" data-act="quero">${x.w?"✓ In queue":"+ Want to listen"}</button>
+      <button class="btn ${x.l?"on":""}" data-act="curtir">${x.l?"♥ Liked":"♡ Like"}</button>
+      <button class="btn ${fav?"on":""}" data-act="fav">${fav?"★ Favorite":"☆ Favorite"}</button>
     </div>
-    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;justify-content:inherit"><div style="display:flex" id="rate" data-id="${k}">${rateHTML(x.r)}</div><span class="mut" style="font-weight:700" id="rlab">${x.r?String(x.r).replace(".",",")+" de 5":"Sua nota"}</span></div>
+    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;justify-content:inherit"><div style="display:flex" id="rate" data-id="${k}">${rateHTML(x.r)}</div><span class="mut" style="font-weight:700" id="rlab">${x.r?String(x.r)+" of 5":"Your rating"}</span></div>
     ${faixas.length?mediaBloco(faixas,m,x):""}
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">${m.ids.sp?`<a class="btn" href="https://open.spotify.com/album/${m.ids.sp}" target="_blank" rel="noopener">Abrir no Spotify</a>`:""}<label class="btn" style="cursor:pointer">🖼 Trocar capa<input id="capaup" type="file" accept="image/*" hidden></label>${capaCustom?`<button class="btn" data-act="capaRm">Voltar à capa original</button>`:""}</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">${m.ids.sp?`<a class="btn" href="https://open.spotify.com/album/${m.ids.sp}" target="_blank" rel="noopener">Open on Spotify</a>`:""}<label class="btn" style="cursor:pointer">🖼 Change cover<input id="capaup" type="file" accept="image/*" hidden></label>${capaCustom?`<button class="btn" data-act="capaRm">Restore original cover</button>`:""}</div>
   </div></div>
-  ${faixas.length?`<h2>Faixas</h2><div class="mlist">${faixas.map((t,i)=>`<div class="row"><span class="num">${String(i+1).padStart(2,"0")}</span><div class="ttl grow">${esc(t.t)}</div>${trateHTML(t.t,m.a)}<button class="shbtn" data-story="musica" data-tt="${esc(t.t)}" data-ms="${t.ms||0}" aria-label="Compartilhar música" title="Compartilhar música" style="width:30px;height:30px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M8 11H6.5A1.5 1.5 0 0 0 5 12.5v7A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5v-7A1.5 1.5 0 0 0 17.5 11H16"/></svg></button><span class="mut sm">${tempo(t.ms)}</span></div>`).join("")}</div>`:`<div class="empty" style="margin-top:30px">Sem faixas disponíveis para este álbum.</div>`}
-  <h2>Sua resenha</h2><div class="mlist" style="padding:16px;background:#111"><textarea class="field" id="rev" placeholder="O que você achou deste álbum?">${esc(x.rev||"")}</textarea><div style="display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px;margin-top:12px"><button class="fab" data-act="rev">Salvar resenha</button><button class="btn" data-story="album">Compartilhar no Story</button></div></div>
-  ${S.listas.length?`<h2>Adicionar a uma lista</h2><div style="display:flex;gap:10px;flex-wrap:wrap"><select class="field" id="lsel" style="width:auto">${listas}</select><button class="btn" data-act="addLista">Adicionar</button></div>`:`<h2>Listas</h2><div class="empty">Crie uma lista na aba Listas do Perfil para adicionar álbuns.</div>`}`;
+  ${faixas.length?`<h2>Tracks</h2><div class="mlist">${faixas.map((t,i)=>`<div class="row"><span class="num">${String(i+1).padStart(2,"0")}</span><div class="ttl grow">${esc(t.t)}</div>${trateHTML(t.t,m.a)}<button class="shbtn" data-story="musica" data-tt="${esc(t.t)}" data-ms="${t.ms||0}" aria-label="Share song" title="Share song" style="width:30px;height:30px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M8 11H6.5A1.5 1.5 0 0 0 5 12.5v7A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5v-7A1.5 1.5 0 0 0 17.5 11H16"/></svg></button><span class="mut sm">${tempo(t.ms)}</span></div>`).join("")}</div>`:`<div class="empty" style="margin-top:30px">No tracks available for this album.</div>`}
+  <h2>Your review</h2><div class="mlist" style="padding:16px;background:#111"><textarea class="field" id="rev" placeholder="What did you think of this album?">${esc(x.rev||"")}</textarea><div style="display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px;margin-top:12px"><button class="fab" data-act="rev">Save review</button><button class="btn" data-story="album">Share to Story</button></div></div>
+  ${S.listas.length?`<h2>Add to a list</h2><div style="display:flex;gap:10px;flex-wrap:wrap"><select class="field" id="lsel" style="width:auto">${listas}</select><button class="btn" data-act="addLista">Add</button></div>`:`<h2>Lists</h2><div class="empty">Create a list in the Lists tab of your Profile to add albums.</div>`}`;
 }
 function albumAct(a){
   const k=location.hash.slice(7);
   const d=dd(k);
-  if(a==="ouvi"){if(d.d){delete d.d;flash("Removido do diário")}else{d.d=hoje();flash("Registrado no diário")}}
-  if(a==="quero"){d.w=!d.w;flash(d.w?"Adicionado à fila":"Removido da fila")}
-  if(a==="curtir"){d.l=!d.l;flash(d.l?"Curtido":"Descurtido")}
-  if(a==="fav"){const p=P();const i=p.fav.indexOf(k);if(i>=0)p.fav.splice(i,1);else if(p.fav.length<10)p.fav.push(k);else{flash("Até 10 álbuns favoritos");return}}
-  if(a==="rev"){d.rev=($("#rev").value||"").trim();flash("Resenha salva")}
-  if(a==="capaRm"){delete S.covers[k];flash("Capa original restaurada")}
-  if(a==="auto"){d.auto=!d.auto;const md=mediaDOM();if(d.auto&&md.n)d.r=meioPonto(md.avg);flash(d.auto?"Nota automática ligada":"Nota automática desligada")}
-  if(a==="usarMedia"){const md=mediaDOM();if(md.n){d.r=meioPonto(md.avg);flash("Nota do álbum atualizada")}}
-  if(a==="addLista"){const l=S.listas[+$("#lsel").value];if(l&&!l.ids.includes(k)){l.ids.push(k);flash(`Adicionado a "${l.nome}"`)}else flash("Já está nessa lista")}
+  if(a==="ouvi"){if(d.d){delete d.d;flash("Removed from diary")}else{d.d=hoje();flash("Logged in diary")}}
+  if(a==="quero"){d.w=!d.w;flash(d.w?"Added to queue":"Removed from queue")}
+  if(a==="curtir"){d.l=!d.l;flash(d.l?"Liked":"Unliked")}
+  if(a==="fav"){const p=P();const i=p.fav.indexOf(k);if(i>=0)p.fav.splice(i,1);else if(p.fav.length<10)p.fav.push(k);else{flash("Up to 10 favorite albums");return}}
+  if(a==="rev"){d.rev=($("#rev").value||"").trim();flash("Review saved")}
+  if(a==="capaRm"){delete S.covers[k];flash("Original cover restored")}
+  if(a==="auto"){d.auto=!d.auto;const md=mediaDOM();if(d.auto&&md.n)d.r=meioPonto(md.avg);flash(d.auto?"Auto rating on":"Auto rating off")}
+  if(a==="usarMedia"){const md=mediaDOM();if(md.n){d.r=meioPonto(md.avg);flash("Album rating updated")}}
+  if(a==="addLista"){const l=S.listas[+$("#lsel").value];if(l&&!l.ids.includes(k)){l.ids.push(k);flash(`Added to "${l.nome}"`)}else flash("Already in that list")}
   salvar();rota();
 }
 
 /* ===== Página do artista ===== */
 async function artistView(k){
   const a=S.artists[k];
-  if(!a)return `<div class="empty">Artista não encontrado.</div>`;
+  if(!a)return `<div class="empty">Artist not found.</div>`;
   if(!a.ids.dz||!window.__dzOk||!window.__dzOk.has(k)){
     (window.__dzOk=window.__dzOk||new Set()).add(k);
     try{
@@ -830,40 +866,40 @@ async function artistView(k){
   const ordenarAno=(a,b)=>(b.y||"").localeCompare(a.y||"");
   const tipoDe=u=>(u.tipo||"album").toLowerCase();
   const grupos=[
-    ["Álbuns oficiais",u=>tipoDe(u)==="album"],
+    ["Albums",u=>tipoDe(u)==="album"],
     ["EPs",u=>tipoDe(u)==="ep"],
     ["Singles",u=>tipoDe(u)==="single"],
-    ["Compilações e ao vivo",u=>/compil|live/.test(tipoDe(u))]
+    ["Compilations & live",u=>/compil|live/.test(tipoDe(u))]
   ];
   const secoes=grupos.map(([nome,f])=>{
     const l=albuns.filter(f).sort(ordenarAno);
     return l.length?`<div class="secao"><h2>${nome} <span class="mut" style="font-size:16px;font-weight:700">${l.length}</span></h2><div class="grid">${l.map(u=>cardAlbum({...u,fontes:u.fontes||[]})).join("")}</div></div>`:"";
   }).join("");
-  const populares=top.length?`<h2>Músicas populares</h2><div class="mlist">${top.map(t=>`<a class="row" href="#album-${t.al}">${capaAlbum(t.al,t.alb,46)}<div class="grow"><div class="ttl">${esc(t.t)}</div><div class="sm mut" style="font-weight:700">${esc(t.alb)}</div></div><span class="mut sm">${tempo(t.ms)}</span></a>`).join("")}</div>`:"";
+  const populares=top.length?`<h2>Popular songs</h2><div class="mlist">${top.map(t=>`<a class="row" href="#album-${t.al}">${capaAlbum(t.al,t.alb,46)}<div class="grow"><div class="ttl">${esc(t.t)}</div><div class="sm mut" style="font-weight:700">${esc(t.alb)}</div></div><span class="mut sm">${tempo(t.ms)}</span></a>`).join("")}</div>`:"";
   const info=[a.genre,a.info].filter(Boolean).join(" · ");
   return `${banner}<div class="phead"><div class="pav">${foto?`<img src="${foto}" alt="${esc(a.n)}">`:`<div style="width:100%;height:100%;background:linear-gradient(145deg,${c1},${c2});display:grid;place-items:center;font-size:44px;font-weight:900">${esc(ini(a.n))}</div>`}</div>
-    <div class="pinfo"><span class="pill">Artista</span>
+    <div class="pinfo"><span class="pill">Artist</span>
       <h1 style="font-size:clamp(48px,8vw,84px);letter-spacing:-.05em;line-height:.95;margin:10px 0 8px">${esc(a.n)}</h1>
-      <div class="phandle">${esc(info||"Artista")}</div><button class="btn ${(S.seguindo||[]).some(s=>s.k===k)?"on":""}" data-seguir="${k}" style="margin-top:10px">${(S.seguindo||[]).some(s=>s.k===k)?"✓ Seguindo":"+ Seguir"}</button>
-      <div class="mut sm" style="font-weight:700;margin-top:6px">Dados de: ${esc(a.fontes.map(nomeFonte).join(" · "))}</div>
+      <div class="phandle">${esc(info||"Artist")}</div><button class="btn ${(S.seguindo||[]).some(s=>s.k===k)?"on":""}" data-seguir="${k}" style="margin-top:10px">${(S.seguindo||[]).some(s=>s.k===k)?"✓ Following":"+ Follow"}</button>
+      <div class="mut sm" style="font-weight:700;margin-top:6px">Data from: ${esc(a.fontes.map(nomeFonte).join(" · "))}</div>
     </div></div>
-  ${populares}${secoes||`<div class="empty" style="margin-top:30px">Nenhum lançamento encontrado.</div>`}`;
+  ${populares}${secoes||`<div class="empty" style="margin-top:30px">No releases found.</div>`}`;
 }
 
 /* ===== Diário ===== */
 function diaryList(){
   const e=Object.entries(S.u).filter(([,v])=>v.d).sort((a,b)=>b[1].d.localeCompare(a[1].d));
-  if(!e.length)return `<div class="empty">Você ainda não marcou nenhum álbum como ouvido.</div>`;
-  const MESES=["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
+  if(!e.length)return `<div class="empty">You haven't marked any album as listened yet.</div>`;
+  const MESES=["January","February","March","April","May","June","July","August","September","October","November","December"];
   let atual="",html="";
   e.forEach(([k,v])=>{
     const mk=v.d.slice(0,7);
     if(mk!==atual){
       if(atual)html+=`</div>`;
       atual=mk;const [y,mm]=mk.split("-"),n=e.filter(x=>x[1].d.slice(0,7)===mk).length;
-      html+=`<h3 class="sec" style="margin:22px 4px 10px">${MESES[+mm-1]} de ${y} · ${n}</h3><div class="mlist">`;
+      html+=`<h3 class="sec" style="margin:22px 4px 10px">${MESES[+mm-1]} ${y} · ${n}</h3><div class="mlist">`;
     }
-    const m=S.meta[k]||{t:"Álbum",a:""};
+    const m=S.meta[k]||{t:"Album",a:""};
     html+=`<a class="row" href="#album-${k}">${capaAlbum(k,m.t,50)}<div class="grow"><div class="ttl">${esc(m.t)}</div><div class="sm mut" style="font-weight:700">${esc(m.a)} · ${v.d.slice(8,10)}/${v.d.slice(5,7)}</div></div>${v.r?estrelas(v.r):""}</a>`;
   });
   return html+(atual?`</div>`:"");
@@ -879,19 +915,19 @@ function perfilView(){
   const [c1,c2]=fav[0]?cores(fav[0]):cores(p.handle||"acetato");
   const banner=p.banner?`<div class="pban"><div class="art img" style="background-image:url(${p.banner})"></div></div>`:`<div class="pban"><div class="art" style="background:linear-gradient(135deg,${c1},${c2})"></div></div>`;
   const avatar=p.avatar?`<img src="${p.avatar}" alt="">`:`<div style="width:100%;height:100%;background:linear-gradient(145deg,${c1},${c2});display:grid;place-items:center">${esc(ini(p.nome))}</div>`;
-  const stats=[[ouv,"Ouvidos"],[av.length,"Avaliações"],[media?media.toFixed(1).replace(".",","):"—","Média"],[curt,"Curtidos"],[S.listas.length,"Listas"]].map(([n,l])=>`<div><strong>${n}</strong><span>${l}</span></div>`).join("");
-  const tabs=[["perfil","Perfil"],["avaliacoes","Avaliações"],["diario","Diário"],["fila","Fila"],["stats","Estatísticas"],["listas","Listas"]];
+  const stats=[[ouv,"Listened"],[av.length,"Ratings"],[media?media.toFixed(1):"—","Avg"],[curt,"Liked"],[S.listas.length,"Lists"]].map(([n,l])=>`<div><strong>${n}</strong><span>${l}</span></div>`).join("");
+  const tabs=[["perfil","Profile"],["avaliacoes","Ratings"],["diario","Diary"],["fila","Queue"],["stats","Stats"],["listas","Lists"]];
   let corpo="";
   if(aba==="perfil"){
-    const slot=i=>fav[i]?`<a class="fitem" href="#album-${fav[i]}">${capaAlbum(fav[i],(S.meta[fav[i]]||{}).t,null)}<div class="ttl" style="margin-top:8px">${esc((S.meta[fav[i]]||{}).t||"")}</div></a>`:`<div class="fvazio">Vazio</div>`;
+    const slot=i=>fav[i]?`<a class="fitem" href="#album-${fav[i]}">${capaAlbum(fav[i],(S.meta[fav[i]]||{}).t,null)}<div class="ttl" style="margin-top:8px">${esc((S.meta[fav[i]]||{}).t||"")}</div></a>`:`<div class="fvazio">Empty</div>`;
     const nPag=Math.max(1,Math.ceil(fav.length/4));
-    const slots=`<div class="favpages" id="favpages">${Array.from({length:nPag},(_,pg)=>`<div class="favpage">${[0,1,2,3].map(j=>slot(pg*4+j)).join("")}</div>`).join("")}</div>${nPag>1?`<div class="favdots">${Array.from({length:nPag},(_,n)=>`<button class="${n===0?"on":""}" data-favpg="${n}" aria-label="Grupo ${n+1}"></button>`).join("")}</div>`:""}`;
-    const mus=p.musicas.length?`<div class="mlist">${p.musicas.map((m,i)=>`<div class="row"><span class="num">${String(i+1).padStart(2,"0")}</span><div class="ttl grow">${esc(m)}</div></div>`).join("")}</div>`:`<div class="empty">Adicione músicas favoritas em Editar.</div>`;
+    const slots=`<div class="favpages" id="favpages">${Array.from({length:nPag},(_,pg)=>`<div class="favpage">${[0,1,2,3].map(j=>slot(pg*4+j)).join("")}</div>`).join("")}</div>${nPag>1?`<div class="favdots">${Array.from({length:nPag},(_,n)=>`<button class="${n===0?"on":""}" data-favpg="${n}" aria-label="Group ${n+1}"></button>`).join("")}</div>`:""}`;
+    const mus=p.musicas.length?`<div class="mlist">${p.musicas.map((m,i)=>`<div class="row"><span class="num">${String(i+1).padStart(2,"0")}</span><div class="ttl grow">${esc(m)}</div></div>`).join("")}</div>`:`<div class="empty">Add favorite songs in Edit.</div>`;
     const recs=av.slice(-5).reverse();
-    const rec=recs.length?`<div class="mlist">${recs.map(([k,v])=>{const m=S.meta[k]||{t:"Álbum",a:""};return `<a class="row" href="#album-${k}">${capaAlbum(k,m.t,46)}<div class="grow"><div class="ttl">${esc(m.t)}</div><div class="sm mut" style="font-weight:700">${esc(m.a)}</div></div>${estrelas(v.r)}</a>`}).join("")}</div>`:`<div class="empty">Nenhuma avaliação ainda.</div>`;
-    corpo=`<div class="pgrid"><div><h3 class="sec">Álbuns favoritos${fav.length>4?` <span style="text-transform:none;letter-spacing:0;font-weight:700">· ${fav.length}</span>`:""}</h3>${slots}<h3 class="sec" style="margin-top:34px">Músicas favoritas</h3>${mus}</div><aside><h3 class="sec">Avaliações recentes</h3>${rec}</aside></div>`;
+    const rec=recs.length?`<div class="mlist">${recs.map(([k,v])=>{const m=S.meta[k]||{t:"Album",a:""};return `<a class="row" href="#album-${k}">${capaAlbum(k,m.t,46)}<div class="grow"><div class="ttl">${esc(m.t)}</div><div class="sm mut" style="font-weight:700">${esc(m.a)}</div></div>${estrelas(v.r)}</a>`}).join("")}</div>`:`<div class="empty">No ratings yet.</div>`;
+    corpo=`<div class="pgrid"><div><h3 class="sec">Favorite albums${fav.length>4?` <span style="text-transform:none;letter-spacing:0;font-weight:700">· ${fav.length}</span>`:""}</h3>${slots}<h3 class="sec" style="margin-top:34px">Favorite songs</h3>${mus}</div><aside><h3 class="sec">Recent ratings</h3>${rec}</aside></div>`;
   }else if(aba==="avaliacoes"){
-    corpo=av.length?`<div class="mlist" style="margin-top:30px">${[...av].reverse().map(([k,v])=>{const m=S.meta[k]||{t:"Álbum",a:""};return `<a class="row" href="#album-${k}" style="display:block"><div style="display:flex;align-items:center;gap:14px">${capaAlbum(k,m.t,46)}<div class="grow"><div class="ttl">${esc(m.t)}</div><div class="sm mut" style="font-weight:700">${esc(m.a)}</div></div>${estrelas(v.r)}</div>${v.rev?`<div style="font-weight:600;padding:10px 0 0 60px;line-height:1.45">${esc(v.rev)}</div>`:""}</a>`}).join("")}</div>`:`<div class="empty" style="margin-top:30px">Você ainda não avaliou nenhum álbum.</div>`;
+    corpo=av.length?`<div class="mlist" style="margin-top:30px">${[...av].reverse().map(([k,v])=>{const m=S.meta[k]||{t:"Album",a:""};return `<a class="row" href="#album-${k}" style="display:block"><div style="display:flex;align-items:center;gap:14px">${capaAlbum(k,m.t,46)}<div class="grow"><div class="ttl">${esc(m.t)}</div><div class="sm mut" style="font-weight:700">${esc(m.a)}</div></div>${estrelas(v.r)}</div>${v.rev?`<div style="font-weight:600;padding:10px 0 0 60px;line-height:1.45">${esc(v.rev)}</div>`:""}</a>`}).join("")}</div>`:`<div class="empty" style="margin-top:30px">You haven't rated any album yet.</div>`;
   }else if(aba==="diario"){
     corpo=`<div style="margin-top:30px">${diaryList()}</div>`;
   }else if(aba==="fila"){
@@ -899,44 +935,44 @@ function perfilView(){
   }else if(aba==="stats"){
     corpo=statsView();
   }else{
-    corpo=`<div class="mlist" style="margin-top:30px">${S.listas.map((l,i)=>`<a class="row" href="#lista-${i}"><div class="grow"><div class="ttl">${esc(l.nome)}</div><div class="sm mut" style="font-weight:700">${l.ids.length} álbum${l.ids.length===1?"":"s"}</div></div><span class="mut">›</span></a>`).join("")||`<div class="empty" style="border-radius:0">Nenhuma lista ainda.</div>`}<div class="row" style="gap:10px"><input class="field" id="nlNew" placeholder="Nome da nova lista"><button class="fab" data-lst="nova">Criar</button></div></div>`;
+    corpo=`<div class="mlist" style="margin-top:30px">${S.listas.map((l,i)=>`<a class="row" href="#lista-${i}"><div class="grow"><div class="ttl">${esc(l.nome)}</div><div class="sm mut" style="font-weight:700">${l.ids.length} album${l.ids.length===1?"":"s"}</div></div><span class="mut">›</span></a>`).join("")||`<div class="empty" style="border-radius:0">No lists yet.</div>`}<div class="row" style="gap:10px"><input class="field" id="nlNew" placeholder="New list name"><button class="fab" data-lst="nova">Create</button></div></div>`;
   }
   return `${banner}<div class="phead"><div class="pav">${avatar}</div>
     <div class="pinfo"><h1>${esc(p.nome)}</h1><div class="phandle">@${esc(p.handle)}${p.local?" · "+esc(p.local):""}</div>${p.bio?`<p class="pbio">${esc(p.bio)}</p>`:""}</div>
-    <div class="pright"><div class="pstats">${stats}</div><button class="shbtn" data-pact="compartilhar" aria-label="Compartilhar" title="Compartilhar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M8 11H6.5A1.5 1.5 0 0 0 5 12.5v7A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5v-7A1.5 1.5 0 0 0 17.5 11H16"/></svg></button></div></div>
+    <div class="pright"><div class="pstats">${stats}</div><button class="shbtn" data-pact="compartilhar" aria-label="Share" title="Share"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M8 11H6.5A1.5 1.5 0 0 0 5 12.5v7A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5v-7A1.5 1.5 0 0 0 17.5 11H16"/></svg></button></div></div>
   <nav class="ptabs">${tabs.map(([k,l])=>`<button class="${aba===k?"on":""}" data-aba="${k}">${l}</button>`).join("")}</nav>${corpo}${extraPerfil()}`;
 }
 function compartilhar(){
   const p=P();
   const favs=(p.fav||[]).map(k=>(S.meta[k]||{}).t).filter(Boolean).join(", ")||"—";
-  const txt=`${p.nome} (@${p.handle}) no Acetato\n\nÁlbuns favoritos: ${favs}\nMúsicas favoritas: ${p.musicas.join(", ")||"—"}`;
+  const txt=`${p.nome} (@${p.handle}) on Acetato\n\nFavorite albums: ${favs}\nFavorite songs: ${p.musicas.join(", ")||"—"}`;
   if(navigator.share){navigator.share({title:"Acetato",text:txt}).catch(()=>{});return}
-  navigator.clipboard?.writeText(txt).then(()=>flash("Perfil copiado")).catch(()=>flash("Não foi possível copiar"));
+  navigator.clipboard?.writeText(txt).then(()=>flash("Profile copied")).catch(()=>flash("Could not copy"));
 }
 
 /* ===== Listas ===== */
 function listaView(i){
   const l=S.listas[i];
-  if(!l)return `<div class="empty">Lista não encontrada.</div>`;
+  if(!l)return `<div class="empty">List not found.</div>`;
   const capas=l.ids.slice(0,4);
   const colagem=capas.length?`<div class="collage">${[0,1,2,3].map(n=>{const u=capas[n]?coverDe(capas[n]):"";return `<div${u?` style="background-image:url(${u})"`:""}></div>`}).join("")}</div>`:"";
   const rk=l.rank;
-  const itens=!l.ids.length?`<div class="empty">Esta lista está vazia. Adicione álbuns pela página de cada um.</div>`
-   :rk?`<div class="mlist">${l.ids.map((k,n)=>{const m=S.meta[k]||{t:"Álbum",a:""};return `<div class="rkrow"><span class="rn">${n+1}</span><a href="#album-${k}">${capaAlbum(k,m.t,48)}<div class="grow"><div class="ttl">${esc(m.t)}</div><div class="sm mut" style="font-weight:700">${esc(m.a)}</div></div></a><button class="mv" data-lst="up" data-i="${i}" data-id="${k}" aria-label="Subir">▲</button><button class="mv" data-lst="dn" data-i="${i}" data-id="${k}" aria-label="Descer">▼</button><button class="mv" data-lst="rm" data-i="${i}" data-id="${k}" aria-label="Remover">×</button></div>`}).join("")}</div>`
-   :`<div class="grid">${l.ids.map(k=>{const m=S.meta[k]||{t:"Álbum",a:""};return `<div style="position:relative">${cardAlbum({key:k,t:m.t,a:m.a,y:m.y,fontes:m.fontes||[]})}<button data-lst="rm" data-i="${i}" data-id="${k}" aria-label="Remover" style="position:absolute;top:10px;right:10px;z-index:3;width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,.6);font-weight:800">×</button></div>`}).join("")}</div>`;
-  return `<div class="lhead">${colagem}<div style="min-width:0"><span class="pill">Lista${rk?" · Ranking":""}</span><h1 style="margin:10px 0 4px">${esc(l.nome)}</h1><div class="mut sm" style="font-weight:700">${l.ids.length} álbum${l.ids.length===1?"":"s"}</div></div></div>
-  <div style="display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 22px"><input class="field" id="lnome" value="${esc(l.nome)}" style="flex:1;min-width:200px"><button class="btn" data-lst="ren" data-i="${i}">Renomear</button><button class="btn ${rk?"on":""}" data-lst="rank" data-i="${i}">${rk?"✓ Ranking":"Ranking"}</button><button class="btn" data-lst="share" data-i="${i}">Compartilhar</button><button class="btn" data-lst="del" data-i="${i}" style="color:#B794F6">${listaDel===i?"Confirmar exclusão":"Excluir lista"}</button></div>
+  const itens=!l.ids.length?`<div class="empty">This list is empty. Add albums from each album's page.</div>`
+   :rk?`<div class="mlist">${l.ids.map((k,n)=>{const m=S.meta[k]||{t:"Album",a:""};return `<div class="rkrow"><span class="rn">${n+1}</span><a href="#album-${k}">${capaAlbum(k,m.t,48)}<div class="grow"><div class="ttl">${esc(m.t)}</div><div class="sm mut" style="font-weight:700">${esc(m.a)}</div></div></a><button class="mv" data-lst="up" data-i="${i}" data-id="${k}" aria-label="Up">▲</button><button class="mv" data-lst="dn" data-i="${i}" data-id="${k}" aria-label="Down">▼</button><button class="mv" data-lst="rm" data-i="${i}" data-id="${k}" aria-label="Remove">×</button></div>`}).join("")}</div>`
+   :`<div class="grid">${l.ids.map(k=>{const m=S.meta[k]||{t:"Album",a:""};return `<div style="position:relative">${cardAlbum({key:k,t:m.t,a:m.a,y:m.y,fontes:m.fontes||[]})}<button data-lst="rm" data-i="${i}" data-id="${k}" aria-label="Remove" style="position:absolute;top:10px;right:10px;z-index:3;width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,.6);font-weight:800">×</button></div>`}).join("")}</div>`;
+  return `<div class="lhead">${colagem}<div style="min-width:0"><span class="pill">List${rk?" · Ranking":""}</span><h1 style="margin:10px 0 4px">${esc(l.nome)}</h1><div class="mut sm" style="font-weight:700">${l.ids.length} album${l.ids.length===1?"":"s"}</div></div></div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 22px"><input class="field" id="lnome" value="${esc(l.nome)}" style="flex:1;min-width:200px"><button class="btn" data-lst="ren" data-i="${i}">Rename</button><button class="btn ${rk?"on":""}" data-lst="rank" data-i="${i}">${rk?"✓ Ranking":"Ranking"}</button><button class="btn" data-lst="share" data-i="${i}">Share</button><button class="btn" data-lst="del" data-i="${i}" style="color:#B794F6">${listaDel===i?"Confirm delete":"Delete list"}</button></div>
   ${itens}`;
 }
 function listAct(el){
   const a=el.dataset.lst,i=+el.dataset.i;
   if(a==="rank"){S.listas[i].rank=!S.listas[i].rank;salvar();rota();return}
   if(a==="up"||a==="dn"){const ids=S.listas[i].ids,j=ids.indexOf(el.dataset.id),t2=a==="up"?j-1:j+1;if(j>=0&&t2>=0&&t2<ids.length){[ids[j],ids[t2]]=[ids[t2],ids[j]];salvar();rota()}return}
-  if(a==="share"){const l=S.listas[i];const txt=l.nome+"\n\n"+l.ids.map((k,n)=>`${l.rank?(n+1)+". ":"• "}${(S.meta[k]||{}).t||"Álbum"} — ${(S.meta[k]||{}).a||""}`).join("\n")+"\n\nFeito no Acetato";if(navigator.share){navigator.share({title:l.nome,text:txt}).catch(()=>{})}else if(navigator.clipboard){navigator.clipboard.writeText(txt).then(()=>flash("Lista copiada")).catch(()=>flash("Não foi possível copiar"))}return}
-  if(a==="nova"){const n=($("#nlNew").value||"").trim();if(!n){flash("Dê um nome para a lista");return}S.listas.push({nome:n,ids:[]});salvar();rota();flash("Lista criada");return}
-  if(a==="ren"){const n=($("#lnome").value||"").trim();if(n)S.listas[i].nome=n;salvar();rota();flash("Lista renomeada");return}
-  if(a==="rm"){S.listas[i].ids=S.listas[i].ids.filter(x=>x!==el.dataset.id);salvar();rota();flash("Removido da lista");return}
-  if(a==="del"){if(listaDel!==i){listaDel=i;rota();flash("Toque de novo para excluir");return}S.listas.splice(i,1);listaDel=null;salvar();aba="listas";location.hash="profile";flash("Lista excluída");return}
+  if(a==="share"){const l=S.listas[i];const txt=l.nome+"\n\n"+l.ids.map((k,n)=>`${l.rank?(n+1)+". ":"• "}${(S.meta[k]||{}).t||"Album"} — ${(S.meta[k]||{}).a||""}`).join("\n")+"\n\nMade on Acetato";if(navigator.share){navigator.share({title:l.nome,text:txt}).catch(()=>{})}else if(navigator.clipboard){navigator.clipboard.writeText(txt).then(()=>flash("List copied")).catch(()=>flash("Could not copy"))}return}
+  if(a==="nova"){const n=($("#nlNew").value||"").trim();if(!n){flash("Name your list");return}S.listas.push({nome:n,ids:[]});salvar();rota();flash("List created");return}
+  if(a==="ren"){const n=($("#lnome").value||"").trim();if(n)S.listas[i].nome=n;salvar();rota();flash("List renamed");return}
+  if(a==="rm"){S.listas[i].ids=S.listas[i].ids.filter(x=>x!==el.dataset.id);salvar();rota();flash("Removed from list");return}
+  if(a==="del"){if(listaDel!==i){listaDel=i;rota();flash("Tap again to delete");return}S.listas.splice(i,1);listaDel=null;salvar();aba="listas";location.hash="profile";flash("List deleted");return}
 }
 
 /* ===== Editor do perfil ===== */
@@ -945,21 +981,21 @@ function renderEditorAntigo(){
   let el=$("#ed");
   if(!el){el=document.createElement("div");el.id="ed";document.body.appendChild(el)}
   const e=EDIT;
-  el.innerHTML=`<div class="ehead"><button class="lk" data-ed="fechar">Cancelar</button><h2>Editar perfil</h2><button class="sv" data-ed="salvar">Salvar</button></div>
+  el.innerHTML=`<div class="ehead"><button class="lk" data-ed="fechar">Cancel</button><h2>Edit profile</h2><button class="sv" data-ed="salvar">Save</button></div>
   <div class="ebody">
     <div class="esec"><h3 class="sec">Foto e banner</h3><div style="display:flex;gap:10px;flex-wrap:wrap">
       <label class="btn" style="cursor:pointer">Escolher foto<input id="edfoto" type="file" accept="image/*" hidden></label>
       <label class="btn" style="cursor:pointer">Escolher banner<input id="edbanner" type="file" accept="image/*" hidden></label>
       <button class="btn" data-ed="foto-rm">Sem foto</button><button class="btn" data-ed="banner-rm">Sem banner</button></div></div>
-    <div class="esec"><h3 class="sec">Informações</h3>
+    <div class="esec"><h3 class="sec">Info</h3>
       <input class="field" data-f="nome" maxlength="40" placeholder="Nome" value="${esc(e.nome)}">
-      <input class="field" data-f="handle" maxlength="30" placeholder="Usuário" value="${esc(e.handle)}">
+      <input class="field" data-f="handle" maxlength="30" placeholder="Username" value="${esc(e.handle)}">
       <textarea class="field" data-f="bio" maxlength="160" placeholder="Bio">${esc(e.bio)}</textarea>
-      <input class="field" data-f="local" maxlength="40" placeholder="Localização" value="${esc(e.local)}"></div>
-    <div class="esec"><h3 class="sec">Músicas favoritas · uma por linha, até 10</h3>
+      <input class="field" data-f="local" maxlength="40" placeholder="Location" value="${esc(e.local)}"></div>
+    <div class="esec"><h3 class="sec">Favorite songs · uma por linha, até 10</h3>
       <textarea class="field" data-f="musicasTxt" style="min-height:160px">${esc(e.musicasTxt??e.musicas.join("\n"))}</textarea></div>
-    <div class="esec"><h3 class="sec">Álbuns favoritos</h3><p class="mut sm">Na página de qualquer álbum, toque em ☆ Favoritar para escolhê-lo (até 4).</p>
-      <div class="favs">${[0,1,2,3].map(i=>e.fav[i]?`<div class="fitem">${capaAlbum(e.fav[i],(S.meta[e.fav[i]]||{}).t,null)}</div>`:`<div class="fvazio">Vazio</div>`).join("")}</div></div>
+    <div class="esec"><h3 class="sec">Favorite albums</h3><p class="mut sm">On any album page, tap ☆ Favorite to pick it (up to 4).</p>
+      <div class="favs">${[0,1,2,3].map(i=>e.fav[i]?`<div class="fitem">${capaAlbum(e.fav[i],(S.meta[e.fav[i]]||{}).t,null)}</div>`:`<div class="fvazio">Empty</div>`).join("")}</div></div>
   </div>`;
   document.body.style.overflow="hidden";
 }
@@ -971,7 +1007,7 @@ function lerImg(f,max,quadrado,cb){
     if(quadrado){c.width=c.height=max;const s=Math.min(im.width,im.height);c.getContext("2d").drawImage(im,(im.width-s)/2,(im.height-s)/2,s,s,0,0,max,max)}
     else{const k=Math.min(1,max/im.width);c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext("2d").drawImage(im,0,0,c.width,c.height)}
     cb(c.toDataURL("image/jpeg",.85));
-  };im.onerror=()=>flash("Não foi possível ler essa imagem");im.src=r.result};
+  };im.onerror=()=>flash("Could not read that image");im.src=r.result};
   r.readAsDataURL(f);
 }
 
@@ -984,13 +1020,13 @@ function trateHTML(t,a){const k=tkey(t,a);const r=(S.u[k]||{}).r||0;return `<spa
 let EDQ="",EDQF="albuns",edT=null,edTok=0,EDRES=[],EDTAB="perfil";
 function favoritosAlbHTML(){
   const favs=(EDIT&&EDIT.fav)||[];
-  return `<div class="gr-tit">Álbuns favoritos <span>${favs.length}/10</span></div><div class="mut sm" style="margin:-6px 2px 0;font-weight:600">No perfil eles aparecem em grupos de 4.</div>
-    <div class="ed-fav">${Array.from({length:Math.min(10,Math.ceil((favs.length+1)/4)*4)},(_,i)=>i).map(i=>favs[i]?`<div class="ed-fitem">${capaAlbum(favs[i],(S.meta[favs[i]]||{}).t,null)}<button data-ed="fav-rm" data-k="${favs[i]}" class="xb" aria-label="Remover">×</button></div>`:`<div class="ed-vazio">+</div>`).join("")}</div>`;
+  return `<div class="gr-tit">Favorite albums <span>${favs.length}/10</span></div><div class="mut sm" style="margin:-6px 2px 0;font-weight:600">On your profile they appear in groups of 4.</div>
+    <div class="ed-fav">${Array.from({length:Math.min(10,Math.ceil((favs.length+1)/4)*4)},(_,i)=>i).map(i=>favs[i]?`<div class="ed-fitem">${capaAlbum(favs[i],(S.meta[favs[i]]||{}).t,null)}<button data-ed="fav-rm" data-k="${favs[i]}" class="xb" aria-label="Remove">×</button></div>`:`<div class="ed-vazio">+</div>`).join("")}</div>`;
 }
 function favoritosMusHTML(){
   const e=EDIT||{musicas:[]};
-  return `<div class="gr-tit">Músicas favoritas <span>${e.musicas.length}/10</span></div>
-    ${e.musicas.length?`<div class="gr">${e.musicas.map((m,i)=>`<div class="gr-row"><span class="num">${String(i+1).padStart(2,"0")}</span><span class="gr-in" style="flex:1">${esc(m)}</span><button data-ed="mus-rm" data-i="${i}" class="xb" aria-label="Remover">×</button></div>`).join("")}</div>`:`<div class="empty" style="padding:22px">Nenhuma música ainda. Busque abaixo.</div>`}`;
+  return `<div class="gr-tit">Favorite songs <span>${e.musicas.length}/10</span></div>
+    ${e.musicas.length?`<div class="gr">${e.musicas.map((m,i)=>`<div class="gr-row"><span class="num">${String(i+1).padStart(2,"0")}</span><span class="gr-in" style="flex:1">${esc(m)}</span><button data-ed="mus-rm" data-i="${i}" class="xb" aria-label="Remove">×</button></div>`).join("")}</div>`:`<div class="empty" style="padding:22px">No songs yet. Search below.</div>`}`;
 }
 /* Depois de marcar/desmarcar um "+" sem redesenhar o editor inteiro, atualiza só os botões
    visíveis na lista de resultados de busca pra refletir o novo estado (✓ ou +) */
@@ -1005,42 +1041,42 @@ function renderEditor(){
   let el=$("#ed");
   if(!el){el=document.createElement("div");el.id="ed";document.body.appendChild(el)}
   const e=EDIT,favs=e.fav||[];
-  const abas=[["perfil","Perfil"],["favoritos","Favoritos"]].map(([k,l])=>`<button class="${EDTAB===k?"on":""}" data-edt="${k}">${l}</button>`).join("");
+  const abas=[["perfil","Profile"],["favoritos","Favoritos"]].map(([k,l])=>`<button class="${EDTAB===k?"on":""}" data-edt="${k}">${l}</button>`).join("");
   const previa=`
     <div class="ed-previa">
       <div class="ed-banner" style="${e.banner?`background-image:url(${e.banner})`:"background:linear-gradient(135deg,#2a1b4d,#0b0b0d)"}">
-        <label class="ed-chip" style="right:12px;top:12px;cursor:pointer">Trocar banner<input id="edbanner" type="file" accept="image/*" hidden></label>
-        <button class="ed-chip" data-ed="banner-rm" style="right:12px;top:52px">Remover</button>
+        <label class="ed-chip" style="right:12px;top:12px;cursor:pointer">Change banner<input id="edbanner" type="file" accept="image/*" hidden></label>
+        <button class="ed-chip" data-ed="banner-rm" style="right:12px;top:52px">Remove</button>
       </div>
       <div class="ed-avwrap">
         <div class="ed-av">${e.avatar?`<img src="${e.avatar}" alt="">`:`<span>${esc(ini(e.nome))}</span>`}</div>
         <div class="ed-av-acoes">
-          <label class="ed-chip" style="cursor:pointer">Trocar foto<input id="edfoto" type="file" accept="image/*" hidden></label>
-          <button class="ed-chip" data-ed="foto-rm">Remover</button>
+          <label class="ed-chip" style="cursor:pointer">Change photo<input id="edfoto" type="file" accept="image/*" hidden></label>
+          <button class="ed-chip" data-ed="foto-rm">Remove</button>
         </div>
       </div>
-      <div class="ed-nome">${esc(e.nome||"Seu nome")}<span>@${esc(e.handle||"usuario")}</span></div>
+      <div class="ed-nome">${esc(e.nome||"Your name")}<span>@${esc(e.handle||"username")}</span></div>
     </div>`;
   const campos=`
     <div class="gr">
-      <div class="gr-row"><span class="gr-lbl">Nome</span><input class="gr-in" data-f="nome" maxlength="40" value="${esc(e.nome)}" placeholder="Seu nome"></div>
-      <div class="gr-row"><span class="gr-lbl">Usuário</span><input class="gr-in" data-f="handle" maxlength="30" value="${esc(e.handle)}" placeholder="seu.usuario"></div>
-      <div class="gr-row gr-alto"><span class="gr-lbl">Bio</span><textarea class="gr-in" data-f="bio" maxlength="160" placeholder="Conte o que você ouve">${esc(e.bio)}</textarea></div>
-      <div class="gr-row"><span class="gr-lbl">Local</span><input class="gr-in" data-f="local" maxlength="40" value="${esc(e.local)}" placeholder="Cidade, país"></div>
+      <div class="gr-row"><span class="gr-lbl">Name</span><input class="gr-in" data-f="nome" maxlength="40" value="${esc(e.nome)}" placeholder="Your name"></div>
+      <div class="gr-row"><span class="gr-lbl">Username</span><input class="gr-in" data-f="handle" maxlength="30" value="${esc(e.handle)}" placeholder="your.handle"></div>
+      <div class="gr-row gr-alto"><span class="gr-lbl">Bio</span><textarea class="gr-in" data-f="bio" maxlength="160" placeholder="Tell us what you listen to">${esc(e.bio)}</textarea></div>
+      <div class="gr-row"><span class="gr-lbl">Location</span><input class="gr-in" data-f="local" maxlength="40" value="${esc(e.local)}" placeholder="City, country"></div>
     </div>`;
   const favoritosAlb=`<div id="edfavalb">${favoritosAlbHTML()}</div>`;
   const favoritosMus=`<div id="edfavmus">${favoritosMusHTML()}</div>`;
   const busca=`
-    <div class="gr-tit">Adicionar</div>
-    <input class="search" id="edq" placeholder="Busque um álbum ou uma música" autocomplete="off" value="${esc(EDQ)}" style="font-size:16px;padding:12px 14px 12px 42px">
-    <div class="chips" style="padding-top:10px">${[["albuns","Álbuns"],["musicas","Músicas"]].map(([k,l])=>`<button class="chip ${EDQF===k?"on":""}" data-edf="${k}">${l}</button>`).join("")}</div>
+    <div class="gr-tit">Add</div>
+    <input class="search" id="edq" placeholder="Search for an album or a song" autocomplete="off" value="${esc(EDQ)}" style="font-size:16px;padding:12px 14px 12px 42px">
+    <div class="chips" style="padding-top:10px">${[["albuns","Albums"],["musicas","Songs"]].map(([k,l])=>`<button class="chip ${EDQF===k?"on":""}" data-edf="${k}">${l}</button>`).join("")}</div>
     <div id="edres"></div>`;
   el.innerHTML=`
-  <div class="ehead"><button class="lk" data-ed="fechar">Cancelar</button><h2>Editar perfil</h2><button class="sv" data-ed="salvar">Salvar</button></div>
+  <div class="ehead"><button class="lk" data-ed="fechar">Cancel</button><h2>Edit profile</h2><button class="sv" data-ed="salvar">Save</button></div>
   <div class="ebody">
     ${previa}
     <div class="edtabs">${abas}</div>
-    ${EDTAB==="perfil"?`<div class="gr-tit">Informações</div>${campos}`:`${favoritosAlb}${favoritosMus}${busca}`}
+    ${EDTAB==="perfil"?`<div class="gr-tit">Info</div>${campos}`:`${favoritosAlb}${favoritosMus}${busca}`}
   </div>`;
   document.body.style.overflow="hidden";
   if(EDTAB==="favoritos"&&EDQ.trim().length>=2)runEdSearch();
@@ -1050,35 +1086,35 @@ async function runEdSearch(){
   if(!res)return;
   if(q.length<2){res.innerHTML="";return}
   const e=encodeURIComponent(q),tok=++edTok;
-  res.innerHTML=`<div class="load">Buscando…</div>`;
+  res.innerHTML=`<div class="load">Searching…</div>`;
   if(EDQF==="albuns"){
     const r=await Promise.allSettled([fontes.albunsDZ(e),fontes.albunsIT(e)]);
     if(tok!==edTok)return;
     const itens=r.filter(x=>x.status==="fulfilled").flatMap(x=>x.value);
     const albuns=unirAlbuns(itens).slice(0,20);
     albuns.forEach(guardarAlbum);salvar();
-    res.innerHTML=albuns.length?`<div class="mlist">${albuns.map(u=>`<div class="row">${capaAlbum(u.key,u.t,46)}<div class="grow"><div class="ttl">${esc(u.t)}</div><div class="sm mut" style="font-weight:700">${esc(u.a)}${u.y?" · "+u.y:""}</div></div><button class="btn" data-ed="pick-alb" data-k="${u.key}" style="padding:8px 12px;font-size:13px">${EDIT.fav.includes(u.key)?"✓":"+"}</button></div>`).join("")}</div>`:`<div class="empty">Nada encontrado.</div>`;
+    res.innerHTML=albuns.length?`<div class="mlist">${albuns.map(u=>`<div class="row">${capaAlbum(u.key,u.t,46)}<div class="grow"><div class="ttl">${esc(u.t)}</div><div class="sm mut" style="font-weight:700">${esc(u.a)}${u.y?" · "+u.y:""}</div></div><button class="btn" data-ed="pick-alb" data-k="${u.key}" style="padding:8px 12px;font-size:13px">${EDIT.fav.includes(u.key)?"✓":"+"}</button></div>`).join("")}</div>`:`<div class="empty">Nothing found.</div>`;
   }else{
     const r=await Promise.allSettled([fontes.musicasDZ(e),fontes.musicasIT(e)]);
     if(tok!==edTok)return;
     const itens=r.filter(x=>x.status==="fulfilled").flatMap(x=>x.value);
     const vistos=new Set();
     EDRES=itens.filter(m=>{const c=norm(m.titulo)+"|"+norm(m.artista);if(vistos.has(c))return false;vistos.add(c);return true}).slice(0,25);
-    res.innerHTML=EDRES.length?`<div class="mlist">${EDRES.map((m,i)=>`<div class="row"><div class="grow"><div class="ttl">${esc(m.titulo)}</div><div class="sm mut" style="font-weight:700">${esc(m.artista)} · ${esc(m.album.t)}</div></div><button class="btn" data-ed="pick-mus" data-i="${i}" style="padding:8px 12px;font-size:13px">${EDIT.musicas.includes(`${m.titulo} — ${m.artista}`)?"✓":"+"}</button></div>`).join("")}</div>`:`<div class="empty">Nada encontrado.</div>`;
+    res.innerHTML=EDRES.length?`<div class="mlist">${EDRES.map((m,i)=>`<div class="row"><div class="grow"><div class="ttl">${esc(m.titulo)}</div><div class="sm mut" style="font-weight:700">${esc(m.artista)} · ${esc(m.album.t)}</div></div><button class="btn" data-ed="pick-mus" data-i="${i}" style="padding:8px 12px;font-size:13px">${EDIT.musicas.includes(`${m.titulo} — ${m.artista}`)?"✓":"+"}</button></div>`).join("")}</div>`:`<div class="empty">Nothing found.</div>`;
   }
 }
 
 /* ===== Roteamento ===== */
 function rota(){
-  const h=location.hash.slice(1)||"home";
+  let h=decodeURIComponent(location.hash.slice(1))||"home";if(h[0]==="@")h="profile";else if(h==="profile")history.replaceState(null,"","#@"+encodeURIComponent(P().handle));
   document.body.classList.toggle("perfil",h==="profile");
   document.querySelectorAll(".nav a").forEach(t=>t.classList.toggle("on",t.dataset.tab===(h.startsWith("album")||h.startsWith("artist")?"search":(h.startsWith("lista")?"profile":h))));
   const app=$("#app");
   const tok=++rotaTok;
   if(!h.startsWith("album-")&&!h.startsWith("artist-"))resetAmb();
-  const carrega=p=>{app.innerHTML=`<div class="load">Carregando…</div>`;p.then(html=>{if(tok===rotaTok)app.innerHTML=html}).catch(()=>{if(tok===rotaTok)app.innerHTML=erroHTML()})};
+  const carrega=p=>{app.innerHTML=`<div class="load">Loading…</div>`;p.then(html=>{if(tok===rotaTok)app.innerHTML=html}).catch(()=>{if(tok===rotaTok)app.innerHTML=erroHTML()})};
   if(h.startsWith("album-")){carrega(albumView(h.slice(6)));return}
-  if(h.startsWith("artist-")){carrega(artistView(h.slice(7)));return}
+  if(h.startsWith("artist-")){carrega(artistRoute(h.slice(7)));return}
   if(h==="search"){app.innerHTML=searchView();runSearch();return}
   if(h==="diary"){app.innerHTML=`<h1>Diário</h1>${diaryList()}`;return}
   if(h==="profile"){app.innerHTML=perfilView();return}
@@ -1105,13 +1141,13 @@ document.addEventListener("focusin",e=>{
 });
 document.addEventListener("change",e=>{
   const t=e.target;
-  if(t.id==="ddate"){const kk=location.hash.slice(7);if(t.value&&S.u[kk]){S.u[kk].d=t.value;salvar();flash("Data atualizada")}return}
+  if(t.id==="ddate"){const kk=location.hash.slice(7);if(t.value&&S.u[kk]){S.u[kk].d=t.value;salvar();flash("Date updated")}return}
   if(t.id==="impf"){importar(t.files[0]);t.value="";return}
   /* Trocar a capa de um álbum, EP ou single */
   if(t.id==="capaup"&&t.files&&t.files[0]){
     const k=location.hash.slice(7);
     if(!S.meta[k])return;
-    lerImg(t.files[0],700,true,u=>{S.covers[k]=u;salvar();rota();flash("Capa trocada")});
+    lerImg(t.files[0],700,true,u=>{S.covers[k]=u;salvar();rota();flash("Cover changed")});
     return;
   }
   if(!t.files||!t.files[0]||!EDIT)return;
@@ -1121,13 +1157,13 @@ document.addEventListener("change",e=>{
 document.addEventListener("click",e=>{
   const t=e.target;
   const tv=t.closest("[data-tv]");
-  if(tv){e.preventDefault();const box=tv.closest(".trate");const k=box.dataset.tk;const d=dd(k);const val=+tv.dataset.tv;d.r=d.r===val?0:val;if(!d.r)delete d.r;S.tracks=S.tracks||{};S.tracks[k]={t:box.dataset.tt,a:box.dataset.ta};salvar();box.innerHTML=rateHTML(d.r).replace(/data-v=/g,'data-tv=');flash(d.r?`Nota ${String(val).replace(".",",")} para a música`:"Nota removida");tic();atualizarMedia();return}
+  if(tv){e.preventDefault();const box=tv.closest(".trate");const k=box.dataset.tk;const d=dd(k);const val=+tv.dataset.tv;d.r=d.r===val?0:val;if(!d.r)delete d.r;S.tracks=S.tracks||{};S.tracks[k]={t:box.dataset.tt,a:box.dataset.ta};salvar();box.innerHTML=rateHTML(d.r).replace(/data-v=/g,'data-tv=');flash(d.r?`Rating ${String(val)} for the song`:"Rating removed");tic();atualizarMedia();return}
   const sg=t.closest("[data-seguir]");
   if(sg){
     const k=sg.dataset.seguir;S.seguindo=S.seguindo||[];
     const i=S.seguindo.findIndex(s=>s.k===k);
-    if(i>=0){S.seguindo.splice(i,1);flash("Deixou de seguir")}
-    else{const a=S.artists[k]||{};S.seguindo.push({k,n:a.n||"",dz:(a.ids||{}).dz||""});flash("Seguindo")}
+    if(i>=0){S.seguindo.splice(i,1);flash("Unfollowed")}
+    else{const a=S.artists[k]||{};S.seguindo.push({k,n:a.n||"",dz:(a.ids||{}).dz||""});flash("Following")}
     salvar();rota();return;
   }
   const hg=t.closest("[data-hg]");
@@ -1146,7 +1182,7 @@ document.addEventListener("click",e=>{
       const k=ed.dataset.k;
       if(EDIT.fav.includes(k)){EDIT.fav=EDIT.fav.filter(x=>x!==k)}
       else if(EDIT.fav.length<10)EDIT.fav.push(k);
-      else{flash("Até 10 álbuns favoritos");return}
+      else{flash("Up to 10 favorite albums");return}
       const box=$("#edfavalb");if(box)box.innerHTML=favoritosAlbHTML();
       atualizarBotoesBusca();
       return;
@@ -1161,7 +1197,7 @@ document.addEventListener("click",e=>{
       const m=EDRES[+ed.dataset.i];const linha=`${m.titulo} — ${m.artista}`;
       if(EDIT.musicas.includes(linha)){EDIT.musicas=EDIT.musicas.filter(x=>x!==linha)}
       else if(EDIT.musicas.length<10)EDIT.musicas.push(linha);
-      else{flash("Até 10 músicas");return}
+      else{flash("Up to 10 songs");return}
       const box=$("#edfavmus");if(box)box.innerHTML=favoritosMusHTML();
       atualizarBotoesBusca();
       return;
@@ -1176,7 +1212,7 @@ document.addEventListener("click",e=>{
       const {musicasTxt,...r}=EDIT;
       const txt=musicasTxt??r.musicas.join("\n");
       S.perfil={...r,musicas:txt.split("\n").map(s=>s.trim()).filter(Boolean).slice(0,10)};
-      salvar();fecharEditor();rota();flash("Perfil salvo");
+      salvar();fecharEditor();rota();flash("Profile saved");
     }
     return;
   }
@@ -1192,8 +1228,8 @@ document.addEventListener("click",e=>{
     d.r=d.r===val?0:val;if(!d.r)delete d.r;
     salvar();
     tic();$("#rate").innerHTML=rateHTML(d.r);
-    $("#rlab").textContent=d.r?String(d.r).replace(".",",")+" de 5":"Sua nota";
-    flash(d.r?`Nota ${String(val).replace(".",",")} salva`:"Nota removida");
+    $("#rlab").textContent=d.r?String(d.r)+" of 5":"Your rating";
+    flash(d.r?`Rating ${String(val)} saved`:"Rating removed");
     return;
   }
   const act=t.closest("[data-act]");
@@ -1206,15 +1242,15 @@ window.addEventListener("DOMContentLoaded",()=>rota());
 <script>
 function extraPerfil(){
   const av=Object.entries(S.u).filter(([k,v])=>v.r&&S.meta[k]);
-  const dist=[.5,1,1.5,2,2.5,3,3.5,4,4.5,5].map(n=>{const c=av.filter(([,v])=>v.r===n).length;return `<div class="hrow"><span>${String(n).replace(".",",")}</span><div class="hbar"><i style="width:${av.length?c/av.length*100:0}%"></i></div><span class="mut">${c}</span></div>`}).join("");
+  const dist=[.5,1,1.5,2,2.5,3,3.5,4,4.5,5].map(n=>{const c=av.filter(([,v])=>v.r===n).length;return `<div class="hrow"><span>${String(n)}</span><div class="hbar"><i style="width:${av.length?c/av.length*100:0}%"></i></div><span class="mut">${c}</span></div>`}).join("");
   const cont={};av.forEach(([k])=>{const a=S.meta[k].a;cont[a]=(cont[a]||0)+1});
   const topA=Object.entries(cont).sort((a,b)=>b[1]-a[1]).slice(0,5);
   const faixas=Object.entries(S.tracks||{}).filter(([k])=>S.u[k]?.r).sort((a,b)=>S.u[b[0]].r-S.u[a[0]].r).slice(0,8);
-  return `<h2>Seguindo</h2>${(S.seguindo||[]).length?`<div class="mlist">${(S.seguindo||[]).map(s=>`<a class="row" href="#artist-${s.k}">${capaFoto("",s.n,44,true)}<div class="grow"><div class="ttl">${esc(s.n)}</div></div><span class="mut">›</span></a>`).join("")}</div>`:`<div class="empty">Siga artistas para ver os lançamentos deles na página inicial.</div>`}
-  <h2>Top artistas</h2>${topA.length?`<div class="mlist">${topA.map(([n,c],i)=>`<a class="row" href="#artist-${artistKey(n)}"><span class="num">${i+1}</span><div class="grow"><div class="ttl">${esc(n)}</div><div class="sm mut" style="font-weight:700">${c} álbum${c>1?"ns":""} avaliado${c>1?"s":""}</div></div><span class="mut">›</span></a>`).join("")}</div>`:`<div class="empty">Avalie álbuns para ver seus artistas favoritos.</div>`}
-  <h2>Distribuição de notas</h2><div class="hist2">${dist}</div>
-  <h2>Músicas avaliadas</h2>${faixas.length?`<div class="mlist">${faixas.map(([k,v])=>`<div class="row"><div class="grow"><div class="ttl">${esc(v.t)}</div><div class="sm mut" style="font-weight:700">${esc(v.a)}</div></div>${estrelas(S.u[k].r)}</div>`).join("")}</div>`:`<div class="empty">Avalie faixas na página de um álbum.</div>`}
-  <h2>Compartilhar</h2><button class="btn p" data-pact="cartao">Compartilhar no Story</button>${aba==="perfil"?backupHTML():""}`;
+  return `<h2>Following</h2>${(S.seguindo||[]).length?`<div class="mlist">${(S.seguindo||[]).map(s=>`<a class="row" href="#artist-${s.k}">${capaFoto("",s.n,44,true)}<div class="grow"><div class="ttl">${esc(s.n)}</div></div><span class="mut">›</span></a>`).join("")}</div>`:`<div class="empty">Follow artists to see their releases on the home page.</div>`}
+  <h2>Top artists</h2>${topA.length?`<div class="mlist">${topA.map(([n,c],i)=>`<a class="row" href="#artist-${artistKey(n)}"><span class="num">${i+1}</span><div class="grow"><div class="ttl">${esc(n)}</div><div class="sm mut" style="font-weight:700">${c} album${c>1?"s":""}  rated</div></div><span class="mut">›</span></a>`).join("")}</div>`:`<div class="empty">Rate albums to see your favorite artists.</div>`}
+  <h2>Rating distribution</h2><div class="hist2">${dist}</div>
+  <h2>Rated songs</h2>${faixas.length?`<div class="mlist">${faixas.map(([k,v])=>`<div class="row"><div class="grow"><div class="ttl">${esc(v.t)}</div><div class="sm mut" style="font-weight:700">${esc(v.a)}</div></div>${estrelas(S.u[k].r)}</div>`).join("")}</div>`:`<div class="empty">Rate tracks on an album page.</div>`}
+  <h2>Share</h2><button class="btn p" data-pact="cartao">Share to Story</button>${aba==="perfil"?backupHTML():""}`;
 }
 function rr(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
 function gerarCartao(){
@@ -1228,8 +1264,8 @@ function gerarCartao(){
   g.font="700 44px Inter, -apple-system, Helvetica, Arial, sans-serif";g.fillStyle="rgba(255,255,255,.8)";g.fillText("@"+p.handle,84,330);
   const ouv=Object.values(S.u).filter(v=>v.d).length;
   const av=Object.values(S.u).filter(v=>v.r);
-  const media=av.length?(av.reduce((s,v)=>s+v.r,0)/av.length).toFixed(1).replace(".",","):"—";
-  g.font="600 38px Inter, -apple-system, Helvetica, Arial, sans-serif";g.fillText(`${ouv} ouvidos · ${av.length} avaliações · média ${media}`,84,410);
+  const media=av.length?(av.reduce((s,v)=>s+v.r,0)/av.length).toFixed(1):"—";
+  g.font="600 38px Inter, -apple-system, Helvetica, Arial, sans-serif";g.fillText(`${ouv} listened · ${av.length} ratings · avg ${media}`,84,410);
   fav.slice(0,4).forEach((k,i)=>{
     const x=80+i*236,y=500,[a,b]=cores(k);
     const t=g.createLinearGradient(x,y,x+200,y+200);t.addColorStop(0,a);t.addColorStop(1,b);
@@ -1238,7 +1274,7 @@ function gerarCartao(){
     const nome=(S.meta[k]||{}).t||"";
     g.fillText(nome.slice(0,14),x,y+240);
   });
-  g.font="800 40px Inter, -apple-system, Helvetica, Arial, sans-serif";g.fillStyle="#fff";g.fillText("Músicas favoritas",84,880);
+  g.font="800 40px Inter, -apple-system, Helvetica, Arial, sans-serif";g.fillStyle="#fff";g.fillText("Favorite songs",84,880);
   g.font="600 36px Inter, -apple-system, Helvetica, Arial, sans-serif";
   (p.musicas||[]).slice(0,5).forEach((m,i)=>{g.fillStyle="rgba(255,255,255,.9)";g.fillText(`${i+1}. ${m.slice(0,40)}`,84,950+i*62)});
   g.font="900 46px Inter, -apple-system, Helvetica, Arial, sans-serif";g.fillStyle="#fff";g.fillText("Acetato.",84,1250);
@@ -1246,14 +1282,14 @@ function gerarCartao(){
     const file=new File([blob],"acetato-perfil.png",{type:"image/png"});
     if(navigator.canShare&&navigator.canShare({files:[file]})){navigator.share({files:[file],title:"Acetato"}).catch(()=>{});return}
     const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="acetato-perfil.png";document.body.appendChild(a);a.click();a.remove();
-    flash("Imagem gerada");
+    flash("Image generated");
   },"image/png");
 }
 document.addEventListener("click",e=>{
   if(e.target.closest("[data-pact='cartao']")){gerarStoryPerfil();return}
   if(e.target.closest("[data-rnd]")){
     const lista=window.__chart||[];
-    if(!lista.length){flash("Ainda não há tendências carregadas");return}
+    if(!lista.length){flash("Trends haven't loaded yet");return}
     const x=lista[Math.floor(Math.random()*lista.length)];
     location.hash="album-"+albumKey(x.title,x.artist?.name||"");
   }
@@ -1266,7 +1302,7 @@ function melhorarCarrosseis(){
     c.dataset.m='1';
     const w=document.createElement('div');w.className='carw';
     c.parentNode.insertBefore(w,c);w.appendChild(c);
-    const bot=(d)=>{const b=document.createElement('button');b.className='carbtn '+(d<0?'l':'r');b.innerHTML=d<0?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>';b.setAttribute('aria-label',d<0?'Anterior':'Próximo');b.onclick=()=>c.scrollBy({left:d*c.clientWidth*.8,behavior:'smooth'});return b};
+    const bot=(d)=>{const b=document.createElement('button');b.className='carbtn '+(d<0?'l':'r');b.innerHTML=d<0?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>';b.setAttribute('aria-label',d<0?'Previous':'Next');b.onclick=()=>c.scrollBy({left:d*c.clientWidth*.8,behavior:'smooth'});return b};
     w.append(bot(-1),bot(1));
   });
 }
@@ -1276,7 +1312,7 @@ melhorarCarrosseis();
   const nav=document.querySelector('.nav');
   if(!nav)return;
   const box=document.createElement('div');box.className='hsearch';
-  box.innerHTML='<input id="hq2" type="search" placeholder="Buscar artistas, álbuns, músicas" autocomplete="off" aria-label="Buscar">';
+  box.innerHTML='<input id="hq2" type="search" placeholder="Search artists, albums, songs" autocomplete="off" aria-label="Buscar">';
   nav.before(box);
   let t=null;
   box.querySelector('input').addEventListener('input',e=>{
@@ -1347,7 +1383,7 @@ const rgba=(c,a=1)=>`rgba(${c[0]},${c[1]},${c[2]},${a})`;
 const escurece=(c,k)=>c.map(v=>Math.round(v*(1-k)));
 
 /* ---- Variações de fundo ---- */
-const VARIACOES=["Degradê","Radial","Desfocado","Vibrante","Escuro","Claro","Sólido"];
+const VARIACOES=["Gradient","Radial","Blurred","Vibrant","Dark","Light","Solid"];
 function fundoStory(g,W,H,pal,im,v){
   const [p1,p2,p3]=pal;
   if(v===2&&!im)v=0;
@@ -1438,7 +1474,7 @@ function desenharResenha(c,k,A,v,o){
 }
 
 /* ---- Layouts: Fade, Pôster, Vinil, Polaroid, Clássico e Letra ---- */
-const LAYOUTS=["Fade","Pôster","Vinil","Polaroid","Clássico"];
+const LAYOUTS=["Fade","Poster","Vinyl","Polaroid","Classic"];
 function cortar(g,t,maxW){t=String(t||"");if(g.measureText(t).width<=maxW)return t;while(t.length>1&&g.measureText(t+"…").width>maxW)t=t.slice(0,-1);return t+"…"}
 function desfocar(src,w,h){
   let cur=src;
@@ -1558,23 +1594,23 @@ function desenharPolaroid(c,I,v,o){
 }
 
 /* ---- Letra: vários estilos para o trecho digitado pelo usuário ---- */
-const LSTYLES=["Centro","Cartão","Destaque","Minimal","Capa","Pôster"];
+const LSTYLES=["Center","Card","Highlight","Minimal","Cover","Poster"];
 const LSTYLE_AL=[1,0,0,0,0,0];
 const LFONTS=[
   ["Sans",s=>`800 ${s}px ${FNT}`],
   ["Serif",s=>`700 ${s}px Georgia,"Times New Roman",serif`],
   ["Mono",s=>`600 ${s}px ui-monospace,Menlo,Consolas,monospace`],
-  ["Itálico",s=>`italic 700 ${s}px Georgia,"Times New Roman",serif`]
+  ["Italic",s=>`italic 700 ${s}px Georgia,"Times New Roman",serif`]
 ];
 const LALIN=["left","center","right"];
-const LTAM=[["P",.72],["M",1],["G",1.3]];
-const LCORES=["Auto","Branco","Preto","Cor"];
+const LTAM=[["S",.72],["M",1],["L",1.3]];
+const LCORES=["Auto","White","Black","Color"];
 const marcaOn=()=>window.__marca!==false;
 const ancora=(L,W,M)=>L.al==="left"?M:L.al==="right"?W-M:W/2;
 
 function lyricCfg(I,o,v){
   const vazio=!(o.letra||"").trim();
-  const txt=vazio?"Escreva aqui o trecho\nda letra que você\nquer compartilhar":o.letra.trim();
+  const txt=vazio?"Write the lyric\nexcerpt you want\nto share here":o.letra.trim();
   const clar=I.pal[0].map(x=>Math.round(x+(255-x)*.5));
   const sobreClaro=!!(o.fundo&&v===5);
   const escuro=o.lc===2||(o.lc===0&&sobreClaro);
@@ -1793,9 +1829,9 @@ function desenharPerfil(g,W,H,A,v){
   texto(g,"@"+p.handle,W/2,710,`600 42px ${FNT}`,"rgba(255,255,255,.7)");
   if(p.bio){g.font=`500 38px ${FNT}`;quebrarLinhas(g,p.bio,840).slice(0,3).forEach((l,i)=>texto(g,l,W/2,790+i*54,`500 38px ${FNT}`,"rgba(255,255,255,.9)"))}
   const ouv=Object.values(S.u).filter(x=>x.d).length,av2=Object.values(S.u).filter(x=>x.r);
-  const media=av2.length?(av2.reduce((s,x)=>s+x.r,0)/av2.length).toFixed(1).replace(".",","):"—";
-  [[ouv,"ouvidos"],[av2.length,"avaliações"],[media,"média"]].forEach(([n,l],i)=>{const x=W/2+(i-1)*290;texto(g,String(n),x,1000,`900 84px ${FNT}`,"#fff");texto(g,l,x,1050,`700 30px ${FNT}`,"rgba(255,255,255,.6)")});
-  texto(g,"Álbuns favoritos",W/2,1150,`800 40px ${FNT}`,"#fff");
+  const media=av2.length?(av2.reduce((s,x)=>s+x.r,0)/av2.length).toFixed(1):"—";
+  [[ouv,"listened"],[av2.length,"ratings"],[media,"avg"]].forEach(([n,l],i)=>{const x=W/2+(i-1)*290;texto(g,String(n),x,1000,`900 84px ${FNT}`,"#fff");texto(g,l,x,1050,`700 30px ${FNT}`,"rgba(255,255,255,.6)")});
+  texto(g,"Favorite albums",W/2,1150,`800 40px ${FNT}`,"#fff");
   const tam=200,gap=26,x0=(W-(4*tam+3*gap))/2;
   for(let i=0;i<4;i++){const x=x0+i*(tam+gap),y=1190,k=fav[i];
     if(k){
@@ -1804,7 +1840,7 @@ function desenharPerfil(g,W,H,A,v){
       texto(g,((S.meta[k]||{}).t||"").slice(0,16),x+tam/2,y+tam+42,`700 26px ${FNT}`,"rgba(255,255,255,.9)");
     }else{g.strokeStyle="rgba(255,255,255,.25)";g.setLineDash([12,10]);g.lineWidth=3;rrect(g,x,y,tam,tam,26);g.stroke();g.setLineDash([])}
   }
-  texto(g,"Músicas favoritas",W/2,1560,`800 40px ${FNT}`,"#fff");
+  texto(g,"Favorite songs",W/2,1560,`800 40px ${FNT}`,"#fff");
   (p.musicas||[]).slice(0,4).forEach((m,i)=>texto(g,(i+1)+". "+m.slice(0,38),W/2,1625+i*64,`600 38px ${FNT}`,"rgba(255,255,255,.92)"));
   texto(g,"@"+p.handle+" · Acetato",W/2,1850,`600 32px ${FNT}`,"rgba(255,255,255,.55)");
 }
@@ -1812,12 +1848,12 @@ function desenharPerfil(g,W,H,A,v){
 /* ---- Prévia com variações ---- */
 function compartilharCanvas(c,nome){
   c.toBlob(async blob=>{
-    if(!blob){flash("Não foi possível gerar a imagem");return}
+    if(!blob){flash("Could not generate the image");return}
     const file=new File([blob],nome,{type:"image/png"});
     try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:"Acetato"});return}}
     catch(e){if(e.name==="AbortError")return}
     const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=nome;document.body.appendChild(a);a.click();a.remove();
-    flash("Imagem salva. Poste no Story pelo app do Instagram.");
+    flash("Image saved. Post it to your Story from the Instagram app.");
   },"image/png");
 }
 /* Painel de Story: prévia em cima e abas embaixo (Estilo, Letra, Fundo, Extras) */
@@ -1867,7 +1903,7 @@ function compartilharCanvas(c,nome){
 async function abrirStory(tipo,k,mus){
   document.getElementById("stv")?.remove();
   const ov=document.createElement("div");ov.id="stv";
-  ov.innerHTML=`<div class="stld">Preparando imagem…</div>`;
+  ov.innerHTML=`<div class="stld">Preparing image…</div>`;
   document.body.appendChild(ov);document.body.style.overflow="hidden";
   const vv=window.visualViewport;
   const medir=()=>{if(!vv)return;ov.style.setProperty("--vh",vv.height+"px");ov.style.top=vv.offsetTop+"px";ov.classList.toggle("kb",vv.height<window.innerHeight*.75)};
@@ -1903,9 +1939,9 @@ async function abrirStory(tipo,k,mus){
   const pal0=tipo==="resenha"?paletaDaImagem(A.capa,k):paletaDaImagem(A.fonte,P().handle||"acetato");
   const im0=tipo==="resenha"?A.capa:A.fonte;
 
-  ov.innerHTML=`<div class="stprev"><button class="stx" data-sf aria-label="Fechar">×</button></div>
+  ov.innerHTML=`<div class="stprev"><button class="stx" data-sf aria-label="Close">×</button></div>
   <div class="stpanel"><div class="sttabs" id="sttabs"></div><div class="stbody" id="stbody"></div>
-  <div class="stacts"><button class="btn" data-sf>Fechar</button><button class="btn p" data-ss>Compartilhar</button></div></div>`;
+  <div class="stacts"><button class="btn" data-sf>Close</button><button class="btn p" data-ss>Share</button></div></div>`;
   const prev=ov.querySelector(".stprev");prev.appendChild(c);
 
   const ajusta=()=>{
@@ -1963,29 +1999,29 @@ async function abrirStory(tipo,k,mus){
   /* Conteúdo das abas */
   const seg=(attr,arr,sel)=>`<div class="seg">${arr.map((n,i)=>`<button class="${i===sel?"on":""}" ${attr}="${i}">${n}</button>`).join("")}</div>`;
   const tog=(key,label,on)=>`<button class="tg" data-so="${key}"><span>${label}</span><i class="sw ${on?"on":""}"></i></button>`;
-  const abasDe=()=>tipo!=="resenha"?[["fundo","Fundo"]]:[["estilo","Estilo"],...(o.mode==="let"?[["texto","Letra"]]:[]),["fundo","Fundo"],["extras","Extras"]];
+  const abasDe=()=>tipo!=="resenha"?[["fundo","Background"]]:[["estilo","Style"],...(o.mode==="let"?[["texto","Lyrics"]]:[]),["fundo","Background"],["extras","Extras"]];
   const corpo=()=>{
     if(tab==="estilo"){
       const nomes=o.mode==="let"?LSTYLES:LAYOUTS,atual=o.mode==="let"?o.ly:o.lay,key=tk();
-      return `<div class="seg"><button class="${o.mode==="res"?"on":""}" data-md="res">Resenha</button><button class="${o.mode==="let"?"on":""}" data-md="let">Trecho de letra</button></div>
+      return `<div class="seg"><button class="${o.mode==="res"?"on":""}" data-md="res">Review</button><button class="${o.mode==="let"?"on":""}" data-md="let">Lyric excerpt</button></div>
       <div class="throw">${nomes.map((n,i)=>{const u=thCache.get(key+"|"+o.mode+"|"+i);return `<button class="th ${i===atual?"on":""}" data-sl="${i}"><span class="thb" data-ti="${i}"${u?` style="background-image:url(${u})"`:""}></span><em>${n}</em></button>`}).join("")}</div>`;
     }
     if(tab==="texto"){
-      return `<textarea class="field" id="stlt" rows="3" maxlength="400" placeholder="Digite ou cole o trecho que você quer compartilhar">${esc(o.letra)}</textarea>
-      <div class="opt"><span>Fonte</span>${seg("data-lf",LFONTS.map(f=>f[0]),o.lf)}</div>
-      <div class="opt"><span>Alinhar</span>${seg("data-la",["Esq.","Centro","Dir."],o.la)}</div>
-      <div class="opt"><span>Tamanho</span>${seg("data-lt",LTAM.map(t=>t[0]),o.lt)}</div>
-      <div class="opt"><span>Cor</span>${seg("data-lc",LCORES,o.lc)}</div>`;
+      return `<textarea class="field" id="stlt" rows="3" maxlength="400" placeholder="Type or paste the excerpt you want to share">${esc(o.letra)}</textarea>
+      <div class="opt"><span>Font</span>${seg("data-lf",LFONTS.map(f=>f[0]),o.lf)}</div>
+      <div class="opt"><span>Align</span>${seg("data-la",["Left","Center","Right"],o.la)}</div>
+      <div class="opt"><span>Size</span>${seg("data-lt",LTAM.map(t=>t[0]),o.lt)}</div>
+      <div class="opt"><span>Color</span>${seg("data-lc",LCORES,o.lc)}</div>`;
     }
     if(tab==="fundo"){
-      return `${tog("fundo","Usar fundo",o.fundo)}
+      return `${tog("fundo","Use background",o.fundo)}
       <div class="throw" style="opacity:${o.fundo?1:.35};pointer-events:${o.fundo?"auto":"none"}">${VARIACOES.map((n,i)=>`<button class="th ${i===v?"on":""}" data-sv="${i}"><span class="thb" style="background-image:url(${swatch(i)})"></span><em>${n}</em></button>`).join("")}</div>
-      ${o.fundo?"":`<div class="sthint">Sem fundo, a imagem sai com transparência (PNG).</div>`}`;
+      ${o.fundo?"":`<div class="sthint">Without background, the image is exported with transparency (PNG).</div>`}`;
     }
     if(o.mode==="let"){
-      return `${tog("lq","Aspas",o.lq)}${tog("lcapa","Mostrar capa",o.lcapa)}${tog("linfo","Mostrar música e artista",o.linfo)}${temNota?tog("estrelas","Mostrar estrelas",o.estrelas):""}${tog("marca","Assinatura Acetato",o.marca)}`;
+      return `${tog("lq","Quotes",o.lq)}${tog("lcapa","Show cover",o.lcapa)}${tog("linfo","Show song and artist",o.linfo)}${temNota?tog("estrelas","Show stars",o.estrelas):""}${tog("marca","Acetato signature",o.marca)}`;
     }
-    return `${temNota?tog("estrelas","Mostrar estrelas",o.estrelas):""}${tog("marca","Assinatura Acetato",o.marca)}`;
+    return `${temNota?tog("estrelas","Show stars",o.estrelas):""}${tog("marca","Acetato signature",o.marca)}`;
   };
   const pintar=()=>{
     const abas=abasDe();
@@ -2032,7 +2068,7 @@ async function abrirStory(tipo,k,mus){
 
 function gerarStoryPerfil(){abrirStory("perfil")}
 function gerarStoryResenha(k){
-  if(!S.meta[k]){flash("Abra o álbum pela busca antes");return}
+  if(!S.meta[k]){flash("Open the album from search first");return}
   abrirStory("resenha",k);
 }
 document.addEventListener("click",e=>{
@@ -2051,14 +2087,14 @@ function calcMedia(keys){
 }
 function mediaDOM(){return calcMedia([...document.querySelectorAll("#app .trate")].map(b=>b.dataset.tk))}
 function mediaHTML(md){
-  if(!md.n)return `<span class="mut sm">Avalie as faixas para ver a média do disco</span>`;
-  return `<span>Média das faixas <strong>${md.avg.toFixed(1).replace(".",",")}</strong></span><span class="mut sm">${md.n} de ${md.total} avaliadas</span><button class="chip" data-act="usarMedia">Usar como nota</button>`;
+  if(!md.n)return `<span class="mut sm">Rate tracks to see the album average</span>`;
+  return `<span>Track average <strong>${md.avg.toFixed(1)}</strong></span><span class="mut sm">${md.n} of ${md.total} rated</span><button class="chip" data-act="usarMedia">Use as rating</button>`;
 }
 function mediaBloco(faixas,m,x){
   const md=calcMedia(faixas.map(t=>tkey(t.t,m.a)));
   return `<div class="autobox"><div id="mediaf" class="mediaf">${mediaHTML(md)}</div>
-  <button class="chip ${x.auto?"on":""}" data-act="auto" style="margin-top:10px">${x.auto?"✓ ":""}Nota automática pela média das faixas</button>
-  ${x.d?`<label class="datal">Ouvido em <input type="date" id="ddate" value="${esc(x.d)}" max="${hoje()}"></label>`:""}</div>`;
+  <button class="chip ${x.auto?"on":""}" data-act="auto" style="margin-top:10px">${x.auto?"✓ ":""}Auto rating from track average</button>
+  ${x.d?`<label class="datal">Listened on  <input type="date" id="ddate" value="${esc(x.d)}" max="${hoje()}"></label>`:""}</div>`;
 }
 function atualizarMedia(){
   const el=document.getElementById("mediaf");if(!el)return;
@@ -2067,28 +2103,28 @@ function atualizarMedia(){
   if(x&&x.auto&&md.n){
     x.r=meioPonto(md.avg);salvar();
     const r=document.getElementById("rate");if(r)r.innerHTML=rateHTML(x.r);
-    const rl=document.getElementById("rlab");if(rl)rl.textContent=String(x.r).replace(".",",")+" de 5";
+    const rl=document.getElementById("rlab");if(rl)rl.textContent=String(x.r)+" of 5";
   }
 }
 
 function filaView(){
   const e=Object.entries(S.u).filter(([k,v])=>v.w&&S.meta[k]);
-  if(!e.length)return `<div class="empty" style="margin-top:30px">Sua fila está vazia. Toque em "+ Quero ouvir" na página de um álbum.</div>`;
-  return `<div style="margin:26px 0 16px;display:flex;gap:12px;flex-wrap:wrap;align-items:center"><button class="btn p" data-fila="rnd">🎲 Sortear da fila</button><span class="mut sm" style="font-weight:700">${e.length} álbum${e.length===1?"":"s"} esperando</span></div>
-  <div class="grid">${e.map(([k])=>`<div style="position:relative">${cardMeta(k)}<button class="xb" data-fila="rm" data-id="${k}" aria-label="Tirar da fila" style="position:absolute;top:8px;right:8px;z-index:3">×</button></div>`).join("")}</div>`;
+  if(!e.length)return `<div class="empty" style="margin-top:30px">Your queue is empty. Tap "+ Want to listen" on an album page.</div>`;
+  return `<div style="margin:26px 0 16px;display:flex;gap:12px;flex-wrap:wrap;align-items:center"><button class="btn p" data-fila="rnd">🎲 Pick from queue</button><span class="mut sm" style="font-weight:700">${e.length} album${e.length===1?"":"s"} waiting</span></div>
+  <div class="grid">${e.map(([k])=>`<div style="position:relative">${cardMeta(k)}<button class="xb" data-fila="rm" data-id="${k}" aria-label="Remove from queue" style="position:absolute;top:8px;right:8px;z-index:3">×</button></div>`).join("")}</div>`;
 }
 
 function statsView(){
   const al=Object.entries(S.u).filter(([k])=>S.meta[k]);
   const ou=al.filter(([,v])=>v.d),av=al.filter(([,v])=>v.r);
-  if(!ou.length&&!av.length)return `<div class="empty" style="margin-top:30px">Marque álbuns como ouvidos e avalie alguns para ver suas estatísticas.</div>`;
-  const MES=["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
+  if(!ou.length&&!av.length)return `<div class="empty" style="margin-top:30px">Mark albums as listened and rate a few to see your stats.</div>`;
+  const MES=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const hj=new Date(),meses=[];
   for(let i=11;i>=0;i--){const d=new Date(hj.getFullYear(),hj.getMonth()-i,1);meses.push({k:d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0"),l:MES[d.getMonth()],n:0})}
   ou.forEach(([,v])=>{const m=meses.find(x=>x.k===v.d.slice(0,7));if(m)m.n++});
   const mx=Math.max(1,...meses.map(m=>m.n));
   const esteAno=ou.filter(([,v])=>v.d.startsWith(String(hj.getFullYear()))).length;
-  const media=av.length?(av.reduce((s,[,v])=>s+v.r,0)/av.length).toFixed(1).replace(".",","):"—";
+  const media=av.length?(av.reduce((s,[,v])=>s+v.r,0)/av.length).toFixed(1):"—";
   const uso=al.filter(([,v])=>v.d||v.r);
   const conta=fn=>{const c={};uso.forEach(([k])=>{const x=fn(S.meta[k]);if(x)c[x]=(c[x]||0)+1});return Object.entries(c).sort((a,b)=>b[1]-a[1])};
   const gen=conta(m=>m.genre).slice(0,5);
@@ -2098,23 +2134,23 @@ function statsView(){
   const top=[...av].sort((a,b)=>b[1].r-a[1].r).slice(0,5);
   const sec=(t,h)=>`<h3 class="sec" style="margin:30px 0 12px">${t}</h3>${h}`;
   const kpi=(n,l)=>`<div class="kpi"><strong>${n}</strong><span>${l}</span></div>`;
-  return `<div class="kpis" style="margin-top:30px">${kpi(ou.length,"Ouvidos")}${kpi(esteAno,"Em "+hj.getFullYear())}${kpi(av.length,"Avaliados")}${kpi(media,"Média")}</div>`
-  +sec("Ouvidos nos últimos 12 meses",`<div class="hist2"><div class="mbars">${meses.map(m=>`<div class="mb"><b>${m.n||""}</b><i style="height:${Math.max(m.n?6:2,Math.round(m.n/mx*80))}px;${m.n?"":"opacity:.25"}"></i><span>${m.l}</span></div>`).join("")}</div></div>`)
-  +(gen.length?sec("Gêneros mais ouvidos",`<div class="hist2">${bars(gen)}</div>`):"")
-  +(dec.length?sec("Por década",`<div class="hist2">${bars(dec)}</div>`):"")
-  +(art.length?sec("Artistas mais presentes",`<div class="hist2">${bars(art)}</div>`):"")
-  +(top.length?sec("Mais bem avaliados",`<div class="mlist">${top.map(([k,v])=>{const m=S.meta[k];return `<a class="row" href="#album-${k}">${capaAlbum(k,m.t,46)}<div class="grow"><div class="ttl">${esc(m.t)}</div><div class="sm mut" style="font-weight:700">${esc(m.a)}</div></div>${estrelas(v.r)}</a>`}).join("")}</div>`):"");
+  return `<div class="kpis" style="margin-top:30px">${kpi(ou.length,"Listened")}${kpi(esteAno,"In "+hj.getFullYear())}${kpi(av.length,"Rated")}${kpi(media,"Avg")}</div>`
+  +sec("Listened in the last 12 months",`<div class="hist2"><div class="mbars">${meses.map(m=>`<div class="mb"><b>${m.n||""}</b><i style="height:${Math.max(m.n?6:2,Math.round(m.n/mx*80))}px;${m.n?"":"opacity:.25"}"></i><span>${m.l}</span></div>`).join("")}</div></div>`)
+  +(gen.length?sec("Top genres",`<div class="hist2">${bars(gen)}</div>`):"")
+  +(dec.length?sec("By decade",`<div class="hist2">${bars(dec)}</div>`):"")
+  +(art.length?sec("Most frequent artists",`<div class="hist2">${bars(art)}</div>`):"")
+  +(top.length?sec("Highest rated",`<div class="mlist">${top.map(([k,v])=>{const m=S.meta[k];return `<a class="row" href="#album-${k}">${capaAlbum(k,m.t,46)}<div class="grow"><div class="ttl">${esc(m.t)}</div><div class="sm mut" style="font-weight:700">${esc(m.a)}</div></div>${estrelas(v.r)}</a>`}).join("")}</div>`):"");
 }
 
 function backupHTML(){
-  return `<h2>Seus dados</h2><p class="mut sm" style="margin:-4px 0 12px;font-weight:600">Tudo fica salvo só neste navegador. Faça um backup de vez em quando.</p>
-  <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" data-bk="exp">Exportar backup</button><label class="btn" style="cursor:pointer">Importar backup<input id="impf" type="file" accept="application/json,.json" hidden></label></div>`;
+  return `<h2>Your data</h2><p class="mut sm" style="margin:-4px 0 12px;font-weight:600">Everything is saved only in this browser. Back up from time to time.</p>
+  <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" data-bk="exp">Export backup</button><label class="btn" style="cursor:pointer">Import backup<input id="impf" type="file" accept="application/json,.json" hidden></label></div>`;
 }
 function exportar(){
   const blob=new Blob([JSON.stringify(S)],{type:"application/json"});
   const url=URL.createObjectURL(blob),a=document.createElement("a");
   a.href=url;a.download="acetato-backup-"+hoje()+".json";document.body.appendChild(a);a.click();a.remove();
-  setTimeout(()=>URL.revokeObjectURL(url),2000);flash("Backup salvo");
+  setTimeout(()=>URL.revokeObjectURL(url),2000);flash("Backup saved");
 }
 function importar(f){
   if(!f)return;
@@ -2123,9 +2159,9 @@ function importar(f){
     try{
       const o=JSON.parse(r.result);
       if(!o||typeof o!=="object"||!o.u||!o.meta)throw 0;
-      if(!confirm("Importar este backup vai substituir os dados atuais deste navegador. Continuar?"))return;
-      S={u:{},meta:{},artists:{},listas:[],perfil:null,covers:{},...o};salvar();rota();flash("Backup importado");
-    }catch(e){flash("Arquivo de backup inválido")}
+      if(!confirm("Importing this backup will replace the current data in this browser. Continue?"))return;
+      S={u:{},meta:{},artists:{},listas:[],perfil:null,covers:{},...o};salvar();rota();flash("Backup imported");
+    }catch(e){flash("Invalid backup file")}
   };
   r.readAsText(f);
 }
@@ -2137,7 +2173,7 @@ document.addEventListener("click",e=>{
     if(fi.dataset.fila==="rnd"){
       const ks=Object.entries(S.u).filter(([k,v])=>v.w&&S.meta[k]).map(([k])=>k);
       if(ks.length)location.hash="album-"+ks[Math.floor(Math.random()*ks.length)];
-    }else{const d=S.u[fi.dataset.id];if(d){delete d.w;salvar();rota();flash("Removido da fila")}}
+    }else{const d=S.u[fi.dataset.id];if(d){delete d.w;salvar();rota();flash("Removed from queue")}}
     return;
   }
   if(t.closest("[data-bk]"))exportar();
