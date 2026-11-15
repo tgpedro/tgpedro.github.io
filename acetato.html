@@ -1043,16 +1043,17 @@ async function apWikiLogo(nome){
   return "";
 }
 async function apAudioDB(nome){
-  let o={};
+  let o={},ok=false;
   try{
     const c=new AbortController(),to=setTimeout(()=>c.abort(),6000);
-    const r=await fetch(`https://www.theaudiodb.com/api/v1/json/2/search.php?s=${encodeURIComponent(nome)}`,{signal:c.signal});clearTimeout(to);
+    const r=await fetch(`https://www.theaudiodb.com/api/v1/json/123/search.php?s=${encodeURIComponent(nome)}`,{signal:c.signal});clearTimeout(to);
     if(r.ok){
+      ok=true;
       const j=await r.json(),x=(j.artists||[]).find(y=>norm(y.strArtist)===norm(nome));
       if(x)o={logo:x.strArtistLogo||x.strArtistClearart||"",fan:x.strArtistFanart||x.strArtistFanart2||x.strArtistWideThumb||"",bio:(x.strBiographyEN||"").trim(),genre:x.strGenre||""};
     }
   }catch(e){}
-  if(!o.logo)o.logo=await apWikiLogo(nome);
+  if(ok&&!o.logo)o.logo=await apWikiLogo(nome);
   return o;
 }
 async function apDados(k,a){
