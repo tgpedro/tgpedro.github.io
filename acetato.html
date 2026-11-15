@@ -591,15 +591,6 @@ h3.sec{font-size:12px;letter-spacing:.1em}
   .ap .carrossel.sim>*{flex-basis:130px}
 }
 </style>
-<style>
-.ap-logo{display:block;max-width:min(82%,560px);max-height:clamp(90px,18vw,190px);width:auto;height:auto;object-fit:contain;margin:6px 0 2px;filter:drop-shadow(0 6px 30px rgba(0,0,0,.5));animation:fadeUp .8s cubic-bezier(.2,.8,.2,1) both}
-.ap-logo.inv{filter:brightness(0) invert(1) drop-shadow(0 6px 30px rgba(0,0,0,.5))}
-.ap[data-logo="1"] .ap-name{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-.ap[data-logo="0"] .ap-logo{display:none}
-.ap-bio{margin-top:18px;max-width:720px;line-height:1.55;font-weight:500;color:rgba(255,255,255,.82);display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-line}
-.ap-bio.open{display:block;-webkit-line-clamp:unset}
-@media(max-width:640px){.ap-logo{max-width:86%}}
-</style>
 </head>
 <body>
 <div class="amb" id="amb"></div>
@@ -976,88 +967,10 @@ function albumAct(a){
 }
 
 /* ===== Página do artista (estilo Apple Music / Apple TV) ===== */
-const ERA_FONTES=[
-{n:"Bebas Neue",w:400,i:0,ls:".02em",sz:1.2,up:1},
-{n:"Anton",w:400,i:0,ls:"0",sz:1.05,up:1},
-{n:"Playfair Display",w:900,i:1,ls:"-.02em",sz:.95},
-{n:"Abril Fatface",w:400,i:0,ls:"-.01em",sz:.95},
-{n:"Righteous",w:400,i:0,ls:"0",sz:1},
-{n:"Orbitron",w:900,i:0,ls:".02em",sz:.78,up:1},
-{n:"Pacifico",w:400,i:0,ls:"0",sz:.9},
-{n:"Permanent Marker",w:400,i:0,ls:"0",sz:.9},
-{n:"Rye",w:400,i:0,ls:".01em",sz:.82},
-{n:"Monoton",w:400,i:0,ls:".02em",sz:.68},
-{n:"Bungee",w:400,i:0,ls:"0",sz:.8,up:1},
-{n:"Cormorant Garamond",w:700,i:1,ls:"-.01em",sz:1.15},
-{n:"Syne",w:800,i:0,ls:"-.03em",sz:.95},
-{n:"Space Grotesk",w:700,i:0,ls:"-.04em",sz:1},
-{n:"Fredoka",w:700,i:0,ls:"-.01em",sz:1},
-{n:"UnifrakturCook",w:700,i:0,ls:"0",sz:1.05},
-{n:"Cinzel",w:900,i:0,ls:".02em",sz:.82,up:1},
-{n:"Lobster",w:400,i:0,ls:"0",sz:1},
-{n:"DM Serif Display",w:400,i:1,ls:"-.01em",sz:1.05},
-{n:"Archivo Black",w:400,i:0,ls:"-.03em",sz:.92},
-{n:"Poppins",w:800,i:0,ls:"-.04em",sz:.95}
-];
-/* Artistas conhecidos: fonte que lembra a era/identidade visual */
-const ERA_OVR={taylorswift:18,lanadelrey:11,dualipa:9,harrystyles:4,metallica:15,nirvana:7,kendricklamar:1,theweeknd:13,billieeilish:12,tylerthecreator:6,daftpunk:5,queen:16,abba:9,kanyewest:19,brunomars:4,oliviarodrigo:7,drake:20,arianagrande:20,sza:12,travisscott:10,ledzeppelin:8,acdc:0,ironmaiden:15,blackpink:12,bts:20};
-/* Gênero → fonte */
-const ERA_GEN=[[/metal/,15],[/punk|grunge/,7],[/hip.?hop|rap|trap/,1],[/r&b|soul/,3],[/electro|dance|house|techno|edm/,5],[/country/,8],[/folk|acoustic|singer/,11],[/jazz|blues/,2],[/classical|opera|soundtrack|score/,16],[/disco|funk/,4],[/latin|reggaeton|samba|mpb|brazil|sertanejo|pagode|forr/,10],[/k-?pop|j-?pop/,12],[/alternative|indie/,13],[/rock/,0],[/pop/,20]];
-function eraFonte(k,a,generos,desde){
-  const nk=norm(a.n);if(ERA_OVR[nk]!=null)return ERA_OVR[nk];
-  const g=String(generos||"").toLowerCase();
-  for(const [re,i] of ERA_GEN)if(re.test(g))return i;
-  const y=+desde||0;
-  if(y&&y<1980)return 4;if(y>=1980&&y<1990)return 9;if(y>=1990&&y<2000)return 19;if(y>=2000&&y<2010)return 12;
-  return parseInt(hash(nk),36)%ERA_FONTES.length;
-}
-function apFontes(){
-  if(document.getElementById("apf"))return;
-  const l=document.createElement("link");l.id="apf";l.rel="stylesheet";
-  l.href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Anton&family=Archivo+Black&family=Bebas+Neue&family=Bungee&family=Cinzel:wght@900&family=Cormorant+Garamond:ital,wght@1,700&family=DM+Serif+Display:ital@1&family=Fredoka:wght@700&family=Lobster&family=Monoton&family=Orbitron:wght@900&family=Pacifico&family=Permanent+Marker&family=Playfair+Display:ital,wght@1,900&family=Poppins:wght@800&family=Righteous&family=Rye&family=Space+Grotesk:wght@700&family=Syne:wght@800&family=UnifrakturCook:wght@700&display=swap";
-  document.head.appendChild(l);
-}
-function apSetFonte(el,i){
-  const F=ERA_FONTES[i];if(!el||!F)return;
-  el.dataset.fi=i;
-  el.style.setProperty("--af","'"+F.n+"'");el.style.setProperty("--aw",F.w);el.style.setProperty("--ai",F.i?"italic":"normal");
-  el.style.setProperty("--als",F.ls);el.style.setProperty("--asz",F.sz);
-  const h=el.querySelector(".ap-name");if(h)h.classList.toggle("up",!!F.up);
-}
 const fmtFas=n=>{try{return new Intl.NumberFormat("en",{notation:"compact",maximumFractionDigits:1}).format(n)}catch(e){return String(n)}};
 const fmtData=d=>{if(!/^\d{4}-\d{2}-\d{2}$/.test(d||""))return d||"";try{return new Date(d+"T00:00:00Z").toLocaleDateString("en",{month:"short",day:"numeric",year:"numeric",timeZone:"UTC"})}catch(e){return d}};
 
-async function apWikiLogo(nome){
-  try{
-    const W="https://www.wikidata.org/w/api.php?format=json&origin=*&";
-    const j=await getJSON(W+`action=wbsearchentities&language=en&type=item&limit=7&search=${encodeURIComponent(nome)}`);
-    const re=/singer|band|musician|rapper|duo|group|artist|composer|producer|dj|songwriter/i;
-    const c=(j.search||[]).filter(x=>norm(x.label)===norm(nome)&&re.test(x.description||""));
-    for(const x of c.slice(0,3)){
-      const e=await getJSON(W+`action=wbgetentities&props=claims&ids=${x.id}`);
-      const f=(((e.entities||{})[x.id]||{}).claims||{}).P154;
-      const v=f&&f[0]&&f[0].mainsnak&&f[0].mainsnak.datavalue&&f[0].mainsnak.datavalue.value;
-      if(v)return "https://commons.wikimedia.org/wiki/Special:FilePath/"+encodeURIComponent(v)+"?width=800";
-    }
-  }catch(e){}
-  return "";
-}
-async function apAudioDB(nome){
-  let o={},ok=false;
-  try{
-    const c=new AbortController(),to=setTimeout(()=>c.abort(),6000);
-    const r=await fetch(`https://www.theaudiodb.com/api/v1/json/123/search.php?s=${encodeURIComponent(nome)}`,{signal:c.signal});clearTimeout(to);
-    if(r.ok){
-      ok=true;
-      const j=await r.json(),x=(j.artists||[]).find(y=>norm(y.strArtist)===norm(nome));
-      if(x)o={logo:x.strArtistLogo||x.strArtistClearart||"",fan:x.strArtistFanart||x.strArtistFanart2||x.strArtistWideThumb||"",bio:(x.strBiographyEN||"").trim(),genre:x.strGenre||""};
-    }
-  }catch(e){}
-  if(ok&&!o.logo)o.logo=await apWikiLogo(nome);
-  return o;
-}
 async function apDados(k,a){
-  const adbP=apAudioDB(a.n);
   let albuns=[],top=[],rel=[],gen="";
   if(a.ids.dz){
     const [alb,tp,rl]=await Promise.all([
@@ -1087,9 +1000,7 @@ async function apDados(k,a){
       albuns=unirAlbuns(rgs.map(r=>({src:"mb",id:r.id,t:r.title,a:a.n,y:(r["first-release-date"]||"").slice(0,4),tipo:(r["primary-type"]||"album").toLowerCase(),cover:`${CAA}/release-group/${r.id}/front-500`}))).map(u=>({...u,d:u.y}))}catch(e){}
   }
   albuns.forEach(u=>{const m=S.meta[u.key];if(!m||(!m.cover&&u.cover))guardarAlbum({...u,genre:(m&&m.genre)||""})});
-  const adb=await adbP;
-  gen=[gen,adb.genre].filter(Boolean).join(", ");
-  return {albuns,top,rel,gen,logo:adb.logo||"",fan:adb.fan||"",bio:adb.bio||""};
+  return {albuns,top,rel,gen};
 }
 
 async function artistView(k){
@@ -1112,11 +1023,9 @@ async function artistView(k){
   const por=(x,y)=>(y.d||y.y||"").localeCompare(x.d||x.y||"");
   const todos=[...D.albuns].sort(por),ult=todos[0];
   const anos=D.albuns.map(u=>+u.y).filter(Boolean),desde=anos.length?Math.min(...anos):0;
-  const logo=(S.artLogos||{})[k]||D.logo||"",custom=!!(S.artLogos||{})[k];
-  const auto=0,modo=logo?-1:-2,fi=modo,F={n:"Inter",w:900,i:0,ls:"-.04em",sz:.95};
-  const inv=(window.__invC||{})[logo];
+  const fi=-2,auto=0,F={n:"Inter",w:900,i:0,ls:"-.04em",sz:.95};
   const foto=a.foto||(todos.find(u=>u.cover)||{}).cover||"";
-  const hero=D.fan||foto;
+  const hero=foto;
   const gs=[...new Set([a.genre,...String(D.gen||"").split(", ")].filter(Boolean))].slice(0,2);
   const meta=[...gs,a.fas?fmtFas(a.fas)+" fans":""].filter(Boolean).join(" · ");
   const seg=S.seguindo.some(s=>s.k===k);
@@ -1133,55 +1042,23 @@ async function artistView(k){
   const nAlb=todos.filter(grupos[0][1]).length,nSin=todos.filter(u=>/single|ep/.test(tipoDe(u))).length;
   const kp=(n,l)=>`<div class="kpi"><strong>${n}</strong><span>${l}</span></div>`;
   const links=[a.ids.dz?`<a class="btn" href="https://www.deezer.com/artist/${a.ids.dz}" target="_blank" rel="noopener">Deezer ↗</a>`:"",a.ids.sp?`<a class="btn" href="https://open.spotify.com/artist/${a.ids.sp}" target="_blank" rel="noopener">Spotify ↗</a>`:"",`<a class="btn" href="https://music.apple.com/search?term=${encodeURIComponent(a.n)}" target="_blank" rel="noopener">Apple Music ↗</a>`].join("");
-  const sobre=`<div class="sec-h"><h2>About</h2></div><div class="kpis">${kp(a.fas?fmtFas(a.fas):"—","Fans")}${kp(nAlb,"Albums")}${kp(nSin,"Singles & EPs")}${kp(desde||"—","Active since")}</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">${links}</div>${D.bio?`<div class="ap-bio" id="apbio">${esc(D.bio.slice(0,1400))}</div><button class="chip" data-apbio style="margin-top:10px">Read more</button><div class="mut sm" style="margin-top:8px;font-weight:600">Bio and backdrop: TheAudioDB</div>`:""}`;
+  const sobre=`<div class="sec-h"><h2>About</h2></div><div class="kpis">${kp(a.fas?fmtFas(a.fas):"—","Fans")}${kp(nAlb,"Albums")}${kp(nSin,"Singles & EPs")}${kp(desde||"—","Active since")}</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">${links}</div>`;
   setTimeout(()=>apTema(k,hero),0);
-  return `<div class="ap" data-k="${k}" data-fi="${fi}" data-auto="${auto}" data-logo="${modo===-1?1:0}" style="--ac:${D.ac||c1};--af:'${F.n}';--aw:${F.w};--ai:${F.i?"italic":"normal"};--als:${F.ls};--asz:${F.sz}">
+  return `<div class="ap" data-k="${k}" data-fi="${fi}" style="--ac:${D.ac||c1};--af:'${F.n}';--aw:${F.w};--ai:${F.i?"italic":"normal"};--als:${F.ls};--asz:${F.sz}">
   <section class="ap-hero"><div class="ap-img" style="${hero?`background-image:url('${hero}')`:`background:linear-gradient(135deg,${c1},#000)`}"></div><div class="ap-shade"></div>
     <div class="ap-hbody"><span class="atv-tag">Artist</span>
       <h1 class="ap-name${F.up?" up":""}">${esc(a.n)}</h1>
-      ${logo?`<img class="ap-logo${inv?" inv":""}" src="${esc(logo)}" alt="${esc(a.n)}">`:""}
       ${meta?`<div class="ap-meta">${esc(meta)}</div>`:""}
       <div class="ap-btns">
         ${D.top.length?`<button class="gl pri" data-aplay="0">▶ Play</button>`:""}
         <button class="gl ${seg?"on":""}" data-apfollow="${k}">${seg?"✓ Following":"+ Follow"}</button>
         <button class="gl ic" data-apshare aria-label="Share" title="Share"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M8 11H6.5A1.5 1.5 0 0 0 5 12.5v7A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5v-7A1.5 1.5 0 0 0 17.5 11H16"/></svg></button>
-        <label class="gl ${logo?"ic":""}" title="Upload your own logo (PNG with transparent background)" aria-label="Upload logo" style="cursor:pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="1.6"/><path d="M21 15l-5-5L5 21"/></svg>${logo?"":"Add logo"}<input id="aplogoup" type="file" accept="image/*" hidden></label>
-        ${custom?`<button class="gl ic" data-aplogorm aria-label="Remove my logo" title="Remove my logo">×</button>`:""}
       </div>
     </div></section>
   <div class="ap-main">${late}${tops}${discos||`<div class="empty" style="margin-top:30px">No releases found.</div>`}${sim}${sobre}</div></div>`;
 }
-async function apLogoInv(src){
-  window.__invC=window.__invC||{};
-  if(src in window.__invC)return window.__invC[src];
-  const im=await carregarImg(src);if(!im)return false;
-  try{
-    const c=document.createElement("canvas");c.width=c.height=64;const g=c.getContext("2d",{willReadFrequently:true});
-    g.drawImage(im,0,0,64,64);const d=g.getImageData(0,0,64,64).data;let n=0,l=0;
-    for(let i=0;i<d.length;i+=4){if(d[i+3]>128){n++;l+=(d[i]+d[i+1]+d[i+2])/3}}
-    return window.__invC[src]=n>30&&l/n<80;
-  }catch(e){return false}
-}
-document.addEventListener("change",e=>{
-  const t=e.target;if(t.id!=="aplogoup"||!t.files||!t.files[0])return;
-  const ap=t.closest(".ap");if(!ap)return;const k=ap.dataset.k,f=t.files[0];
-  const r=new FileReader();
-  r.onload=()=>{const im=new Image();
-    im.onload=()=>{
-      const sc=Math.min(1,900/im.width),c=document.createElement("canvas");
-      c.width=Math.max(1,Math.round(im.width*sc));c.height=Math.max(1,Math.round(im.height*sc));
-      c.getContext("2d").drawImage(im,0,0,c.width,c.height);
-      S.artLogos=S.artLogos||{};S.artLogos[k]=c.toDataURL("image/png");
-      S.artFonts=S.artFonts||{};S.artFonts[k]=-1;salvar();rota();flash("Logo saved");
-    };
-    im.onerror=()=>flash("Could not read that image");im.src=r.result};
-  r.readAsDataURL(f);t.value="";
-});
 async function apTema(k,src){
-  const D=(window.__apC||{})[k];if(!D)return;
-  const lg=document.querySelector(`.ap[data-k="${k}"] .ap-logo`);
-  if(lg){const ls=lg.getAttribute("src");apLogoInv(ls).then(v=>{const l2=document.querySelector(`.ap[data-k="${k}"] .ap-logo`);if(l2&&l2.getAttribute("src")===ls)l2.classList.toggle("inv",!!v)})}
-  if(D.ac||!src)return;
+  const D=(window.__apC||{})[k];if(!D||D.ac||!src)return;
   const im=await carregarImg(src);
   if(!im)return;
   const p=paletaDaImagem(im,k)[0];if(!p)return;
@@ -1213,27 +1090,7 @@ document.addEventListener("click",e=>{
     else navigator.clipboard?.writeText(location.href).then(()=>flash("Link copied")).catch(()=>flash("Could not copy"));
     return;
   }
-  if(t.closest("[data-apfont]")&&ap){
-    const k=ap.dataset.k,D=(window.__apC||{})[k]||{},tem=!!((S.artLogos||{})[k]||D.logo);
-    const cur=+ap.dataset.fi,auto=+ap.dataset.auto;
-    let nx=cur===-1?auto:cur+1;
-    if(nx>=ERA_FONTES.length)nx=tem?-1:0;
-    S.artFonts=S.artFonts||{};S.artFonts[k]=nx;salvar();
-    ap.dataset.fi=nx;ap.dataset.logo=nx===-1?"1":"0";
-    if(nx>=0)apSetFonte(ap,nx);
-    flash(nx===-1?"Title: logo":"Title font: "+ERA_FONTES[nx].n);
-    return;
-  }
-  if(t.closest("[data-aplogorm]")&&ap){
-    const k=ap.dataset.k;
-    if(S.artLogos)delete S.artLogos[k];
-    if(S.artFonts&&S.artFonts[k]===-1)delete S.artFonts[k];
-    salvar();rota();flash("Logo removed");return;
-  }
-  if(t.closest("[data-apbio]")){
-    const b=document.getElementById("apbio");if(b){const ab=b.classList.toggle("open");t.closest("[data-apbio]").textContent=ab?"Show less":"Read more"}
-    return;
-  }
+
 });
 
 /* ===== Diário ===== */
