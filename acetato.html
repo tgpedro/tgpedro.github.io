@@ -106,11 +106,11 @@ textarea.field{min-height:100px;resize:vertical;font-weight:500}
 .fitem .cover{width:100%;aspect-ratio:1;border-radius:18px;font-size:36px}
 .fvazio{aspect-ratio:1;border-radius:18px;border:2px dashed rgba(255,255,255,.18);display:grid;place-items:center;color:var(--mut);font-weight:800;font-size:13px}
 #ed{position:fixed;inset:0;z-index:50;background:#000;overflow:auto}
-.ehead{position:sticky;top:0;z-index:2;display:flex;justify-content:space-between;align-items:center;padding:16px 22px;background:rgba(18,18,20,.85);backdrop-filter:blur(24px);border-bottom:1px solid var(--line)}
+.ehead{position:sticky;top:0;z-index:2;display:flex;justify-content:space-between;align-items:center;padding:calc(16px + env(safe-area-inset-top,0px)) 22px 16px;background:rgba(18,18,20,.85);backdrop-filter:blur(24px);border-bottom:1px solid var(--line)}
 .ehead h2{margin:0;font-size:18px;font-weight:900}
 .ehead .lk{font-weight:700;color:var(--mut);font-size:16px}
 .ehead .sv{font-weight:900;color:var(--acc);font-size:16px}
-.ebody{max-width:640px;margin:0 auto;padding:26px 22px 80px;display:grid;gap:30px}
+.ebody{max-width:640px;margin:0 auto;padding:26px 22px calc(80px + env(safe-area-inset-bottom,0px));display:grid;gap:30px}
 .esec{display:grid;gap:12px}
 .flash{position:fixed;left:50%;top:86px;transform:translateX(-50%);background:var(--txt);color:#000;padding:12px 20px;border-radius:999px;font-size:14px;font-weight:800;z-index:120;box-shadow:0 10px 30px rgba(0,0,0,.5);animation:fl 2.4s forwards;pointer-events:none;max-width:90vw;text-align:center}
 @keyframes fl{0%{opacity:0;transform:translate(-50%,-8px)}8%,80%{opacity:1;transform:translate(-50%,0)}100%{opacity:0}}
@@ -157,8 +157,8 @@ textarea.field{min-height:100px;resize:vertical;font-weight:500}
   .favs{grid-template-columns:repeat(2,minmax(0,1fr))}
   .ptabs button{padding:12px;font-size:14px}
   .search{font-size:16px;padding:14px 14px 14px 44px}
-  .ehead{padding:12px 14px}
-  .ebody{padding:18px 14px 60px}
+  .ehead{padding:calc(12px + env(safe-area-inset-top,0px)) 14px 12px}
+  .ebody{padding:18px 14px calc(60px + env(safe-area-inset-bottom,0px))}
   .flash{top:70px}
 }
 .card>.cover{border-radius:0;box-shadow:none}.card .info{padding:12px 14px 16px}.ta{font-weight:800;font-size:16px;letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sa{font-size:13px;color:rgba(255,255,255,.7);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cover img{width:100%;height:100%;object-fit:cover;display:block}
@@ -278,7 +278,7 @@ h2{font-size:19px;letter-spacing:-.4px;margin:26px 0 10px}
 .chip{padding:6px 12px;font-size:13px}
 .chips{gap:6px;padding:10px 0 2px}
 .pill{font-size:11px;padding:4px 9px}
-.search{font-size:15px;padding:12px 14px 12px 42px;border-radius:14px}
+.search{font-size:16px;padding:12px 14px 12px 42px;border-radius:14px}
 .nav a{padding:7px 13px;font-size:13px}
 .logo{font-size:19px}
 .hero{gap:24px}
@@ -307,8 +307,8 @@ h2{font-size:19px;letter-spacing:-.4px;margin:26px 0 10px}
 .flash{font-size:13px;padding:10px 16px}
 .hsearch input{font-size:13px;padding:8px 13px 8px 36px}
 /* editor redesenhado */
-.ebody{max-width:600px;padding:14px 16px 70px;gap:18px}
-.ehead{padding:12px 16px}
+.ebody{max-width:600px;padding:14px 16px calc(70px + env(safe-area-inset-bottom,0px));gap:18px}
+.ehead{padding:calc(12px + env(safe-area-inset-top,0px)) 16px 12px}
 .ehead h2{font-size:16px}
 .ed-previa{position:relative;border-radius:22px;overflow:hidden;background:#0b0b0d;border:1px solid rgba(255,255,255,.06)}
 .ed-banner{position:relative;height:140px;background-size:cover;background-position:center}
@@ -327,7 +327,7 @@ h2{font-size:19px;letter-spacing:-.4px;margin:26px 0 10px}
 .gr-row:last-child{border-bottom:0}
 .gr-alto{align-items:flex-start}
 .gr-lbl{width:78px;flex-shrink:0;font-size:13px;font-weight:700;color:var(--mut);padding-top:2px}
-.gr-in{flex:1;min-width:0;background:none;border:0;color:#fff;font:inherit;font-size:15px;font-weight:600;outline:none;padding:0}
+.gr-in{flex:1;min-width:0;background:none;border:0;color:#fff;font:inherit;font-size:16px;font-weight:600;outline:none;padding:0}
 textarea.gr-in{resize:none;min-height:56px;line-height:1.4}
 .gr-tit{font-size:12px;font-weight:800;color:var(--mut);text-transform:uppercase;letter-spacing:.06em;padding:4px 4px 0;display:flex;justify-content:space-between;align-items:center}
 .gr-tit span{font-weight:700;letter-spacing:0;text-transform:none}
@@ -365,7 +365,7 @@ textarea.gr-in{resize:none;min-height:56px;line-height:1.4}
 .mediaf strong{font-size:18px;font-weight:900}
 .xb{display:grid;place-items:center;padding:0;text-align:center;line-height:1}
 .datal{display:inline-flex;align-items:center;gap:8px;margin-top:10px;font-weight:700;font-size:13px;color:var(--mut)}
-.datal input{background:rgba(255,255,255,.1);border:0;border-radius:10px;padding:8px 10px;color-scheme:dark;font:inherit;font-size:14px;color:#fff}
+.datal input{background:rgba(255,255,255,.1);border:0;border-radius:10px;padding:8px 10px;color-scheme:dark;font:inherit;font-size:16px;color:#fff}
 .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
 .kpi{padding:16px 10px;border-radius:18px;background:#111;text-align:center}
 .kpi strong{display:block;font-size:26px;font-weight:900;letter-spacing:-.8px}
@@ -955,6 +955,25 @@ function trateHTML(t,a){const k=tkey(t,a);const r=(S.u[k]||{}).r||0;return `<spa
 
 /* ===== Editor do perfil com busca de álbuns e músicas ===== */
 let EDQ="",EDQF="albuns",edT=null,edTok=0,EDRES=[],EDTAB="perfil";
+function favoritosAlbHTML(){
+  const favs=(EDIT&&EDIT.fav)||[];
+  return `<div class="gr-tit">Álbuns favoritos <span>${favs.length}/10</span></div><div class="mut sm" style="margin:-6px 2px 0;font-weight:600">No perfil eles aparecem em grupos de 4.</div>
+    <div class="ed-fav">${Array.from({length:Math.min(10,Math.ceil((favs.length+1)/4)*4)},(_,i)=>i).map(i=>favs[i]?`<div class="ed-fitem">${capaAlbum(favs[i],(S.meta[favs[i]]||{}).t,null)}<button data-ed="fav-rm" data-k="${favs[i]}" class="xb" aria-label="Remover">×</button></div>`:`<div class="ed-vazio">+</div>`).join("")}</div>`;
+}
+function favoritosMusHTML(){
+  const e=EDIT||{musicas:[]};
+  return `<div class="gr-tit">Músicas favoritas <span>${e.musicas.length}/10</span></div>
+    ${e.musicas.length?`<div class="gr">${e.musicas.map((m,i)=>`<div class="gr-row"><span class="num">${String(i+1).padStart(2,"0")}</span><span class="gr-in" style="flex:1">${esc(m)}</span><button data-ed="mus-rm" data-i="${i}" class="xb" aria-label="Remover">×</button></div>`).join("")}</div>`:`<div class="empty" style="padding:22px">Nenhuma música ainda. Busque abaixo.</div>`}`;
+}
+/* Depois de marcar/desmarcar um "+" sem redesenhar o editor inteiro, atualiza só os botões
+   visíveis na lista de resultados de busca pra refletir o novo estado (✓ ou +) */
+function atualizarBotoesBusca(){
+  document.querySelectorAll('#edres [data-ed="pick-alb"]').forEach(b=>{b.textContent=EDIT.fav.includes(b.dataset.k)?"✓":"+"});
+  document.querySelectorAll('#edres [data-ed="pick-mus"]').forEach(b=>{
+    const mm=EDRES[+b.dataset.i];const linha=mm?`${mm.titulo} — ${mm.artista}`:"";
+    b.textContent=EDIT.musicas.includes(linha)?"✓":"+";
+  });
+}
 function renderEditor(){
   let el=$("#ed");
   if(!el){el=document.createElement("div");el.id="ed";document.body.appendChild(el)}
@@ -982,15 +1001,11 @@ function renderEditor(){
       <div class="gr-row gr-alto"><span class="gr-lbl">Bio</span><textarea class="gr-in" data-f="bio" maxlength="160" placeholder="Conte o que você ouve">${esc(e.bio)}</textarea></div>
       <div class="gr-row"><span class="gr-lbl">Local</span><input class="gr-in" data-f="local" maxlength="40" value="${esc(e.local)}" placeholder="Cidade, país"></div>
     </div>`;
-  const favoritosAlb=`
-    <div class="gr-tit">Álbuns favoritos <span>${favs.length}/10</span></div><div class="mut sm" style="margin:-6px 2px 0;font-weight:600">No perfil eles aparecem em grupos de 4.</div>
-    <div class="ed-fav">${Array.from({length:Math.min(10,Math.ceil((favs.length+1)/4)*4)},(_,i)=>i).map(i=>favs[i]?`<div class="ed-fitem">${capaAlbum(favs[i],(S.meta[favs[i]]||{}).t,null)}<button data-ed="fav-rm" data-k="${favs[i]}" class="xb" aria-label="Remover">×</button></div>`:`<div class="ed-vazio">+</div>`).join("")}</div>`;
-  const favoritosMus=`
-    <div class="gr-tit">Músicas favoritas <span>${e.musicas.length}/10</span></div>
-    ${e.musicas.length?`<div class="gr">${e.musicas.map((m,i)=>`<div class="gr-row"><span class="num">${String(i+1).padStart(2,"0")}</span><span class="gr-in" style="flex:1">${esc(m)}</span><button data-ed="mus-rm" data-i="${i}" class="xb" aria-label="Remover">×</button></div>`).join("")}</div>`:`<div class="empty" style="padding:22px">Nenhuma música ainda. Busque abaixo.</div>`}`;
+  const favoritosAlb=`<div id="edfavalb">${favoritosAlbHTML()}</div>`;
+  const favoritosMus=`<div id="edfavmus">${favoritosMusHTML()}</div>`;
   const busca=`
     <div class="gr-tit">Adicionar</div>
-    <input class="search" id="edq" placeholder="Busque um álbum ou uma música" autocomplete="off" value="${esc(EDQ)}" style="font-size:15px;padding:12px 14px 12px 42px">
+    <input class="search" id="edq" placeholder="Busque um álbum ou uma música" autocomplete="off" value="${esc(EDQ)}" style="font-size:16px;padding:12px 14px 12px 42px">
     <div class="chips" style="padding-top:10px">${[["albuns","Álbuns"],["musicas","Músicas"]].map(([k,l])=>`<button class="chip ${EDQF===k?"on":""}" data-edf="${k}">${l}</button>`).join("")}</div>
     <div id="edres"></div>`;
   el.innerHTML=`
@@ -1055,6 +1070,12 @@ document.addEventListener("input",e=>{
 document.addEventListener("keydown",e=>{
   if(e.target.id==="hq"&&e.key==="Enter"){busca.q=e.target.value;location.hash="search"}
 });
+document.addEventListener("focusin",e=>{
+  const t=e.target;
+  if((t.tagName==="INPUT"||t.tagName==="TEXTAREA")&&t.closest("#ed")){
+    setTimeout(()=>{try{t.scrollIntoView({block:"center",behavior:"smooth"})}catch(err){}},300);
+  }
+});
 document.addEventListener("change",e=>{
   const t=e.target;
   if(t.id==="ddate"){const kk=location.hash.slice(7);if(t.value&&S.u[kk]){S.u[kk].d=t.value;salvar();flash("Data atualizada")}return}
@@ -1094,10 +1115,36 @@ document.addEventListener("click",e=>{
     if(a==="fechar"){fecharEditor();return}
     if(a==="foto-rm"){EDIT.avatar="";renderEditor();return}
     if(a==="banner-rm"){EDIT.banner="";renderEditor();return}
-    if(a==="pick-alb"){const k=ed.dataset.k;if(EDIT.fav.includes(k)){EDIT.fav=EDIT.fav.filter(x=>x!==k)}else if(EDIT.fav.length<10)EDIT.fav.push(k);else{flash("Até 10 álbuns favoritos");return}renderEditor();return}
-    if(a==="fav-rm"){EDIT.fav=EDIT.fav.filter(x=>x!==ed.dataset.k);renderEditor();return}
-    if(a==="pick-mus"){const m=EDRES[+ed.dataset.i];const linha=`${m.titulo} — ${m.artista}`;if(EDIT.musicas.includes(linha)){EDIT.musicas=EDIT.musicas.filter(x=>x!==linha)}else if(EDIT.musicas.length<10)EDIT.musicas.push(linha);else{flash("Até 10 músicas");return}renderEditor();return}
-    if(a==="mus-rm"){EDIT.musicas.splice(+ed.dataset.i,1);renderEditor();return}
+    if(a==="pick-alb"){
+      const k=ed.dataset.k;
+      if(EDIT.fav.includes(k)){EDIT.fav=EDIT.fav.filter(x=>x!==k)}
+      else if(EDIT.fav.length<10)EDIT.fav.push(k);
+      else{flash("Até 10 álbuns favoritos");return}
+      const box=$("#edfavalb");if(box)box.innerHTML=favoritosAlbHTML();
+      atualizarBotoesBusca();
+      return;
+    }
+    if(a==="fav-rm"){
+      EDIT.fav=EDIT.fav.filter(x=>x!==ed.dataset.k);
+      const box=$("#edfavalb");if(box)box.innerHTML=favoritosAlbHTML();
+      atualizarBotoesBusca();
+      return;
+    }
+    if(a==="pick-mus"){
+      const m=EDRES[+ed.dataset.i];const linha=`${m.titulo} — ${m.artista}`;
+      if(EDIT.musicas.includes(linha)){EDIT.musicas=EDIT.musicas.filter(x=>x!==linha)}
+      else if(EDIT.musicas.length<10)EDIT.musicas.push(linha);
+      else{flash("Até 10 músicas");return}
+      const box=$("#edfavmus");if(box)box.innerHTML=favoritosMusHTML();
+      atualizarBotoesBusca();
+      return;
+    }
+    if(a==="mus-rm"){
+      EDIT.musicas.splice(+ed.dataset.i,1);
+      const box=$("#edfavmus");if(box)box.innerHTML=favoritosMusHTML();
+      atualizarBotoesBusca();
+      return;
+    }
     if(a==="salvar"){
       const {musicasTxt,...r}=EDIT;
       const txt=musicasTxt??r.musicas.join("\n");
