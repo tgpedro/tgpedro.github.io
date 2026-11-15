@@ -805,7 +805,7 @@ async function albumView(k){
     ${faixas.length?mediaBloco(faixas,m,x):""}
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">${m.ids.sp?`<a class="btn" href="https://open.spotify.com/album/${m.ids.sp}" target="_blank" rel="noopener">Open on Spotify</a>`:""}<label class="btn" style="cursor:pointer">🖼 Change cover<input id="capaup" type="file" accept="image/*" hidden></label>${capaCustom?`<button class="btn" data-act="capaRm">Restore original cover</button>`:""}</div>
   </div></div>
-  ${faixas.length?`<h2>Tracks</h2><div class="mlist">${faixas.map((t,i)=>`<div class="row"><span class="num">${String(i+1).padStart(2,"0")}</span><div class="ttl grow">${esc(t.t)}</div>${trateHTML(t.t,m.a)}<button class="shbtn" data-story="musica" data-tt="${esc(t.t)}" data-ms="${t.ms||0}" aria-label="Share song" title="Share song" style="width:30px;height:30px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M8 11H6.5A1.5 1.5 0 0 0 5 12.5v7A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5v-7A1.5 1.5 0 0 0 17.5 11H16"/></svg></button><span class="mut sm">${tempo(t.ms)}</span></div>`).join("")}</div>`:`<div class="empty" style="margin-top:30px">No tracks available for this album.</div>`}
+  ${faixas.length?`<h2>Tracks</h2><div class="mlist">${faixas.map((t,i)=>`<div class="row"><span class="num">${String(i+1).padStart(2,"0")}</span><div class="ttl grow">${esc(t.t)}</div>${trateHTML(t.t,m.a)}<button class="shbtn" data-play data-tt="${esc(t.t)}" data-ta="${esc(m.a)}" aria-label="Preview, video and links" title="Preview, video and links" style="width:30px;height:30px;font-size:11px;padding-left:2px">▶</button><button class="shbtn" data-story="musica" data-tt="${esc(t.t)}" data-ms="${t.ms||0}" aria-label="Share song" title="Share song" style="width:30px;height:30px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M8 11H6.5A1.5 1.5 0 0 0 5 12.5v7A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5v-7A1.5 1.5 0 0 0 17.5 11H16"/></svg></button><span class="mut sm">${tempo(t.ms)}</span></div>`).join("")}</div>`:`<div class="empty" style="margin-top:30px">No tracks available for this album.</div>`}
   <h2>Your review</h2><div class="mlist" style="padding:16px;background:#111"><textarea class="field" id="rev" placeholder="What did you think of this album?">${esc(x.rev||"")}</textarea><div style="display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px;margin-top:12px"><button class="fab" data-act="rev">Save review</button><button class="btn" data-story="album">Share to Story</button></div></div>
   ${S.listas.length?`<h2>Add to a list</h2><div style="display:flex;gap:10px;flex-wrap:wrap"><select class="field" id="lsel" style="width:auto">${listas}</select><button class="btn" data-act="addLista">Add</button></div>`:`<h2>Lists</h2><div class="empty">Create a list in the Lists tab of your Profile to add albums.</div>`}`;
 }
@@ -2200,6 +2200,79 @@ document.addEventListener("click",e=>{
 document.addEventListener("touchmove",e=>{if(e.touches&&e.touches.length>1)e.preventDefault()},{passive:false});
 /* Se algo ainda empurrar a página pro lado, volta pro lugar */
 window.addEventListener("scroll",()=>{if(window.scrollX)window.scrollTo(0,window.scrollY)},{passive:true});
+</script>
+<style>
+#trk{position:fixed;inset:0;z-index:95;background:rgba(0,0,0,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:16px;animation:fadeUp .25s both}
+#trk .trkbox{position:relative;width:min(520px,100%);max-height:calc(100dvh - 32px);overflow-y:auto;overscroll-behavior:contain;background:#121214;border:1px solid rgba(255,255,255,.1);border-radius:26px;padding:22px 20px 24px;box-shadow:0 30px 80px rgba(0,0,0,.7)}
+#trk .trkx{position:absolute;top:12px;right:12px;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.12);display:grid;place-items:center;font-size:20px;padding:0;text-align:center}
+#trk .trkhead{display:flex;gap:14px;align-items:center;margin:4px 40px 18px 0}
+#trk .trkhead img,#trk .trkph{width:84px;height:84px;border-radius:14px;object-fit:cover;flex-shrink:0;background:linear-gradient(145deg,#8B5CF6,#B794F6);display:grid;place-items:center;font-weight:900;font-size:26px}
+#trk .trkt{font-size:20px;font-weight:900;letter-spacing:-.4px;line-height:1.15}
+#trk audio{width:100%;height:42px}
+#trk .yt{position:relative;width:100%;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:#000}
+#trk .yt iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+#trk .trklinks{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#trk .trklinks a{display:flex;flex-direction:column;gap:2px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.08);font-weight:800;font-size:14px}
+#trk .trklinks a small{font-weight:600;font-size:11px;color:var(--mut)}
+#trk .trklinks a.ok{background:rgba(139,92,246,.22);box-shadow:inset 0 0 0 1px rgba(139,92,246,.55)}
+#trk .trklinks a:hover{background:rgba(255,255,255,.14)}
+@media(max-width:640px){#trk{align-items:flex-end;padding:0}#trk .trkbox{border-radius:26px 26px 0 0;max-height:88dvh}}
+</style>
+<script>
+/* ===== Card da faixa: preview, clipe no YouTube e links para os serviços ===== */
+async function abrirFaixa(t,a,alb,cover){
+  document.getElementById("trk")?.remove();
+  const ov=document.createElement("div");ov.id="trk";
+  const q=encodeURIComponent(`${t} ${a}`),nt=norm(t);
+  ov.innerHTML=`<div class="trkbox"><button class="trkx" data-trkx aria-label="Close">×</button>
+  <div class="trkhead">${cover?`<img src="${cover}" alt="">`:`<div class="trkph">${esc(ini(t))}</div>`}<div><div class="trkt">${esc(t)}</div><div class="mut sm" style="font-weight:700;margin-top:3px">${esc(a)}${alb?" · "+esc(alb):""}</div></div></div>
+  <h3 class="sec">Preview</h3><div id="trkprev" class="mut sm" style="font-weight:600">Looking for a preview…</div>
+  <h3 class="sec" style="margin-top:20px">Music video</h3><div id="trkyt" class="mut sm" style="font-weight:600">Looking for the video…</div>
+  <h3 class="sec" style="margin-top:20px">Listen on</h3><div class="trklinks" id="trklinks"></div></div>`;
+  document.body.appendChild(ov);document.body.style.overflow="hidden";
+  const L={},ytSearch=`https://www.youtube.com/results?search_query=${encodeURIComponent(t+" "+a+" official video")}`;
+  const $$=s=>ov.querySelector(s);
+  const pinta=()=>{const el=$$("#trklinks");if(!el)return;
+    const it=[["Spotify",L.sp,`https://open.spotify.com/search/${q}`],["Apple Music",L.it,`https://music.apple.com/search?term=${q}`],["Deezer",L.dz,`https://www.deezer.com/search/${q}`],["YouTube",L.yt,ytSearch],["YouTube Music",null,`https://music.youtube.com/search?q=${q}`]];
+    el.innerHTML=it.map(([n,d,f])=>`<a class="${d?"ok":""}" href="${esc(d||f)}" target="_blank" rel="noopener"><span>${n}</span><small>${d?"Open track":"Search"}</small></a>`).join("")};
+  pinta();
+  const bate=x=>norm(x)===nt;
+  const prev={};
+  const tarefas=[
+    getJSON(`${IT}/search?term=${q}&entity=song&limit=6`).then(j=>{const r=j.results||[];const x=r.find(y=>bate(y.trackName))||r[0];if(x){L.it=x.trackViewUrl;prev.it=x.previewUrl}}),
+    dz(`/search/track?q=${q}&limit=6`).then(j=>{const r=j.data||[];const x=r.find(y=>bate(y.title))||r[0];if(x){L.dz=x.link;prev.dz=x.preview}}),
+    spOn()?spSearch(q).then(j=>{const r=((j.tracks||{}).items||[]).filter(Boolean);const x=r.find(y=>bate(y.name))||r[0];if(x){L.sp=(x.external_urls||{}).spotify||`https://open.spotify.com/track/${x.id}`;prev.sp=x.preview_url}}):Promise.resolve()
+  ].map(p=>p.catch(()=>{}));
+  Promise.all(tarefas).then(()=>{
+    pinta();const el=$$("#trkprev");if(!el)return;
+    const u=prev.dz||prev.it||prev.sp;
+    el.innerHTML=u?`<audio controls preload="none" src="${esc(u)}"></audio><div class="sm mut" style="margin-top:4px">30-second preview</div>`:"No preview available for this track.";
+  });
+  (async()=>{
+    let id=null;
+    for(const h of ["https://pipedapi.kavin.rocks","https://pipedapi.adminforge.de","https://api.piped.private.coffee"]){
+      if(!ov.isConnected)return;
+      try{
+        const c=new AbortController(),to=setTimeout(()=>c.abort(),4500);
+        const r=await fetch(`${h}/search?q=${encodeURIComponent(t+" "+a+" official video")}&filter=videos`,{signal:c.signal});clearTimeout(to);
+        if(!r.ok)continue;
+        const j=await r.json(),v=(j.items||[]).find(x=>x.url&&/v=/.test(x.url));
+        if(v){id=v.url.split("v=")[1].split("&")[0];break}
+      }catch(e){}
+    }
+    const el=$$("#trkyt");if(!el)return;
+    if(id){L.yt=`https://www.youtube.com/watch?v=${id}`;pinta();
+      el.innerHTML=`<div class="yt"><iframe src="https://www.youtube-nocookie.com/embed/${id}" allow="accelerometer;encrypted-media;picture-in-picture;fullscreen" allowfullscreen loading="lazy"></iframe></div><div class="sm mut" style="margin-top:6px">Best match found automatically. It may not be the official clip.</div>`;
+    }else el.innerHTML=`Couldn't load a video here. <a href="${ytSearch}" target="_blank" rel="noopener" style="color:var(--acc2);font-weight:800">Search on YouTube ↗</a>`;
+  })();
+}
+function fecharFaixa(){document.getElementById("trk")?.remove();if(!document.getElementById("stv")&&!document.getElementById("ed"))document.body.style.overflow=""}
+document.addEventListener("click",e=>{
+  const p=e.target.closest("[data-play]");
+  if(p){const k=location.hash.slice(7),m=S.meta[k]||{};abrirFaixa(p.dataset.tt,p.dataset.ta,m.t,coverDe(k));return}
+  if(e.target.closest("[data-trkx]")||e.target.id==="trk")fecharFaixa();
+});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&document.getElementById("trk"))fecharFaixa()});
 </script>
 </body>
 </html>
