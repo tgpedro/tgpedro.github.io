@@ -4501,5 +4501,81 @@ window.addEventListener("beforeunload",e=>{if(dirty()){e.preventDefault();e.retu
 if(/^#settings/.test(location.hash))setTimeout(()=>rota(),0);
 </script>
 
+<style id="v8">
+/* ===== v8: perfil integrado (estilo Letterboxd, acabamento Apple) ===== */
+.pf-stats{display:flex;flex-wrap:wrap;align-items:center;gap:6px 0;margin-top:16px;padding:0;background:none;border:0;grid-template-columns:none}
+.pf-sx{display:inline-flex;align-items:baseline;gap:6px;padding:2px 16px 2px 0;margin-right:16px;position:relative;font-size:13px;font-weight:500;color:var(--mut);background:none;border:0;text-align:left;cursor:default}
+.pf-sx+.pf-sx::before{content:"";position:absolute;left:-16px;top:50%;width:3px;height:3px;margin-top:-1px;border-radius:50%;background:rgba(255,255,255,.3)}
+.pf-sx strong{font-size:17px;font-weight:700;letter-spacing:-.025em;color:#fff}
+button.pf-sx{cursor:pointer;transition:color .2s}
+button.pf-sx:hover,button.pf-sx:hover strong{color:#fff}
+button.pf-sx:hover span{text-decoration:underline;text-underline-offset:3px}
+.pf-links{align-items:center}
+.pf-ib{width:32px;height:32px;flex-shrink:0;border-radius:50%;display:inline-grid;place-items:center;padding:0;text-align:center;color:rgba(255,255,255,.8);background:rgba(38,38,40,.6);-webkit-backdrop-filter:saturate(220%) blur(16px);backdrop-filter:saturate(220%) blur(16px);border:1px solid rgba(255,255,255,.1);transition:background .2s,color .2s,transform .25s cubic-bezier(.3,1.6,.5,1)}
+.pf-ib:hover{background:rgba(255,255,255,.18);color:#fff;transform:scale(1.07)}
+.pf-ib:active{transform:scale(.93)}
+.pf-ib.end{margin-left:auto}
+.ptabs{margin-top:20px}
+.rdate{display:inline-flex;align-items:center;gap:5px}
+@media(max-width:640px){
+  .pf-sx{font-size:12.5px;padding-right:12px;margin-right:12px}
+  .pf-sx+.pf-sx::before{left:-12px}
+  .pf-sx strong{font-size:16px}
+}
+</style>
+<script>
+Object.assign(ICP,{story:'<circle cx="12" cy="12" r="8.5" stroke-dasharray="3.2 2.6"/><path d="M12 8.5v7M8.5 12h7"/>'});
+const hojeLocal=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+
+/* data em que a review foi POSTADA (campo p); reviews antigas usam a data da escuta como reserva */
+SOC.post=function(k,r,txt,d,id){
+  const me=this.me(),s=this.s();
+  id=id||"m"+hash(k+me.h+Date.now()+Math.random());
+  const i=s.rev.findIndex(x=>x.id===id),old=i>=0?s.rev[i]:null;
+  const rv={id,k,u:me.h,n:me.n,av:me.av,r:r||0,txt,d,p:(old&&old.p)||hojeLocal()};
+  if(i>=0)s.rev[i]=rv;else s.rev.push(rv);
+  salvar();
+};
+const postedOn=k=>{const l=SOC.mineAll(k).map(r=>r.p||r.d).filter(Boolean).sort();return l.length?l[l.length-1]:((S.u[k]||{}).d||"")};
+
+/* postedCard: mostra "Posted <dia>" */
+(function(){
+  const pc=postedCard;
+  postedCard=function(rv,m){
+    return pc(rv,m).replace(`<span class="mut sm">Listened `,`<span class="mut sm">Posted ${esc(fmtData(rv.p||rv.d))}</span><span class="mut sm">Listened `);
+  };
+})();
+
+/* aba Ratings: data de postagem em cada linha */
+pfRatings=function(){
+  const av=Object.entries(S.u).filter(([k,v])=>v.r&&S.meta[k]);
+  const ord=av.map(([k,v])=>[k,v,postedOn(k)]).sort((a,b)=>String(b[2]).localeCompare(String(a[2])));
+  const faixas=Object.entries(S.tracks||{}).filter(([k])=>S.u[k]&&S.u[k].r).sort((a,b)=>S.u[b[0]].r-S.u[a[0]].r).slice(0,20);
+  const alb=ord.length?`<div class="mlist" style="margin-top:24px">${ord.map(([k,v,p])=>{const m=S.meta[k];
+    const last=SOC.mineAll(k).sort((a,b)=>String(b.p||b.d).localeCompare(String(a.p||a.d)))[0],txt=(last&&last.txt)||v.rev||"";
+    return `<a class="row" href="#album-${k}" style="display:block"><div style="display:flex;align-items:center;gap:14px">${capaAlbum(k,m.t,46)}<div class="grow"><div class="ttl">${esc(m.t)}</div><div class="sm mut">${esc(m.a)}${p?` · <span class="rdate">${esc(fmtData(p))}</span>`:""}</div></div>${estrelas(v.r)}</div>${txt?`<div style="font-weight:500;padding:10px 0 0 60px;line-height:1.45">${esc(txt)}</div>`:""}</a>`}).join("")}</div>`:`<div class="empty" style="margin-top:24px">You haven't rated any album yet.</div>`;
+  return alb+(faixas.length?`<h2>Rated songs</h2><div class="mlist">${faixas.map(([k,v])=>`<div class="row"><div class="grow"><div class="ttl">${esc(v.t)}</div><div class="sm mut">${esc(v.a)}</div></div>${estrelas(S.u[k].r)}</div>`).join("")}</div>`:"");
+};
+
+/* perfil: números em linha (sem cards), story vira ícone pequeno junto dos links */
+(function(){
+  const pv=perfilView;
+  perfilView=function(){
+    let h=pv();const p=P();
+    const av=Object.values(S.u).filter(v=>v.r),ouv=Object.values(S.u).filter(v=>v.d).length;
+    const media=av.length?av.reduce((s,v)=>s+v.r,0)/av.length:0;
+    const st=(n,l,pp)=>pp?`<button class="pf-sx" data-aba="pessoas" data-pp="${pp}"><strong>${n}</strong><span>${l}</span></button>`:`<span class="pf-sx"><strong>${n}</strong><span>${l}</span></span>`;
+    const strip=`<div class="pf-stats">${st(ouv,"Listened")}${st(av.length,"Ratings")}${st(media?media.toFixed(1):"—","Avg")}${st(SOC.following().length,"Following","seguindo")}${st(SOC.followers().length,"Followers","seguidores")}</div>`;
+    h=h.replace(/<div class="pf-stats">[\s\S]*?<\/div>(?=\s*<nav class="ptabs">)/,"@@STATS@@");
+    h=h.replace(/<div class="pf-links">[\s\S]*?<\/div>/,m=>m.replace(/<\/div>$/,""));
+    const story=`<button class="pf-ib end" data-pact="cartao" aria-label="Share to Story" title="Share to Story">${ico("story",17)}</button>`;
+    if(/<div class="pf-links">/.test(h))h=h.replace("@@STATS@@",story+"</div>"+strip);
+    else h=h.replace("@@STATS@@",`<div class="pf-links">${story}</div>`+strip);
+    h=h.replace(/<button class="btn" data-pact="cartao">Story<\/button>/,"");
+    return h;
+  };
+})();
+</script>
+
 </body>
 </html>
