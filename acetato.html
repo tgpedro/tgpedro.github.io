@@ -5158,5 +5158,86 @@ hfSection=function(){
 })();
 </script>
 
+<style id="v20">
+/* ===== v20: busca em Ratings e Diary ===== */
+.lt-bar{max-width:460px;margin-top:22px}
+.lt-bar+.rt-top{margin-top:14px}
+@media(max-width:640px){.lt-bar{max-width:none;margin-top:18px}}
+</style>
+<script>
+let DY_Q="",RT_Q="";
+const ltBar=(id,ph,val)=>`<div class="sp-bar sm lt-bar${val?" has":""}" id="${id}bar">${SQ_ICON}<input class="sp-in" id="${id}q" type="text" enterkeyhint="search" placeholder="${ph}" autocomplete="off" autocapitalize="none" spellcheck="false" value="${esc(val)}"><button class="sp-x" data-ltx="${id}" aria-label="Clear">${ico("x",15)}</button></div>`;
+const noRes=q=>`<div class="empty" style="margin-top:20px">No results for “${esc(q)}”.</div>`;
+
+/* ---- Diary ---- */
+function diaryBody(){
+  const q=norm(DY_Q);
+  const e=Object.entries(S.u).filter(([k,v])=>v.d&&(!q||(S.meta[k]&&(norm(S.meta[k].t).includes(q)||norm(S.meta[k].a).includes(q))))).sort((a,b)=>b[1].d.localeCompare(a[1].d));
+  if(!e.length)return DY_Q?noRes(DY_Q):`<div class="empty">You haven't marked any album as listened yet.</div>`;
+  const MESES=["January","February","March","April","May","June","July","August","September","October","November","December"];
+  let atual="",html="";
+  e.forEach(([k,v])=>{
+    const mk=v.d.slice(0,7);
+    if(mk!==atual){
+      if(atual)html+=`</div>`;
+      atual=mk;const [y,mm]=mk.split("-"),n=e.filter(x=>x[1].d.slice(0,7)===mk).length;
+      html+=`<h3 class="sec" style="margin:22px 4px 10px">${MESES[+mm-1]} ${y} · ${n}</h3><div class="mlist">`;
+    }
+    const m=S.meta[k]||{t:"Album",a:""};
+    html+=`<a class="row" href="#album-${k}">${capaAlbum(k,m.t,50)}<div class="grow"><div class="ttl">${hl(m.t,DY_Q)}</div><div class="sm mut" style="font-weight:700">${hl(m.a,DY_Q)} · ${v.d.slice(8,10)}/${v.d.slice(5,7)}</div></div>${v.r?estrelas(v.r):""}</a>`;
+  });
+  return html+(atual?`</div>`:"");
+}
+diaryList=function(){
+  DY_Q="";
+  const has=Object.values(S.u).some(v=>v.d);
+  return (has?ltBar("dy","Search your diary",""):"")+`<div id="dylist">${diaryBody()}</div>`;
+};
+
+/* ---- Ratings ---- */
+ratingsListHTML=function(){
+  const q=norm(RT_Q),all=ratingsItems();
+  const l=all.filter(x=>RT_F==="all"||(RT_F==="albums"?x.t==="album":x.t==="song")).filter(it=>{
+    if(!q)return true;
+    if(it.t==="album"){const m=S.meta[it.k],last=SOC.mineAll(it.k).map(r=>r.txt).join(" ")+" "+(it.v.rev||"");return norm(m.t).includes(q)||norm(m.a).includes(q)||norm(last).includes(q)}
+    return norm(it.tr.t).includes(q)||norm(it.tr.a).includes(q);
+  });
+  if(!l.length)return RT_Q?noRes(RT_Q):`<div class="empty" style="margin-top:20px">${all.length?"Nothing here yet.":"You haven't rated anything yet."}</div>`;
+  const groups=[];l.forEach(it=>{const g=monthLbl(it.d),last=groups[groups.length-1];if(last&&last.g===g)last.items.push(it);else groups.push({g,items:[it]})});
+  return groups.map(g=>`<h3 class="sec rt-m">${esc(g.g)}</h3><div class="mlist">${g.items.map(ratingRow).join("")}</div>`).join("");
+};
+(function(){
+  const pr=pfRatings;
+  pfRatings=function(){
+    RT_Q="";
+    const h=pr();
+    const has=Object.values(S.u).some(v=>v.r);
+    return (has?ltBar("rt","Search your ratings",""):"")+h;
+  };
+})();
+
+/* ---- eventos ---- */
+function ltRender(id){
+  const el=document.getElementById(id==="dy"?"dylist":"rtlist");
+  if(el)el.innerHTML=id==="dy"?diaryBody():ratingsListHTML();
+  const bar=document.getElementById(id+"bar");if(bar)bar.classList.toggle("has",!!(id==="dy"?DY_Q:RT_Q));
+}
+document.addEventListener("input",e=>{
+  const id=e.target.id;
+  if(id==="dyq"){DY_Q=e.target.value.trim();ltRender("dy")}
+  else if(id==="rtq"){RT_Q=e.target.value.trim();ltRender("rt")}
+});
+document.addEventListener("click",e=>{
+  const x=e.target.closest("[data-ltx]");if(!x)return;
+  const id=x.dataset.ltx,inp=document.getElementById(id+"q");
+  if(inp){inp.value="";inp.focus()}
+  if(id==="dy")DY_Q="";else RT_Q="";
+  ltRender(id);
+});
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape"&&(e.target.id==="dyq"||e.target.id==="rtq")){e.target.value="";const id=e.target.id.slice(0,2);if(id==="dy")DY_Q="";else RT_Q="";ltRender(id)}
+});
+</script>
+
 </body>
 </html>
