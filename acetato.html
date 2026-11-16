@@ -347,6 +347,11 @@ textarea.gr-in{resize:none;min-height:56px;line-height:1.4}
   .pinfo h1{font-size:26px}
   .ed-fav{gap:8px}
   .ed-banner{height:120px}
+  /* correção: as regras de .pstats lá em cima (feitas pra telas um pouco maiores)
+     deixavam pouco espaço nas 5 colunas do grid de estatísticas do perfil no celular,
+     e o nowrap+ellipsis cortava "LISTENED"/"RATINGS" no meio da palavra. */
+  .pstats div{padding:8px 3px}
+  .pstats span{font-size:9px;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.15;letter-spacing:0}
 }
 </style>
 
@@ -689,6 +694,7 @@ h3.sec{font-size:12px;letter-spacing:.1em}
   <a class="logo" href="#home">Acetato<b>.</b></a>
   <nav class="nav" aria-label="Navigation">
     <a href="#home" data-tab="home">Home</a>
+    <a href="#feed" data-tab="feed">Feed</a>
     <a href="#search" data-tab="search">Search</a>
     <a href="#diary" data-tab="diary">Diary</a>
     <a href="#profile" data-tab="profile">Profile</a>
@@ -1468,7 +1474,8 @@ function rota(){
   if(h.startsWith("album-")){carrega(albumView(h.slice(6)));return}
   if(h.startsWith("artist-")){carrega(artistRoute(h.slice(7)));return}
   if(h==="search"){app.innerHTML=searchView();runSearch();return}
-  if(h==="diary"){app.innerHTML=`<h1>Diário</h1>${diaryList()}`;return}
+  if(h==="diary"){app.innerHTML=`<h1>Diary</h1>${diaryList()}`;return}
+  if(h==="feed"){app.innerHTML=feedHTML();return}
   if(h==="profile"){app.innerHTML=perfilView();return}
   if(h.startsWith("lista-")){app.innerHTML=listaView(+h.slice(6));return}
   carrega(homeView());
@@ -3232,6 +3239,9 @@ async function abrirFaixa(t,a,alb,cover){
 .rvempty{padding:26px 18px;text-align:center;color:var(--mut);font-weight:500;border-radius:18px;background:rgba(255,255,255,.05);font-size:14px}
 .rvempty a{color:#fff;font-weight:600;text-decoration:underline;text-underline-offset:3px}
 .rvnote{font-size:12px;font-weight:500;color:var(--mut);margin:12px 2px 0;line-height:1.45}
+.feed-alb{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:13px;font-weight:700;color:var(--mut)}
+.feed-alb:hover{color:#fff}
+.feed-alb-t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
 </style>
 <script>
 /* ===== Camada social (local por enquanto) =====
@@ -3268,6 +3278,33 @@ const SOC={
   rmFriend(h){const s=this.s();s.amigos=s.amigos.filter(a=>a.h!==h);salvar()},
   toggleDemo(){const s=this.s();s.demo=!s.demo;if(s.demo){DEMOF.slice(0,4).forEach(([h,n])=>{if(!s.amigos.some(a=>a.h===h))s.amigos.push({h,n})})}else{s.amigos=s.amigos.filter(a=>!DEMOF.some(d=>d[0]===a.h))}salvar()}
 };
+/* ===== Feed de atividade (você + amigos, cruzando todos os álbuns conhecidos) =====
+   Hoje só existe o que está salvo neste navegador (suas próprias publicações) mais as
+   avaliações demo dos amigos de mentira, quando o modo demo está ligado — mesma limitação
+   do socHTML. Quando o banco de dados existir, troque feedItens() por uma chamada à API
+   que já traga a atividade de quem você segue de verdade. */
+function feedItens(){
+  const me=SOC.me().h,keys=Object.keys(S.meta);
+  let itens=[];
+  keys.forEach(k=>{SOC.list(k).forEach(rv=>{if(rv.u===me||SOC.isFriend(rv.u))itens.push(rv)})});
+  itens.sort((a,b)=>b.d.localeCompare(a.d));
+  return itens.slice(0,40);
+}
+function feedCard(rv){
+  const me=SOC.me().h,eu=rv.u===me,[c1,c2]=cores(rv.u),av=eu?SOC.me().av:rv.av,lk=SOC.liked(rv);
+  const m=S.meta[rv.k]||{t:"Album",a:""},cv=coverDe(rv.k),[ca,cb]=cores(rv.k);
+  return `<div class="rv"><div class="rv-av" style="background:linear-gradient(145deg,${c1},${c2})">${av?`<img src="${esc(av)}" alt="">`:esc(ini(rv.n))}</div><div class="rv-b">
+    <a href="#album-${rv.k}" class="feed-alb"><div class="cover" style="width:34px;height:34px;border-radius:8px;flex-shrink:0;font-size:12px;background:linear-gradient(145deg,${ca},${cb})">${cv?`<img src="${cv}" alt="" loading="lazy" onerror="this.remove()">`:`<span>${esc(ini(m.t))}</span>`}</div><span class="feed-alb-t">${esc(m.t)}${m.a?" · "+esc(m.a):""}</span></a>
+    <div class="rv-h"><b>${esc(eu?"You":rv.n)}</b><span class="mut sm">@${esc(rv.u)}</span>${rv.r?estrelas(rv.r):""}<span class="mut sm">${esc(fmtData(rv.d))}</span>${rv.demo?`<i class="rv-demo">Demo</i>`:""}</div>
+    ${rv.txt?`<p class="rv-t">${esc(rv.txt)}</p>`:""}
+    <div class="rv-f"><button class="rv-l ${lk?"on":""}" data-feedlike="${rv.id}" aria-label="Like review">${ico("heart",14,lk)} ${SOC.likes(rv)}</button></div></div></div>`;
+}
+function feedHTML(){
+  const itens=feedItens(),me=SOC.me().h;
+  const vazio=SOC.s().amigos.length?`Nothing from you or your friends yet. Publish a review or rate an album to see it here.`:`You haven't added friends yet. <a href="#@${encodeURIComponent(me)}" data-gofriends>Add them on your Profile</a>, or publish a review of your own.`;
+  return `<h1>Feed</h1><div id="feedlist">${itens.length?itens.map(feedCard).join(""):`<div class="empty">${vazio}</div>`}</div><p class="rvnote">The feed shows your own published reviews and your friends' activity. Reviews are stored only in this browser for now — when the database is connected, this will include real activity from everyone you follow.</p>`;
+}
+function renderFeed(){const el=document.getElementById("feedlist");if(!el)return;const itens=feedItens();el.innerHTML=itens.length?itens.map(feedCard).join(""):el.innerHTML}
 function socStats(k){
   const me=SOC.me().h,lista=SOC.list(k).filter(x=>x.r),rs=lista.map(x=>x.r);
   const myr=(S.u[k]||{}).r;
@@ -3342,6 +3379,11 @@ document.addEventListener("click",e=>{
 });
 document.addEventListener("click",e=>{
   if(e.target.closest("[data-gofriends]")){aba="perfil";setTimeout(()=>{const f=document.getElementById("friends");if(f)f.scrollIntoView({behavior:"smooth"})},150)}
+});
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-feedlike]");
+  if(!b)return;
+  SOC.like(b.dataset.feedlike);renderFeed();
 });
 </script>
 
