@@ -1554,7 +1554,7 @@ document.addEventListener("change",e=>{
 document.addEventListener("click",e=>{
   const t=e.target;
   const tv=t.closest("[data-tv]");
-  if(tv){e.preventDefault();const box=tv.closest(".trate");const k=box.dataset.tk;const d=dd(k);const val=+tv.dataset.tv;d.r=d.r===val?0:val;if(!d.r)delete d.r;S.tracks=S.tracks||{};S.tracks[k]={t:box.dataset.tt,a:box.dataset.ta};salvar();box.innerHTML=rateHTML(d.r).replace(/data-v=/g,'data-tv=');flash(d.r?`Rating ${String(val)} for the song`:"Rating removed");tic();atualizarMedia();return}
+  if(tv){e.preventDefault();const box=tv.closest(".trate");const k=box.dataset.tk;const d=dd(k);const val=+tv.dataset.tv;d.r=d.r===val?0:val;if(!d.r)delete d.r;S.tracks=S.tracks||{};S.tracks[k]=Object.assign(S.tracks[k]||{},{t:box.dataset.tt,a:box.dataset.ta});if(d.r)S.tracks[k].p=hojeLocal();salvar();box.innerHTML=rateHTML(d.r).replace(/data-v=/g,'data-tv=');flash(d.r?`Rating ${String(val)} for the song`:"Rating removed");tic();atualizarMedia();return}
   const sg=t.closest("[data-seguir]");
   if(sg){
     const k=sg.dataset.seguir;S.seguindo=S.seguindo||[];
@@ -5050,6 +5050,112 @@ document.addEventListener("click",e=>{
   if(a==="pick"){const inp=document.querySelector(`[data-sl="${k}"]`);if(inp)inp.focus()}
   if(a==="other"){const l=document.querySelectorAll('[data-sc="l"]');if(l.length)l[l.length-1].focus()}
 });
+</script>
+
+<style id="v18">
+/* ===== v18: Ratings unificado (álbuns + músicas, do mais recente ao mais antigo) ===== */
+.rt-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:22px}
+.rt-top .chips{padding:0;margin:0}
+.pf-body h3.sec.rt-m{font-size:14px;font-weight:600;letter-spacing:0;color:var(--mut);margin:26px 2px 10px}
+.rt-top+#rtlist h3.sec.rt-m:first-child{margin-top:20px}
+.rs-song{display:block;width:100%;text-align:left;color:#fff}
+.rs-song .fs-cv{width:46px;height:46px}
+.rt-tag{display:inline-block;margin-left:8px;padding:1px 7px;border-radius:6px;font-style:normal;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:rgba(255,255,255,.12);color:var(--mut);vertical-align:2px}
+</style>
+<script>
+let RT_F="all";
+function ratingsItems(){
+  const out=[];let n=0;
+  Object.entries(S.u).forEach(([k,v])=>{n++;if(v.r&&S.meta[k])out.push({t:"album",k,v,d:postedOn(k)||"",n})});
+  Object.entries(S.tracks||{}).forEach(([k,tr])=>{n++;const v=S.u[k];if(v&&v.r)out.push({t:"song",k,v,tr,d:tr.p||"",n})});
+  return out.sort((a,b)=>String(b.d).localeCompare(String(a.d))||(b.n-a.n));
+}
+const monthLbl=d=>{if(!d)return"Earlier";const [y,m]=d.split("-").map(Number);return new Date(y,m-1,1).toLocaleDateString("en-US",{month:"long",year:"numeric"})};
+function ratingRow(it){
+  if(it.t==="album"){
+    const m=S.meta[it.k],last=SOC.mineAll(it.k).sort((a,b)=>String(b.p||b.d).localeCompare(String(a.p||a.d)))[0],txt=(last&&last.txt)||it.v.rev||"";
+    return `<a class="row" href="#album-${it.k}" style="display:block"><div style="display:flex;align-items:center;gap:14px">${capaAlbum(it.k,m.t,46)}<div class="grow"><div class="ttl">${esc(m.t)}</div><div class="sm mut">${esc(m.a)}${it.d?` · ${esc(fmtData(it.d))}`:""}</div></div>${estrelas(it.v.r)}</div>${txt?`<div style="font-weight:500;padding:10px 0 0 60px;line-height:1.45">${esc(txt)}</div>`:""}</a>`;
+  }
+  const t=it.tr,l=`${t.t} — ${t.a}`;
+  return `<button class="row rs-song" data-rs="${it.k}"><div style="display:flex;align-items:center;gap:14px">${songCover(l,{[l]:{c:t.c}})}<div class="grow"><div class="ttl">${esc(t.t)}<i class="rt-tag">Song</i></div><div class="sm mut">${esc(t.a)}${it.d?` · ${esc(fmtData(it.d))}`:""}</div></div>${estrelas(it.v.r)}</div></button>`;
+}
+function ratingsListHTML(){
+  const all=ratingsItems(),l=all.filter(x=>RT_F==="all"||(RT_F==="albums"?x.t==="album":x.t==="song"));
+  if(!l.length)return `<div class="empty" style="margin-top:20px">${all.length?"Nothing here yet.":"You haven't rated anything yet."}</div>`;
+  const groups=[];l.forEach(it=>{const g=monthLbl(it.d),last=groups[groups.length-1];if(last&&last.g===g)last.items.push(it);else groups.push({g,items:[it]})});
+  return groups.map(g=>`<h3 class="sec rt-m">${esc(g.g)}</h3><div class="mlist">${g.items.map(ratingRow).join("")}</div>`).join("");
+}
+pfRatings=function(){
+  const all=ratingsItems(),na=all.filter(x=>x.t==="album").length,ns=all.length-na;
+  setTimeout(rtBackfill,60);
+  return `<div class="rt-top"><div class="chips">${[["all","All",all.length],["albums","Albums",na],["songs","Songs",ns]].map(([k,lb,n])=>`<button class="chip ${RT_F===k?"on":""}" data-rtf="${k}">${lb} <span class="cn" style="opacity:.55;font-weight:700;font-size:11.5px">${n}</span></button>`).join("")}</div></div><div id="rtlist">${ratingsListHTML()}</div>`;
+};
+document.addEventListener("click",e=>{
+  const f=e.target.closest("[data-rtf]");
+  if(f){RT_F=f.dataset.rtf;document.querySelectorAll("[data-rtf]").forEach(c=>c.classList.toggle("on",c===f));const el=document.getElementById("rtlist");if(el)el.innerHTML=ratingsListHTML();return}
+  const s=e.target.closest("[data-rs]");
+  if(s){const t=(S.tracks||{})[s.dataset.rs];if(t)abrirFaixa(t.t,t.a,"",t.c||"")}
+});
+/* capa das músicas avaliadas (busca em segundo plano, uma vez) */
+let rtBusy=false;
+async function rtBackfill(){
+  if(rtBusy)return;
+  const falta=Object.entries(S.tracks||{}).filter(([k,t])=>S.u[k]&&S.u[k].r&&!t.c&&!t.tried);
+  if(!falta.length)return;rtBusy=true;
+  for(const [k,t] of falta){
+    try{
+      const r=await fontes.musicasDZ(encodeURIComponent(t.t+" "+t.a));
+      const hit=(r||[]).find(m=>norm(m.titulo)===norm(t.t)&&norm(m.artista)===norm(t.a))||(r||[]).find(m=>norm(m.artista)===norm(t.a));
+      const c=hit?(coverDe(albumKey(hit.album.t,hit.album.a))||hit.album.cover||""):"";
+      if(c)t.c=c;else t.tried=1;
+    }catch(e){t.tried=1}
+  }
+  rtBusy=false;salvar();
+  const el=document.getElementById("rtlist");if(el&&document.querySelector("[data-rtf]"))el.innerHTML=ratingsListHTML();
+}
+</script>
+
+<style id="v19">
+/* ===== v19: botão de compartilhar centralizado + chevron estilo Apple só em títulos que levam a algum lugar ===== */
+.gl.ic{display:inline-grid!important;place-items:center;width:46px;height:46px;padding:0!important;gap:0!important;flex:0 0 46px;border-radius:50%}
+.gl.ic svg{display:block;margin:0;flex-shrink:0}
+@media(max-width:640px){.gl.ic{width:44px;height:44px;flex-basis:44px}}
+/* some o "›" decorativo de todos os títulos */
+.sec-h h2::after{content:none!important;display:none!important}
+.sec-go{display:inline-flex;align-items:center;gap:7px;padding:0;margin:0;background:none;border:0;color:#fff;text-align:left;font:inherit;cursor:pointer;max-width:100%;border-radius:10px}
+.sec-go h2{margin:0}
+.sec-go svg{flex-shrink:0;color:var(--mut);margin-top:2px;transition:transform .25s cubic-bezier(.3,1.5,.5,1),color .2s}
+.sec-go:hover svg,.sec-go:focus-visible svg{color:#fff;transform:translateX(3px)}
+.pf-sh .sec-go+em{margin-left:2px}
+</style>
+<script>
+const CHEV='<svg width="9" height="14" viewBox="0 0 9 14" fill="none" aria-hidden="true"><path d="M1.6 1.6L7 7l-5.4 5.4" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const secGo=(h,attrs,tag)=>`<${tag||"button"} class="sec-go" ${attrs}><h2>${h}</h2>${CHEV}</${tag||"button"}>`;
+/* Home: "Reviews from friends" leva ao Feed (Following) */
+hfSection=function(){
+  const fo=SOC.following().length,items=feedItens2("following").slice(0,10);
+  const head=items.length?`<div class="sec-h">${secGo("Reviews from friends","data-hfall")}</div>`:`<div class="sec-h"><h2>Reviews from friends</h2></div>`;
+  if(items.length)return head+`<div class="hf-row">${items.map(hfCard).join("")}</div>`;
+  const me=SOC.me().h;
+  return head+(fo?`<div class="hf-empty"><div><b>No reviews yet</b><span>The people you follow haven't published a review. New ones will show up here.</span></div></div>`
+    :`<div class="hf-empty"><div><b>Follow people to see their reviews</b><span>Like Letterboxd: follow friends and their latest reviews appear here.</span></div><a class="btn p" href="#@${encodeURIComponent(me)}" data-gofriends>Find people</a></div>`);
+};
+/* Perfil: "Artists you follow" leva à página de artistas */
+(function(){
+  const po=pfOverview;
+  pfOverview=function(){
+    return po().replace(/<div class="pf-sh"><h2>Artists you follow<\/h2>(<em>\d+<\/em>)<a class="lnk" href="#following-artists">See all<\/a><\/div>/,
+      (m,em)=>`<div class="pf-sh">${secGo("Artists you follow",'href="#following-artists"',"a")}${em}</div>`);
+  };
+})();
+/* Busca: os títulos Artists / Albums & EPs / People trocam o "See all" pelo chevron */
+(function(){
+  const mb=montarBusca;
+  montarBusca=function(q,coleta,f){
+    return mb(q,coleta,f).replace(/<div class="sec-h"><h2>([^<]+)<\/h2><button class="lnk" data-sqgo="(\w+)">See all<\/button><\/div>/g,
+      (m,t,g)=>`<div class="sec-h">${secGo(t,`data-sqgo="${g}"`)}</div>`);
+  };
+})();
 </script>
 
 </body>
