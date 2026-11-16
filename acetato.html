@@ -4282,7 +4282,7 @@ function stInit(){
   if(SETD)return;
   const p=P();
   SETD=JSON.parse(JSON.stringify(p));
-  SETD.fav=SETD.fav||[];SETD.musicas=SETD.musicas||[];SETD.links=SETD.links||{};SETD.custom=SETD.custom||[];
+  SETD.fav=SETD.fav||[];SETD.musicas=SETD.musicas||[];SETD.mcov=SETD.mcov||{};SETD.links=SETD.links||{};SETD.custom=SETD.custom||[];
   SETD.pron=SETD.pron||"";SETD.bio=SETD.bio||"";SETD.local=SETD.local||"";SETD.criador=p.criador!==false;
   SETO=JSON.stringify(SETD);
 }
@@ -4634,7 +4634,7 @@ pfOverview=function(){
   const slot=i=>fav[i]?`<a class="fitem" href="#album-${fav[i]}">${capaAlbum(fav[i],(S.meta[fav[i]]||{}).t,null)}<div class="ttl" style="margin-top:8px">${esc((S.meta[fav[i]]||{}).t||"")}</div></a>`:`<div class="fvazio">Empty</div>`;
   const nPag=Math.max(1,Math.ceil(fav.length/4));
   const slots=`<div class="favpages" id="favpages">${Array.from({length:nPag},(_,pg)=>`<div class="favpage">${[0,1,2,3].map(j=>slot(pg*4+j)).join("")}</div>`).join("")}</div>${nPag>1?`<div class="favdots">${Array.from({length:nPag},(_,n)=>`<button class="${n===0?"on":""}" data-favpg="${n}" aria-label="Group ${n+1}"></button>`).join("")}</div>`:""}`;
-  const mus=(p.musicas||[]).length?`<div class="mlist">${p.musicas.map((m,i)=>`<div class="row"><span class="num">${String(i+1).padStart(2,"0")}</span><div class="ttl grow">${esc(m)}</div></div>`).join("")}</div>`:`<div class="empty">Add favorite songs in Settings.</div>`;
+  const mus=favSongsHTML(p);
   const recs=[...av].sort((a,b)=>String(postedOn(b[0])).localeCompare(String(postedOn(a[0])))).slice(0,5);
   const rec=recs.length?`<div class="mlist">${recs.map(([k,v])=>{const m=S.meta[k];return `<a class="row" href="#album-${k}">${capaAlbum(k,m.t,46)}<div class="grow"><div class="ttl">${esc(m.t)}</div><div class="sm mut">${esc(m.a)}</div></div>${estrelas(v.r)}</a>`}).join("")}</div>`:`<div class="empty">No ratings yet.</div>`;
   const segA=(S.seguindo||[]);
@@ -4893,5 +4893,80 @@ THEMES.push(["music","Apple Music","linear-gradient(180deg,#5a4650,#1c1c1e)","rg
 </script>
 
 <script>applyTheme(S.theme);</script>
+<style id="v16">
+/* ===== v16: músicas favoritas em cards com capa (estilo Apple Music) ===== */
+.fs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px}
+.fs-c{position:relative;display:flex;align-items:center;gap:12px;width:100%;padding:8px 14px 8px 8px;border-radius:14px;background:var(--srf);color:#fff;text-align:left;min-width:0;transition:background .2s}
+.fs-c:hover{background:color-mix(in srgb,var(--srf) 82%,#fff)}
+.fs-cv{position:relative;width:52px;height:52px;flex-shrink:0;border-radius:8px;overflow:hidden;display:grid;place-items:center;font-weight:800;font-size:15px;color:#fff;box-shadow:0 4px 14px rgba(0,0,0,.35)}
+.fs-cv img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.fs-pl{position:absolute;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.45);opacity:0;transition:opacity .2s}
+.fs-pl svg{filter:drop-shadow(0 1px 4px rgba(0,0,0,.5))}
+.fs-c:hover .fs-pl,.fs-c:focus-visible .fs-pl{opacity:1}
+@media(hover:none){.fs-pl{display:none}}
+.fs-t{min-width:0;flex:1}
+.fs-t b{display:block;font-size:14.5px;font-weight:600;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fs-t small{display:block;margin-top:2px;font-size:12.5px;font-weight:500;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:640px){.fs-grid{grid-template-columns:minmax(0,1fr)}}
+/* na tela de edição */
+.fs-ed{display:flex;align-items:center;gap:12px;padding:8px 12px 8px 8px;border-bottom:1px solid rgba(255,255,255,.07)}
+.fs-ed:last-child{border-bottom:0}
+.fs-ed .fs-cv{width:46px;height:46px}
+</style>
+<script>
+const splitSong=l=>{const i=String(l).lastIndexOf(" — ");return i<0?{t:String(l),a:""}:{t:l.slice(0,i),a:l.slice(i+3)}};
+function songCover(l,mc,size){
+  const x=(mc||{})[l]||{},sp=splitSong(l),[c1,c2]=cores(l);
+  return `<div class="fs-cv" style="${size?`width:${size}px;height:${size}px;`:""}background:linear-gradient(145deg,${c1},${c2})"><span>${esc(ini(sp.t))}</span>${x.c?`<img src="${esc(x.c)}" alt="" loading="lazy" onerror="this.remove()">`:""}</div>`;
+}
+function favSongsHTML(p){
+  const m=p.musicas||[];
+  if(!m.length)return `<div class="empty">Add favorite songs in Settings.</div>`;
+  return `<div class="fs-grid">${m.map((l,i)=>{const sp=splitSong(l);
+    return `<button class="fs-c" data-fs="${i}" aria-label="Play preview: ${esc(sp.t)}">${(()=>{const c=songCover(l,p.mcov);return c.replace("</div>",`<span class="fs-pl">${ico("play",16)}</span></div>`)})()}<div class="fs-t"><b>${esc(sp.t)}</b><small>${esc(sp.a)}</small></div></button>`}).join("")}</div>`;
+}
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-fs]");if(!b)return;
+  const p=P(),l=(p.musicas||[])[+b.dataset.fs];if(!l)return;
+  const sp=splitSong(l),x=(p.mcov||{})[l]||{};
+  abrirFaixa(sp.t,sp.a,x.al||"",x.c||"");
+});
+/* músicas antigas (sem capa): busca a capa em segundo plano e guarda */
+let fsBusy=false;
+async function fsBackfill(){
+  if(fsBusy)return;const p=P();p.mcov=p.mcov||{};
+  const falta=(p.musicas||[]).filter(l=>!(p.mcov[l]&&p.mcov[l].c)&&!(p.mcov[l]&&p.mcov[l].tried));
+  if(!falta.length)return;fsBusy=true;
+  for(const l of falta){
+    const sp=splitSong(l);let ok=null;
+    try{
+      const r=await fontes.musicasDZ(encodeURIComponent(sp.t+" "+sp.a));
+      const hit=(r||[]).find(m=>norm(m.titulo)===norm(sp.t)&&norm(m.artista)===norm(sp.a))||(r||[]).find(m=>norm(m.artista)===norm(sp.a));
+      if(hit){const c=coverDe(albumKey(hit.album.t,hit.album.a))||hit.album.cover||"";if(c)ok={c,al:hit.album.t}}
+    }catch(e){}
+    p.mcov[l]=ok||{tried:1};
+  }
+  fsBusy=false;salvar();
+  const g=document.querySelector(".fs-grid");if(g&&document.querySelector(".pf"))g.outerHTML=favSongsHTML(P());
+}
+(function(){
+  const po=pfOverview;
+  pfOverview=function(){const h=po();setTimeout(fsBackfill,50);return h};
+})();
+/* tela de edição: lista com capas e guarda a capa ao adicionar */
+favMusHTML=function(){
+  const m=SETD.musicas;
+  if(!m.length)return `<div class="sx-empty">No favorite songs yet.</div>`;
+  return `<div class="mlist">${m.map((l,i)=>{const sp=splitSong(l);return `<div class="fs-ed">${songCover(l,SETD.mcov)}<div class="fs-t"><b>${esc(sp.t)}</b><small>${esc(sp.a)}</small></div><button class="ib" data-s="mus-u" data-i="${i}" aria-label="Move up" ${i?"":"disabled style='opacity:.3'"}>${ico("up",13)}</button><button class="ib" data-s="mus-d" data-i="${i}" aria-label="Move down" ${i<m.length-1?"":"disabled style='opacity:.3'"}>${ico("down",13)}</button><button class="ib" data-s="mus-x" data-i="${i}" aria-label="Remove">${ico("x",12)}</button></div>`}).join("")}</div>`;
+};
+document.addEventListener("click",e=>{
+  const b=e.target.closest('[data-s="pick-mus"]');if(!b||typeof SETD==="undefined"||!SETD)return;
+  const m=SFRES[+b.dataset.i];if(!m)return;
+  const l=`${m.titulo} — ${m.artista}`;
+  SETD.mcov=SETD.mcov||{};
+  SETD.mcov[l]={c:coverDe(albumKey(m.album.t,m.album.a))||m.album.cover||"",al:m.album.t};
+},true);
+</script>
+
 </body>
 </html>
