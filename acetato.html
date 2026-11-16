@@ -2703,7 +2703,7 @@ h1{font-weight:700;letter-spacing:-.028em}
 h2{font-weight:700;letter-spacing:-.02em}
 h3.sec{font-weight:600}
 .logo{font-weight:800;letter-spacing:-.04em}
-.nav a,.btn,.fab,.chip,.gl,.pill,.ptabs button,.edtabs button,.xs-btn,.xs-o,.stt{font-weight:600}
+.btn,.fab,.chip,.gl,.pill,.ptabs button,.edtabs button,.xs-btn,.xs-o,.stt{font-weight:600}
 .ttl,.ta,.gc .t,.ap-tt b,.ap-sim .t,.lbx-t,.ap-latei .t{font-weight:600;letter-spacing:-.012em}
 .sa,.gc .s,.sub,.ap-tt i,.ap-latei .s{font-weight:400}
 .mut,.sm,.phandle{font-weight:500!important}
@@ -2721,13 +2721,6 @@ h3.sec{font-weight:600}
 
 /* ===== Ícones ===== */
 .ic{display:inline-block;flex-shrink:0;vertical-align:-3px}
-.nav a .ni{display:none}
-@media(max-width:640px){
-  .nav{border-radius:26px}
-  .nav a{display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 4px 6px;font-size:10.5px;font-weight:600;border-radius:18px;color:#8e8e93}
-  .nav a .ni{display:block}
-  .nav a.on{background:rgba(255,255,255,.14);color:#fff}
-}
 
 /* ===== Página do álbum ===== */
 .hero .info h1{font-size:clamp(30px,5vw,46px);margin:6px 0 4px;line-height:1.04}
@@ -2833,12 +2826,6 @@ function ico(n,w,on){
 }
 const likeInner=on=>ico("heart",18,on)+`<span>${on?"Liked":"Like"}</span>`;
 const followInner=on=>on?ico("check",15)+" Following":ico("plus",15)+" Follow";
-
-/* Ícones na barra de navegação (aparecem no celular, como no app da Apple) */
-document.querySelectorAll(".nav a[data-tab]").forEach(a=>{
-  const n={home:"home",search:"search",diary:"diary",profile:"user"}[a.dataset.tab];
-  if(n)a.insertAdjacentHTML("afterbegin",ico(n,22).replace('class="ic"','class="ic ni"'));
-});
 
 /* ===== Utilitários ===== */
 const whenEl=(sel,fn,n)=>{n=n==null?60:n;const t=()=>{const e=document.querySelector(sel);if(e)fn(e);else if(n-->0)setTimeout(t,100)};t()};
@@ -3080,6 +3067,133 @@ document.addEventListener("click",e=>{
   const p=document.getElementById("abio");if(!p)return;
   const cl=p.classList.toggle("cl");b.textContent=cl?"More":"Less";
 });
+</script>
+<style id="trk-v2">
+/* ===== Card da faixa: reescrito ===== */
+#trk{position:fixed;inset:0;z-index:95;background:rgba(0,0,0,.6);-webkit-backdrop-filter:blur(14px) saturate(150%);backdrop-filter:blur(14px) saturate(150%);display:flex;align-items:center;justify-content:center;padding:16px;animation:fadeUp .25s both}
+.tk-box{position:relative;isolation:isolate;width:min(460px,100%);max-height:calc(100dvh - 32px);overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;border-radius:30px;background:#111113;border:1px solid rgba(255,255,255,.1);box-shadow:0 40px 100px rgba(0,0,0,.7);padding-bottom:22px;scrollbar-width:none}
+.tk-box::-webkit-scrollbar{display:none}
+.tk-glow{position:absolute;left:0;right:0;top:0;height:400px;z-index:-2;background:#2a2a2e var(--cv,none) center/cover no-repeat;filter:blur(60px) saturate(200%) brightness(.8);transform:scale(1.6);opacity:.9;transition:opacity .6s}
+.tk-shade{position:absolute;left:0;right:0;top:0;height:400px;z-index:-1;background:linear-gradient(180deg,rgba(17,17,19,0) 0%,#111113 92%);pointer-events:none}
+#trk.pl .tk-glow{animation:tkGlow 3.2s ease-in-out infinite alternate}
+@keyframes tkGlow{from{opacity:.75}to{opacity:1}}
+.tk-top{position:sticky;top:0;height:0;z-index:5;display:flex;justify-content:flex-end}
+.tk-x{width:32px;height:32px;margin:14px 14px 0 0;border-radius:50%;display:grid;place-items:center;padding:0;background:rgba(0,0,0,.38);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);color:#fff;transition:background .2s,transform .2s}
+.tk-x:hover{background:rgba(0,0,0,.6);transform:scale(1.08)}
+.tk-head{display:flex;flex-direction:column;align-items:center;text-align:center;padding:38px 28px 4px}
+.tk-art{width:176px;height:176px;border-radius:16px;object-fit:cover;display:grid;place-items:center;font-weight:800;font-size:44px;background:linear-gradient(145deg,#8B5CF6,#B794F6);box-shadow:0 26px 60px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.14);transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+#trk.pl .tk-art{transform:scale(1.05)}
+.tk-t{font-size:22px;font-weight:700;letter-spacing:-.025em;line-height:1.15;margin-top:20px;max-width:100%;overflow-wrap:anywhere}
+.tk-s{font-size:14px;font-weight:500;color:rgba(255,255,255,.68);margin-top:5px;max-width:100%;overflow-wrap:anywhere}
+.tk-sec{padding:0 20px;margin-top:24px}
+.tk-lb{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin:0 0 10px 2px}
+.tk-note{font-size:13px;font-weight:500;color:var(--mut);padding:14px 16px;border-radius:16px;background:rgba(255,255,255,.05)}
+.tk-note a{color:#fff;font-weight:600;text-decoration:underline;text-underline-offset:3px}
+.tk-pl{display:flex;align-items:center;gap:14px;padding:12px 16px 12px 12px;border-radius:22px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);-webkit-backdrop-filter:blur(22px) saturate(160%);backdrop-filter:blur(22px) saturate(160%);box-shadow:inset 0 1px 0 rgba(255,255,255,.15)}
+.tk-pp{width:48px;height:48px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;padding:0;background:#fff;color:#000;transition:transform .2s cubic-bezier(.3,1.6,.5,1)}
+.tk-pp:hover{transform:scale(1.07)}
+.tk-pp:active{transform:scale(.93)}
+.tk-pp .ic{margin-left:2px}
+.tk-pp.on .ic{margin-left:0}
+.tk-col{flex:1;min-width:0}
+.tk-bar{position:relative;height:5px;border-radius:3px;background:rgba(255,255,255,.18);cursor:pointer}
+.tk-bar::before{content:"";position:absolute;left:0;right:0;top:-10px;bottom:-10px}
+.tk-fill{position:relative;display:block;height:100%;width:0;border-radius:3px;background:#fff}
+.tk-fill::after{content:"";position:absolute;right:-5px;top:50%;width:11px;height:11px;margin-top:-5.5px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.5);transform:scale(0);transition:transform .2s}
+.tk-bar:hover .tk-fill::after,#trk.pl .tk-fill::after{transform:scale(1)}
+.tk-tm{display:flex;justify-content:space-between;font-size:11px;font-weight:600;color:var(--mut);margin-top:9px;font-variant-numeric:tabular-nums}
+.tk-yt{position:relative;width:100%;aspect-ratio:16/9;border-radius:18px;overflow:hidden;background:#000;box-shadow:0 12px 30px rgba(0,0,0,.5)}
+.tk-yt iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.tk-ph{aspect-ratio:16/9;border-radius:18px;background:linear-gradient(90deg,rgba(255,255,255,.04),rgba(255,255,255,.12),rgba(255,255,255,.04));background-size:200% 100%;animation:shim 1.4s infinite linear}
+.tk-hint{font-size:11.5px;font-weight:500;color:var(--mut);margin:8px 2px 0}
+.tk-links{display:grid;gap:8px}
+.tk-ln{display:flex;align-items:center;gap:14px;padding:10px 14px 10px 10px;border-radius:18px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.07);transition:background .2s,transform .25s cubic-bezier(.2,.8,.2,1),border-color .2s}
+.tk-ln:hover{background:rgba(255,255,255,.12);transform:translateY(-1px)}
+.tk-ln:active{transform:scale(.985)}
+.tk-ln.ok{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2)}
+.tk-lg{width:42px;height:42px;flex-shrink:0;display:grid;place-items:center}
+.tk-lg svg{display:block;width:42px;height:42px;filter:drop-shadow(0 4px 10px rgba(0,0,0,.35))}
+.tk-lt{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.tk-lt b{font-size:15px;font-weight:600;letter-spacing:-.01em}
+.tk-lt small{font-size:12px;font-weight:500;color:var(--mut)}
+.tk-ln.ok .tk-lt small{color:rgba(255,255,255,.7)}
+.tk-go{color:var(--mut);transition:transform .25s,color .2s}
+.tk-ln:hover .tk-go{transform:translateX(2px);color:#fff}
+@media(max-width:640px){
+  #trk{align-items:flex-end;padding:0}
+  .tk-box{width:100%;max-height:92dvh;border-radius:28px 28px 0 0;border-bottom:0;padding-bottom:calc(22px + env(safe-area-inset-bottom,0px))}
+  .tk-art{width:156px;height:156px}
+}
+</style>
+<script>
+/* ===== Logos dos serviços (marcas simplificadas) ===== */
+const TKLOGO={
+  "Spotify":'<svg viewBox="0 0 42 42"><circle cx="21" cy="21" r="21" fill="#1DB954"/><g fill="none" stroke="#000" stroke-linecap="round"><path d="M10.5 16.2c6.6-1.9 13.6-1.3 19.4 2" stroke-width="3.2"/><path d="M12 22.6c5.4-1.5 10.9-1 15.6 1.6" stroke-width="2.8"/><path d="M13.4 28.4c4.2-1.1 8.2-.7 11.8 1.3" stroke-width="2.4"/></g></svg>',
+  "Apple Music":'<svg viewBox="0 0 42 42"><defs><linearGradient id="tkam" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FA5C70"/><stop offset="1" stop-color="#FA233B"/></linearGradient></defs><rect width="42" height="42" rx="10" fill="url(#tkam)"/><path d="M17 28.5V13.6l12-2.7v15" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="14.2" cy="28.8" r="3.3" fill="#fff"/><circle cx="26.2" cy="26.2" r="3.3" fill="#fff"/></svg>',
+  "Deezer":'<svg viewBox="0 0 42 42"><rect width="42" height="42" rx="10" fill="#15151a"/><g><rect x="7" y="27" width="5.4" height="3.6" rx=".8" fill="#40ab5d"/><rect x="14" y="27" width="5.4" height="3.6" rx=".8" fill="#3fb6c0"/><rect x="21" y="27" width="5.4" height="3.6" rx=".8" fill="#5d86f2"/><rect x="28" y="27" width="5.4" height="3.6" rx=".8" fill="#a238ff"/><rect x="14" y="21.6" width="5.4" height="3.6" rx=".8" fill="#fdb913"/><rect x="21" y="21.6" width="5.4" height="3.6" rx=".8" fill="#3fb6c0"/><rect x="28" y="21.6" width="5.4" height="3.6" rx=".8" fill="#a238ff"/><rect x="21" y="16.2" width="5.4" height="3.6" rx=".8" fill="#ff8a00"/><rect x="28" y="16.2" width="5.4" height="3.6" rx=".8" fill="#ef5466"/><rect x="28" y="10.8" width="5.4" height="3.6" rx=".8" fill="#ef5466"/></g></svg>',
+  "YouTube":'<svg viewBox="0 0 42 42"><rect x="3" y="9" width="36" height="24" rx="8" fill="#FF0000"/><path d="M17.5 15.3v11.4L27.6 21z" fill="#fff"/></svg>',
+  "YouTube Music":'<svg viewBox="0 0 42 42"><circle cx="21" cy="21" r="21" fill="#FF0000"/><circle cx="21" cy="21" r="12.2" fill="none" stroke="#fff" stroke-width="2.4"/><path d="M18.2 15.8v10.4L27 21z" fill="#fff"/></svg>'
+};
+const TKPLAY=ico("play",22),TKPAUSE='<svg class="ic" viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><rect x="6.5" y="4.8" width="4" height="14.4" rx="1.3"/><rect x="13.5" y="4.8" width="4" height="14.4" rx="1.3"/></svg>';
+
+async function abrirFaixa(t,a,alb,cover){
+  document.getElementById("trk")?.remove();
+  const ov=document.createElement("div");ov.id="trk";
+  const q=encodeURIComponent(`${t} ${a}`),nt=norm(t);
+  ov.innerHTML=`<div class="tk-box"${cover?` style="--cv:url('${esc(cover)}')"`:""}>
+    <div class="tk-glow"></div><div class="tk-shade"></div>
+    <div class="tk-top"><button class="tk-x" data-trkx aria-label="Close">${'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>'}</button></div>
+    <div class="tk-head">${cover?`<img class="tk-art" src="${esc(cover)}" alt="">`:`<div class="tk-art">${esc(ini(t))}</div>`}
+      <div class="tk-t">${esc(t)}</div><div class="tk-s">${esc(a)}${alb?" · "+esc(alb):""}</div></div>
+    <div class="tk-sec"><div class="tk-lb">Preview</div><div id="tkprev"><div class="tk-note">Looking for a preview…</div></div></div>
+    <div class="tk-sec"><div class="tk-lb">Music video</div><div id="tkyt"><div class="tk-ph"></div></div></div>
+    <div class="tk-sec"><div class="tk-lb">Listen on</div><div class="tk-links" id="tklinks"></div></div></div>`;
+  document.body.appendChild(ov);document.body.style.overflow="hidden";
+  const L={},ytSearch=`https://www.youtube.com/results?search_query=${encodeURIComponent(t+" "+a+" official video")}`;
+  const $$=s=>ov.querySelector(s);
+  const pinta=()=>{const el=$$("#tklinks");if(!el)return;
+    const it=[["Spotify",L.sp,`https://open.spotify.com/search/${q}`],["Apple Music",L.it,`https://music.apple.com/search?term=${q}`],["Deezer",L.dz,`https://www.deezer.com/search/${q}`],["YouTube",L.yt,ytSearch],["YouTube Music",null,`https://music.youtube.com/search?q=${q}`]];
+    el.innerHTML=it.map(([n,d,f])=>`<a class="tk-ln${d?" ok":""}" href="${esc(d||f)}" target="_blank" rel="noopener"><span class="tk-lg">${TKLOGO[n]}</span><span class="tk-lt"><b>${n}</b><small>${d?"Open this track":"Search for it"}</small></span><span class="tk-go">${ico("external",15)}</span></a>`).join("")};
+  pinta();
+  const bate=x=>norm(x)===nt,prev={};
+  const tarefas=[
+    getJSON(`${IT}/search?term=${q}&entity=song&limit=6`).then(j=>{const r=j.results||[];const x=r.find(y=>bate(y.trackName))||r[0];if(x){L.it=x.trackViewUrl;prev.it=x.previewUrl}}),
+    dz(`/search/track?q=${q}&limit=6`).then(j=>{const r=j.data||[];const x=r.find(y=>bate(y.title))||r[0];if(x){L.dz=x.link;prev.dz=x.preview}}),
+    spOn()?spSearch(q).then(j=>{const r=((j.tracks||{}).items||[]).filter(Boolean);const x=r.find(y=>bate(y.name))||r[0];if(x){L.sp=(x.external_urls||{}).spotify||`https://open.spotify.com/track/${x.id}`;prev.sp=x.preview_url}}):Promise.resolve()
+  ].map(p=>p.catch(()=>{}));
+  Promise.all(tarefas).then(()=>{
+    pinta();const el=$$("#tkprev");if(!el)return;
+    const u=prev.dz||prev.it||prev.sp;
+    if(!u){el.innerHTML=`<div class="tk-note">No preview available for this track.</div>`;return}
+    el.innerHTML=`<div class="tk-pl"><button class="tk-pp" aria-label="Play">${TKPLAY}</button><div class="tk-col"><div class="tk-bar"><i class="tk-fill"></i></div><div class="tk-tm"><span class="tc">0:00</span><span class="td">0:30</span></div></div><audio preload="none" src="${esc(u)}"></audio></div>`;
+    const au=el.querySelector("audio"),pp=el.querySelector(".tk-pp"),fl=el.querySelector(".tk-fill"),tc=el.querySelector(".tc"),br=el.querySelector(".tk-bar");
+    const fmt=s=>Math.floor(s/60)+":"+String(Math.floor(s%60)).padStart(2,"0");
+    pp.onclick=()=>{au.paused?au.play().catch(()=>{}):au.pause()};
+    au.onplay=()=>{pp.innerHTML=TKPAUSE;pp.classList.add("on");ov.classList.add("pl")};
+    au.onpause=()=>{pp.innerHTML=TKPLAY;pp.classList.remove("on");ov.classList.remove("pl")};
+    au.onended=()=>{fl.style.width="0";tc.textContent="0:00"};
+    au.onloadedmetadata=()=>{const d=el.querySelector(".td");if(d&&isFinite(au.duration))d.textContent=fmt(au.duration)};
+    au.ontimeupdate=()=>{const d=au.duration||30;fl.style.width=(au.currentTime/d*100)+"%";tc.textContent=fmt(au.currentTime)};
+    br.onclick=e=>{const r=br.getBoundingClientRect();au.currentTime=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width))*(au.duration||30)};
+  });
+  (async()=>{
+    let id=null;
+    for(const h of ["https://pipedapi.kavin.rocks","https://pipedapi.adminforge.de","https://api.piped.private.coffee"]){
+      if(!ov.isConnected)return;
+      try{
+        const c=new AbortController(),to=setTimeout(()=>c.abort(),4500);
+        const r=await fetch(`${h}/search?q=${encodeURIComponent(t+" "+a+" official video")}&filter=videos`,{signal:c.signal});clearTimeout(to);
+        if(!r.ok)continue;
+        const j=await r.json(),v=(j.items||[]).find(x=>x.url&&/v=/.test(x.url));
+        if(v){id=v.url.split("v=")[1].split("&")[0];break}
+      }catch(e){}
+    }
+    const el=$$("#tkyt");if(!el)return;
+    if(id){L.yt=`https://www.youtube.com/watch?v=${id}`;pinta();
+      el.innerHTML=`<div class="tk-yt"><iframe src="https://www.youtube-nocookie.com/embed/${id}" allow="accelerometer;encrypted-media;picture-in-picture;fullscreen" allowfullscreen loading="lazy"></iframe></div><div class="tk-hint">Best match found automatically. It may not be the official clip.</div>`;
+    }else el.innerHTML=`<div class="tk-note">Couldn't load a video here. <a href="${ytSearch}" target="_blank" rel="noopener">Search on YouTube</a></div>`;
+  })();
+}
 </script>
 
 </body>
