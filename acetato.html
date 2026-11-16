@@ -4248,7 +4248,7 @@ const linkChips=p=>{const l=linksOf(p);return l.length?`<div class="pf-links">${
 })();
 
 /* ===== v7: página de configurações ===== */
-const STABS=[["profile","Profile","user"],["favorites","Favorites","star"],["links","Links","link"],["appearance","Appearance","palette"],["account","Account","info"]];
+const STABS=[["profile","Profile","user"],["favorites","Favorites","star"],["appearance","Appearance","palette"],["account","Account","info"]];
 let SETD=null,SETO="",STAB="profile",SFQ="",SFM="albuns",SFRES=[],sfTok=0,sfT=null;
 const dirty=()=>!!SETD&&JSON.stringify(SETD)!==SETO;
 const stHash=t=>t==="profile"?"settings":"settings-"+t;
@@ -4966,6 +4966,90 @@ document.addEventListener("click",e=>{
   SETD.mcov=SETD.mcov||{};
   SETD.mcov[l]={c:coverDe(albumKey(m.album.t,m.album.a))||m.album.cover||"",al:m.album.t};
 },true);
+</script>
+
+<style id="v17">
+/* ===== v17: correções de layout (lista estourando) + settings minimalista + mais blur ===== */
+.stg{padding-bottom:130px;overflow-x:clip}
+.stg-grid>*,.stg-main>*{min-width:0}
+.stg-main{grid-template-columns:minmax(0,1fr)}
+.stg .row{min-width:0}
+.stg .row .grow{min-width:0}
+.stg .row .ttl,.stg .row .sm,.stg .fs-t b,.stg .fs-t small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stg-sub{display:none}
+.stg-main section>h2{margin-bottom:12px}
+.sx-hint:empty{display:none}
+.sx-hint{margin-top:8px}
+/* capa: só ícones */
+.sx-ic{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;padding:0;text-align:center;color:#fff;cursor:pointer;background:rgba(38,38,40,.55);-webkit-backdrop-filter:saturate(220%) blur(16px);backdrop-filter:saturate(220%) blur(16px);border:1px solid rgba(255,255,255,.18);transition:background .2s,transform .25s cubic-bezier(.3,1.6,.5,1)}
+.sx-ic:hover{background:rgba(80,80,84,.7);transform:scale(1.07)}
+.sx-avw{position:relative;flex-shrink:0}
+.sx-avl{cursor:pointer;position:relative}
+.sx-avo{position:absolute;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.45);color:#fff;opacity:0;transition:opacity .2s}
+.sx-avl:hover .sx-avo{opacity:1}
+@media(hover:none){.sx-avo{opacity:1;background:rgba(0,0,0,.28)}}
+.sx-avx{position:absolute;right:-2px;bottom:2px;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;padding:0;background:#000;color:#fff;border:2px solid var(--srf2);z-index:3}
+.sx-avx:hover{background:#333}
+/* bio com contador dentro da caixa */
+.gr-bio{position:relative;flex:1;min-width:0}
+.gr-bio textarea.gr-in{display:block;width:100%;min-height:84px;padding-bottom:22px}
+.bio-c{position:absolute;right:0;bottom:0;font-size:11.5px;font-weight:600;color:var(--mut);pointer-events:none}
+/* links: só os adicionados + botão */
+.lk-menu{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.lk-menu button{display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 14px 0 11px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);color:#fff;font-size:13.5px;font-weight:600;transition:background .2s}
+.lk-menu button:hover{background:rgba(255,255,255,.16)}
+.lk-menu .ic{color:var(--mut)}
+.lk-add{margin-top:12px}
+/* mais blur no card de pesquisa e nos itens em alta */
+.sg,.hm{background:rgba(38,38,40,.5)!important;-webkit-backdrop-filter:saturate(220%) blur(44px)!important;backdrop-filter:saturate(220%) blur(44px)!important}
+.sq-c{background:rgba(255,255,255,.1)!important;-webkit-backdrop-filter:saturate(220%) blur(30px)!important;backdrop-filter:saturate(220%) blur(30px)!important}
+.sp-bar{-webkit-backdrop-filter:saturate(220%) blur(30px)!important;backdrop-filter:saturate(220%) blur(30px)!important}
+.sq-top{-webkit-backdrop-filter:saturate(220%) blur(30px)!important;backdrop-filter:saturate(220%) blur(30px)!important}
+</style>
+<script>
+Object.assign(ICP,{camera:'<path d="M4 8.5A2.5 2.5 0 0 1 6.5 6H8l1.2-1.8h5.6L16 6h1.5A2.5 2.5 0 0 1 20 8.5v8A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5z"/><circle cx="12" cy="12.5" r="3.4"/>'});
+let LKO=null,LKM=false;
+const lkInit=()=>{if(!LKO)LKO=LKS.map(x=>x[0]).filter(k=>(SETD.links[k]||"").trim())};
+(function(){const si=stInit;stInit=function(){const fresh=!SETD;si();if(fresh){LKO=null;LKM=false}}})();
+(function(){const ss=stSync;stSync=function(){ss();const h=document.getElementById("shandle");if(h&&h.classList.contains("ok"))h.textContent=""}})();
+
+stProfile=function(){
+  const e=SETD,[c1,c2]=cores(e.handle||"acetato");
+  const avBg=e.avatar?"#222":`linear-gradient(145deg,${c1},${c2})`;
+  return `<section><div class="sx-cov"><div class="sx-ban" style="${e.banner?`background-image:url('${esc(e.banner)}')`:`background:linear-gradient(135deg,${c1},${c2})`}"></div>
+    <div class="sx-bacts"><label class="sx-ic" title="Change banner" aria-label="Change banner">${ico("camera",16)}<input id="sbanner" type="file" accept="image/*" hidden></label>${e.banner?`<button class="sx-ic" data-s="banner-rm" title="Remove banner" aria-label="Remove banner">${ico("x",14)}</button>`:""}</div>
+    <div class="sx-avrow"><div class="sx-avw"><label class="sx-av sx-avl" style="background:${avBg}" title="Change photo" aria-label="Change photo">${e.avatar?`<img src="${esc(e.avatar)}" alt="">`:esc(ini(e.nome))}<span class="sx-avo">${ico("camera",22)}</span><input id="sfoto" type="file" accept="image/*" hidden></label>${e.avatar?`<button class="sx-avx" data-s="foto-rm" title="Remove photo" aria-label="Remove photo">${ico("x",12)}</button>`:""}</div></div></div></section>
+  <section><div class="gr">
+    <div class="gr-row"><span class="gr-lbl">Name</span><input class="gr-in" data-sf="nome" maxlength="40" value="${esc(e.nome)}" placeholder="Your name"></div>
+    <div class="gr-row"><span class="gr-lbl">Username</span><span class="sx-at">@</span><input class="gr-in" data-sf="handle" maxlength="30" value="${esc(e.handle)}" placeholder="username" autocapitalize="none" autocorrect="off" spellcheck="false"></div>
+    <div class="gr-row"><span class="gr-lbl">Pronouns</span><input class="gr-in" data-sf="pron" maxlength="24" value="${esc(e.pron)}" placeholder="Optional"></div>
+    <div class="gr-row"><span class="gr-lbl">Location</span><input class="gr-in" data-sf="local" maxlength="40" value="${esc(e.local)}" placeholder="City, country"></div>
+    <div class="gr-row gr-alto"><span class="gr-lbl">Bio</span><div class="gr-bio"><textarea class="gr-in" data-sf="bio" maxlength="240" rows="3" placeholder="Tell people what you listen to">${esc(e.bio)}</textarea><span class="bio-c" id="sbioc">${(e.bio||"").length}/240</span></div></div>
+  </div><p class="sx-hint" id="shandle"></p></section>${stLinks()}`;
+};
+stLinks=function(){
+  lkInit();const L=SETD.links;
+  const rows=LKO.map(k=>{const d=LKS.find(x=>x[0]===k),[,n,ic,ph]=d,u=linkURL(k,L[k]),bad=!!(L[k]||"").trim()&&!u;
+    return `<div class="gr-row${bad?" bad":""}"><span class="gr-lbl lk">${ico(ic,17)}${n}</span><input class="gr-in" data-sl="${k}" value="${esc(L[k]||"")}" placeholder="${ph}" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="${k==="site"?"url":"text"}"><span class="sx-lp" data-lp="${k}">${u?esc(hostOf(u)+new URL(u).pathname.replace(/\/$/,"")):""}</span><button class="ib" data-lk="rm" data-k="${k}" aria-label="Remove">${ico("x",12)}</button></div>`}).join("");
+  const cus=SETD.custom.map((c,i)=>{const bad=!!(c.u||"").trim()&&!linkURL("site",c.u);
+    return `<div class="gr-row${bad?" bad":""}"><span class="gr-lbl lk">${ico("link",17)}</span><input class="gr-in" style="flex:.7" data-sc="l" data-i="${i}" value="${esc(c.l)}" placeholder="Label (optional)" maxlength="24"><input class="gr-in" data-sc="u" data-i="${i}" value="${esc(c.u)}" placeholder="https://" autocapitalize="none" spellcheck="false" inputmode="url"><button class="ib" data-lk="crm" data-i="${i}" aria-label="Remove">${ico("x",12)}</button></div>`}).join("");
+  const rest=LKS.filter(x=>!LKO.includes(x[0])),canCus=SETD.custom.length<4;
+  const menu=LKM?`<div class="lk-menu">${rest.map(([k,n,ic])=>`<button data-lk="pick" data-k="${k}">${ico(ic,15)}${n}</button>`).join("")}${canCus?`<button data-lk="other">${ico("link",15)}Other link</button>`:""}</div>`:"";
+  const any=!!(rows||cus);
+  return `<section><h2>Links</h2>${any?`<div class="gr">${rows}${cus}</div>`:""}${(rest.length||canCus)?`<button class="btn lk-add" data-lk="menu">${ico("plus",14)} Add link</button>`:""}${menu}</section>`;
+};
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-lk]");if(!b||!SETD)return;
+  const a=b.dataset.lk,k=b.dataset.k,i=+b.dataset.i;
+  if(a==="menu")LKM=!LKM;
+  else if(a==="pick"){LKO.push(k);LKM=false}
+  else if(a==="other"){SETD.custom.push({l:"",u:""});LKM=false}
+  else if(a==="rm"){LKO=LKO.filter(x=>x!==k);SETD.links[k]=""}
+  else if(a==="crm")SETD.custom.splice(i,1);
+  renderSettings();
+  if(a==="pick"){const inp=document.querySelector(`[data-sl="${k}"]`);if(inp)inp.focus()}
+  if(a==="other"){const l=document.querySelectorAll('[data-sc="l"]');if(l.length)l[l.length-1].focus()}
+});
 </script>
 
 </body>
