@@ -4577,5 +4577,72 @@ pfRatings=function(){
 })();
 </script>
 
+<style id="v9">
+/* ===== v9: perfil limpo, centrado, sem repetir informação ===== */
+.pz{text-align:center;margin-top:-58px;position:relative;z-index:2}
+.pz-av{width:116px;height:116px;margin:0 auto;border-radius:50%;border:5px solid #000;overflow:hidden;display:grid;place-items:center;font-weight:800;font-size:34px;color:#fff;box-shadow:0 0 0 1px rgba(255,255,255,.14),0 20px 50px rgba(0,0,0,.6)}
+.pz-av img{width:100%;height:100%;object-fit:cover}
+.pz-nm{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin:16px 0 0}
+.pz-nm h1{margin:0;font-size:clamp(28px,4.4vw,38px);line-height:1.05;letter-spacing:-.035em}
+.pz-sub{margin-top:6px;font-size:14.5px;font-weight:500;color:var(--mut)}
+.pz-bio{max-width:460px;margin:14px auto 0;font-size:15px;line-height:1.5;font-weight:500;color:rgba(255,255,255,.9);white-space:pre-line;overflow-wrap:anywhere}
+.pz-lks{display:flex;justify-content:center;flex-wrap:wrap;gap:6px;margin-top:14px}
+.pz-lk{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;color:var(--mut);transition:color .2s,background .2s,transform .25s cubic-bezier(.3,1.6,.5,1)}
+.pz-lk:hover{color:#fff;background:rgba(255,255,255,.1);transform:scale(1.08)}
+.pz-act{display:flex;justify-content:center;align-items:center;gap:10px;margin-top:18px}
+.pz-act .btn{height:38px;padding:0 22px}
+.pz-act .pf-ib{width:38px;height:38px}
+.pz+.ptabs{margin:30px auto 0}
+.pf-body{margin-top:12px}
+@media(max-width:640px){
+  .pz{margin-top:-48px}
+  .pz-av{width:96px;height:96px;font-size:28px;border-width:4px}
+  .pz+.ptabs{margin-top:24px}
+}
+</style>
+<script>
+/* Overview enxuto: só o que é do perfil (favoritos, últimas ratings, artistas seguidos).
+   Números e gráficos ficam na aba Stats; backup fica em Settings. */
+pfOverview=function(){
+  const p=P(),fav=p.fav||[],av=Object.entries(S.u).filter(([k,v])=>v.r&&S.meta[k]);
+  const slot=i=>fav[i]?`<a class="fitem" href="#album-${fav[i]}">${capaAlbum(fav[i],(S.meta[fav[i]]||{}).t,null)}<div class="ttl" style="margin-top:8px">${esc((S.meta[fav[i]]||{}).t||"")}</div></a>`:`<div class="fvazio">Empty</div>`;
+  const nPag=Math.max(1,Math.ceil(fav.length/4));
+  const slots=`<div class="favpages" id="favpages">${Array.from({length:nPag},(_,pg)=>`<div class="favpage">${[0,1,2,3].map(j=>slot(pg*4+j)).join("")}</div>`).join("")}</div>${nPag>1?`<div class="favdots">${Array.from({length:nPag},(_,n)=>`<button class="${n===0?"on":""}" data-favpg="${n}" aria-label="Group ${n+1}"></button>`).join("")}</div>`:""}`;
+  const mus=(p.musicas||[]).length?`<div class="mlist">${p.musicas.map((m,i)=>`<div class="row"><span class="num">${String(i+1).padStart(2,"0")}</span><div class="ttl grow">${esc(m)}</div></div>`).join("")}</div>`:`<div class="empty">Add favorite songs in Settings.</div>`;
+  const recs=[...av].sort((a,b)=>String(postedOn(b[0])).localeCompare(String(postedOn(a[0])))).slice(0,5);
+  const rec=recs.length?`<div class="mlist">${recs.map(([k,v])=>{const m=S.meta[k];return `<a class="row" href="#album-${k}">${capaAlbum(k,m.t,46)}<div class="grow"><div class="ttl">${esc(m.t)}</div><div class="sm mut">${esc(m.a)}</div></div>${estrelas(v.r)}</a>`}).join("")}</div>`:`<div class="empty">No ratings yet.</div>`;
+  const segA=(S.seguindo||[]);
+  return `<div class="pgrid"><div><h3 class="sec">Favorite albums</h3>${slots}<h3 class="sec" style="margin-top:34px">Favorite songs</h3>${mus}</div><aside><h3 class="sec">Recent ratings</h3>${rec}</aside></div>
+  ${segA.length?`<h2>Artists you follow</h2><div class="pf-arl">${segA.map(s=>`<a class="pf-a" href="#artist-${s.k}">${capaFoto((S.artists[s.k]||{}).foto||"",s.n,64,true)}<span>${esc(s.n)}</span></a>`).join("")}</div>`:""}`;
+};
+
+perfilView=function(){
+  const p=P(),fav=p.fav||[];
+  const [c1,c2]=fav[0]?cores(fav[0]):cores(p.handle||"acetato");
+  const banner=p.banner?`<div class="pban"><div class="art img" style="background-image:url(${p.banner})"></div></div>`:`<div class="pban"><div class="art" style="background:linear-gradient(135deg,${c1},${c2})"></div></div>`;
+  const avatar=p.avatar?`<img src="${p.avatar}" alt="">`:`<div style="width:100%;height:100%;background:linear-gradient(145deg,${c1},${c2});display:grid;place-items:center">${esc(ini(p.nome))}</div>`;
+  const tabs=[["perfil","Overview"],["avaliacoes","Ratings"],["diario","Diary"],["fila","Queue"],["stats","Stats"],["listas","Lists"],["pessoas","People"]];
+  let corpo="";
+  if(aba==="perfil")corpo=pfOverview();
+  else if(aba==="avaliacoes")corpo=pfRatings();
+  else if(aba==="diario")corpo=`<div style="margin-top:24px">${diaryList()}</div>`;
+  else if(aba==="fila")corpo=filaView();
+  else if(aba==="stats")corpo=statsView();
+  else if(aba==="pessoas")corpo=pfPessoas();
+  else corpo=pfListas();
+  const sub=["@"+esc(p.handle),p.local?esc(p.local):"",p.pron?esc(p.pron):""].filter(Boolean).join(" · ");
+  const lks=linksOf(p).map(x=>`<a class="pz-lk" href="${esc(x.u)}" target="_blank" rel="noopener noreferrer me" aria-label="${esc(x.t)}" title="${esc(x.t)}">${ico(x.ic,19)}</a>`).join("");
+  return `<div class="pf">${banner}<div class="pz">
+    <div class="pz-av">${avatar}</div>
+    <div class="pz-nm"><h1>${esc(p.nome)}</h1>${isCreator(p.handle)?cbadge(1):""}</div>
+    <div class="pz-sub">${sub}</div>
+    ${p.bio?`<p class="pz-bio">${esc(p.bio)}</p>`:""}
+    ${lks?`<div class="pz-lks">${lks}</div>`:""}
+    <div class="pz-act"><button class="btn p" data-pact="editar">Edit profile</button><button class="pf-ib" data-pact="compartilhar" aria-label="Share profile" title="Share profile">${ico("share",17)}</button><button class="pf-ib" data-pact="cartao" aria-label="Share to Story" title="Share to Story">${ico("story",17)}</button></div></div>
+  <nav class="ptabs">${tabs.map(([k,l])=>`<button class="${aba===k?"on":""}" data-aba="${k}">${l}</button>`).join("")}</nav>
+  <div class="pf-body">${corpo}</div></div>`;
+};
+</script>
+
 </body>
 </html>
