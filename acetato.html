@@ -3870,8 +3870,8 @@ function hdrSync(){
     const p=P(),fo=SOC.following().length,fr=SOC.followers().length,nq=queueKeys().length,[c1,c2]=cores(p.handle||"acetato");
     const av=p.avatar?`<img src="${esc(p.avatar)}" alt="">`:esc(ini(p.nome));
     const i=(a,ic,l,em)=>`<button class="hm-i" data-hm="${a}">${ico(ic,17)}${l}${em!=null?`<em>${em}</em>`:""}</button>`;
-    return `<div class="hm-h"><div class="pf-av" style="background:${p.avatar?"#222":`linear-gradient(145deg,${c1},${c2})`}">${av}</div><div style="min-width:0"><b>${esc(p.nome)}</b><small>@${esc(p.handle)}</small></div></div>
-    ${i("perfil","user","Profile")}${i("diario","diary","Diary")}${i("fila","queue","Queue",nq)}${i("listas","list","Lists",S.listas.length)}${i("pessoas","people","People",fo+" · "+fr)}<hr>${i("feed","home","Feed")}${i("share","share","Share profile")}${i("story","share","Share to Story")}${i("backup","external","Export backup")}`;
+    return `<div class="hm-h"><div class="pf-av" style="background:${p.avatar?"#222":`linear-gradient(145deg,${c1},${c2})`}">${av}</div><div style="min-width:0"><b>${esc(p.nome)}</b><small>@${esc(p.handle)}</small>${isCreator(p.handle)?cbadge():""}</div></div>
+    ${i("perfil","user","Profile")}${i("diario","diary","Diary")}${i("fila","queue","Queue",nq)}${i("listas","list","Lists",S.listas.length)}${i("pessoas","people","People",fo+" · "+fr)}<hr>${i("feed","home","Feed")}${i("share","share","Share profile")}${i("story","share","Share to Story")}${i("backup","external","Export backup")}${i("criador","info","Creator badge",p.criador!==false?"On":"Off")}`;
   };
   document.getElementById("hbAv").onclick=e=>{e.stopPropagation();sgClose();if(hm.hidden){hm.innerHTML=menu();hm.hidden=false}else hmClose()};
   hm.addEventListener("click",e=>{
@@ -3880,7 +3880,7 @@ function hdrSync(){
     if(a==="feed")location.hash="feed";
     else if(a==="share")compartilhar();
     else if(a==="story")gerarStoryPerfil();
-    else if(a==="backup")exportar();
+    else if(a==="backup")exportar();else if(a==="criador"){const pp=P();pp.criador=pp.criador===false;salvar();flash(pp.criador===false?"Creator badge off":"Creator badge on");rota()}
     else{if(a==="pessoas")window.__pp="seguindo";goPerfil(a==="perfil"?"perfil":a)}
   });
   document.addEventListener("click",e=>{
@@ -3904,6 +3904,196 @@ function hdrSync(){
   new MutationObserver(()=>{cancelAnimationFrame(raf);raf=requestAnimationFrame(hdrSync)}).observe(document.getElementById("app"),{childList:true});
   hdrSync();
 })();
+</script>
+
+<style id="v6">
+/* ===== v6: selo de criador ===== */
+.cbadge{display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px 0 6px;border-radius:999px;vertical-align:middle;color:#fff;font-style:normal;white-space:nowrap;background:linear-gradient(135deg,rgba(255,255,255,.22),rgba(255,255,255,.08));border:1px solid rgba(255,255,255,.28);-webkit-backdrop-filter:saturate(220%) blur(16px);backdrop-filter:saturate(220%) blur(16px);box-shadow:inset 0 1px 0 rgba(255,255,255,.3);position:relative;overflow:hidden;cursor:default}
+.cbadge b{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.cbadge svg{flex-shrink:0}
+.cbadge::after{content:"";position:absolute;top:0;bottom:0;width:40%;left:-60%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.4),transparent);transform:skewX(-20deg);animation:cshine 4.5s ease-in-out infinite}
+@keyframes cshine{0%,60%{left:-60%}100%{left:130%}}
+.cbadge.lg{height:28px;padding:0 12px 0 8px;gap:6px}
+.cbadge.lg b{font-size:12px}
+.pf-nm{display:flex;align-items:center;gap:10px 12px;flex-wrap:wrap}
+.pf-nm h1{margin:0!important}
+.rv-h .cbadge{height:18px;padding:0 7px 0 5px}
+.rv-h .cbadge b{font-size:9.5px}
+.hm-h .cbadge{height:17px;margin-top:3px;padding:0 7px 0 5px}
+.hm-h .cbadge b{font-size:9.5px}
+
+/* ===== v6: review publicada ===== */
+.rvpost{display:grid;gap:12px;padding:18px;margin-bottom:12px;border-radius:22px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
+.rvp-h{display:flex;gap:14px;align-items:center}
+.rvp-i{min-width:0}
+.rvp-ok{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#000;background:#fff;padding:3px 9px 3px 7px;border-radius:999px;margin-bottom:6px}
+.rvp-m{display:flex;align-items:center;gap:6px 14px;flex-wrap:wrap}
+.rvp-m .mut{display:inline-flex;align-items:center;gap:5px}
+.rvpost .rv-t{margin:0}
+.rvp-b{display:flex;gap:8px;flex-wrap:wrap}
+</style>
+
+<script>
+/* ===== v6: selo de criador =====
+   Para dar o selo a outro perfil, coloque o @username dele em CREATORS. No seu próprio perfil
+   o selo fica ligado por padrão (dá para desligar no menu da conta, no canto superior direito). */
+const CREATORS=[];
+const SEAL='<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M12 1.8l2.4 1.6 2.9-.2 1.2 2.6 2.6 1.2-.2 2.9L22.5 12l-1.6 2.4.2 2.9-2.6 1.2-1.2 2.6-2.9-.2L12 22.2l-2.4-1.6-2.9.2-1.2-2.6-2.6-1.2.2-2.9L1.5 12l1.6-2.4-.2-2.9 2.6-1.2 1.2-2.6 2.9.2z"/><path d="M8.2 12.3l2.6 2.6 5-5.3" fill="none" stroke="#000" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const isCreator=h=>{const p=P();return (h===p.handle&&p.criador!==false)||CREATORS.includes(h)};
+const cbadge=lg=>`<span class="cbadge${lg?" lg":""}" title="Creator of Acetato">${SEAL}<b>Creator</b></span>`;
+(function(){
+  const pv=perfilView;
+  perfilView=function(){
+    let h=pv();const p=P();
+    if(isCreator(p.handle))h=h.replace(`<h1>${esc(p.nome)}</h1>`,`<div class="pf-nm"><h1>${esc(p.nome)}</h1>${cbadge(1)}</div>`);
+    return h;
+  };
+  const wrap=fn=>rv=>{let h=fn(rv);return isCreator(rv.u)?h.replace('</b><span class="mut sm">@','</b>'+cbadge()+'<span class="mut sm">@'):h};
+  const a=rvCard,b=feedCard;
+  rvCard=wrap(a);feedCard=wrap(b);
+})();
+
+/* ===== v6: várias reviews por álbum (publicar, editar, escrever outra) ===== */
+SOC.mineAll=function(k){const h=this.me().h;return this.s().rev.filter(x=>x.k===k&&x.u===h)};
+SOC.post=function(k,r,txt,d,id){
+  const me=this.me(),s=this.s();
+  id=id||"m"+hash(k+me.h+Date.now()+Math.random());
+  const i=s.rev.findIndex(x=>x.id===id),rv={id,k,u:me.h,n:me.n,av:me.av,r:r||0,txt,d};
+  if(i>=0)s.rev[i]=rv;else s.rev.push(rv);
+  salvar();
+};
+/* nota da comunidade conta só a avaliação mais recente de cada pessoa */
+socStats=function(k){
+  const me=SOC.me().h,by=new Map();
+  SOC.list(k).filter(x=>x.r).sort((a,b)=>String(a.d).localeCompare(String(b.d))).forEach(x=>by.set(x.u,x));
+  const lista=[...by.values()],rs=lista.map(x=>x.r),myr=(S.u[k]||{}).r;
+  if(myr&&!by.has(me))rs.push(myr);
+  const n=rs.length,avg=n?rs.reduce((a,b)=>a+b,0)/n:0;
+  const hist=[.5,1,1.5,2,2.5,3,3.5,4,4.5,5].map(v=>rs.filter(r=>r===v).length);
+  const fr=lista.filter(x=>SOC.isFriend(x.u)),fa=fr.length?fr.reduce((a,b)=>a+b.r,0)/fr.length:0;
+  return {n,avg,pct:Math.round(avg/5*100),hist,fn:fr.length,fpct:Math.round(fa/5*100)};
+};
+function postedCard(rv,m){
+  const lk=SOC.liked(rv);
+  return `<div class="rvpost"><div class="rvp-h">${capaAlbum(rv.k,m.t,64)}<div class="rvp-i"><div class="rvp-ok">${ico("check",12)} Posted</div><div class="lbx-t">${esc(m.t)}</div><div class="lbx-s">${esc(m.a)}${m.y?" · "+m.y:""}</div></div></div>
+  <div class="rvp-m">${rv.r?estrelas(rv.r):""}<span class="mut sm">Listened ${esc(fmtData(rv.d))}</span><span class="mut sm">${ico("heart",13,lk)} ${SOC.likes(rv)}</span></div>
+  ${rv.txt?`<p class="rv-t">${esc(rv.txt)}</p>`:`<p class="rv-t mut">Rating only, no written review.</p>`}
+  <div class="rvp-b"><button class="btn" data-rv="edit" data-id="${rv.id}">Edit</button><button class="btn" data-story="album">${ico("share",14)} Share to Story</button><button class="btn" data-soc="unpub" data-id="${rv.id}">Remove</button></div></div>`;
+}
+function revSection(k){
+  const m=S.meta[k],x=dd(k);
+  const mine=SOC.mineAll(k).sort((a,b)=>String(b.d).localeCompare(String(a.d)));
+  const ed=(window.__revEdit&&mine.find(r=>r.id===window.__revEdit))||null;
+  const nw=window.__revNew===k,box=!mine.length||!!ed||nw;
+  const cards=mine.filter(r=>!ed||r.id!==ed.id);
+  let h=`<div id="revsec">`;
+  if(cards.length)h+=`<h2>Your review${cards.length>1?"s":""}</h2>`+cards.map(r=>postedCard(r,m)).join("");
+  if(mine.length&&!box)h+=`<div style="margin-top:4px"><button class="btn" data-rv="new">${ico("plus",14)} Write another review</button></div>`;
+  if(box){
+    const val=ed?ed.txt:(nw?"":(x.rev||"")),dt=ed?ed.d:(nw?hoje():(x.d||hoje()));
+    h+=`<h2>${ed?"Edit review":(mine.length?"New review":"Review")}</h2>
+    <div class="lbx">
+      <div class="lbx-h">${capaAlbum(k,m.t,64)}<div style="min-width:0"><div class="lbx-t">${esc(m.t)}</div><div class="lbx-s">${esc(m.a)}${m.y?` · ${m.y}`:""}</div></div></div>
+      <label class="lbx-d"><span>Listened on</span><input type="date" id="revd" value="${esc(dt)}" max="${hoje()}"></label>
+      <textarea class="field" id="rev" placeholder="Add a review…">${esc(val)}</textarea>
+      <div class="lbx-f">
+        <div class="lbx-r"><span class="mut sm">Rating</span><div style="display:flex" id="rate2">${rateHTML(x.r)}</div></div>
+        <button class="ab ${x.l?"on":""}" data-act="revlike">${likeInner(!!x.l)}</button>
+      </div>
+      <div class="lbx-b">${ed?"":`<button class="btn" data-act="rev">Save draft</button>`}<button class="fab" data-soc="pub">${ed?"Update review":"Publish review"}</button><button class="btn" data-story="album">${ico("share",14)} Share to Story</button>${mine.length?`<button class="btn" data-rv="cancel">Cancel</button>`:""}</div>
+    </div>`;
+  }
+  return h+`</div>`;
+}
+(function(){
+  const av=albumView;
+  albumView=async function(k){
+    let html=await av(k);
+    if(!S.meta[k])return html;
+    const a=html.indexOf("<h2>Review</h2>"),b=html.indexOf("<h2>Reviews</h2>");
+    if(a<0||b<a)return html;
+    return html.slice(0,a)+revSection(k)+html.slice(b);
+  };
+})();
+const goRev=()=>whenEl("#revsec",el=>el.scrollIntoView({behavior:"smooth",block:"start"}));
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-rv]");if(!b)return;
+  const a=b.dataset.rv,k=location.hash.slice(7);
+  if(a==="new"){window.__revNew=k;window.__revEdit=null}
+  else if(a==="edit"){window.__revEdit=b.dataset.id;window.__revNew=null}
+  else{window.__revNew=null;window.__revEdit=null}
+  rota();goRev();
+});
+/* publicar: captura antes do handler antigo (que só sabia de uma review por álbum) */
+document.addEventListener("click",e=>{
+  const b=e.target.closest('[data-soc="pub"]');if(!b)return;
+  e.stopPropagation();
+  const k=location.hash.slice(7),d=dd(k);
+  const txt=((document.getElementById("rev")||{}).value||"").trim(),dv=(document.getElementById("revd")||{}).value;
+  if(!d.r&&!txt){flash("Add a rating or write a review first");return}
+  const id=window.__revEdit||null;
+  d.rev=txt;d.d=dv||d.d||hoje();
+  SOC.post(k,d.r||0,txt,dv||d.d,id);
+  window.__revEdit=null;window.__revNew=null;
+  flash(id?"Review updated":"Review published");rota();goRev();
+},true);
+document.addEventListener("click",e=>{
+  if(!e.target.closest("[data-gofriends]"))return;
+  e.stopPropagation();aba="pessoas";window.__pp="seguindo";
+},true);
+
+/* ===== v6: Feed estilo Letterboxd (You · Friends · Following · Incoming) ===== */
+const FT_LBL={you:"You",friends:"Friends",following:"Following",incoming:"Incoming"};
+function feedItens2(tab){
+  const me=SOC.me().h,out=[];
+  Object.keys(S.meta).forEach(k=>SOC.list(k).forEach(rv=>{
+    const u=rv.u;
+    const ok=tab==="you"?u===me:tab==="friends"?(u!==me&&SOC.isFriend(u)&&SOC.followsMe(u)):tab==="following"?(u!==me&&SOC.isFriend(u)):false;
+    if(ok)out.push(rv);
+  }));
+  return out.sort((a,b)=>String(b.d).localeCompare(String(a.d))).slice(0,60);
+}
+function feedIncoming(){
+  const me=SOC.me().h,s=SOC.s(),fol=SOC.followers(),likes=[];
+  s.rev.filter(x=>x.u===me).forEach(rv=>{
+    const who=(s.likes[rv.id]||[]).filter(h=>h!==me).map(h=>({h,n:(DEMOF.find(d=>d[0]===h)||[h,h])[1]}));
+    if(s.demo)fol.forEach(a=>{if(parseInt(hash(rv.id+a.h),36)%3===0&&!who.some(w=>w.h===a.h))who.push(a)});
+    who.forEach(a=>likes.push({a,rv}));
+  });
+  likes.sort((x,y)=>String(y.rv.d).localeCompare(String(x.rv.d)));
+  return {fol,likes};
+}
+function feedBody(tab){
+  const me=SOC.me().h;
+  if(tab==="incoming"){
+    const D=feedIncoming();
+    if(!D.fol.length&&!D.likes.length)return `<div class="empty">Nothing yet. New followers and likes on your reviews will show up here.</div>`;
+    const av=a=>{const [c1,c2]=cores(a.h);return `<div class="pf-av" style="background:linear-gradient(145deg,${c1},${c2})">${esc(ini(a.n))}</div>`};
+    return (D.fol.length?`<h3 class="sec" style="margin:6px 4px 10px">New followers</h3><div class="mlist">${D.fol.map(a=>`<div class="row">${av(a)}<div class="grow"><div class="ttl">${esc(a.n)}</div><div class="sm mut">@${esc(a.h)} started following you</div></div>${fbtnHTML(a.h,a.n)}</div>`).join("")}</div>`:"")
+      +(D.likes.length?`<h3 class="sec" style="margin:26px 4px 10px">Likes on your reviews</h3><div class="mlist">${D.likes.map(({a,rv})=>{const m=S.meta[rv.k]||{t:"Album"};return `<a class="row" href="#album-${rv.k}">${av(a)}<div class="grow"><div class="ttl">${esc(a.n)} liked your review</div><div class="sm mut">${esc(m.t)} · ${esc(fmtData(rv.d))}</div></div>${capaAlbum(rv.k,m.t,40)}</a>`}).join("")}</div>`:"");
+  }
+  const itens=feedItens2(tab);
+  if(itens.length)return itens.map(feedCard).join("");
+  const msg={
+    you:`You haven't posted any reviews yet. Open an album and publish one.`,
+    friends:`No friends yet. When you follow someone and they follow you back, they show up here.`,
+    following:`You're not following anyone yet. <a href="#@${encodeURIComponent(me)}" data-gofriends>Find people</a> in Search (type @username) or on your Profile.`
+  }[tab];
+  return `<div class="empty">${msg}</div>`;
+}
+feedHTML=function(){
+  const tab=window.__ft||"friends",inc=feedIncoming(),
+    cnt={you:feedItens2("you").length,friends:feedItens2("friends").length,following:feedItens2("following").length,incoming:inc.fol.length+inc.likes.length};
+  return `<h1>Feed</h1>
+  <div class="rvtabs">${Object.keys(FT_LBL).map(t=>`<button class="${tab===t?"on":""}" data-ft="${t}">${FT_LBL[t]}${cnt[t]?` · ${cnt[t]}`:""}</button>`).join("")}</div>
+  <div id="feedlist">${feedBody(tab)}</div>
+  <p class="rvnote">Reviews are stored only in this browser for now. When the database is connected, this feed will show real activity from the people you follow.</p>`;
+};
+renderFeed=function(){const el=document.getElementById("feedlist");if(el)el.innerHTML=feedBody(window.__ft||"friends")};
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-ft]");if(!b)return;
+  window.__ft=b.dataset.ft;rota();
+});
 </script>
 
 </body>
