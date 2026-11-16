@@ -11,9 +11,9 @@
 <title>Acetato</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,100..900&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#000;--txt:#fff;--mut:#8e8e93;--line:rgba(255,255,255,.1);--acc:#8B5CF6;--acc2:#B794F6;--fx:"Inter",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Helvetica,Arial,sans-serif}
+:root{--bg:#000;--txt:#fff;--mut:#8e8e93;--line:rgba(255,255,255,.1);--acc:#8B5CF6;--acc2:#B794F6;--fx:"Inter","Helvetica Neue",Helvetica,Arial,sans-serif}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:var(--fx);background:var(--bg);color:var(--txt);min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:clip}
 a{color:inherit;text-decoration:none}
@@ -1161,7 +1161,7 @@ async function artistView(k){
       ${meta?`<div class="ap-meta">${esc(meta)}</div>`:""}
       <div class="ap-btns">
         ${D.top.length?`<button class="gl pri" data-aplay="0">▶ Play</button>`:""}
-        <button class="gl ${seg?"on":""}" data-apfollow="${k}">${seg?"✓ Following":"+ Follow"}</button>
+        <button class="gl ${seg?"on":""}" data-apfollow="${k}">${followInner(seg)}</button>
         <button class="gl ic" data-apshare aria-label="Share" title="Share"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M8 11H6.5A1.5 1.5 0 0 0 5 12.5v7A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5v-7A1.5 1.5 0 0 0 17.5 11H16"/></svg></button>
       </div>
     </div></section>
@@ -1225,7 +1225,7 @@ document.addEventListener("click",e=>{
     if(i>=0){S.seguindo.splice(i,1);flash("Unfollowed")}
     else{const a=S.artists[k]||{};S.seguindo.push({k,n:a.n||"",dz:(a.ids||{}).dz||""});flash("Following")}
     const on=S.seguindo.some(s=>s.k===k);
-    fo.textContent=on?"✓ Following":"+ Follow";fo.classList.toggle("on",on);
+    fo.innerHTML=followInner(on);fo.classList.toggle("on",on);
     salvar();return;
   }
   if(t.closest("[data-apshare]")&&ap){
@@ -1650,24 +1650,24 @@ function gerarCartao(){
   const [c1,c2]=fav[0]?cores(fav[0]):cores(p.handle||"acetato");
   const fundo=g.createLinearGradient(0,0,0,1350);fundo.addColorStop(0,c1);fundo.addColorStop(.55,c2);fundo.addColorStop(1,"#000");
   g.fillStyle=fundo;g.fillRect(0,0,1080,1350);
-  g.fillStyle="#fff";g.font="900 104px Inter, -apple-system, Helvetica, Arial, sans-serif";g.fillText(p.nome.slice(0,16),80,260);
-  g.font="700 44px Inter, -apple-system, Helvetica, Arial, sans-serif";g.fillStyle="rgba(255,255,255,.8)";g.fillText("@"+p.handle,84,330);
+  g.fillStyle="#fff";g.font="900 104px Inter, Helvetica, Arial, sans-serif";g.fillText(p.nome.slice(0,16),80,260);
+  g.font="700 44px Inter, Helvetica, Arial, sans-serif";g.fillStyle="rgba(255,255,255,.8)";g.fillText("@"+p.handle,84,330);
   const ouv=Object.values(S.u).filter(v=>v.d).length;
   const av=Object.values(S.u).filter(v=>v.r);
   const media=av.length?(av.reduce((s,v)=>s+v.r,0)/av.length).toFixed(1):"—";
-  g.font="600 38px Inter, -apple-system, Helvetica, Arial, sans-serif";g.fillText(`${ouv} listened · ${av.length} ratings · avg ${media}`,84,410);
+  g.font="600 38px Inter, Helvetica, Arial, sans-serif";g.fillText(`${ouv} listened · ${av.length} ratings · avg ${media}`,84,410);
   fav.slice(0,4).forEach((k,i)=>{
     const x=80+i*236,y=500,[a,b]=cores(k);
     const t=g.createLinearGradient(x,y,x+200,y+200);t.addColorStop(0,a);t.addColorStop(1,b);
     g.fillStyle=t;rr(g,x,y,200,200,26);g.fill();
-    g.fillStyle="#fff";g.font="800 26px Inter, -apple-system, Helvetica, Arial, sans-serif";
+    g.fillStyle="#fff";g.font="800 26px Inter, Helvetica, Arial, sans-serif";
     const nome=(S.meta[k]||{}).t||"";
     g.fillText(nome.slice(0,14),x,y+240);
   });
-  g.font="800 40px Inter, -apple-system, Helvetica, Arial, sans-serif";g.fillStyle="#fff";g.fillText("Favorite songs",84,880);
-  g.font="600 36px Inter, -apple-system, Helvetica, Arial, sans-serif";
+  g.font="800 40px Inter, Helvetica, Arial, sans-serif";g.fillStyle="#fff";g.fillText("Favorite songs",84,880);
+  g.font="600 36px Inter, Helvetica, Arial, sans-serif";
   (p.musicas||[]).slice(0,5).forEach((m,i)=>{g.fillStyle="rgba(255,255,255,.9)";g.fillText(`${i+1}. ${m.slice(0,40)}`,84,950+i*62)});
-  g.font="900 46px Inter, -apple-system, Helvetica, Arial, sans-serif";g.fillStyle="#fff";g.fillText("Acetato.",84,1250);
+  g.font="900 46px Inter, Helvetica, Arial, sans-serif";g.fillStyle="#fff";g.fillText("Acetato.",84,1250);
   c.toBlob(blob=>{
     const file=new File([blob],"acetato-perfil.png",{type:"image/png"});
     if(navigator.canShare&&navigator.canShare({files:[file]})){navigator.share({files:[file],title:"Acetato"}).catch(()=>{});return}
@@ -1727,7 +1727,7 @@ function quebrarLinhas(g,texto,maxW){
 }
 function rrect(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
 function texto(g,t,x,y,font,cor,align){g.font=font;g.fillStyle=cor;g.textAlign=align||"center";g.fillText(t,x,y)}
-const FNT="Inter, -apple-system, Helvetica, Arial, sans-serif";
+const FNT="Inter, Helvetica, Arial, sans-serif";
 
 /* Carregamento com CORS (necessário para exportar o canvas e ler os pixels) */
 function tentarImg(src,cors){return new Promise(res=>{const im=new Image();if(cors)im.crossOrigin="anonymous";im.onload=()=>res(im);im.onerror=()=>res(null);im.src=src})}
@@ -2696,5 +2696,391 @@ document.addEventListener("scroll",e=>{const c=e.target;if(!c||!c.classList||!c.
   document.addEventListener("dragstart",e=>{if(e.target.closest&&e.target.closest(".carrossel"))e.preventDefault()});
 })();
 </script>
+<style id="apple-v4">
+/* ===== Tipografia: Inter fina, no estilo da Apple (sem usar a SF) ===== */
+body{font-weight:400;letter-spacing:-.006em;font-optical-sizing:auto}
+h1{font-weight:700;letter-spacing:-.028em}
+h2{font-weight:700;letter-spacing:-.02em}
+h3.sec{font-weight:600}
+.logo{font-weight:800;letter-spacing:-.04em}
+.nav a,.btn,.fab,.chip,.gl,.pill,.ptabs button,.edtabs button,.xs-btn,.xs-o,.stt{font-weight:600}
+.ttl,.ta,.gc .t,.ap-tt b,.ap-sim .t,.lbx-t,.ap-latei .t{font-weight:600;letter-spacing:-.012em}
+.sa,.gc .s,.sub,.ap-tt i,.ap-latei .s{font-weight:400}
+.mut,.sm,.phandle{font-weight:500!important}
+.ap-name{font-weight:700!important;letter-spacing:-.035em!important}
+.ap-meta,.atv-a{font-weight:500}
+.atv-tag{font-weight:600}
+.atv-t,.hh-t,.hero h1,.pinfo h1{font-weight:700;letter-spacing:-.03em}
+.pstats strong,.kpi strong,.rkrow .rn,.hrow,.brow{font-weight:700}
+.pstats span,.kpi span{font-weight:600}
+.search,.field,.gr-in{font-weight:500}
+.sec-h h2{font-size:21px;font-weight:700}
+.flash{font-weight:600}
+.num{font-weight:500;font-variant-numeric:tabular-nums}
+.tdur{font-variant-numeric:tabular-nums}
+
+/* ===== Ícones ===== */
+.ic{display:inline-block;flex-shrink:0;vertical-align:-3px}
+.nav a .ni{display:none}
+@media(max-width:640px){
+  .nav{border-radius:26px}
+  .nav a{display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 4px 6px;font-size:10.5px;font-weight:600;border-radius:18px;color:#8e8e93}
+  .nav a .ni{display:block}
+  .nav a.on{background:rgba(255,255,255,.14);color:#fff}
+}
+
+/* ===== Página do álbum ===== */
+.hero .info h1{font-size:clamp(30px,5vw,46px);margin:6px 0 4px;line-height:1.04}
+.ah-kind{font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
+.ah-art{display:inline-flex;align-items:center;gap:4px;font-size:clamp(17px,2.4vw,21px);font-weight:600;letter-spacing:-.015em;color:#fff;opacity:.92}
+.ah-art:hover{opacity:1;text-decoration:underline;text-underline-offset:4px}
+.ah-meta{display:flex;flex-wrap:wrap;gap:2px 8px;align-items:center;margin-top:5px;font-size:13px;color:var(--mut);font-weight:500}
+.ah-meta .dot{opacity:.5}
+.exb{display:inline-grid;place-items:center;width:15px;height:15px;margin-left:6px;border-radius:3px;background:rgba(255,255,255,.2);font-style:normal;font-size:10px;font-weight:700;color:rgba(255,255,255,.85);vertical-align:1px;line-height:1}
+.abar{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 12px}
+.ab{display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 14px 0 11px;border-radius:999px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.1);-webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%);font-weight:600;font-size:13px;color:#fff;letter-spacing:-.005em;transition:background .2s,color .2s,transform .2s}
+.ab svg{transition:transform .35s cubic-bezier(.3,1.6,.5,1)}
+.ab:hover{background:rgba(255,255,255,.22)}
+.ab:hover svg{transform:scale(1.18)}
+.ab:active{transform:scale(.95)}
+.ab.on{background:#fff;color:#000;border-color:#fff}
+.ab.on svg{animation:pop .4s cubic-bezier(.3,1.6,.5,1)}
+.cnt{color:var(--mut);font-size:14px;font-weight:600;margin-left:6px}
+
+/* ===== Lista de faixas: compacta, com botões pequenos ===== */
+#tlist .row{padding:7px 12px;gap:10px}
+#tlist .row .ttl{font-size:14.5px}
+.tact{display:flex;align-items:center;gap:6px}
+.trate{zoom:.5!important}
+.ib{width:26px;height:26px;border-radius:50%;display:inline-grid;place-items:center;padding:0;flex-shrink:0;color:#fff;background:rgba(255,255,255,.1);text-align:center;transition:background .2s,transform .3s cubic-bezier(.3,1.6,.5,1),opacity .25s}
+.ib:hover{background:rgba(255,255,255,.22);transform:scale(1.1)}
+.ib:active{transform:scale(.92)}
+.ib.hv{background:none}
+.ib.hv:hover{background:rgba(255,255,255,.14)}
+.pop{width:44px;height:3px;border-radius:2px;background:rgba(255,255,255,.12);overflow:hidden;flex-shrink:0}
+.pop i{display:block;height:100%;background:rgba(255,255,255,.55);border-radius:2px}
+@media(hover:hover){
+  #tlist .row .hv{opacity:0;transform:scale(.6)}
+  #tlist .row:hover .hv,#tlist .row:focus-within .hv{opacity:1;transform:none}
+}
+@media(max-width:640px){
+  #tlist .row .tact{gap:8px}
+  #tlist .row .pop{display:none}
+  .trate{zoom:.56!important}
+}
+
+/* ===== Blocos de informação (álbum e artista) ===== */
+.ainfo{border-radius:22px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);padding:18px;display:grid;gap:16px}
+.ai-top{display:flex;gap:14px;align-items:center}
+.ai-t{font-size:19px;font-weight:700;letter-spacing:-.022em}
+.ai-s{color:var(--mut);font-size:13.5px;font-weight:500;margin-top:2px}
+.ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:0 28px;margin:0}
+.ai-r{display:flex;align-items:center;gap:12px;padding:11px 2px;border-bottom:1px solid rgba(255,255,255,.07);min-width:0}
+.ai-r>.ic{color:var(--mut)}
+.ai-r dt{font-size:11px;font-weight:600;color:var(--mut);letter-spacing:.06em;text-transform:uppercase}
+.ai-r dd{font-size:14.5px;font-weight:500;margin:1px 0 0;overflow-wrap:anywhere}
+.ai-r .stars{font-size:13px}
+.ai-copy{font-size:12px;color:var(--mut);font-weight:500;line-height:1.5}
+.ai-links{display:flex;gap:8px;flex-wrap:wrap}
+.ai-links .btn{gap:6px}
+.abio{font-size:15px;line-height:1.55;font-weight:400;color:rgba(255,255,255,.88);margin:0;max-width:74ch;white-space:pre-line}
+.abio.cl{display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
+.abio-more{font-weight:600;font-size:13.5px;color:#fff;opacity:.8;padding:0;margin-top:6px}
+.abio-more:hover{opacity:1}
+.asrc{font-size:11.5px;color:var(--mut);font-weight:500;margin-top:8px}
+.asrc a{text-decoration:underline;text-underline-offset:3px}
+</style>
+<script>
+/* ===== Ícones SVG estilo SF Symbols ===== */
+const ICP={
+  listen:'<circle cx="12" cy="12" r="9"/><path d="M8 12.4l2.7 2.7 5.5-5.7"/>',
+  queue:'<path d="M7.5 3.8h9A1.5 1.5 0 0 1 18 5.3v15l-6-4.2-6 4.2v-15a1.5 1.5 0 0 1 1.5-1.5z"/>',
+  heart:'<path d="M12 20.2s-7.6-4.5-9.3-9.5C1.6 7.4 3.6 4.4 6.9 4.4c2 0 3.4 1.1 5.1 3 1.7-1.9 3.1-3 5.1-3 3.3 0 5.3 3 4.2 6.3-1.7 5-9.3 9.5-9.3 9.5z"/>',
+  star:'<path d="M12 3.8l2.5 5.2 5.7.8-4.1 4 1 5.7L12 16.9l-5.1 2.6 1-5.7-4.1-4 5.7-.8z"/>',
+  play:'<path d="M8.2 5.6v12.8a.6.6 0 0 0 .9.5l10.3-6.4a.6.6 0 0 0 0-1L9.1 5.1a.6.6 0 0 0-.9.5z"/>',
+  share:'<path d="M12 3.5v11.5M8.2 7.2L12 3.5l3.8 3.7M7.5 10.5h-.8A1.7 1.7 0 0 0 5 12.2v6.1A1.7 1.7 0 0 0 6.7 20h10.6a1.7 1.7 0 0 0 1.7-1.7v-6.1a1.7 1.7 0 0 0-1.7-1.7h-.8"/>',
+  more:'<circle cx="5.5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="18.5" cy="12" r="1.7"/>',
+  chev:'<path d="M9 5l7 7-7 7"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  check:'<path d="M5 12.5l4.5 4.5L19 7"/>',
+  list:'<path d="M9 6.5h10.5M9 12h10.5M9 17.5h10.5M4.5 6.5h.01M4.5 12h.01M4.5 17.5h.01"/>',
+  calendar:'<rect x="4" y="5.5" width="16" height="14.5" rx="3"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/>',
+  tag:'<path d="M3.5 12.2V5A1.5 1.5 0 0 1 5 3.5h7.2a1.5 1.5 0 0 1 1.1.44l7.2 7.2a1.5 1.5 0 0 1 0 2.12l-6.9 6.9a1.5 1.5 0 0 1-2.12 0l-7.2-7.2a1.5 1.5 0 0 1-.44-1.1z"/><circle cx="8" cy="8" r="1.1"/>',
+  note:'<path d="M9 17.5V6.5l10-2v11"/><circle cx="6.5" cy="17.5" r="2.5"/><circle cx="16.5" cy="15.5" r="2.5"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5.2l3.4 2"/>',
+  people:'<circle cx="9" cy="8.5" r="3.2"/><path d="M3 19c.6-3.2 3-5 6-5s5.4 1.8 6 5"/><path d="M16 5.6a3.2 3.2 0 0 1 0 5.8M18.5 14.4c1.5.7 2.4 2.1 2.7 4.6"/>',
+  globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 3.8 5.6 3.8 9s-1.2 6.4-3.8 9c-2.6-2.6-3.8-5.6-3.8-9S9.4 5.6 12 3z"/>',
+  info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.8h.01"/>',
+  disc:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.6"/>',
+  mic:'<rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3"/>',
+  chart:'<path d="M5 20v-8M12 20V5M19 20v-10"/>',
+  pin:'<path d="M12 21s-6.5-5.7-6.5-11a6.5 6.5 0 0 1 13 0c0 5.3-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/>',
+  user:'<circle cx="12" cy="8.5" r="3.5"/><path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5"/>',
+  external:'<path d="M9 5H6.5A1.5 1.5 0 0 0 5 6.5v11A1.5 1.5 0 0 0 6.5 19h11a1.5 1.5 0 0 0 1.5-1.5V15M13 5h6v6M19 5l-8 8"/>',
+  home:'<path d="M4 11l8-6.5 8 6.5v8a1 1 0 0 1-1 1h-4.5v-6h-5v6H5a1 1 0 0 1-1-1z"/>',
+  search:'<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/>',
+  diary:'<path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19v-3"/>'
+};
+function ico(n,w,on){
+  w=w||18;let p=ICP[n]||"",f=0,sw=1.9;
+  if(on){
+    if(n==="listen")p='<circle cx="12" cy="12" r="9" fill="currentColor"/><path d="M8 12.4l2.7 2.7 5.5-5.7" stroke="#fff"/>';
+    else if(n==="queue"||n==="heart"||n==="star")f=1;
+  }
+  if(n==="play"){f=1;sw=1.2}
+  if(n==="more"){f=1;sw=0}
+  return `<svg class="ic" viewBox="0 0 24 24" width="${w}" height="${w}" fill="${f?"currentColor":"none"}" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+}
+const likeInner=on=>ico("heart",18,on)+`<span>${on?"Liked":"Like"}</span>`;
+const followInner=on=>on?ico("check",15)+" Following":ico("plus",15)+" Follow";
+
+/* Ícones na barra de navegação (aparecem no celular, como no app da Apple) */
+document.querySelectorAll(".nav a[data-tab]").forEach(a=>{
+  const n={home:"home",search:"search",diary:"diary",profile:"user"}[a.dataset.tab];
+  if(n)a.insertAdjacentHTML("afterbegin",ico(n,22).replace('class="ic"','class="ic ni"'));
+});
+
+/* ===== Utilitários ===== */
+const whenEl=(sel,fn,n)=>{n=n==null?60:n;const t=()=>{const e=document.querySelector(sel);if(e)fn(e);else if(n-->0)setTimeout(t,100)};t()};
+function quando(d){
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(d||""))return"";
+  const days=Math.floor((Date.now()-new Date(d+"T00:00:00Z"))/864e5);
+  if(days<0)return"Upcoming";
+  if(days<1)return"Today";
+  if(days<30)return days+(days>1?" days ago":" day ago");
+  const mo=Math.floor(days/30.44);
+  if(mo<12)return mo+(mo>1?" months ago":" month ago");
+  const y=Math.floor(days/365.25);
+  return y+(y>1?" years ago":" year ago");
+}
+function durTxt(ms){const mi=Math.max(1,Math.round(ms/60000));if(mi<60)return mi+" min";const h=Math.floor(mi/60),r=mi%60;return h+" hr"+(r?" "+r+" min":"")}
+const urlOk=u=>{u=String(u||"").trim();if(!u)return"";return /^https?:\/\//i.test(u)?u:"https://"+u};
+
+/* ===== Dados completos do álbum: faixas + data, gravadora, duração, copyright... ===== */
+const _dadosCache={};
+async function dadosAlbum(m){
+  const ck=JSON.stringify(m.ids||{});
+  if(_dadosCache[ck])return _dadosCache[ck];
+  const info={},faixas=[],tarefas=[];
+  if(m.ids.dz)tarefas.push(dz(`/album/${m.ids.dz}`).then(d=>{
+    info.date=d.release_date||"";info.label=d.label||"";
+    info.genres=((d.genres||{}).data||[]).map(g=>g.name);
+    info.dur=(d.duration||0)*1000;info.fans=d.fans||0;info.upc=d.upc||"";
+    info.ex=!!d.explicit_lyrics;info.artistDz=(d.artist||{}).id;info.link=d.link||"";
+    info.contrib=(d.contributors||[]).map(c=>c.name);
+    ((d.tracks||{}).data||[]).forEach(t=>faixas.push({t:t.title,ms:t.duration*1000,ex:!!t.explicit_lyrics,rk:t.rank||0}));
+  }));
+  if(m.ids.it)tarefas.push(getJSON(`${IT}/lookup?id=${m.ids.it}`).then(j=>{
+    const r=(j.results||[])[0]||{};
+    info.copy=r.copyright||"";info.itLink=r.collectionViewUrl||"";
+    if(!info.date&&r.releaseDate)info.date=r.releaseDate.slice(0,10);
+    if(r.primaryGenreName)info.itGenre=r.primaryGenreName;
+  }));
+  else tarefas.push(Promise.race([getJSON(`${IT}/search?term=${encodeURIComponent(m.t+" "+m.a)}&entity=album&limit=5`),new Promise((_,r)=>setTimeout(()=>r(0),4000))]).then(j=>{
+    const r=(j.results||[]).find(x=>albumKey(x.collectionName,x.artistName)===albumKey(m.t,m.a));
+    if(r){info.copy=r.copyright||"";info.itLink=r.collectionViewUrl||"";if(!info.date&&r.releaseDate)info.date=r.releaseDate.slice(0,10);if(r.primaryGenreName)info.itGenre=r.primaryGenreName}
+  }));
+  if(m.ids.sp)tarefas.push(spGet(`/v1/albums/${m.ids.sp}`).then(d=>{
+    if(d.label&&!info.label)info.label=d.label;
+    if(d.release_date&&!info.date&&/^\d{4}-\d{2}-\d{2}$/.test(d.release_date))info.date=d.release_date;
+    if(!info.copy&&(d.copyrights||[])[0])info.copy=d.copyrights[0].text||"";
+    if(d.popularity!=null)info.pop=d.popularity;
+  }));
+  await Promise.allSettled(tarefas);
+  if(!faixas.length){(await faixasDe(m)).forEach(t=>faixas.push(t))}
+  const res={faixas,info};
+  if(faixas.length)_dadosCache[ck]=res;
+  return res;
+}
+
+/* ===== Página do álbum (redesenhada) ===== */
+async function albumView(k){
+  const m=S.meta[k];
+  if(!m)return `<div class="empty">Open this album from search to load its data.</div>`;
+  setAmb(cores(k)[0]);
+  const ak=artistKey(m.a);
+  if(!S.artists[ak]){S.artists[ak]={n:m.a,foto:"",fas:0,genre:"",info:"",ids:{},fontes:[]};salvar()}
+  const x=dd(k);
+  const {faixas,info}=await dadosAlbum(m);
+  const fav=(P().fav||[]).includes(k);
+  const cv=coverDe(k);
+  const tipo=tipoLabel(m.tipo);
+  const tipoTxt=tipo==="EP"?"EP":tipo.toLowerCase();
+  const date=info.date||m.y||"";
+  const total=faixas.reduce((s,t)=>s+(t.ms||0),0)||info.dur||0;
+  const gens=[...new Set((info.genres&&info.genres.length?info.genres:[m.genre||info.itGenre]).filter(Boolean))];
+  const kind=[tipo.toUpperCase(),...gens.slice(0,2)].join(" · ");
+  const bits=[date?esc(fmtData(date)):"",faixas.length?`${faixas.length} ${faixas.length===1?"song":"songs"}`:"",total?durTxt(total):""].filter(Boolean);
+  const metaHTML=bits.join(`<span class="dot">•</span>`)+(info.ex?`<i class="exb" title="Explicit">E</i>`:"");
+  const maxRk=Math.max(1,...faixas.map(t=>t.rk||0));
+  const r=(ic,l,v)=>v?`<div class="ai-r">${ico(ic,18)}<div style="min-width:0"><dt>${l}</dt><dd>${v}</dd></div></div>`:"";
+  const artistas=(info.contrib&&info.contrib.length>1)?info.contrib:[m.a];
+  const md=calcMedia(faixas.map(t=>tkey(t.t,m.a)));
+  const quandoTxt=quando(date);
+  const linhas=[
+    r("disc","Type",esc(tipo)+(info.ex?" · Explicit":"")),
+    r("calendar","Released",date?esc(fmtData(date))+(quandoTxt?` <span class="mut">· ${quandoTxt}</span>`:""):""),
+    r("mic",artistas.length>1?"Artists":"Artist",artistas.map((n,i)=>i===0?`<a href="#artist-${ak}" style="border-bottom:1px solid rgba(255,255,255,.4)">${esc(n)}</a>`:esc(n)).join(", ")),
+    r("tag","Label",esc(info.label||"")),
+    r("note","Genre",esc(gens.join(", "))),
+    r("list","Tracks",faixas.length?String(faixas.length):""),
+    r("clock","Length",total?durTxt(total):""),
+    r("people","Fans on Deezer",info.fans?fmtFas(info.fans):""),
+    r("chart","Spotify popularity",info.pop!=null?info.pop+"/100":""),
+    r("globe","Available on",esc((m.fontes||[]).map(nomeFonte).join(", "))),
+    r("info","Barcode (UPC)",esc(info.upc||"")),
+    r("listen","Your listen",x.d?esc(fmtData(x.d)):""),
+    r("star","Your rating",x.r?`${estrelas(x.r)} <span class="mut">${x.r}</span>`:""),
+    r("star","Track ratings",md.n?`${md.n} of ${faixas.length} rated · avg ${md.avg.toFixed(1)}`:"")
+  ].join("");
+  const apple=info.itLink||`https://music.apple.com/search?term=${encodeURIComponent(m.t+" "+m.a)}`;
+  const links=[info.link?["Deezer",info.link]:null,["Apple Music",apple],m.ids.sp?["Spotify",`https://open.spotify.com/album/${m.ids.sp}`]:null].filter(Boolean)
+    .map(([n,u])=>`<a class="btn" href="${esc(u)}" target="_blank" rel="noopener">${n} ${ico("external",13)}</a>`).join("");
+  const sobre=`<h2>About this ${tipoTxt}</h2><div class="ainfo">
+    <div class="ai-top">${capaAlbum(k,m.t,72)}<div style="min-width:0"><div class="ai-t">${esc(m.t)}</div><div class="ai-s">${esc(m.a)}${date?" · "+esc(String(date).slice(0,4)):""}</div></div></div>
+    <dl class="ai-grid">${linhas}</dl>
+    ${info.copy?`<p class="ai-copy">${esc(info.copy)}</p>`:""}
+    <div class="ai-links">${links}</div></div>`;
+  whenEl("#amore",()=>maisDoArtista(k,m,ak,info));
+  return `${cv?`<div class="abg" aria-hidden="true"><div style="background-image:url(${cv})"></div></div>`:""}<div class="hero">${capaAlbum(k,m.t,230)}<div class="info">
+    <div class="ah-kind">${esc(kind)}</div>
+    <h1>${esc(m.t)}</h1>
+    <a class="ah-art" href="#artist-${ak}">${esc(m.a)} ${ico("chev",14)}</a>
+    <div class="ah-meta">${metaHTML}</div>
+    <div class="abar">
+      <button class="ab ${x.d?"on":""}" data-act="ouvi" title="${x.d?"Remove from diary":"Log in your diary"}">${ico("listen",18,!!x.d)}<span>${x.d?"Listened":"Log listen"}</span></button>
+      <button class="ab ${x.w?"on":""}" data-act="quero" title="Listen later">${ico("queue",18,!!x.w)}<span>${x.w?"In queue":"Queue"}</span></button>
+      <button class="ab ${x.l?"on":""}" data-act="curtir" title="Like">${likeInner(!!x.l)}</button>
+      <button class="ab ${fav?"on":""}" data-act="fav" title="Favorite album">${ico("star",18,fav)}<span>Favorite</span></button>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;justify-content:inherit"><div style="display:flex" id="rate" data-id="${k}">${rateHTML(x.r)}</div><span class="mut" id="rlab">${x.r?String(x.r)+" of 5":"Your rating"}</span></div>
+    ${faixas.length?mediaBloco(faixas,m,x):""}
+  </div></div>
+  ${faixas.length?`<h2>Tracks</h2>${faixas.length>1?`<div class="tbar"><div class="tsearch"><input class="search" id="tsearch" type="search" placeholder="Search tracks in this album" autocomplete="off"></div>${xsel("tsort",[["n","Album order"],["az","Title A–Z"],["za","Title Z–A"],["long","Longest first"],["short","Shortest first"]],"n")}</div>`:""}<div class="mlist" id="tlist">${faixas.map((t,i)=>`<div class="row" data-tn="${esc(t.t.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase())}" data-i="${i}" data-ms="${t.ms||0}"><span class="num">${String(i+1).padStart(2,"0")}</span><div class="ttl grow">${esc(t.t)}${t.ex?`<i class="exb" title="Explicit">E</i>`:""}</div>${t.rk?`<span class="pop" title="Popularity"><i style="width:${Math.max(6,Math.round(t.rk/maxRk*100))}%"></i></span>`:""}<div class="tact">${trateHTML(t.t,m.a)}<button class="ib" data-play data-tt="${esc(t.t)}" data-ta="${esc(m.a)}" aria-label="Preview, video and links" title="Preview, video and links">${ico("play",12)}</button><button class="ib hv" data-story="musica" data-tt="${esc(t.t)}" data-ms="${t.ms||0}" aria-label="Share song" title="Share song">${ico("share",14)}</button></div><span class="mut sm tdur">${tempo(t.ms)}</span></div>`).join("")}<div class="tnone" id="tnone">No tracks found</div></div>`:`<div class="empty" style="margin-top:30px">No tracks available for this album.</div>`}
+  <h2>Review</h2>
+  <div class="lbx">
+    <div class="lbx-h">${capaAlbum(k,m.t,64)}<div style="min-width:0"><div class="lbx-t">${esc(m.t)}</div><div class="lbx-s">${esc(m.a)}${m.y?` · ${m.y}`:""}</div></div></div>
+    <label class="lbx-d"><span>Listened on</span><input type="date" id="revd" value="${esc(x.d||hoje())}" max="${hoje()}"></label>
+    <textarea class="field" id="rev" placeholder="Add a review…">${esc(x.rev||"")}</textarea>
+    <div class="lbx-f">
+      <div class="lbx-r"><span class="mut sm">Rating</span><div style="display:flex" id="rate2">${rateHTML(x.r)}</div></div>
+      <button class="ab ${x.l?"on":""}" data-act="revlike">${likeInner(!!x.l)}</button>
+    </div>
+    <div class="lbx-b"><button class="fab" data-act="rev">Save</button><button class="btn" data-story="album">${ico("share",14)} Share to Story</button></div>
+  </div>
+  ${S.listas.length?`<h2>Add to a list</h2><div style="display:flex;gap:10px;flex-wrap:wrap">${xsel("lsel",S.listas.map((l,i)=>[String(i),l.nome]),"0")}<button class="btn" data-act="addLista">Add</button></div>`:`<h2>Lists</h2><div class="empty">Create a list in the Lists tab of your Profile to add albums.</div>`}
+  ${sobre}
+  <div id="amore"></div>`;
+}
+async function maisDoArtista(k,m,ak,info){
+  const id=((S.artists[ak]||{}).ids||{}).dz||info.artistDz;
+  if(!id)return;
+  try{
+    const j=await dz(`/artist/${id}/albums?limit=30`);
+    const l=unirAlbuns((j.data||[]).map(x=>({src:"dz",id:x.id,t:x.title,a:m.a,y:(x.release_date||"").slice(0,4),tipo:x.record_type||"album",cover:x.cover_xl||x.cover_big||""}))).filter(u=>u.key!==k&&temCapa(u)).slice(0,14);
+    const el=document.getElementById("amore");
+    if(!l.length||!el)return;
+    l.forEach(guardarAlbum);salvar();
+    el.innerHTML=`<div class="sec-h"><h2>More by ${esc(m.a)}</h2></div><div class="carrossel" data-keep>${l.map(u=>cardAlbum({...u,solo:true})).join("")}</div>`;
+  }catch(e){}
+}
+/* Curtir pela caixa de review atualiza os botões sem perder o texto digitado */
+const _albumAct0=albumAct;
+albumAct=function(a){
+  if(a==="revlike"){
+    const k=location.hash.slice(7),d=dd(k);d.l=!d.l;salvar();
+    document.querySelectorAll('[data-act="revlike"],[data-act="curtir"]').forEach(b=>{b.classList.toggle("on",!!d.l);b.innerHTML=likeInner(!!d.l)});
+    flash(d.l?"Liked":"Unliked");return;
+  }
+  return _albumAct0(a);
+};
+
+/* ===== Página do artista: ícones + informações no final ===== */
+async function audioDB(n){
+  try{
+    const url=`https://www.theaudiodb.com/api/v1/json/2/search.php?s=${encodeURIComponent(n)}`;
+    const j=await Promise.race([getJSON(url).catch(()=>PROXY?getJSON(PROXY+"/deezer?u="+encodeURIComponent(url)):Promise.reject(0)),new Promise((_,rj)=>setTimeout(()=>rj(0),5000))]);
+    return (j.artists||[]).find(x=>norm(x.strArtist)===norm(n))||null;
+  }catch(e){return null}
+}
+async function wikiArtista(n){
+  try{
+    const f=u=>Promise.race([getJSON(u),new Promise((_,rj)=>setTimeout(()=>rj(0),6000))]);
+    const s=await f(`https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(n+" musician band singer rapper")}&srlimit=3&format=json&origin=*`);
+    for(const c of ((s.query||{}).search||[])){
+      const nt=norm(c.title),nn=norm(n);
+      if(!nt.includes(nn)&&!nn.includes(nt))continue;
+      const r=await f(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(c.title.replace(/ /g,"_"))}`);
+      if(r.type==="disambiguation")continue;
+      if(!/singer|band|musician|rapper|duo|group|songwriter|composer|producer|DJ|vocalist|artist/i.test((r.description||"")+" "+(r.extract||"").slice(0,200)))continue;
+      return {t:r.title,x:r.extract||"",u:((r.content_urls||{}).desktop||{}).page||""};
+    }
+  }catch(e){}
+  return null;
+}
+async function infoArtista(k){
+  const sel=`.ap[data-k="${k}"] #apinfo`;
+  if(!document.querySelector(sel))return;
+  const a=S.artists[k]||{},D=(window.__apC||{})[k]||{albuns:[],top:[],rel:[],gen:""};
+  const C=(window.__aiC=window.__aiC||{});
+  let I=C[k];
+  if(!I){const [b,w]=await Promise.all([audioDB(a.n),wikiArtista(a.n)]);I=C[k]={b,w}}
+  const el=document.querySelector(sel);
+  if(!el)return;
+  const b=I.b,w=I.w,albs=D.albuns||[];
+  const tipoDe=u=>(u.tipo||"album").toLowerCase();
+  const datas=albs.map(u=>u.d||u.y).filter(Boolean).sort();
+  const first=datas[0],last=datas[datas.length-1];
+  const nAlb=albs.filter(u=>tipoDe(u)==="album").length,nEp=albs.filter(u=>tipoDe(u)==="ep").length,nSin=albs.filter(u=>tipoDe(u)==="single").length;
+  const gens=[...new Set([a.genre,...String(D.gen||"").split(", "),b&&b.strGenre,b&&b.strStyle].filter(Boolean))].slice(0,4);
+  const bio=((w&&w.x)||(b&&(b.strBiographyEN||"").trim())||"").trim();
+  const fonte=w&&w.x?`<a href="${esc(w.u)}" target="_blank" rel="noopener">Wikipedia</a> (CC BY-SA)`:"TheAudioDB";
+  const r=(ic,l,v)=>v?`<div class="ai-r">${ico(ic,18)}<div style="min-width:0"><dt>${l}</dt><dd>${v}</dd></div></div>`:"";
+  const lastAlb=albs.find(u=>(u.d||u.y)===last);
+  const linhas=[
+    r("pin","Origin",esc(b&&b.strCountry||"")),
+    b&&b.intFormedYear&&b.intFormedYear!=="0"?r("calendar","Formed",esc(b.intFormedYear)):(b&&b.intBornYear&&b.intBornYear!=="0"?r("calendar","Born",esc(b.intBornYear)):""),
+    r("calendar","Disbanded",esc(b&&b.intDiedYear&&b.intDiedYear!=="0"?b.intDiedYear:(b&&b.strDisbanded&&b.strDisbanded!=="0"?b.strDisbanded:""))),
+    r("people","Members",esc(b&&b.intMembers&&b.intMembers!=="0"?b.intMembers:"")),
+    r("note","Genre",esc(gens.join(", "))),
+    r("info","Mood",esc(b&&b.strMood||"")),
+    r("people","Fans on Deezer",a.fas?fmtFas(a.fas):""),
+    r("disc","Releases",albs.length?`${albs.length} total <span class="mut">· ${nAlb} albums, ${nEp} EPs, ${nSin} singles</span>`:""),
+    r("calendar","First release",first?esc(fmtData(first)):""),
+    r("calendar","Latest release",last?esc(fmtData(last))+(lastAlb?` <span class="mut">· ${esc(lastAlb.t)}</span>`:""):""),
+    r("play","Top song",D.top&&D.top[0]?esc(D.top[0].t):""),
+    r("mic","Similar to",esc((D.rel||[]).slice(0,4).map(o=>o.n).join(", ")))
+  ].join("");
+  const L=[
+    w&&w.u?["Wikipedia",w.u]:null,
+    b&&b.strWebsite?["Website",urlOk(b.strWebsite)]:null,
+    b&&b.strTwitter?["Twitter",urlOk(b.strTwitter)]:null,
+    b&&b.strFacebook?["Facebook",urlOk(b.strFacebook)]:null,
+    a.ids&&a.ids.dz?["Deezer",`https://www.deezer.com/artist/${a.ids.dz}`]:null,
+    a.ids&&a.ids.sp?["Spotify",`https://open.spotify.com/artist/${a.ids.sp}`]:null,
+    ["Apple Music",`https://music.apple.com/search?term=${encodeURIComponent(a.n)}`]
+  ].filter(Boolean).map(([n,u])=>`<a class="btn" href="${esc(u)}" target="_blank" rel="noopener">${n} ${ico("external",13)}</a>`).join("");
+  el.innerHTML=`${bio?`<div><p class="abio${bio.length>380?" cl":""}" id="abio">${esc(bio)}</p>${bio.length>380?`<button class="abio-more" data-abio>More</button>`:""}<div class="asrc">Source: ${fonte}</div></div>`:""}
+    <dl class="ai-grid">${linhas}</dl><div class="ai-links">${L}</div>`;
+}
+const _artistView0=artistView;
+artistView=async function(k){
+  let html=await _artistView0(k);
+  html=html.replace(/>···<\/button>/g,`>${ico("more",16)}</button>`)
+    .replace('<span class="ap-chev">›</span>',`<span class="ap-chev">${ico("chev",22)}</span>`)
+    .replace("▶ Play",`${ico("play",15)} Play`)
+    .replace("<h2>About</h2>","<h2>Overview</h2>");
+  const blk=`<div class="sec-h"><h2>Artist info</h2></div><div id="apinfo" class="ainfo"><div class="load" style="min-height:120px">…</div></div>`;
+  html=html.replace(/<\/div><\/div>\s*$/,blk+"</div></div>");
+  whenEl(`.ap[data-k="${k}"] #apinfo`,()=>infoArtista(k),80);
+  return html;
+};
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-abio]");if(!b)return;
+  const p=document.getElementById("abio");if(!p)return;
+  const cl=p.classList.toggle("cl");b.textContent=cl?"More":"Less";
+});
+</script>
+
 </body>
 </html>
