@@ -4232,8 +4232,8 @@ function linkURL(k,v){
 const hostOf=u=>{try{return new URL(u).hostname.replace(/^www\./,"")}catch(e){return u}};
 function linksOf(p){
   const L=p.links||{},out=[];
-  LKS.forEach(([k,n,ic])=>{const u=linkURL(k,L[k]);if(u)out.push({ic,t:k==="site"?hostOf(u):n,u})});
-  (p.custom||[]).forEach(c=>{const u=linkURL("site",c.u),l=String(c.l||"").trim();if(u&&l)out.push({ic:"link",t:l,u})});
+  LKS.forEach(([k,n,ic])=>{const u=linkURL(k,L[k]);if(u)out.push({ic,t:k==="site"?hostOf(u):n,u,web:k==="site"})});
+  (p.custom||[]).forEach(c=>{const u=linkURL("site",c.u),l=String(c.l||"").trim();if(u)out.push({ic:"link",t:l||hostOf(u),u,web:true})});
   return out;
 }
 const linkChips=p=>{const l=linksOf(p);return l.length?`<div class="pf-links">${l.map(x=>`<a class="pf-lk" href="${esc(x.u)}" target="_blank" rel="noopener noreferrer me">${ico(x.ic,15)}<span>${esc(x.t)}</span></a>`).join("")}</div>`:""};
@@ -4341,7 +4341,7 @@ function stLinks(){
   return `<section><h2>Links</h2><p class="stg-sub">Show your website and social profiles on your profile. Type a username or paste the full link.</p>
   <div class="gr">${LKS.map(row).join("")}</div></section>
   <section><div class="gr-tit">Custom links <span>${SETD.custom.length}/4</span></div><div style="margin-top:10px">
-  ${SETD.custom.length?`<div class="gr">${SETD.custom.map((c,i)=>{const bad=!!(c.u||"").trim()&&!linkURL("site",c.u);return `<div class="gr-row${bad?" bad":""}"><span class="gr-lbl lk">${ico("link",17)}</span><input class="gr-in" style="flex:.8" data-sc="l" data-i="${i}" value="${esc(c.l)}" placeholder="Label" maxlength="24"><input class="gr-in" data-sc="u" data-i="${i}" value="${esc(c.u)}" placeholder="https://" autocapitalize="none" spellcheck="false" inputmode="url"><button class="ib" data-s="cus-x" data-i="${i}" aria-label="Remove">${ico("x",12)}</button></div>`}).join("")}</div>`:""}
+  ${SETD.custom.length?`<div class="gr">${SETD.custom.map((c,i)=>{const bad=!!(c.u||"").trim()&&!linkURL("site",c.u);return `<div class="gr-row${bad?" bad":""}"><span class="gr-lbl lk">${ico("link",17)}</span><input class="gr-in" style="flex:.8" data-sc="l" data-i="${i}" value="${esc(c.l)}" placeholder="Label (optional)" maxlength="24"><input class="gr-in" data-sc="u" data-i="${i}" value="${esc(c.u)}" placeholder="https://" autocapitalize="none" spellcheck="false" inputmode="url"><button class="ib" data-s="cus-x" data-i="${i}" aria-label="Remove">${ico("x",12)}</button></div>`}).join("")}</div>`:""}
   ${SETD.custom.length<4?`<button class="btn" style="margin-top:12px" data-s="cus-add">${ico("plus",14)} Add link</button>`:""}</div></section>`;
 }
 function stAccount(){
@@ -4385,7 +4385,7 @@ function stSave(){
   const links={};let badLink=false;
   LKS.forEach(([k])=>{const v=(e.links[k]||"").trim();if(v){if(!linkURL(k,v))badLink=true;links[k]=v}});
   const custom=(e.custom||[]).map(c=>({l:(c.l||"").trim(),u:(c.u||"").trim()})).filter(c=>c.l||c.u);
-  custom.forEach(c=>{if(!c.l||!linkURL("site",c.u))badLink=true});
+  custom.forEach(c=>{if(!linkURL("site",c.u))badLink=true});
   if(badLink){flash("Check your links: some are not valid");stGo("links");return}
   const next={...old,...e,nome,handle:h,bio:(e.bio||"").trim(),local:(e.local||"").trim(),pron:(e.pron||"").trim(),links,custom,criador:!!e.criador,musicas:(e.musicas||[]).slice(0,10),fav:(e.fav||[]).slice(0,10)};
   const s=SOC.s();
@@ -4661,11 +4661,12 @@ perfilView=function(){
   const cell=(n,l,t,pp)=>`<button class="pw-c" data-aba="${t}"${pp?` data-pp="${pp}"`:""}><strong>${n}</strong><span>${l}</span></button>`;
   const stats=cell(ouv,"Listened","diario")+cell(av.length,"Ratings","avaliacoes")+cell(media?media.toFixed(1):"—","Avg","stats")+cell(SOC.following().length,"Following","pessoas","seguindo")+cell(SOC.followers().length,"Followers","pessoas","seguidores");
   const sub=["@"+esc(p.handle),p.local?esc(p.local):"",p.pron?esc(p.pron):""].filter(Boolean).join(" · ");
-  const lk=linksOf(p),lks=lk.map(x=>`<a class="pw-lk" href="${esc(x.u)}" target="_blank" rel="noopener noreferrer me" aria-label="${esc(x.t)}" title="${esc(x.t)}">${ico(x.ic,19)}</a>`).join("");
+  const lk=linksOf(p),webs=lk.filter(x=>x.web).map(x=>`<a href="${esc(x.u)}" target="_blank" rel="noopener noreferrer me" title="${esc(x.u)}">${ico("ptr",14)}<span>${esc(x.t)}</span></a>`).join(""),lks=lk.filter(x=>!x.web).map(x=>`<a class="pw-lk" href="${esc(x.u)}" target="_blank" rel="noopener noreferrer me" aria-label="${esc(x.t)}" title="${esc(x.t)}">${ico(x.ic,19)}</a>`).join("");
   return `<div class="pf">${banner}<div class="pw">
     <div class="pw-av">${avatar}</div>
     <div class="pw-id"><div class="pw-ns"><div class="pw-nm"><h1>${esc(p.nome)}</h1>${isCreator(p.handle)?cbadge(1):""}</div><div class="pw-sub">${sub}</div></div>
       ${p.bio?`<p class="pw-bio">${esc(p.bio)}</p>`:""}
+      ${webs?`<div class="pw-web">${webs}</div>`:""}
       <div class="pw-row"><button class="btn p" data-pact="editar">Edit profile</button><button class="pf-ib" data-pact="compartilhar" aria-label="Share profile" title="Share profile">${ico("share",17)}</button><button class="pf-ib" data-pact="cartao" aria-label="Share to Story" title="Share to Story">${ico("story",17)}</button>${lks?`<span class="pw-sep"></span>${lks}`:""}</div></div>
     <div class="pw-st">${stats}</div></div>
   <nav class="ptabs">${tabs.map(([k,l])=>`<button class="${aba===k?"on":""}" data-aba="${k}">${l}</button>`).join("")}</nav>
@@ -4759,5 +4760,24 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&e.target.id==="faq"
 })();
 </script>
 
+<style id="v12">
+/* ===== v12: link de site no estilo Letterboxd + favoritos menores no celular ===== */
+.pw-web{display:flex;flex-direction:column;align-items:flex-start;gap:4px;margin-top:10px}
+.pw-web a{display:inline-flex;align-items:center;gap:7px;max-width:100%;font-size:14px;font-weight:500;color:var(--mut);transition:color .2s}
+.pw-web a span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pw-web a svg{flex-shrink:0;opacity:.8}
+.pw-web a:hover{color:#fff}
+.pw-web a:hover span{text-decoration:underline;text-underline-offset:3px}
+@media(max-width:640px){
+  .pw-web{grid-column:1/-1;margin-top:8px}
+  .favpage{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+  .favpages{gap:8px}
+  .fitem .cover,.fvazio{border-radius:10px}
+  .fitem .ttl{font-size:11px;margin-top:6px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .fvazio{font-size:10px;border-width:1.5px}
+  .pf-body h3.sec{font-size:20px}
+}
+</style>
+<script>Object.assign(ICP,{ptr:'<path d="M5 3l14 7-6 2-2 6z"/>'});</script>
 </body>
 </html>
