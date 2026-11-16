@@ -4672,5 +4672,91 @@ perfilView=function(){
 };
 </script>
 
+<style id="v11">
+/* ===== v11: números discretos (estilo Letterboxd), abas em texto, página de artistas seguidos ===== */
+.pw-st{background:none;border:0;-webkit-backdrop-filter:none;backdrop-filter:none;padding:0;margin-top:22px;align-self:start;border-radius:0}
+.pw-c{min-width:0;padding:2px 17px;gap:3px;border-radius:10px}
+.pw-st .pw-c:last-child{padding-right:0}
+.pw-c+.pw-c::before{top:10%;bottom:10%}
+.pw-c strong{font-size:19px;letter-spacing:-.02em}
+.pw-c span{font-size:9.5px;letter-spacing:.09em}
+@media(max-width:1020px){
+  .pw-st{grid-column:1/-1;margin-top:12px;border-top:1px solid rgba(255,255,255,.1);border-bottom:1px solid rgba(255,255,255,.1);padding:8px 0}
+  .pw-c{flex:1;min-width:0;padding:4px 2px}
+  .pw-st .pw-c:last-child{padding-right:2px}
+}
+@media(max-width:640px){
+  .pw-st{margin-top:14px}
+  .pw-c strong{font-size:18px}
+  .pw-c span{font-size:9px;letter-spacing:.05em}
+}
+/* abas em texto com sublinhado */
+.pw+.ptabs{display:flex;width:100%;max-width:none;gap:26px;padding:0;margin:26px 0 0;background:none;border:0;border-radius:0;border-bottom:1px solid rgba(255,255,255,.12);-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none;overflow-x:auto}
+.pw+.ptabs button,.pw+.ptabs button.on{height:44px;padding:0;margin-bottom:-1px;border-radius:0;background:none;box-shadow:none;color:var(--mut);font-size:14.5px;font-weight:600;border-bottom:2px solid transparent;flex-shrink:0;transition:color .2s,border-color .2s}
+.pw+.ptabs button:hover{color:#fff}
+.pw+.ptabs button.on{color:#fff;border-bottom-color:#fff}
+@media(max-width:640px){.pw+.ptabs{gap:22px;margin-top:20px}}
+.pf-body{margin-top:22px}
+.pf-body>h2:first-child{margin-top:0}
+/* artistas seguidos */
+.pf-sh{display:flex;align-items:baseline;gap:12px;margin:34px 0 14px}
+.pf-sh h2{margin:0}
+.pf-sh .lnk{margin-left:auto;padding:4px 0}
+.pf-sh em{font-style:normal;color:var(--mut);font-weight:600;font-size:15px}
+.fa-top{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.fa-top h1{margin:0}
+.fa-top span{color:var(--mut);font-weight:600;font-size:18px}
+.fa-back{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;color:var(--mut);padding:6px 0;margin-bottom:6px;transition:color .2s}
+.fa-back:hover{color:#fff}
+.fa-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:26px 18px;margin-top:22px}
+.fa-i{display:block;text-align:center;min-width:0}
+.fa-i .cover{margin:0 auto;transition:transform .3s cubic-bezier(.3,1.4,.5,1)}
+.fa-i:hover .cover{transform:scale(1.05)}
+.fa-i b{display:block;margin-top:10px;font-size:14px;font-weight:600;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fa-i small{display:block;margin-top:2px;font-size:12px;font-weight:500;color:var(--mut)}
+@media(max-width:640px){.fa-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:22px 12px}}
+</style>
+<script>
+const faList=()=>(S.seguindo||[]).map(s=>({k:s.k,n:s.n,foto:(S.artists[s.k]||{}).foto||""})).sort((a,b)=>String(a.n).localeCompare(String(b.n)));
+function faGrid(q){
+  const nq=norm(q||""),l=faList().filter(a=>!nq||norm(a.n).includes(nq));
+  if(!l.length)return `<div class="empty" style="margin-top:22px">${(S.seguindo||[]).length?`No artists match “${esc(q)}”.`:"You aren't following any artists yet. Open an artist page and tap Follow."}</div>`;
+  return `<div class="fa-grid">${l.map(a=>`<a class="fa-i" href="#artist-${a.k}">${capaFoto(a.foto,a.n,104,true)}<b>${hl(a.n,q)}</b></a>`).join("")}</div>`;
+}
+function faView(){
+  const n=(S.seguindo||[]).length;
+  return `<a class="fa-back" href="#profile">${ico("left",15)} ${esc(P().nome)}</a>
+  <div class="fa-top"><h1>Artists you follow</h1><span>${n}</span></div>
+  <div class="sp-bar sm">${SQ_ICON}<input class="sp-in" id="faq" type="text" placeholder="Search your artists" autocomplete="off" autocapitalize="none" spellcheck="false"></div>
+  <div id="falist">${faGrid("")}</div>`;
+}
+(function(){
+  const prev=rota;
+  rota=function(){
+    const h=decodeURIComponent(location.hash.slice(1));
+    if(h!=="following-artists")return prev();
+    rotaTok++;resetAmb();
+    document.documentElement.style.removeProperty("--bg");
+    document.body.classList.remove("perfil","settings");
+    document.querySelectorAll(".nav a").forEach(a=>a.classList.toggle("on",a.dataset.tab==="profile"));
+    $("#app").innerHTML=faView();window.scrollTo(0,0);
+  };
+})();
+document.addEventListener("input",e=>{if(e.target.id==="faq"){const l=document.getElementById("falist");if(l)l.innerHTML=faGrid(e.target.value)}});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&e.target.id==="faq"){e.target.value="";document.getElementById("falist").innerHTML=faGrid("")}});
+
+/* Overview: prateleira curta + "See all" */
+(function(){
+  const po=pfOverview;
+  pfOverview=function(){
+    let h=po();const segA=faList();
+    h=h.replace(/<h2>Artists you follow<\/h2><div class="pf-arl">[\s\S]*<\/div>\s*$/,"");
+    if(!segA.length)return h;
+    const rec=[...(S.seguindo||[])].reverse().slice(0,12).map(s=>({k:s.k,n:s.n,foto:(S.artists[s.k]||{}).foto||""}));
+    return h+`<div class="pf-sh"><h2>Artists you follow</h2><em>${segA.length}</em><a class="lnk" href="#following-artists">See all</a></div><div class="pf-arl">${rec.map(a=>`<a class="pf-a" href="#artist-${a.k}">${capaFoto(a.foto,a.n,64,true)}<span>${esc(a.n)}</span></a>`).join("")}</div>`;
+  };
+})();
+</script>
+
 </body>
 </html>
