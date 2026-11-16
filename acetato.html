@@ -2941,7 +2941,7 @@ async function albumView(k){
       <button class="ab ${fav?"on":""}" data-act="fav" title="Favorite album">${ico("star",18,fav)}<span>Favorite</span></button>
     </div>
     <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;justify-content:inherit"><div style="display:flex" id="rate" data-id="${k}">${rateHTML(x.r)}</div><span class="mut" id="rlab">${x.r?String(x.r)+" of 5":"Your rating"}</span></div>
-    ${faixas.length?mediaBloco(faixas,m,x):""}
+    ${faixas.length?mediaBloco(faixas,m,x):""}${scoreHero(k)}
   </div></div>
   ${faixas.length?`<h2>Tracks</h2>${faixas.length>1?`<div class="tbar"><div class="tsearch"><input class="search" id="tsearch" type="search" placeholder="Search tracks in this album" autocomplete="off"></div>${xsel("tsort",[["n","Album order"],["az","Title A–Z"],["za","Title Z–A"],["long","Longest first"],["short","Shortest first"]],"n")}</div>`:""}<div class="mlist" id="tlist">${faixas.map((t,i)=>`<div class="row" data-tn="${esc(t.t.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase())}" data-i="${i}" data-ms="${t.ms||0}"><span class="num">${String(i+1).padStart(2,"0")}</span><div class="ttl grow">${esc(t.t)}${t.ex?`<i class="exb" title="Explicit">E</i>`:""}</div>${t.rk?`<span class="pop" title="Popularity"><i style="width:${Math.max(6,Math.round(t.rk/maxRk*100))}%"></i></span>`:""}<div class="tact">${trateHTML(t.t,m.a)}<button class="ib" data-play data-tt="${esc(t.t)}" data-ta="${esc(m.a)}" aria-label="Preview, video and links" title="Preview, video and links">${ico("play",12)}</button><button class="ib hv" data-story="musica" data-tt="${esc(t.t)}" data-ms="${t.ms||0}" aria-label="Share song" title="Share song">${ico("share",14)}</button></div><span class="mut sm tdur">${tempo(t.ms)}</span></div>`).join("")}<div class="tnone" id="tnone">No tracks found</div></div>`:`<div class="empty" style="margin-top:30px">No tracks available for this album.</div>`}
   <h2>Review</h2>
@@ -2953,8 +2953,9 @@ async function albumView(k){
       <div class="lbx-r"><span class="mut sm">Rating</span><div style="display:flex" id="rate2">${rateHTML(x.r)}</div></div>
       <button class="ab ${x.l?"on":""}" data-act="revlike">${likeInner(!!x.l)}</button>
     </div>
-    <div class="lbx-b"><button class="fab" data-act="rev">Save</button><button class="btn" data-story="album">${ico("share",14)} Share to Story</button></div>
+    <div class="lbx-b"><button class="btn" data-act="rev">Save draft</button><button class="fab" data-soc="pub">${SOC.mine(k)?"Update review":"Publish review"}</button><button class="btn" data-story="album">${ico("share",14)} Share to Story</button></div>
   </div>
+  <h2>Reviews</h2><div id="socrev">${socHTML(k)}</div>
   ${S.listas.length?`<h2>Add to a list</h2><div style="display:flex;gap:10px;flex-wrap:wrap">${xsel("lsel",S.listas.map((l,i)=>[String(i),l.nome]),"0")}<button class="btn" data-act="addLista">Add</button></div>`:`<h2>Lists</h2><div class="empty">Create a list in the Lists tab of your Profile to add albums.</div>`}
   ${sobre}
   <div id="amore"></div>`;
@@ -3196,6 +3197,152 @@ async function abrirFaixa(t,a,alb,cover){
     }else el.innerHTML=`<div class="tk-note">Couldn't load a video here. <a href="${ytSearch}" target="_blank" rel="noopener">Search on YouTube</a></div>`;
   })();
 }
+</script>
+<style id="social-v1">
+/* ===== Reviews publicadas, amigos e nota da comunidade ===== */
+.scorebox{display:flex;align-items:center;gap:12px;margin-top:14px;justify-content:inherit}
+.sc-t{font-size:15px;font-weight:700;letter-spacing:-.015em}
+.sc-s{font-size:12.5px;font-weight:500;color:var(--mut);margin-top:1px}
+.ring{flex-shrink:0;display:block}
+.socbox{display:grid;grid-template-columns:auto minmax(0,1fr);gap:20px;align-items:center;padding:18px;border-radius:22px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
+.socbox .sb-l{display:grid;justify-items:center;gap:8px;text-align:center}
+.socbox .sb-l small{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--mut)}
+.socbox .mbars{height:96px}
+.socbox .mb i{max-width:100%}
+.sb-fr{display:flex;gap:18px;flex-wrap:wrap;margin-top:12px;font-size:13px;font-weight:500;color:var(--mut)}
+.sb-fr strong{color:#fff;font-weight:700}
+@media(max-width:640px){.socbox{grid-template-columns:1fr}}
+.rvtabs{display:flex;width:max-content;max-width:100%;gap:2px;padding:4px;margin:16px 0 10px;border:1px solid rgba(255,255,255,.1);border-radius:999px;background:rgba(255,255,255,.07)}
+.rvtabs button{padding:8px 15px;border-radius:999px;font-size:13.5px;font-weight:600;color:var(--mut);white-space:nowrap;transition:background .25s,color .25s}
+.rvtabs button.on{background:#fff;color:#000}
+.rv{display:flex;gap:12px;padding:16px 4px;border-bottom:1px solid rgba(255,255,255,.08)}
+.rv:last-child{border-bottom:0}
+.rv-av{width:40px;height:40px;border-radius:50%;overflow:hidden;flex-shrink:0;display:grid;place-items:center;font-weight:700;font-size:14px}
+.rv-av img{width:100%;height:100%;object-fit:cover}
+.rv-b{flex:1;min-width:0}
+.rv-h{display:flex;align-items:center;gap:6px 8px;flex-wrap:wrap;font-size:14px}
+.rv-h b{font-weight:700;letter-spacing:-.01em}
+.rv-demo{font-style:normal;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 6px;border-radius:5px;background:rgba(255,255,255,.14);color:var(--mut)}
+.rv-t{margin:6px 0 0;font-size:15px;line-height:1.5;font-weight:400;color:rgba(255,255,255,.9);white-space:pre-line;overflow-wrap:anywhere}
+.rv-f{display:flex;gap:6px;margin-top:8px}
+.rv-l{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;font-size:12.5px;font-weight:600;color:var(--mut);background:rgba(255,255,255,.06);transition:background .2s,color .2s,transform .2s}
+.rv-l:hover{background:rgba(255,255,255,.14);color:#fff}
+.rv-l:active{transform:scale(.94)}
+.rv-l.on{color:#fff;background:rgba(255,255,255,.16)}
+.rvempty{padding:26px 18px;text-align:center;color:var(--mut);font-weight:500;border-radius:18px;background:rgba(255,255,255,.05);font-size:14px}
+.rvempty a{color:#fff;font-weight:600;text-decoration:underline;text-underline-offset:3px}
+.rvnote{font-size:12px;font-weight:500;color:var(--mut);margin:12px 2px 0;line-height:1.45}
+</style>
+<script>
+/* ===== Camada social (local por enquanto) =====
+   Tudo passa pelo objeto SOC. Quando o banco de dados existir, basta trocar os métodos
+   me / list / publish / unpublish / like / friends abaixo por chamadas à API. */
+const DEMOF=[["marina.sol","Marina Sol"],["caio.vinil","Caio Vinil"],["bia.reverb","Bia Reverb"],["theo.lofi","Theo Lofi"],["duda.fm","Duda FM"],["lu.analog","Lu Analog"]];
+const DEMOT=["Solid front to back, a few tracks I keep replaying.","Not what I expected, but it grew on me.","The production is incredible. Headphones recommended.","A couple of skips, but the highs are really high.","Instant favorite of the year for me.","Pleasant, a bit safe. Nice for background listening.","The second half is where it really shines.","Overhyped IMO, but I get why people love it."];
+const SOC={
+  s(){S.soc=S.soc||{};S.soc.amigos=S.soc.amigos||[];S.soc.rev=S.soc.rev||[];S.soc.likes=S.soc.likes||{};return S.soc},
+  me(){const p=P();return {h:p.handle,n:p.nome,av:p.avatar||""}},
+  isFriend(h){return this.s().amigos.some(a=>a.h===h)},
+  demoRev(k){
+    if(!this.s().demo)return [];
+    return DEMOF.map(([h,n])=>{
+      const x=parseInt(hash(k+h),36);
+      if(x%100>=70)return null;
+      const r=[2.5,3,3.5,3.5,4,4,4.5,5,2,3][x%10];
+      return {id:"d"+hash(k+h),k,u:h,n,av:"",r,txt:x%3?DEMOT[x%DEMOT.length]:"",d:new Date(Date.now()-(x%60)*864e5).toISOString().slice(0,10),demo:1,base:x%12};
+    }).filter(Boolean);
+  },
+  list(k){return [...this.s().rev.filter(x=>x.k===k),...this.demoRev(k)]},
+  mine(k){const h=this.me().h;return this.s().rev.find(x=>x.k===k&&x.u===h)||null},
+  publish(k,r,txt,d){
+    const me=this.me(),s=this.s(),id="m"+hash(k+me.h),i=s.rev.findIndex(x=>x.id===id);
+    const rv={id,k,u:me.h,n:me.n,av:me.av,r:r||0,txt,d};
+    if(i>=0)s.rev[i]=rv;else s.rev.push(rv);
+    salvar();
+  },
+  unpublish(id){const s=this.s();s.rev=s.rev.filter(x=>x.id!==id);salvar()},
+  likes(rv){return (rv.base||0)+(this.s().likes[rv.id]||[]).length},
+  liked(rv){return (this.s().likes[rv.id]||[]).includes(this.me().h)},
+  like(id){const s=this.s(),l=s.likes[id]||(s.likes[id]=[]),h=this.me().h,i=l.indexOf(h);if(i>=0)l.splice(i,1);else l.push(h);salvar()},
+  addFriend(h){h=String(h||"").trim().replace(/^@/,"").toLowerCase();if(!h)return"empty";const s=this.s();if(h===this.me().h.toLowerCase())return"self";if(s.amigos.some(a=>a.h===h))return"dup";const d=DEMOF.find(x=>x[0]===h);s.amigos.push({h,n:d?d[1]:h});salvar();return"ok"},
+  rmFriend(h){const s=this.s();s.amigos=s.amigos.filter(a=>a.h!==h);salvar()},
+  toggleDemo(){const s=this.s();s.demo=!s.demo;if(s.demo){DEMOF.slice(0,4).forEach(([h,n])=>{if(!s.amigos.some(a=>a.h===h))s.amigos.push({h,n})})}else{s.amigos=s.amigos.filter(a=>!DEMOF.some(d=>d[0]===a.h))}salvar()}
+};
+function socStats(k){
+  const me=SOC.me().h,lista=SOC.list(k).filter(x=>x.r),rs=lista.map(x=>x.r);
+  const myr=(S.u[k]||{}).r;
+  if(myr&&!lista.some(x=>x.u===me))rs.push(myr);
+  const n=rs.length,avg=n?rs.reduce((a,b)=>a+b,0)/n:0;
+  const hist=[.5,1,1.5,2,2.5,3,3.5,4,4.5,5].map(v=>rs.filter(r=>r===v).length);
+  const fr=lista.filter(x=>SOC.isFriend(x.u)),fa=fr.length?fr.reduce((a,b)=>a+b.r,0)/fr.length:0;
+  return {n,avg,pct:Math.round(avg/5*100),hist,fn:fr.length,fpct:Math.round(fa/5*100)};
+}
+function ringSVG(p,w,vazio){
+  const R=w/2-5,C=2*Math.PI*R,c=w/2;
+  return `<svg class="ring" width="${w}" height="${w}" viewBox="0 0 ${w} ${w}" aria-hidden="true"><circle cx="${c}" cy="${c}" r="${R}" fill="none" stroke="rgba(255,255,255,.14)" stroke-width="5"/>${vazio?"":`<circle cx="${c}" cy="${c}" r="${R}" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-p/100)}" transform="rotate(-90 ${c} ${c})"/>`}<text x="50%" y="50%" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="${Math.round(w*.27)}" font-weight="700" font-family="Inter,Helvetica,Arial,sans-serif">${vazio?"—":p+"%"}</text></svg>`;
+}
+function scoreHero(k){
+  const s=socStats(k);
+  return `<div class="scorebox">${ringSVG(s.pct,58,!s.n)}<div><div class="sc-t">${s.n?s.pct+"% community score":"No score yet"}</div><div class="sc-s">${s.n?`${s.avg.toFixed(1)} avg · ${s.n} rating${s.n>1?"s":""}`:"Rate or publish a review to start"}</div></div></div>`;
+}
+function rvCard(rv){
+  const me=SOC.me().h,eu=rv.u===me,[c1,c2]=cores(rv.u),av=eu?SOC.me().av:rv.av,lk=SOC.liked(rv);
+  return `<div class="rv"><div class="rv-av" style="background:linear-gradient(145deg,${c1},${c2})">${av?`<img src="${esc(av)}" alt="">`:esc(ini(rv.n))}</div><div class="rv-b">
+    <div class="rv-h"><b>${esc(eu?"You":rv.n)}</b><span class="mut sm">@${esc(rv.u)}</span>${rv.r?estrelas(rv.r):""}<span class="mut sm">${esc(fmtData(rv.d))}</span>${rv.demo?`<i class="rv-demo">Demo</i>`:""}</div>
+    ${rv.txt?`<p class="rv-t">${esc(rv.txt)}</p>`:""}
+    <div class="rv-f"><button class="rv-l ${lk?"on":""}" data-soc="like" data-id="${rv.id}" aria-label="Like review">${ico("heart",14,lk)} ${SOC.likes(rv)}</button>${eu?`<button class="rv-l" data-soc="unpub" data-id="${rv.id}">Remove</button>`:""}</div></div></div>`;
+}
+function socHTML(k){
+  const s=socStats(k),tab=window.__socTab||"friends",me=SOC.me().h;
+  const all=SOC.list(k).sort((a,b)=>b.d.localeCompare(a.d));
+  const sets={friends:all.filter(x=>SOC.isFriend(x.u)&&x.u!==me),all:all,you:all.filter(x=>x.u===me)};
+  const lab={friends:"Friends",all:"Everyone",you:"You"};
+  const mx=Math.max(1,...s.hist),lbl=["½","1","","2","","3","","4","","5"];
+  const bars=s.hist.map((c,i)=>`<div class="mb" title="${(i+1)/2} stars: ${c} rating${c===1?"":"s"}${s.n?" ("+Math.round(c/s.n*100)+"%)":""}"><b>${c||""}</b><i style="height:${Math.max(c?6:2,Math.round(c/mx*60))}px;${c?"":"opacity:.25"}"></i><span>${lbl[i]}</span></div>`).join("");
+  const lista=sets[tab];
+  const vazio=tab==="friends"?(SOC.s().amigos.length?`None of your friends reviewed this yet.`:`You haven't added friends yet. <a href="#@${encodeURIComponent(me)}" data-gofriends>Add them on your Profile</a>.`):tab==="you"?`You haven't published a review for this album.`:`No reviews yet. Be the first to publish one.`;
+  return `<div class="socbox"><div class="sb-l">${ringSVG(s.pct,92,!s.n)}<small>Community score</small></div>
+    <div><div class="mbars">${bars}</div><div class="sb-fr"><span><strong>${s.n}</strong> rating${s.n===1?"":"s"}</span>${s.n?`<span><strong>${s.avg.toFixed(2)}</strong> / 5 avg</span>`:""}${s.fn?`<span>Friends: <strong>${s.fpct}%</strong> (${s.fn})</span>`:""}</div></div></div>
+  <div class="rvtabs">${["friends","all","you"].map(t=>`<button class="${tab===t?"on":""}" data-soc="tab" data-t="${t}">${lab[t]} · ${sets[t].length}</button>`).join("")}</div>
+  ${lista.length?`<div>${lista.map(rvCard).join("")}</div>`:`<div class="rvempty">${vazio}</div>`}
+  <p class="rvnote">Reviews are stored only in this browser for now. When the database is connected, friends' reviews will show up here for real.</p>`;
+}
+function renderSoc(k){const el=document.getElementById("socrev");if(el)el.innerHTML=socHTML(k)}
+function amigosHTML(){
+  const s=SOC.s();
+  const rows=s.amigos.map(a=>{const [c1,c2]=cores(a.h);return `<div class="row"><div class="rv-av" style="width:40px;height:40px;background:linear-gradient(145deg,${c1},${c2})">${esc(ini(a.n))}</div><div class="grow"><div class="ttl">${esc(a.n)}${DEMOF.some(d=>d[0]===a.h)&&s.demo?` <i class="rv-demo">Demo</i>`:""}</div><div class="sm mut">@${esc(a.h)}</div></div><button class="mv" data-soc="friend-rm" data-h="${esc(a.h)}" aria-label="Remove friend">×</button></div>`}).join("");
+  return `<div id="friends"></div><h2>Friends</h2><div class="mlist">${rows||`<div class="empty" style="border-radius:0">No friends yet.</div>`}<div class="row" style="gap:10px"><input class="field" id="friendin" placeholder="Friend's username" autocomplete="off"><button class="fab" data-soc="friend-add">Add</button></div></div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px"><button class="btn ${s.demo?"on":""}" data-soc="demo">${s.demo?"Remove demo friends":"Load demo friends"}</button></div>
+  <p class="rvnote">Demo friends are made-up sample reviews so you can see how the feed and the percentage look. They disappear when you remove them.</p>`;
+}
+const _extraPerfil0=extraPerfil;
+extraPerfil=function(){return _extraPerfil0()+(aba==="perfil"?amigosHTML():"")};
+
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-soc]");
+  if(!b)return;
+  const a=b.dataset.soc,k=location.hash.slice(7);
+  if(a==="pub"){
+    const d=dd(k),txt=((document.getElementById("rev")||{}).value||d.rev||"").trim(),dv=(document.getElementById("revd")||{}).value;
+    if(!d.r&&!txt){flash("Add a rating or write a review first");return}
+    d.rev=txt;d.d=dv||d.d||hoje();
+    const novo=!SOC.mine(k);SOC.publish(k,d.r||0,txt,d.d);
+    flash(novo?"Review published":"Review updated");rota();return;
+  }
+  if(a==="unpub"){SOC.unpublish(b.dataset.id);flash("Review removed");rota();return}
+  if(a==="like"){SOC.like(b.dataset.id);renderSoc(k);return}
+  if(a==="tab"){window.__socTab=b.dataset.t;renderSoc(k);return}
+  if(a==="friend-add"){
+    const inp=document.getElementById("friendin"),r=SOC.addFriend(inp&&inp.value);
+    flash({ok:"Friend added",dup:"Already your friend",self:"That's you",empty:"Type a username"}[r]);
+    if(r==="ok")rota();return;
+  }
+  if(a==="friend-rm"){SOC.rmFriend(b.dataset.h);flash("Friend removed");rota();return}
+  if(a==="demo"){SOC.toggleDemo();flash(SOC.s().demo?"Demo friends loaded":"Demo friends removed");rota();return}
+});
+document.addEventListener("click",e=>{
+  if(e.target.closest("[data-gofriends]")){aba="perfil";setTimeout(()=>{const f=document.getElementById("friends");if(f)f.scrollIntoView({behavior:"smooth"})},150)}
+});
 </script>
 
 </body>
