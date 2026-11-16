@@ -4874,5 +4874,33 @@ document.addEventListener("click",e=>{
 });
 </script>
 
+<style id="v15">
+/* ===== v15: tema Apple Music (fundo em degradê com a cor da capa) ===== */
+html[data-theme="music"]{--base:#1c1c1e;--srf:rgba(255,255,255,.09);--srf2:rgba(255,255,255,.06);--mut:#a1a1a6;--tint:36%}
+html[data-theme="music"] body{background:linear-gradient(180deg,var(--bg) 0%,color-mix(in srgb,var(--bg) 50%,#000) 100%) fixed}
+html[data-theme="music"] .ap{--apbg:color-mix(in srgb,var(--ac,#333) 40%,var(--base))}
+html[data-theme="music"] .ap-main::before{background:linear-gradient(180deg,var(--apbg),var(--bg))!important}
+html[data-theme="music"] .abg::after{background:linear-gradient(180deg,rgba(0,0,0,.2) 0%,var(--bg) 85%)}
+html[data-theme="music"] .pban{background:none;-webkit-mask-image:linear-gradient(180deg,#000 35%,transparent 100%);mask-image:linear-gradient(180deg,#000 35%,transparent 100%)}
+html[data-theme="music"] .pban::after{display:none}
+html[data-theme="music"] .pw-av,html[data-theme="music"] .pav{border-color:var(--bg)}
+</style>
+<script>
+/* a cor do fundo das páginas de álbum passa a depender do tema (--tint) */
+apBg=function(c){document.documentElement.style.setProperty("--bg",`color-mix(in srgb,${c} var(--tint,14%),var(--base))`)};
+(function(){
+  const pv=perfilView;
+  perfilView=function(){
+    if(S.theme==="music"){
+      const p=P(),fav=p.fav||[],c=cores(fav[0]||p.handle||"acetato")[0];
+      document.documentElement.style.setProperty("--bg",`color-mix(in srgb,${c} 30%,var(--base))`);
+    }
+    return pv();
+  };
+})();
+THEMES.push(["music","Apple Music","linear-gradient(180deg,#5a4650,#1c1c1e)","rgba(255,255,255,.12)","#1c1c1e",""]);
+</script>
+
+<script>applyTheme(S.theme);</script>
 </body>
 </html>
