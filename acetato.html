@@ -4096,5 +4096,410 @@ document.addEventListener("click",e=>{
 });
 </script>
 
+<style id="v7">
+/* ===== v7: tela de configurações / editar perfil ===== */
+body.settings .gear{width:34px;opacity:1;transform:none;pointer-events:auto}
+.gear.on,.gear.on:hover{background:#fff;color:#000}
+main:has(.stg){max-width:1180px}
+.stg{width:100%}
+.stg-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:20px}
+.stg-head h1{margin:0}
+.stg-head span{color:var(--mut);font-weight:500;font-size:15px}
+.stg-grid{display:grid;grid-template-columns:200px minmax(0,1fr);gap:30px;align-items:start}
+@media(min-width:1100px){.stg-grid{grid-template-columns:200px minmax(0,1fr) 300px}}
+.stg-nav{position:sticky;top:84px;display:flex;flex-direction:column;gap:4px}
+.stg-n{display:flex;align-items:center;gap:11px;height:42px;padding:0 14px;border-radius:14px;font-size:14.5px;font-weight:600;color:var(--mut);transition:background .2s,color .2s}
+.stg-n:hover{background:rgba(255,255,255,.08);color:#fff}
+.stg-n.on{background:#fff;color:#000}
+.stg-prev{position:sticky;top:84px;display:none}
+@media(min-width:1100px){.stg-prev{display:block}}
+.stg-lbl{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin:0 0 10px 4px}
+.stg-main{min-width:0;display:grid;gap:26px}
+.stg-main h2{margin:0 0 4px}
+.stg-sub{color:var(--mut);font-size:13.5px;font-weight:500;margin:0 2px 12px;line-height:1.45}
+@media(max-width:820px){
+  .stg-grid{grid-template-columns:minmax(0,1fr);gap:18px}
+  .stg-nav{position:static;flex-direction:row;overflow-x:auto;scrollbar-width:none;padding:4px;gap:2px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
+  .stg-nav::-webkit-scrollbar{display:none}
+  .stg-n{flex:1;justify-content:center;height:38px;border-radius:999px;padding:0 12px;white-space:nowrap;font-size:13.5px}
+  .stg-n .ic{display:none}
+}
+.sx-cov{position:relative;border-radius:24px;overflow:hidden;background:#0b0b0d;border:1px solid rgba(255,255,255,.1);padding-bottom:18px}
+.sx-ban{position:relative;height:160px;background-size:cover;background-position:center}
+.sx-ban::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 45%,#0b0b0d 100%)}
+.sx-bacts{position:absolute;top:12px;right:12px;display:flex;gap:8px;z-index:3}
+.sx-chip{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 13px;border-radius:999px;background:rgba(38,38,40,.6);-webkit-backdrop-filter:saturate(220%) blur(16px);backdrop-filter:saturate(220%) blur(16px);border:1px solid rgba(255,255,255,.18);font-size:12.5px;font-weight:600;color:#fff;cursor:pointer;transition:background .2s;text-align:center}
+.sx-chip:hover{background:rgba(72,72,76,.7)}
+.sx-avrow{display:flex;align-items:flex-end;gap:14px;padding:0 20px;margin-top:-46px;position:relative;z-index:2}
+.sx-av{width:98px;height:98px;border-radius:50%;border:4px solid #0b0b0d;overflow:hidden;display:grid;place-items:center;font-weight:800;font-size:28px;flex-shrink:0;box-shadow:0 0 0 1px rgba(255,255,255,.14)}
+.sx-av img{width:100%;height:100%;object-fit:cover}
+.sx-aacts{display:flex;gap:8px;flex-wrap:wrap;padding-bottom:6px}
+.sx-hint{font-size:12.5px;font-weight:500;color:var(--mut);margin:8px 4px 0;line-height:1.4}
+.sx-hint.err{color:#ff8a80}
+.sx-hint.ok{color:#8fe3a3}
+.sx-at{color:var(--mut);font-weight:600;margin-right:-8px}
+.sx-sug{display:flex;gap:6px;flex-wrap:wrap;margin:10px 2px 0}
+.sx-sug button{padding:5px 11px;border-radius:999px;font-size:12.5px;font-weight:600;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);color:#fff}
+.sx-sug button:hover{background:rgba(255,255,255,.16)}
+.gr-row.bad{background:rgba(255,69,58,.09)}
+.gr-lbl.lk{display:flex;align-items:center;gap:9px;width:116px;color:#fff;font-weight:600}
+.gr-lbl.lk .ic{color:var(--mut)}
+.sx-lp{font-size:11.5px;font-weight:500;color:var(--mut);max-width:32%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:1}
+@media(max-width:640px){.sx-lp{display:none}.gr-lbl.lk{width:96px}}
+.sx-fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:14px}
+.sx-fi{position:relative;min-width:0}
+.sx-fi .cover{width:100%;aspect-ratio:1}
+.sx-n{position:absolute;top:7px;left:7px;z-index:3;min-width:22px;height:22px;padding:0 6px;border-radius:11px;background:rgba(0,0,0,.6);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);font:700 11px/22px var(--fx);text-align:center}
+.sx-fcap{font-size:12.5px;font-weight:600;margin-top:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sx-fa{display:flex;gap:6px;margin-top:6px}
+.sx-empty{padding:26px 18px;text-align:center;color:var(--mut);font-weight:500;font-size:14px;border-radius:18px;background:rgba(255,255,255,.05);border:1px dashed rgba(255,255,255,.14)}
+.sp-bar.sm{height:46px;padding-left:16px}
+.sp-bar.sm .sp-in{font-size:16px}
+.sx-add{flex-shrink:0;height:32px;min-width:78px;padding:0 14px;border-radius:999px;background:#fff;color:#000;font-size:13px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:transform .2s}
+.sx-add:hover{transform:scale(1.04)}
+.sx-add.on{background:rgba(255,255,255,.12);color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.16)}
+.sx-row{display:flex;align-items:center;gap:14px;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.07)}
+.sx-row:last-child{border-bottom:0}
+.sx-row .t{flex:1;min-width:0}
+.sx-row .t b{display:block;font-size:15px;font-weight:600;letter-spacing:-.01em}
+.sx-row .t small{display:block;margin-top:2px;font-size:12.5px;font-weight:500;color:var(--mut);line-height:1.4}
+.sx-sw{width:48px;height:29px;border-radius:15px;background:rgba(255,255,255,.2);position:relative;flex-shrink:0;transition:background .25s;padding:0}
+.sx-sw::after{content:"";position:absolute;left:3px;top:3px;width:23px;height:23px;border-radius:50%;background:#fff;transition:transform .3s cubic-bezier(.3,1.4,.5,1),background .2s}
+.sx-sw.on{background:#fff}
+.sx-sw.on::after{background:#000;transform:translateX(19px)}
+.sx-btns{display:flex;gap:10px;flex-wrap:wrap;padding:14px 16px}
+.stg-bar{position:fixed;left:50%;bottom:24px;transform:translate(-50%,24px);opacity:0;pointer-events:none;z-index:40;display:flex;align-items:center;gap:12px;padding:8px 8px 8px 22px;border-radius:999px;background:rgba(38,38,40,.7);-webkit-backdrop-filter:saturate(220%) blur(20px);backdrop-filter:saturate(220%) blur(20px);border:1px solid rgba(255,255,255,.14);box-shadow:0 20px 50px rgba(0,0,0,.6);transition:transform .35s cubic-bezier(.2,.8,.2,1),opacity .25s;max-width:94vw}
+.stg-bar.show{transform:translate(-50%,0);opacity:1;pointer-events:auto}
+.stg-bar span{font-size:13.5px;font-weight:600;white-space:nowrap}
+.stg-bar .btn,.stg-bar .fab{height:38px;padding:0 18px}
+@media(max-width:640px){.stg-bar{bottom:calc(84px + env(safe-area-inset-bottom,0px));padding-left:16px;gap:8px}.stg-bar span{font-size:12.5px}}
+.sx-pv{border-radius:24px;overflow:hidden;background:#0b0b0d;border:1px solid rgba(255,255,255,.1);padding-bottom:18px}
+.sx-pvb{height:92px;background-size:cover;background-position:center}
+.sx-pva{width:74px;height:74px;margin:-37px 0 0 18px;border-radius:50%;border:4px solid #0b0b0d;overflow:hidden;display:grid;place-items:center;font-weight:800;font-size:22px;position:relative}
+.sx-pva img{width:100%;height:100%;object-fit:cover}
+.sx-pvt{padding:10px 18px 0}
+.sx-pvn{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:19px;font-weight:700;letter-spacing:-.025em;overflow-wrap:anywhere}
+.sx-pvh{color:var(--mut);font-size:13px;font-weight:500;margin-top:2px;overflow-wrap:anywhere}
+.sx-pvbio{font-size:13.5px;line-height:1.45;margin-top:10px;color:rgba(255,255,255,.88);white-space:pre-line;overflow-wrap:anywhere}
+.sx-pvl{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.sx-pvl .pf-lk{height:26px;font-size:12px;padding:0 10px 0 8px;gap:5px;pointer-events:none}
+.sx-pvf{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:14px 18px 0}
+.sx-pvf .cover{width:100%;aspect-ratio:1;border-radius:8px}
+.sx-pvf i{aspect-ratio:1;border-radius:8px;border:1.5px dashed rgba(255,255,255,.18)}
+/* links no perfil */
+.pf-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.pf-lk{display:inline-flex;align-items:center;gap:7px;height:32px;padding:0 13px 0 11px;border-radius:999px;font-size:13px;font-weight:600;color:#fff;background:rgba(38,38,40,.6);-webkit-backdrop-filter:saturate(220%) blur(16px);backdrop-filter:saturate(220%) blur(16px);border:1px solid rgba(255,255,255,.1);transition:background .2s,transform .2s}
+.pf-lk:hover{background:rgba(255,255,255,.16);transform:translateY(-1px)}
+.pf-lk .ic{color:rgba(255,255,255,.75)}
+.pf-pron{display:inline-block;margin-left:8px;padding:1px 8px;border-radius:999px;font-size:11.5px;font-weight:600;background:rgba(255,255,255,.1);color:var(--mut);vertical-align:1px}
+</style>
+
+<script>
+/* ===== v7: ícones extras ===== */
+Object.assign(ICP,{
+  link:'<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
+  left:'<path d="M15 5l-7 7 7 7"/>',up:'<path d="M5 15l7-7 7 7"/>',down:'<path d="M5 9l7 7 7-7"/>',
+  lk_ig:'<rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.3 6.8h.01"/>',
+  lk_x:'<path d="M4.5 4.5l15 15M19.5 4.5l-15 15"/>',
+  lk_tt:'<path d="M14 4v10.5a3.5 3.5 0 1 1-3.5-3.5M14 4c.4 2.4 1.9 3.9 4.5 4.2"/>',
+  lk_sp:'<circle cx="12" cy="12" r="9"/><path d="M7 9.5c3.3-1 7-.7 10 1M7.8 13c2.7-.8 5.4-.5 7.8.9M8.6 16.2c2-.5 4-.3 5.7.7"/>',
+  lk_yt:'<rect x="3" y="6" width="18" height="12" rx="4"/><path d="M10.5 9.6v4.8l4.1-2.4z"/>',
+  lk_lb:'<circle cx="7.3" cy="12" r="3.3"/><circle cx="12" cy="12" r="3.3"/><circle cx="16.7" cy="12" r="3.3"/>',
+  lk_fm:'<circle cx="12" cy="12" r="9"/><path d="M8 8v8M8 12c0-1.6 1.2-2.6 2.5-2.6s2.2.9 2.6 2.6.9 2.6 2.4 2.6"/>'
+});
+
+/* ===== v7: links (como no Letterboxd) ===== */
+const LKS=[
+  ["site","Website","globe","yourwebsite.com"],
+  ["instagram","Instagram","lk_ig","username"],
+  ["x","X / Twitter","lk_x","username"],
+  ["tiktok","TikTok","lk_tt","username"],
+  ["youtube","YouTube","lk_yt","@channel or link"],
+  ["spotify","Spotify","lk_sp","profile link"],
+  ["letterboxd","Letterboxd","lk_lb","username"],
+  ["lastfm","Last.fm","lk_fm","username"]
+];
+const LKBASE={instagram:"https://instagram.com/",x:"https://x.com/",tiktok:"https://tiktok.com/@",youtube:"https://youtube.com/@",spotify:"https://open.spotify.com/user/",letterboxd:"https://letterboxd.com/",lastfm:"https://last.fm/user/"};
+function linkURL(k,v){
+  v=String(v||"").trim();if(!v||/\s/.test(v)&&!/^https?:\/\//i.test(v))return"";
+  let u="";
+  if(/^https?:\/\//i.test(v))u=v;
+  else if(/\./.test(v)&&(k==="site"||/\//.test(v)))u="https://"+v;
+  else if(k==="site")return"";
+  else u=LKBASE[k]+encodeURIComponent(v.replace(/^@/,""));
+  try{const x=new URL(u);return (/^https?:$/.test(x.protocol)&&x.hostname.includes("."))?x.href:""}catch(e){return""}
+}
+const hostOf=u=>{try{return new URL(u).hostname.replace(/^www\./,"")}catch(e){return u}};
+function linksOf(p){
+  const L=p.links||{},out=[];
+  LKS.forEach(([k,n,ic])=>{const u=linkURL(k,L[k]);if(u)out.push({ic,t:k==="site"?hostOf(u):n,u})});
+  (p.custom||[]).forEach(c=>{const u=linkURL("site",c.u),l=String(c.l||"").trim();if(u&&l)out.push({ic:"link",t:l,u})});
+  return out;
+}
+const linkChips=p=>{const l=linksOf(p);return l.length?`<div class="pf-links">${l.map(x=>`<a class="pf-lk" href="${esc(x.u)}" target="_blank" rel="noopener noreferrer me">${ico(x.ic,15)}<span>${esc(x.t)}</span></a>`).join("")}</div>`:""};
+(function(){
+  const pv=perfilView;
+  perfilView=function(){
+    let h=pv();const p=P();
+    const old=`<div class="phandle">@${esc(p.handle)}${p.local?" · "+esc(p.local):""}</div>`;
+    h=h.replace(old,`<div class="phandle">@${esc(p.handle)}${p.local?" · "+esc(p.local):""}${p.pron?`<span class="pf-pron">${esc(p.pron)}</span>`:""}</div>`);
+    return h.replace('<div class="pf-stats">',linkChips(p)+'<div class="pf-stats">');
+  };
+})();
+
+/* ===== v7: página de configurações ===== */
+const STABS=[["profile","Profile","user"],["favorites","Favorites","star"],["links","Links","link"],["account","Account","info"]];
+let SETD=null,SETO="",STAB="profile",SFQ="",SFM="albuns",SFRES=[],sfTok=0,sfT=null;
+const dirty=()=>!!SETD&&JSON.stringify(SETD)!==SETO;
+const stHash=t=>t==="profile"?"settings":"settings-"+t;
+function stGo(t){const h=stHash(t);if(location.hash==="#"+h)renderSettings();else location.hash=h}
+
+(function(){
+  const _rota=rota;
+  window.removeEventListener("hashchange",_rota);
+  rota=function(){
+    const h=decodeURIComponent(location.hash.slice(1)),on=h==="settings"||h.startsWith("settings-");
+    document.body.classList.toggle("settings",on);
+    const g=document.querySelector(".gear");if(g)g.classList.toggle("on",on);
+    if(!on){SETD=null;return _rota()}
+    rotaTok++;resetAmb();
+    document.documentElement.style.removeProperty("--bg");
+    document.body.classList.remove("perfil");
+    document.querySelectorAll(".nav a").forEach(a=>a.classList.remove("on"));
+    const t=h.split("-")[1];STAB=STABS.some(x=>x[0]===t)?t:"profile";
+    renderSettings(true);
+  };
+  window.addEventListener("hashchange",()=>rota());
+})();
+
+function renderSettings(top){
+  const y=window.scrollY;
+  $("#app").innerHTML=settingsView();
+  window.scrollTo(0,top?0:y);
+  stSync();
+}
+function stInit(){
+  if(SETD)return;
+  const p=P();
+  SETD=JSON.parse(JSON.stringify(p));
+  SETD.fav=SETD.fav||[];SETD.musicas=SETD.musicas||[];SETD.links=SETD.links||{};SETD.custom=SETD.custom||[];
+  SETD.pron=SETD.pron||"";SETD.bio=SETD.bio||"";SETD.local=SETD.local||"";SETD.criador=p.criador!==false;
+  SETO=JSON.stringify(SETD);
+}
+function settingsView(){
+  stInit();
+  const body={profile:stProfile,favorites:stFav,links:stLinks,account:stAccount}[STAB]();
+  return `<div class="stg"><div class="stg-head"><h1>Settings</h1><span>@${esc(P().handle)}</span></div>
+  <div class="stg-grid">
+    <nav class="stg-nav">${STABS.map(([k,l,ic])=>`<a class="stg-n ${STAB===k?"on":""}" href="#${stHash(k)}">${ico(ic,18)}${l}</a>`).join("")}</nav>
+    <div class="stg-main">${body}</div>
+    <aside class="stg-prev"><div class="stg-lbl">Preview</div><div id="stpvin"></div></aside>
+  </div>
+  <div class="stg-bar" id="stbar"><span>Unsaved changes</span><button class="btn" data-s="discard">Discard</button><button class="fab" data-s="save">Save changes</button></div></div>`;
+}
+function stProfile(){
+  const e=SETD,[c1,c2]=cores(e.handle||"acetato");
+  return `<section><h2>Profile</h2><p class="stg-sub">This is how people see you on Acetato.</p>
+  <div class="sx-cov"><div class="sx-ban" style="${e.banner?`background-image:url('${esc(e.banner)}')`:`background:linear-gradient(135deg,${c1},${c2})`}"></div>
+    <div class="sx-bacts"><label class="sx-chip">${ico("plus",13)} Banner<input id="sbanner" type="file" accept="image/*" hidden></label>${e.banner?`<button class="sx-chip" data-s="banner-rm">Remove</button>`:""}</div>
+    <div class="sx-avrow"><div class="sx-av" style="background:${e.avatar?"#222":`linear-gradient(145deg,${c1},${c2})`}">${e.avatar?`<img src="${esc(e.avatar)}" alt="">`:esc(ini(e.nome))}</div>
+      <div class="sx-aacts"><label class="sx-chip">Change photo<input id="sfoto" type="file" accept="image/*" hidden></label>${e.avatar?`<button class="sx-chip" data-s="foto-rm">Remove</button>`:""}</div></div></div></section>
+  <section><div class="gr">
+    <div class="gr-row"><span class="gr-lbl">Name</span><input class="gr-in" data-sf="nome" maxlength="40" value="${esc(e.nome)}" placeholder="Your name"></div>
+    <div class="gr-row"><span class="gr-lbl">Username</span><span class="sx-at">@</span><input class="gr-in" data-sf="handle" maxlength="30" value="${esc(e.handle)}" placeholder="username" autocapitalize="none" autocorrect="off" spellcheck="false"></div>
+    <div class="gr-row"><span class="gr-lbl">Pronouns</span><input class="gr-in" data-sf="pron" maxlength="24" value="${esc(e.pron)}" placeholder="Optional"></div>
+    <div class="gr-row"><span class="gr-lbl">Location</span><input class="gr-in" data-sf="local" maxlength="40" value="${esc(e.local)}" placeholder="City, country"></div>
+    <div class="gr-row gr-alto"><span class="gr-lbl">Bio</span><textarea class="gr-in" data-sf="bio" maxlength="240" rows="3" placeholder="Tell people what you listen to">${esc(e.bio)}</textarea></div>
+  </div>
+  <p class="sx-hint" id="shandle"></p>
+  <div class="sx-sug">${["she/her","he/him","they/them"].map(v=>`<button data-s="pron" data-v="${v}">${v}</button>`).join("")}</div>
+  <p class="sx-hint" id="sbioc"></p></section>`;
+}
+function favAlbHTML(){
+  const f=SETD.fav;
+  if(!f.length)return `<div class="sx-empty">No favorite albums yet. Search below and tap Add.</div>`;
+  return `<div class="sx-fgrid">${f.map((k,i)=>{const m=S.meta[k]||{};return `<div class="sx-fi"><span class="sx-n">${i+1}</span>${capaAlbum(k,m.t,null)}<div class="sx-fcap">${esc(m.t||"")}</div><div class="sx-fa"><button class="ib" data-s="fav-l" data-i="${i}" aria-label="Move earlier" ${i?"":"disabled style='opacity:.3'"}>${ico("left",13)}</button><button class="ib" data-s="fav-r" data-i="${i}" aria-label="Move later" ${i<f.length-1?"":"disabled style='opacity:.3'"}>${ico("chev",13)}</button><button class="ib" data-s="fav-x" data-i="${i}" aria-label="Remove">${ico("x",12)}</button></div></div>`}).join("")}</div>`;
+}
+function favMusHTML(){
+  const m=SETD.musicas;
+  if(!m.length)return `<div class="sx-empty">No favorite songs yet.</div>`;
+  return `<div class="mlist">${m.map((t,i)=>`<div class="row"><span class="num">${String(i+1).padStart(2,"0")}</span><div class="ttl grow">${esc(t)}</div><button class="ib" data-s="mus-u" data-i="${i}" aria-label="Move up" ${i?"":"disabled style='opacity:.3'"}>${ico("up",13)}</button><button class="ib" data-s="mus-d" data-i="${i}" aria-label="Move down" ${i<m.length-1?"":"disabled style='opacity:.3'"}>${ico("down",13)}</button><button class="ib" data-s="mus-x" data-i="${i}" aria-label="Remove">${ico("x",12)}</button></div>`).join("")}</div>`;
+}
+function stFav(){
+  return `<section><h2>Favorites</h2><p class="stg-sub">Pick up to 10 albums and 10 songs. The first four albums are the ones shown first on your profile.</p>
+  <div class="gr-tit">Favorite albums <span>${SETD.fav.length}/10</span></div><div id="sffa" style="margin-top:10px">${favAlbHTML()}</div></section>
+  <section><div class="gr-tit">Favorite songs <span>${SETD.musicas.length}/10</span></div><div id="sffm" style="margin-top:10px">${favMusHTML()}</div></section>
+  <section><div class="gr-tit">Add</div>
+  <div class="sp-bar sm" style="margin-top:10px">${SQ_ICON}<input class="sp-in" id="sfq" type="text" placeholder="Search an album or a song" autocomplete="off" autocapitalize="none" spellcheck="false" value="${esc(SFQ)}"></div>
+  <div class="chips">${[["albuns","Albums"],["musicas","Songs"]].map(([k,l])=>`<button class="chip ${SFM===k?"on":""}" data-sfm="${k}">${l}</button>`).join("")}</div>
+  <div id="sfres" style="margin-top:12px"></div></section>`;
+}
+function stLinks(){
+  const L=SETD.links;
+  const row=([k,n,ic,ph])=>{const u=linkURL(k,L[k]),bad=!!(L[k]||"").trim()&&!u;
+    return `<div class="gr-row${bad?" bad":""}" data-lrow="${k}"><span class="gr-lbl lk">${ico(ic,17)}${n}</span><input class="gr-in" data-sl="${k}" value="${esc(L[k]||"")}" placeholder="${ph}" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="${k==="site"?"url":"text"}"><span class="sx-lp" data-lp="${k}">${u?esc(hostOf(u)+new URL(u).pathname.replace(/\/$/,"")):""}</span></div>`};
+  return `<section><h2>Links</h2><p class="stg-sub">Show your website and social profiles on your profile. Type a username or paste the full link.</p>
+  <div class="gr">${LKS.map(row).join("")}</div></section>
+  <section><div class="gr-tit">Custom links <span>${SETD.custom.length}/4</span></div><div style="margin-top:10px">
+  ${SETD.custom.length?`<div class="gr">${SETD.custom.map((c,i)=>{const bad=!!(c.u||"").trim()&&!linkURL("site",c.u);return `<div class="gr-row${bad?" bad":""}"><span class="gr-lbl lk">${ico("link",17)}</span><input class="gr-in" style="flex:.8" data-sc="l" data-i="${i}" value="${esc(c.l)}" placeholder="Label" maxlength="24"><input class="gr-in" data-sc="u" data-i="${i}" value="${esc(c.u)}" placeholder="https://" autocapitalize="none" spellcheck="false" inputmode="url"><button class="ib" data-s="cus-x" data-i="${i}" aria-label="Remove">${ico("x",12)}</button></div>`}).join("")}</div>`:""}
+  ${SETD.custom.length<4?`<button class="btn" style="margin-top:12px" data-s="cus-add">${ico("plus",14)} Add link</button>`:""}</div></section>`;
+}
+function stAccount(){
+  const on=!!SETD.criador;
+  return `<section><h2>Account</h2><p class="stg-sub">Preferences and your data.</p>
+  <div class="gr"><div class="sx-row"><div class="t"><b>Creator badge</b><small>Show the Creator seal next to your name on your profile, reviews and feed.</small></div><button class="sx-sw ${on?"on":""}" data-s="criador" role="switch" aria-checked="${on}" aria-label="Creator badge"></button></div></div></section>
+  <section><div class="gr-tit">Your data</div><p class="stg-sub" style="margin-top:8px">Everything is saved only in this browser. Back up from time to time.</p>
+  <div class="gr"><div class="sx-btns"><button class="btn" data-bk="exp">Export backup</button><label class="btn" style="cursor:pointer">Import backup<input id="impf" type="file" accept="application/json,.json" hidden></label><button class="btn" data-s="clr-recent">Clear search history</button></div></div></section>`;
+}
+function stPreview(){
+  const e=SETD,[c1,c2]=cores(e.handle||"acetato"),favs=(e.fav||[]).slice(0,4),links=linksOf(e);
+  const badge=e.criador||CREATORS.includes(e.handle);
+  return `<div class="sx-pv"><div class="sx-pvb" style="${e.banner?`background-image:url('${esc(e.banner)}')`:`background:linear-gradient(135deg,${c1},${c2})`}"></div>
+  <div class="sx-pva" style="background:${e.avatar?"#222":`linear-gradient(145deg,${c1},${c2})`}">${e.avatar?`<img src="${esc(e.avatar)}" alt="">`:esc(ini(e.nome))}</div>
+  <div class="sx-pvt"><div class="sx-pvn">${esc(e.nome||"Your name")}${badge?cbadge():""}</div>
+  <div class="sx-pvh">@${esc(e.handle||"username")}${e.local?" · "+esc(e.local):""}${e.pron?" · "+esc(e.pron):""}</div>
+  ${e.bio?`<div class="sx-pvbio">${esc(e.bio)}</div>`:""}
+  ${links.length?`<div class="sx-pvl">${links.map(x=>`<span class="pf-lk">${ico(x.ic,13)}<span>${esc(x.t)}</span></span>`).join("")}</div>`:""}</div>
+  <div class="sx-pvf">${[0,1,2,3].map(i=>favs[i]?capaAlbum(favs[i],(S.meta[favs[i]]||{}).t,null):"<i></i>").join("")}</div></div>`;
+}
+function stHandleErr(){
+  const h=(SETD.handle||"").trim(),old=P().handle;
+  if(!h)return"Choose a username.";
+  if(!/^[a-z0-9._]{3,30}$/.test(h))return"Use 3 to 30 letters, numbers, dots or underscores.";
+  if(h!==old&&DEMOF.some(d=>d[0]===h))return"That username is taken.";
+  return"";
+}
+function stSync(){
+  if(!SETD)return;
+  const bar=document.getElementById("stbar");if(bar)bar.classList.toggle("show",dirty());
+  const pv=document.getElementById("stpvin");if(pv)pv.innerHTML=stPreview();
+  const hh=document.getElementById("shandle");
+  if(hh){const er=stHandleErr();hh.className="sx-hint "+(er?"err":"ok");hh.textContent=er||`Your profile: @${SETD.handle}`}
+  const bc=document.getElementById("sbioc");if(bc)bc.textContent=`${(SETD.bio||"").length}/240`;
+}
+function stSave(){
+  const e=SETD,old=P();
+  const nome=(e.nome||"").trim(),h=(e.handle||"").trim();
+  if(!nome){flash("Add a display name");stGo("profile");return}
+  const er=stHandleErr();if(er){flash(er);stGo("profile");return}
+  const links={};let badLink=false;
+  LKS.forEach(([k])=>{const v=(e.links[k]||"").trim();if(v){if(!linkURL(k,v))badLink=true;links[k]=v}});
+  const custom=(e.custom||[]).map(c=>({l:(c.l||"").trim(),u:(c.u||"").trim()})).filter(c=>c.l||c.u);
+  custom.forEach(c=>{if(!c.l||!linkURL("site",c.u))badLink=true});
+  if(badLink){flash("Check your links: some are not valid");stGo("links");return}
+  const next={...old,...e,nome,handle:h,bio:(e.bio||"").trim(),local:(e.local||"").trim(),pron:(e.pron||"").trim(),links,custom,criador:!!e.criador,musicas:(e.musicas||[]).slice(0,10),fav:(e.fav||[]).slice(0,10)};
+  const s=SOC.s();
+  if(h!==old.handle){
+    s.rev.forEach(r=>{if(r.u===old.handle)r.u=h});
+    Object.keys(s.likes).forEach(id=>{s.likes[id]=s.likes[id].map(x=>x===old.handle?h:x)});
+  }
+  s.rev.forEach(r=>{if(r.u===h){r.n=nome;r.av=next.avatar||""}});
+  S.perfil=next;salvar();SETD=null;aba="perfil";
+  flash("Profile saved");
+  location.hash="profile";
+}
+
+/* busca para favoritos */
+async function runSf(){
+  const q=SFQ.trim(),res=document.getElementById("sfres");if(!res)return;
+  if(q.length<2){res.innerHTML="";return}
+  const e=encodeURIComponent(q),tok=++sfTok;res.innerHTML=`<div class="load"></div>`;
+  if(SFM==="albuns"){
+    const r=await Promise.allSettled([fontes.albunsDZ(e),fontes.albunsIT(e)]);if(tok!==sfTok)return;
+    const l=unirAlbuns(r.flatMap(x=>x.status==="fulfilled"?x.value:[])).slice(0,20);l.forEach(guardarAlbum);salvar();
+    res.innerHTML=l.length?`<div class="mlist">${l.map(u=>`<div class="row">${capaAlbum(u.key,u.t,46)}<div class="grow"><div class="ttl">${hl(u.t,q)}</div><div class="sm mut">${esc(u.a)}${u.y?" · "+u.y:""}</div></div><button class="sx-add" data-s="pick-alb" data-k="${u.key}"></button></div>`).join("")}</div>`:`<div class="empty">Nothing found.</div>`;
+  }else{
+    const r=await Promise.allSettled([fontes.musicasDZ(e),fontes.musicasIT(e)]);if(tok!==sfTok)return;
+    SFRES=dedupMusicas(r.flatMap(x=>x.status==="fulfilled"?x.value:[])).slice(0,25);
+    res.innerHTML=SFRES.length?`<div class="mlist">${SFRES.map((m,i)=>`<div class="row"><div class="grow"><div class="ttl">${hl(m.titulo,q)}</div><div class="sm mut">${esc(m.artista)} · ${esc(m.album.t)}</div></div><button class="sx-add" data-s="pick-mus" data-i="${i}"></button></div>`).join("")}</div>`:`<div class="empty">Nothing found.</div>`;
+  }
+  markPicks();
+}
+function markPicks(){
+  document.querySelectorAll('#sfres [data-s="pick-alb"]').forEach(b=>{const on=SETD.fav.includes(b.dataset.k);b.classList.toggle("on",on);b.textContent=on?"Added":"Add"});
+  document.querySelectorAll('#sfres [data-s="pick-mus"]').forEach(b=>{const m=SFRES[+b.dataset.i],on=!!m&&SETD.musicas.includes(`${m.titulo} — ${m.artista}`);b.classList.toggle("on",on);b.textContent=on?"Added":"Add"});
+}
+function favRefresh(){
+  const a=document.getElementById("sffa"),m=document.getElementById("sffm");
+  if(a)a.innerHTML=favAlbHTML();if(m)m.innerHTML=favMusHTML();
+  document.querySelectorAll(".stg-main .gr-tit span").forEach((s,i)=>{s.textContent=(i?SETD.musicas.length:SETD.fav.length)+"/10"});
+  markPicks();stSync();
+}
+const mv=(arr,i,d)=>{const j=i+d;if(j<0||j>=arr.length)return;[arr[i],arr[j]]=[arr[j],arr[i]]};
+
+document.addEventListener("click",e=>{
+  const g=e.target.closest('[data-pact="editar"]');
+  if(g){e.stopPropagation();e.preventDefault();location.hash="settings"}
+},true);
+document.addEventListener("click",e=>{
+  if(!SETD||!dirty())return;
+  const a=e.target.closest('a[href^="#"]');
+  if(a&&!/^#settings/.test(a.getAttribute("href"))&&!confirm("Discard unsaved changes?")){e.preventDefault();e.stopPropagation()}
+},true);
+document.addEventListener("click",e=>{
+  const sm=e.target.closest("[data-sfm]");
+  if(sm&&SETD){SFM=sm.dataset.sfm;document.querySelectorAll("[data-sfm]").forEach(c=>c.classList.toggle("on",c===sm));runSf();return}
+  const b=e.target.closest("[data-s]");if(!b||!SETD)return;
+  const a=b.dataset.s,i=+b.dataset.i;
+  switch(a){
+    case"banner-rm":SETD.banner="";renderSettings();break;
+    case"foto-rm":SETD.avatar="";renderSettings();break;
+    case"pron":{SETD.pron=b.dataset.v;const inp=document.querySelector('[data-sf="pron"]');if(inp)inp.value=b.dataset.v;stSync();break}
+    case"fav-l":mv(SETD.fav,i,-1);favRefresh();break;
+    case"fav-r":mv(SETD.fav,i,1);favRefresh();break;
+    case"fav-x":SETD.fav.splice(i,1);favRefresh();break;
+    case"mus-u":mv(SETD.musicas,i,-1);favRefresh();break;
+    case"mus-d":mv(SETD.musicas,i,1);favRefresh();break;
+    case"mus-x":SETD.musicas.splice(i,1);favRefresh();break;
+    case"pick-alb":{
+      const k=b.dataset.k,j=SETD.fav.indexOf(k);
+      if(j>=0)SETD.fav.splice(j,1);else if(SETD.fav.length<10)SETD.fav.push(k);else{flash("Up to 10 favorite albums");break}
+      favRefresh();break}
+    case"pick-mus":{
+      const m=SFRES[i];if(!m)break;const l=`${m.titulo} — ${m.artista}`,j=SETD.musicas.indexOf(l);
+      if(j>=0)SETD.musicas.splice(j,1);else if(SETD.musicas.length<10)SETD.musicas.push(l);else{flash("Up to 10 songs");break}
+      favRefresh();break}
+    case"cus-add":if(SETD.custom.length<4){SETD.custom.push({l:"",u:""});renderSettings()}break;
+    case"cus-x":SETD.custom.splice(i,1);renderSettings();break;
+    case"criador":SETD.criador=!SETD.criador;b.classList.toggle("on",SETD.criador);b.setAttribute("aria-checked",SETD.criador);stSync();break;
+    case"clr-recent":S.recent=[];salvar();flash("Search history cleared");break;
+    case"discard":if(!dirty()||confirm("Discard your changes?")){SETD=null;location.hash="profile"}break;
+    case"save":stSave();break;
+  }
+});
+document.addEventListener("input",e=>{
+  const t=e.target;if(!SETD)return;
+  if(t.dataset.sf){
+    let v=t.value;const f=t.dataset.sf;
+    if(f==="handle"){v=v.toLowerCase().replace(/[^a-z0-9._]/g,"");if(v!==t.value)t.value=v}
+    SETD[f]=v;stSync();return;
+  }
+  if(t.dataset.sl){
+    const k=t.dataset.sl;SETD.links[k]=t.value;
+    const u=linkURL(k,t.value),row=t.closest(".gr-row"),lp=document.querySelector(`[data-lp="${k}"]`);
+    if(row)row.classList.toggle("bad",!!t.value.trim()&&!u);
+    if(lp)lp.textContent=u?hostOf(u)+new URL(u).pathname.replace(/\/$/,""):"";
+    stSync();return;
+  }
+  if(t.dataset.sc){
+    const c=SETD.custom[+t.dataset.i];if(!c)return;c[t.dataset.sc]=t.value;
+    const row=t.closest(".gr-row");if(row)row.classList.toggle("bad",!!(c.u||"").trim()&&!linkURL("site",c.u));
+    stSync();return;
+  }
+  if(t.id==="sfq"){SFQ=t.value;clearTimeout(sfT);sfT=setTimeout(runSf,300)}
+});
+document.addEventListener("change",e=>{
+  const t=e.target;if(!SETD||!t.files||!t.files[0])return;
+  if(t.id==="sfoto")lerImg(t.files[0],256,true,u=>{SETD.avatar=u;renderSettings()});
+  if(t.id==="sbanner")lerImg(t.files[0],1400,false,u=>{SETD.banner=u;renderSettings()});
+});
+document.addEventListener("keydown",e=>{
+  if(SETD&&(e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==="s"){e.preventDefault();if(dirty())stSave()}
+});
+window.addEventListener("beforeunload",e=>{if(dirty()){e.preventDefault();e.returnValue=""}});
+/* se o app abriu direto em #settings, desenha agora */
+if(/^#settings/.test(location.hash))setTimeout(()=>rota(),0);
+</script>
+
 </body>
 </html>
