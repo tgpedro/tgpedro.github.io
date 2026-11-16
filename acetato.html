@@ -4822,5 +4822,57 @@ document.addEventListener("click",e=>{
 });
 applyTheme(S.theme);
 </script>
+<style id="v14">
+/* ===== v14: reviews de amigos na Home ===== */
+.hf-row{display:flex;gap:14px;overflow-x:auto;scrollbar-width:none;padding:2px 0 8px;touch-action:pan-x pan-y;scroll-snap-type:x proximity}
+.hf-row::-webkit-scrollbar{display:none}
+.hf-c{flex:0 0 min(320px,82%);scroll-snap-align:start;display:flex;flex-direction:column;gap:12px;padding:14px;border-radius:22px;background:var(--srf);border:1px solid rgba(255,255,255,.08);color:#fff;min-width:0;transition:background .2s,transform .25s}
+.hf-c:hover{background:color-mix(in srgb,var(--srf) 85%,#fff);transform:translateY(-2px)}
+.hf-h{display:flex;align-items:center;gap:9px;min-width:0}
+.hf-h .pf-av{width:30px;height:30px;font-size:11px}
+.hf-h b{font-size:13.5px;font-weight:700;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.hf-h .st{flex-shrink:0}
+.hf-b{display:flex;gap:12px;min-width:0}
+.hf-b .grow{min-width:0}
+.hf-t{font-size:14px;font-weight:600;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hf-s{font-size:12.5px;font-weight:500;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.hf-x{font-size:13.5px;line-height:1.45;font-weight:500;color:rgba(255,255,255,.88);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.hf-f{display:flex;align-items:center;gap:6px;margin-top:auto;font-size:12px;font-weight:600;color:var(--mut)}
+.hf-empty{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:18px 20px;border-radius:22px;background:var(--srf);border:1px solid rgba(255,255,255,.08)}
+.hf-empty b{display:block;font-size:15px;font-weight:700;letter-spacing:-.01em}
+.hf-empty span{display:block;font-size:13px;font-weight:500;color:var(--mut);margin-top:2px}
+.sec-h .lnk{margin-left:auto}
+</style>
+<script>
+function hfCard(rv){
+  const [c1,c2]=cores(rv.u),m=S.meta[rv.k]||{t:"Album",a:""};
+  const eu=rv.u===SOC.me().h,av=eu?SOC.me().av:rv.av;
+  return `<a class="hf-c" href="#album-${rv.k}"><div class="hf-h"><div class="pf-av" style="background:linear-gradient(145deg,${c1},${c2})">${av?`<img src="${esc(av)}" alt="">`:esc(ini(rv.n))}</div><b>${esc(rv.n)}</b>${rv.r?estrelas(rv.r):""}</div>
+    <div class="hf-b">${capaAlbum(rv.k,m.t,56)}<div class="grow"><div class="hf-t">${esc(m.t)}</div><div class="hf-s">${esc(m.a)}${m.y?" · "+m.y:""}</div></div></div>
+    ${rv.txt?`<div class="hf-x">${esc(rv.txt)}</div>`:""}
+    <div class="hf-f">${ico("heart",13,SOC.liked(rv))} ${SOC.likes(rv)} <span style="margin-left:auto;font-weight:500">${esc(fmtData(rv.p||rv.d))}</span></div></a>`;
+}
+function hfSection(){
+  const fo=SOC.following().length,items=feedItens2("following").slice(0,10);
+  const head=`<div class="sec-h"><h2>Reviews from friends</h2>${items.length?`<button class="lnk" data-hfall>See all</button>`:""}</div>`;
+  if(items.length)return head+`<div class="hf-row">${items.map(hfCard).join("")}</div>`;
+  const me=SOC.me().h;
+  return head+(fo?`<div class="hf-empty"><div><b>No reviews yet</b><span>The people you follow haven't published a review. New ones will show up here.</span></div></div>`
+    :`<div class="hf-empty"><div><b>Follow people to see their reviews</b><span>Like Letterboxd: follow friends and their latest reviews appear here.</span></div><a class="btn p" href="#@${encodeURIComponent(me)}" data-gofriends>Find people</a></div>`);
+}
+(function(){
+  const hv=homeView;
+  homeView=async function(){
+    let h=await hv();
+    const mark='<div class="sec-h"><h2>Trending</h2>';
+    return h.includes(mark)?h.replace(mark,hfSection()+mark):h+hfSection();
+  };
+})();
+document.addEventListener("click",e=>{
+  if(!e.target.closest("[data-hfall]"))return;
+  window.__ft="following";location.hash="feed";
+});
+</script>
+
 </body>
 </html>
