@@ -3071,10 +3071,11 @@ document.addEventListener("click",e=>{
 <style id="trk-v2">
 /* ===== Card da faixa: reescrito ===== */
 #trk{position:fixed;inset:0;z-index:95;background:rgba(0,0,0,.6);-webkit-backdrop-filter:blur(14px) saturate(150%);backdrop-filter:blur(14px) saturate(150%);display:flex;align-items:center;justify-content:center;padding:16px;animation:fadeUp .25s both}
-.tk-box{position:relative;isolation:isolate;width:min(460px,100%);max-height:calc(100dvh - 32px);overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;border-radius:30px;background:#111113;border:1px solid rgba(255,255,255,.1);box-shadow:0 40px 100px rgba(0,0,0,.7);padding-bottom:22px;scrollbar-width:none}
-.tk-box::-webkit-scrollbar{display:none}
-.tk-glow{position:absolute;left:0;right:0;top:0;height:400px;z-index:-2;background:#2a2a2e var(--cv,none) center/cover no-repeat;filter:blur(60px) saturate(200%) brightness(.8);transform:scale(1.6);opacity:.9;transition:opacity .6s}
-.tk-shade{position:absolute;left:0;right:0;top:0;height:400px;z-index:-1;background:linear-gradient(180deg,rgba(17,17,19,0) 0%,#111113 92%);pointer-events:none}
+.tk-box{position:relative;isolation:isolate;width:min(460px,100%);max-height:calc(100dvh - 32px);display:flex;flex-direction:column;overflow:hidden;border-radius:30px;background:#111113;border:1px solid rgba(255,255,255,.1);box-shadow:0 40px 100px rgba(0,0,0,.7)}
+.tk-scroll{position:relative;z-index:1;flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;padding-bottom:22px;scrollbar-width:none}
+.tk-scroll::-webkit-scrollbar{display:none}
+.tk-glow{position:absolute;inset:0;z-index:0;background:#2a2a2e var(--cv,none) center/cover no-repeat;filter:blur(50px) saturate(190%) brightness(.75);transform:scale(1.5);opacity:.95}
+.tk-shade{position:absolute;inset:0;z-index:0;background:linear-gradient(180deg,rgba(17,17,19,.1) 0%,rgba(17,17,19,.55) 45%,rgba(17,17,19,.92) 100%);pointer-events:none}
 #trk.pl .tk-glow{animation:tkGlow 3.2s ease-in-out infinite alternate}
 @keyframes tkGlow{from{opacity:.75}to{opacity:1}}
 .tk-top{position:sticky;top:0;height:0;z-index:5;display:flex;justify-content:flex-end}
@@ -3121,7 +3122,8 @@ document.addEventListener("click",e=>{
 .tk-ln:hover .tk-go{transform:translateX(2px);color:#fff}
 @media(max-width:640px){
   #trk{align-items:flex-end;padding:0}
-  .tk-box{width:100%;max-height:92dvh;border-radius:28px 28px 0 0;border-bottom:0;padding-bottom:calc(22px + env(safe-area-inset-bottom,0px))}
+  .tk-box{width:100%;max-height:92dvh;border-radius:28px 28px 0 0;border-bottom:0}
+  .tk-scroll{padding-bottom:calc(22px + env(safe-area-inset-bottom,0px))}
   .tk-art{width:156px;height:156px}
 }
 </style>
@@ -3141,13 +3143,13 @@ async function abrirFaixa(t,a,alb,cover){
   const ov=document.createElement("div");ov.id="trk";
   const q=encodeURIComponent(`${t} ${a}`),nt=norm(t);
   ov.innerHTML=`<div class="tk-box"${cover?` style="--cv:url('${esc(cover)}')"`:""}>
-    <div class="tk-glow"></div><div class="tk-shade"></div>
+    <div class="tk-glow"></div><div class="tk-shade"></div><div class="tk-scroll">
     <div class="tk-top"><button class="tk-x" data-trkx aria-label="Close">${'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>'}</button></div>
     <div class="tk-head">${cover?`<img class="tk-art" src="${esc(cover)}" alt="">`:`<div class="tk-art">${esc(ini(t))}</div>`}
       <div class="tk-t">${esc(t)}</div><div class="tk-s">${esc(a)}${alb?" · "+esc(alb):""}</div></div>
     <div class="tk-sec"><div class="tk-lb">Preview</div><div id="tkprev"><div class="tk-note">Looking for a preview…</div></div></div>
     <div class="tk-sec"><div class="tk-lb">Music video</div><div id="tkyt"><div class="tk-ph"></div></div></div>
-    <div class="tk-sec"><div class="tk-lb">Listen on</div><div class="tk-links" id="tklinks"></div></div></div>`;
+    <div class="tk-sec"><div class="tk-lb">Listen on</div><div class="tk-links" id="tklinks"></div></div></div></div>`;
   document.body.appendChild(ov);document.body.style.overflow="hidden";
   const L={},ytSearch=`https://www.youtube.com/results?search_query=${encodeURIComponent(t+" "+a+" official video")}`;
   const $$=s=>ov.querySelector(s);
